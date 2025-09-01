@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendamentos - OilSmart</title>
+    <meta name="description" content="Agende seus serviços automotivos com a OilSmart. Histórico de agendamentos e lembretes para próxima troca.">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="icon" href="/img/tentativa4.png" type="image/x-icon"></head>
+
+
+
+</head>
+<body>
+<header class="header">
+    <div class="container">
+        <div class="navbar">
+            <div class="logo">
+                    <a href="index.html"><img src="/img/oilamarelo.png" alt="OilSmart"></a>
+            </div>
+            
+            <button class="hamburger" id="hamburger">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+            
+            <nav class="nav" id="nav">
+                <ul class="nav__list">
+
+                    <li><a href="/html/index.html">Início</a></li>
+                    <li><a href="/html/servicos.html">Serviços</a></li>
+                                                            <li><a href="/html/agenda.html" class="active">Agenda</a></li>
+                    <li><a href="/html/sobre.html">Sobre</a></li>
+                                                                    <li><a href="/html/contato.html">Contato</a></li>
+
+                </ul>
+            </nav>
+            
+            <div class="action-icons">
+                <a href="#" class="user-icon" id="login-btn"><i class="fas fa-user"></i></a>
+            </div>
+        </div>
+    </div>
+</header>
+
+    <main class="main-content">
+        <div class="container">
+            <h1 class="page-title">Meus Agendamentos</h1>
+            
+            <div class="agenda-container">
+                <!-- Lembrete de Próxima Troca -->
+                <section class="reminder-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-bell"></i> Lembrete de Próxima Troca</h2>
+                    </div>
+                    <div class="reminder-card">
+                        <div class="reminder-content">
+                            <div class="reminder-icon">
+                                <i class="fas fa-oil-can"></i>
+                            </div>
+                            <div class="reminder-details">
+                                <h3>Troca de Óleo e Filtro</h3>
+                                <p>Recomendamos realizar a próxima troca até: <strong>15/11/2023</strong></p>
+                                <p>Quilometragem estimada: <strong>85.000 km</strong></p>
+                            </div>
+                        </div>
+                        <a href="/html/servicos.html" class="btn btn-primary">Agendar Troca</a>
+                    </div>
+                </section>
+
+                <!-- Histórico de Agendamentos -->
+                <section class="history-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-history"></i> Histórico de Agendamentos</h2>
+                        <div class="filter-options">
+                            <select id="filter-period">
+                                <option value="all">Todos</option>
+                                <option value="month">Últimos 30 dias</option>
+                                <option value="year">Último ano</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="appointments-list">
+                        <!-- Agendamento 1 -->
+                        <div class="appointment-card">
+                            <div class="appointment-header">
+                                <span class="protocol">Protocolo: #OIL20231015-001</span>
+                                <span class="status completed">Concluído</span>
+                            </div>
+                            <div class="appointment-body">
+                                <div class="service-info">
+                                    <h3>Troca de Óleo Sintético</h3>
+                                    <p><i class="fas fa-car"></i> Volkswagen Gol 1.6 2020</p>
+                                    <p><i class="fas fa-oil-can"></i> Óleo Mobil 1 5W30</p>
+                                </div>
+                                <div class="date-info">
+                                    <p><i class="far fa-calendar-alt"></i> 15/10/2023</p>
+                                    <p><i class="far fa-clock"></i> 14:00 - 15:30</p>
+                                </div>
+                                <div class="location-info">
+                                    <p><i class="fas fa-map-marker-alt"></i> OilSmart - Unidade Paulista</p>
+                                    <p>Av. Paulista, 1000 - São Paulo/SP</p>
+                                </div>
+                            </div>
+                            <div class="appointment-footer">
+                                <button class="btn btn-outline"><i class="fas fa-redo"></i> Repetir Agendamento</button>
+                                <button class="btn btn-outline"><i class="fas fa-file-invoice"></i> Nota Fiscal</button>
+                                <button class="btn btn-outline"><i class="fas fa-star"></i> Avaliar Serviço</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Agendamento 2 -->
+                        <div class="appointment-card">
+                            <div class="appointment-header">
+                                <span class="protocol">Protocolo: #OIL20230822-002</span>
+                                <span class="status completed">Concluído</span>
+                            </div>
+                            <div class="appointment-body">
+                                <div class="service-info">
+                                    <h3>Revisão Completa</h3>
+                                    <p><i class="fas fa-car"></i> Volkswagen Gol 1.6 2020</p>
+                                    <p><i class="fas fa-tools"></i> Troca de óleo, filtros e verificação geral</p>
+                                </div>
+                                <div class="date-info">
+                                    <p><i class="far fa-calendar-alt"></i> 22/08/2023</p>
+                                    <p><i class="far fa-clock"></i> 10:00 - 12:30</p>
+                                </div>
+                                <div class="location-info">
+                                    <p><i class="fas fa-map-marker-alt"></i> OilSmart - Unidade Morumbi</p>
+                                    <p>Av. Morumbi, 2500 - São Paulo/SP</p>
+                                </div>
+                            </div>
+                            <div class="appointment-footer">
+                                <button class="btn btn-outline"><i class="fas fa-redo"></i> Repetir Agendamento</button>
+                                <button class="btn btn-outline"><i class="fas fa-file-invoice"></i> Nota Fiscal</button>
+                                <button class="btn btn-outline"><i class="fas fa-star"></i> Avaliar Serviço</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <img src="/img/fjkaemfkemif.png" alt="OilSmart" class="footer-logo">
+                    <p>Soluções completas para seu veículo</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Links Úteis</h3>
+                    <ul>
+                        <li><a href="/html/politicas.html">Política de Privacidade</a></li>
+                        <li><a href="/html/termos.html">Termos de Serviço</a></li>
+                        <li><a href="/html/faq.html">Perguntas Frequentes</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h3>Contato</h3>
+                    <p><i class="fas fa-phone"></i> (11) 4002-8922</p>
+                    <p><i class="fas fa-envelope"></i> contato@OilSmart.com.br</p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>© 2025 OilSmart. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal de Login -->
+    <div class="modal" id="login-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="modal-header">
+                <h2>Faça login na sua conta</h2>
+                <p>Bem-vindo de volta à OilSmart</p>
+            </div>
+            <form class="login-form" id="login-form">
+                <div class="form-group">
+                    <label for="login-email">E-mail</label>
+                    <input type="email" id="login-email" placeholder="Digite seu e-mail" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Senha</label>
+                    <div class="password-input">
+                        <input type="password" id="login-password" placeholder="Digite sua senha" required>
+                        <button type="button" class="toggle-password">
+                            <i class="far fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-options">
+                    <label class="remember-me">
+                        <input type="checkbox"> Lembrar de mim
+                    </label>
+                    <a href="#" class="forgot-password">Esqueceu a senha?</a>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+            </form>
+            <div class="divider">
+                <span>ou</span>
+            </div>
+            <div class="social-login">
+                <button class="social-btn google">
+                    <i class="fab fa-google"></i> Continuar com Google
+                </button>
+            </div>
+            <div class="register-link">
+                Não tem uma conta? <a href="#">Cadastre-se</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação -->
+    <div class="modal" id="confirmation-modal">
+        <div class="modal-content">
+            <div class="confirmation-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2>Login realizado com sucesso!</h2>
+            <p class="confirmation-text">Você será redirecionado para sua conta.</p>
+            <button class="btn btn-primary" id="close-confirmation">Fechar</button>
+        </div>
+    </div>
+<script src="/js/agenda.js"></script>
+
+</body>
+</html>

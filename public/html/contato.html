@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OilSmart - Contatos</title>
+    <meta name="description" content="Entre em contato com a OilSmart. Estamos à disposição para tirar suas dúvidas sobre serviços automotivos.">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+<link rel="icon" href="/img/tentativa4.png" type="image/x-icon"></head>
+</head>
+
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="navbar">
+                <div class="logo">
+                    <a href="index.html"><img src="/img/oilamarelo.png" alt="OilSmart"></a>
+                </div>
+
+                <button class="hamburger" id="hamburger">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+
+                <nav class="nav" id="nav">
+                    <ul class="nav__list">
+                        <li><a href="/html/index.html">Início</a></li>
+                        <li><a href="/html/servicos.html">Serviços</a></li>
+                        <li><a href="/html/agenda.html">Agenda</a></li>
+                        <li><a href="/html/sobre.html">Sobre</a></li>
+                                        <li><a href="/html/Contato.html" class="active">Contato</a></li>
+                    </ul>
+                </nav>
+
+                <div class="action-icons">
+                    <a href="#" class="user-icon" id="login-btn"><i class="fas fa-user"></i></a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="about-banner">
+            <div class="container">
+                <h1>Entre em Contato</h1>
+                <p>Estamos aqui para ajudar com todas as suas necessidades automotivas</p>
+            </div>
+        </section>
+                <div class="hero-divider"></div>
+
+
+        <div class="container">
+            <!-- Informações de Contato -->
+            <section class="contact-info-section">
+                <h2 class="section-title">Nossos Canais de Atendimento</h2>
+                
+                <div class="contact-grid">
+                    <div class="contact-card">
+                        <div class="contact-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <h3>Telefone</h3>
+                        <p>(11) 4002-8922</p>
+                        <span class="contact-detail">Segunda a Sexta, 8h às 18h</span>
+                    </div>
+                    
+                    <div class="contact-card">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <h3>E-mail</h3>
+                        <p>oilsmartoficiall@gmail.com</p>
+                        <span class="contact-detail">Respondemos em até 24h</span>
+                    </div>
+                    
+                    <div class="contact-card">
+                        <div class="contact-icon">
+                            <i class="fab fa-whatsapp"></i>
+                        </div>
+                        <h3>WhatsApp</h3>
+                        <p>(11) 99999-9999</p>
+                        <span class="contact-detail">Atendimento rápido pelo app</span>
+                    </div>
+                    
+
+                </div>
+            </section>
+
+            <!-- Formulário de Contato -->
+            <section class="contact-form-section">
+                <div class="form-container">
+                    <div class="form-header">
+                        <h2>Envie sua Mensagem</h2>
+                        <p>Preencha o formulário abaixo e entraremos em contato o mais breve possível</p>
+                    </div>
+                    
+                    <form id="contact-form" class="contact-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="contact-name">Nome Completo *</label>
+                                <input type="text" id="contact-name" placeholder="Digite seu nome completo" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="contact-email">E-mail *</label>
+                                <input type="email" id="contact-email" placeholder="Digite seu e-mail" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="contact-phone">Telefone</label>
+                                <input type="tel" id="contact-phone" placeholder="(11) 99999-9999">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="contact-subject">Assunto *</label>
+                                <select id="contact-subject" required>
+                                    <option value="">Selecione um assunto</option>
+                                    <option value="duvida">Dúvida sobre serviços</option>
+                                    <option value="orcamento">Solicitação de orçamento</option>
+                                    <option value="reclamacao">Reclamação</option>
+                                    <option value="sugestao">Sugestão</option>
+                                    <option value="parceria">Proposta de parceria</option>
+                                    <option value="outro">Outro</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="contact-message">Mensagem *</label>
+                            <textarea id="contact-message" rows="5" placeholder="Descreva sua dúvida, solicitação ou mensagem" required></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-block">Enviar Mensagem</button>
+                    </form>
+                </div>
+                
+                <div class="contact-extra-info">
+                    <div class="info-card">
+                        <h3><i class="fas fa-clock"></i> Horário de Atendimento</h3>
+                        <p>Segunda a Sexta: 8h às 18h</p>
+                        <p>Sábado: 9h às 13h</p>
+                        <p>Domingo: Fechado</p>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3><i class="fas fa-info-circle"></i> Resposta Rápida</h3>
+                        <p>Garantimos retorno em até 24 horas úteis para todas as solicitações recebidas através do nosso formulário.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FAQ - Perguntas Frequentes -->
+            <section class="faq-section">
+                <h2 class="section-title">Perguntas Frequentes</h2>
+                
+                <div class="faq-container">
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Quanto tempo leva uma troca de óleo?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Em média, uma troca de óleo completa leva entre 30 a 45 minutos, dependendo do modelo do veículo e da disponibilidade da oficina.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Preciso agendar com antecedência?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Recomendamos agendar com pelo menos 24 horas de antecedência para garantir o horário desejado, mas também atendemos clientes sem agendamento, sujeito à disponibilidade.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Quais formas de pagamento são aceitas?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Cada oficina possui seus próprios métodos de pagamento. Recomendamos entrar em contato diretamente com elas para confirmar as opções disponíveis.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <h3>Oferecem garantia nos serviços?</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Sim, todos os nossos serviços têm garantia de 90 dias. Utilizamos apenas produtos de qualidade e mão de obra especializada.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <img src="/img/fjkaemfkemif.png" alt="OilSmart" class="footer-logo">
+                    <p>Soluções completas para seu veículo</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Links Úteis</h3>
+                    <ul>
+                        <li><a href="/html/politicas.html">Política de Privacidade</a></li>
+                        <li><a href="/html/termos.html">Termos de Serviço</a></li>
+                        <li><a href="/html/faq.html">Perguntas Frequentes</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h3>Contato</h3>
+                    <p><i class="fas fa-phone"></i> (11) 4002-8922</p>
+                    <p><i class="fas fa-envelope"></i> contato@OilSmart.com.br</p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>© 2025 OilSmart. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal de Login -->
+    <div class="modal" id="login-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="modal-header">
+                <h2>Faça login na sua conta</h2>
+                <p>Bem-vindo de volta à OilSmart</p>
+            </div>
+            <form class="login-form">
+                <div class="form-group">
+                    <label for="login-email">E-mail</label>
+                    <input type="email" id="login-email" placeholder="Digite seu e-mail" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Senha</label>
+                    <div class="password-input">
+                        <input type="password" id="login-password" placeholder="Digite sua senha" required>
+                        <button type="button" class="toggle-password">
+                            <i class="far fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-options">
+                    <label class="remember-me">
+                        <input type="checkbox"> Lembrar de mim
+                    </label>
+                    <a href="#" class="forgot-password">Esqueceu a senha?</a>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+            </form>
+            <div class="divider">
+                <span>ou</span>
+            </div>
+            <div class="social-login">
+                <button class="social-btn google">
+                    <i class="fab fa-google"></i> Continuar com Google
+                </button>
+            </div>
+            <div class="register-link">
+                Não tem uma conta? <a href="#">Cadastre-se</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/main.js"></script>
+
+</body>
+
+</html>

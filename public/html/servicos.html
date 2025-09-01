@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendamento - Troca de Óleo | OilSmart</title>
+    <meta name="description"
+        content="Agende sua troca de óleo com a OilSmart. Encontre o óleo e filtro perfeitos para seu veículo e oficinas parceiras próximas.">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <link rel="icon" href="/img/tentativa4.png" type="image/x-icon">
+</head>
+
+<link rel="stylesheet" href="../css/main.css">
+</head>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const hamburger = document.getElementById("hamburger");
+        const nav = document.getElementById("nav");
+
+        if (hamburger && nav) {
+            hamburger.addEventListener("click", function () {
+                nav.classList.toggle("active");
+                hamburger.classList.toggle("active");
+                document.body.style.overflow = nav.classList.contains("active") ? "hidden" : "auto";
+            });
+
+            const navLinks = nav.querySelectorAll("a");
+            navLinks.forEach(link => {
+                link.addEventListener("click", function () {
+                    if (window.innerWidth <= 992) {
+                        nav.classList.remove("active");
+                        hamburger.classList.remove("active");
+                        document.body.style.overflow = "auto";
+                    }
+                });
+            });
+        }
+    });
+</script>
+
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="navbar">
+                <div class="logo">
+                    <a href="index.html"><img src="/img/oilamarelo.png" alt="OilSmart"></a>
+                </div>
+
+                <button class="hamburger" id="hamburger">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+
+                <nav class="nav" id="nav">
+                    <ul class="nav__list">
+                        <li><a href="index.html">Início</a></li>
+                        <li><a href="#" class="active">Serviços</a></li>
+                        <li><a href="agenda.html">Agenda</a></li>
+                        <li><a href="sobre.html">Sobre</a></li>
+                        <li><a href="/html/contato.html">Contato</a></li>
+
+                    </ul>
+                </nav>
+                <div class="action-icons">
+                    <a href="#" class="user-icon" id="login-btn"><i class="fas fa-user"></i></a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <!-- <div class="progress-steps">
+                <div class="progress-step" data-step="1">1. Veículo e Localização</div>
+                <div class="progress-step" data-step="2">2. Produtos</div>
+                <div class="progress-step" data-step="3">3. Agendamento</div>
+                <div class="progress-step" data-step="4">4. Confirmação</div>
+            </div> -->
+
+            <h1 class="page-title">Agendamento para Troca de Óleo</h1>
+            <p class="page-subtitle">Encontre o óleo e filtro perfeitos para seu veículo</p>
+
+            <div class="service-flow">
+                <!-- Passo 1: Dados do veículo e localização -->
+                <section class="service-step active" id="step1">
+                    <h2><span class="step-number">1</span> Dados do Veículo e Localização</h2>
+                    <form id="vehicle-form" class="vehicle-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="vehicle-brand">Marca</label>
+                                <select id="vehicle-brand" required>
+                                    <option value="">Selecione a marca</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="vehicle-model">Modelo</label>
+                                <select id="vehicle-model" disabled required>
+                                    <option value="">Selecione o modelo</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="vehicle-year">Ano</label>
+                                <select id="vehicle-year" disabled required>
+                                    <option value="">Selecione o ano</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="vehicle-mileage">Quilometragem (opcional)</label>
+                                <input type="number" id="vehicle-mileage" placeholder="Ex: 50000">
+                                <small style="display:block; color:#666; font-size:14px; margin-top:4px;">
+                                    Informe a quilometragem atual do veículo, se souber.
+                                </small>
+                            </div>
+
+                        </div>
+
+                        <div class="form-group">
+                            <label for="location-input">Digite seu endereço</label>
+                            <div class="location-search">
+                                <div class="autocomplete-container">
+                                    <input type="text" id="location-input"
+                                        placeholder="Ex: Av. Paulista, 1000 - São Paulo/SP">
+                                    <div id="autocomplete-results" class="autocomplete-results"></div>
+                                </div>
+                                <button type="button" id="location-button" class="btn btn-primary">
+                                    <i class="fas fa-search"></i> Buscar
+                                </button>
+                            </div>
+                            <div class="location-or">
+                                <span>ou</span>
+                            </div>
+                            <button type="button" id="user-location-btn" class="btn btn-secondary">
+                                <i class="fas fa-location-arrow"></i> Usar minha localização
+                            </button>
+                        </div>
+
+                        <div class="map-container">
+                            <div id="map"></div>
+                            <div class="map-sidebar">
+                                <div class="workshop-list"></div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Buscar Recomendação</button>
+                    </form>
+                </section>
+
+                <!-- Passo 2: Recomendações -->
+                <!-- Passo 2: Recomendações -->
+                <section class="service-step" id="step2">
+                    <h2><span class="step-number">2</span> Produtos Recomendados</h2>
+                    <p class="step-description">Selecione os produtos que deseja incluir no serviço:</p>
+
+                    <div class="recommendation-container">
+                        <div class="product-card" id="recommended-oil">
+                            <h3>Óleo Recomendado</h3>
+                            <div class="product-selection">
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="select-oil" checked>
+                                    <span class="checkmark"></span>
+                                    Incluir óleo no serviço
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="product-card" id="recommended-filter">
+                            <h3>Filtro Recomendado</h3>
+                            <div class="product-selection">
+                                <label class="checkbox-container">
+                                    <input type="checkbox" id="select-filter" checked>
+                                    <span class="checkmark"></span>
+                                    Incluir filtro no serviço
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="selection-summary" id="selection-summary">
+                        <h4>Resumo da Seleção:</h4>
+                        <p id="selected-items">Nenhum produto selecionado</p>
+                    </div>
+
+                    <div class="step-buttons">
+                        <button type="button" class="btn btn-secondary" onclick="goToStep(1)">Voltar</button>
+                        <button type="button" class="btn btn-primary" onclick="goToStep(3)">Continuar</button>
+                    </div>
+                </section>
+
+                <!-- Passo 3: Agendamento -->
+                <section class="service-step" id="step3">
+                    <h2><span class="step-number">3</span> Agendamento</h2>
+                    <div class="scheduling-container">
+                        <div class="workshop-summary">
+                            <h3>Oficina Selecionada</h3>
+                            <div id="selected-workshop"></div>
+                        </div>
+                        <div class="schedule-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="schedule-date">Data</label>
+                                    <input type="date" id="schedule-date" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="time">Horário:</label>
+                                    <select id="schedule-time" name="time" required>
+                                        <option value="" disabled selected>Selecione um horário</option>
+                                        <option value="08:00">08:00</option>
+                                        <option value="08:30">08:30</option>
+                                        <option value="09:00">09:00</option>
+                                        <option value="09:30">09:30</option>
+                                        <option value="10:00">10:00</option>
+                                        <option value="10:30">10:30</option>
+                                        <option value="11:00">11:00</option>
+                                        <option value="11:30">11:30</option>
+                                        <option value="12:00">12:00</option>
+                                        <option value="12:30">12:30</option>
+                                        <option value="13:00">13:00</option>
+                                        <option value="13:30">13:30</option>
+                                        <option value="14:00">14:00</option>
+                                        <option value="14:30">14:30</option>
+                                        <option value="15:00">15:00</option>
+                                        <option value="15:30">15:30</option>
+                                        <option value="16:00">16:00</option>
+                                        <option value="16:30">16:30</option>
+                                        <option value="17:00">17:00</option>
+                                        <option value="17:30">17:30</option>
+                                        <option value="18:00">18:00</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="customer-name">Nome Completo</label>
+                                    <input type="text" id="customer-name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="customer-cpf">CPF</label>
+                                    <input type="text" id="customer-cpf" placeholder="000.000.000-00" required
+                                        maxlength="14">
+                                    <div class="error-message"></div>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="customer-phone">Telefone</label>
+                                    <input type="tel" id="customer-phone" placeholder="(00) 00000-0000" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="customer-email">E-mail</label>
+                                    <input type="email" id="customer-email" required>
+                                </div>
+                            </div>
+
+                            <div class="step-buttons">
+                                <button type="button" class="btn btn-secondary" onclick="goToStep(2)">Voltar</button>
+                                <button type="button" class="btn btn-primary" onclick="goToStep(4)">Confirmar</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Passo 4: Confirmação -->
+                <section class="service-step" id="step4">
+                    <div class="confirmation-container">
+                        <div class="confirmation-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h2>Agendamento Confirmado!</h2>
+                        <div class="confirmation-details">
+                            <p><strong>Protocolo:</strong> #OIL20231115-004</p>
+                            <p><strong>Serviço:</strong> Troca de Óleo Sintético</p>
+                            <p><strong>Data:</strong> 15/11/2023 às 14:00</p>
+                            <p><strong>Local:</strong> OilSmart - Unidade Paulista</p>
+                            <p><strong>Endereço:</strong> Av. Paulista, 1000 - São Paulo/SP</p>
+                        </div>
+                        <p class="confirmation-text">Um e-mail de confirmação foi enviado para você com todos os
+                            detalhes.</p>
+                        <button id="download-pdf" class="btn btn-secondary" style="margin-top: 10px;">
+                            <i class="fas fa-file-download"></i> Baixar Comprovante (PDF)
+                        </button>
+
+                        <button class="btn btn-primary" onclick="window.location.href='index.html'">Voltar ao
+                            Início</button>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <img src="/img/fjkaemfkemif.png" alt="OilSmart" class="footer-logo">
+                    <p>Soluções completas para seu veículo</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Links Úteis</h3>
+                    <ul>
+                        <li><a href="#">Política de Privacidade</a></li>
+                        <li><a href="#">Termos de Serviço</a></li>
+                        <li><a href="#">Perguntas Frequentes</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h3>Contato</h3>
+                    <p><i class="fas fa-phone"></i> (11) 4002-8922</p>
+                    <p><i class="fas fa-envelope"></i> contato@OilSmart.com.br</p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>© 2025 OilSmart. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div id="loading-overlay">
+        <div class="loader"></div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <!-- Modal de Login -->
+    <div class="modal" id="login-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="modal-header">
+                <h2>Faça login na sua conta</h2>
+                <p>Bem-vindo de volta à OilSmart</p>
+            </div>
+            <form class="login-form">
+                <div class="form-group">
+                    <label for="login-email">E-mail</label>
+                    <input type="email" id="login-email" placeholder="Digite seu e-mail" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Senha</label>
+                    <div class="password-input">
+                        <input type="password" id="login-password" placeholder="Digite sua senha" required>
+                        <button type="button" class="toggle-password">
+                            <i class="far fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-options">
+                    <label class="remember-me">
+                        <input type="checkbox"> Lembrar de mim
+                    </label>
+                    <a href="#" class="forgot-password">Esqueceu a senha?</a>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+            </form>
+            <div class="divider">
+                <span>ou</span>
+            </div>
+            <div class="social-login">
+                <button class="social-btn google">
+                    <i class="fab fa-google"></i> Continuar com Google
+                </button>
+            </div>
+            <div class="register-link">
+                Não tem uma conta? <a href="#">Cadastre-se</a>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Correção do menu hamburguer para a página de serviços
+        document.addEventListener('DOMContentLoaded', function () {
+            // Elementos do menu hamburguer
+            const hamburgerMenu = document.getElementById('hamburger-menu');
+            const mobileNav = document.getElementById('mobile-nav');
+            const body = document.body;
+
+            // Verifica se os elementos existem na página
+            if (hamburgerMenu && mobileNav) {
+                // Função para abrir/fechar o menu
+                function toggleMenu() {
+                    const isMenuOpen = mobileNav.style.display === 'block';
+                    mobileNav.style.display = isMenuOpen ? 'none' : 'block';
+                    hamburgerMenu.classList.toggle('active', !isMenuOpen);
+                    body.style.overflow = isMenuOpen ? 'auto' : 'hidden';
+
+                    // Animações dos ícones do hamburguer
+                    const hamburgerLines = hamburgerMenu.querySelectorAll('.hamburger-line');
+                    if (!isMenuOpen) {
+                        hamburgerLines[0].style.transform = 'rotate(45deg) translate(5px, 5px)';
+                        hamburgerLines[1].style.opacity = '0';
+                        hamburgerLines[2].style.transform = 'rotate(-45deg) translate(7px, -6px)';
+                    } else {
+                        hamburgerLines[0].style.transform = 'none';
+                        hamburgerLines[1].style.opacity = '1';
+                        hamburgerLines[2].style.transform = 'none';
+                    }
+                }
+
+                // Adiciona o evento de clique ao hamburguer
+                hamburgerMenu.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    toggleMenu();
+                });
+
+                // Fecha o menu ao clicar fora dele
+                document.addEventListener('click', function (e) {
+                    if (mobileNav.style.display === 'block' &&
+                        !mobileNav.contains(e.target) &&
+                        e.target !== hamburgerMenu) {
+                        toggleMenu();
+                    }
+                });
+
+                // Fecha o menu ao clicar em um link
+                const navLinks = mobileNav.querySelectorAll('a');
+                navLinks.forEach(link => {
+                    link.addEventListener('click', function () {
+                        toggleMenu();
+                    });
+                });
+
+                // Ajusta o menu ao redimensionar a janela
+                window.addEventListener('resize', function () {
+                    if (window.innerWidth > 992) {
+                        mobileNav.style.display = 'none';
+                        body.style.overflow = 'auto';
+                        hamburgerMenu.classList.remove('active');
+
+                        // Reseta as animações do hamburguer
+                        const hamburgerLines = hamburgerMenu.querySelectorAll('.hamburger-line');
+                        hamburgerLines[0].style.transform = 'none';
+                        hamburgerLines[1].style.opacity = '1';
+                        hamburgerLines[2].style.transform = 'none';
+                    }
+                });
+            }
+        });
+    </script>
+
+    <style>
+        /* Estilos para o menu hamburguer */
+        .hamburger-menu {
+            display: none;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 30px;
+            height: 25px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            z-index: 1001;
+        }
+
+        .hamburger-line {
+            width: 100%;
+            height: 3px;
+            background: var(--f8f9fa);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        /* Esconde o menu mobile por padrão */
+        #mobile-nav {
+            display: none;
+            position: fixed;
+            top: 80px;
+            left: 0;
+            width: 100%;
+            height: calc(100vh - 80px);
+            background: var(--light-color);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Mostra o menu hamburguer apenas em mobile */
+        @media (max-width: 992px) {
+            .hamburger-menu {
+                display: flex;
+            }
+
+            #mobile-nav.active {
+                display: block;
+            }
+
+            /* Estilos para os links do menu mobile */
+            #mobile-nav .nav__list {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            #mobile-nav .nav__list a {
+                color: var(--text-color);
+                font-size: 1.2rem;
+                padding: 12px 0;
+                border-bottom: 1px solid var(--border-color);
+                display: block;
+            }
+
+            #mobile-nav .nav__list a:last-child {
+                border-bottom: none;
+            }
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const downloadBtn = document.getElementById("download-pdf");
+            const confirmationSection = document.querySelector("#step4 .confirmation-container");
+
+            if (downloadBtn && confirmationSection) {
+                downloadBtn.addEventListener("click", async function () {
+                    const toast = document.getElementById('toast');
+                    if (toast) {
+                        toast.innerText = "Gerando PDF...";
+                        toast.classList.add("show");
+                        setTimeout(() => toast.classList.remove("show"), 2000);
+                    }
+
+                    html2canvas(confirmationSection, {
+                        scale: 2,
+                        backgroundColor: "#ffffff",
+                        onclone: function (clonedDoc) {
+                            // Garante que todos os estilos sejam aplicados no clone
+                            const clonedSection = clonedDoc.querySelector(".confirmation-container");
+                            if (clonedSection) {
+                                clonedSection.style.width = "100%";
+                                clonedSection.style.padding = "20px";
+                            }
+                        }
+                    }).then(canvas => {
+                        const imgData = canvas.toDataURL("image/png");
+
+                        const { jsPDF } = window.jspdf;
+                        const pdf = new jsPDF({
+                            orientation: "portrait",
+                            unit: "mm",
+                            format: "a4"
+                        });
+
+                        const pageWidth = pdf.internal.pageSize.getWidth();
+                        const imgWidth = pageWidth - 20;
+                        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+                        pdf.addImage(imgData, "PNG", 10, 10, imgWidth, imgHeight);
+
+                        // Adiciona data de geração no rodapé
+                        const currentDate = new Date().toLocaleString('pt-BR');
+                        pdf.setFontSize(10);
+                        pdf.text(`Comprovante gerado em: ${currentDate}`, 10, pdf.internal.pageSize.getHeight() - 10);
+
+                        pdf.save("Comprovante-Agendamento-OilSmart.pdf");
+                    });
+                });
+            }
+        });
+    </script>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="../js/servicos.js"></script>
+</body>
+
+</html>
