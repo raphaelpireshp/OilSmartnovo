@@ -709,17 +709,9 @@ async function getUserLocation() {
             }
 
             // Adiciona coordenadas simuladas para cada oficina
-            const workshopsWithCoords = data.data.map((workshop, index) => {
-                // Gera coordenadas próximas à localização do usuário
-                const offsetLat = (Math.random() - 0.5) * 0.02; // ± ~2km
-                const offsetLng = (Math.random() - 0.5) * 0.02; // ± ~2km
-                
-                return {
-                    ...workshop,
-                    lat: lat + offsetLat,
-                    lng: lng + offsetLng
-                };
-            });
+           // Usa as coordenadas reais do banco
+displayWorkshops(data.data);
+
 
             displayWorkshops(workshopsWithCoords);
         } catch (error) {

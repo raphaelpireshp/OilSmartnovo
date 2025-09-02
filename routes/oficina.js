@@ -16,7 +16,9 @@ router.get('/', async (req, res) => {
                 estado,
                 horario_abertura,
                 horario_fechamento,
-                dias_funcionamento
+                dias_funcionamento,
+                lat,
+                lng
             FROM oficina
         `;
 
@@ -46,7 +48,23 @@ router.get('/', async (req, res) => {
 // Rota para obter oficina por ID
 router.get('/:id', (req, res) => {
     const { id } = req.params;
-    const sql = 'SELECT * FROM oficina WHERE id = ?';
+    const sql = `
+        SELECT 
+            id,
+            usuario_id,
+            nome,
+            cep,
+            endereco,
+            cidade,
+            estado,
+            horario_abertura,
+            horario_fechamento,
+            dias_funcionamento,
+            lat,
+            lng
+        FROM oficina 
+        WHERE id = ?
+    `;
     
     db.query(sql, [id], (err, results) => {
         if (err) {
