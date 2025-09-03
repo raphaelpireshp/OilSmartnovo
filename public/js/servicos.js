@@ -1520,7 +1520,6 @@ function init() {
     initMap();
     populateBrands();
     setMinScheduleDate();
-    goToStep(1);
     handleResponsiveLayout();
     
 
@@ -1565,4 +1564,23 @@ async function getOilRecommendation(modeloAnoId) {
     } finally {
         showLoading(false);
     }
+}
+// Atualiza a barra de progresso
+function updateProgressBar(step) {
+    const progressSteps = document.querySelectorAll('.progress-step');
+    
+    // Atualiza as classes dos passos
+    progressSteps.forEach((stepElement, index) => {
+        const stepNumber = index + 1;
+        
+        if (stepNumber < step) {
+            stepElement.classList.add('completed');
+            stepElement.classList.remove('active');
+        } else if (stepNumber === step) {
+            stepElement.classList.add('active');
+            stepElement.classList.remove('completed');
+        } else {
+            stepElement.classList.remove('active', 'completed');
+        }
+    });
 }
