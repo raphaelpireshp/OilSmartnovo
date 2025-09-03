@@ -2,18 +2,19 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database/db');
 
-// Rota para obter todas as oficinas
+// Rota para obter todas as oficinas, com filtros opcionais por cidade e estado
 router.get('/', async (req, res) => {
     try {
-        const sql = `
-            SELECT 
-                id, 
+        let sql = `
+            SELECT
+                id,
                 usuario_id,
-                nome, 
-                cep, 
-                endereco, 
-                cidade, 
+                nome,
+                cep,
+                endereco,
+                cidade,
                 estado,
+                telefone,
                 horario_abertura,
                 horario_fechamento,
                 dias_funcionamento,
@@ -21,13 +22,28 @@ router.get('/', async (req, res) => {
                 lng
             FROM oficina
         `;
+        const params = [];
+        const conditions = [];
 
-        db.query(sql, (err, results) => {
+        if (req.query.cidade) {
+            conditions.push('cidade = ?');
+            params.push(req.query.cidade);
+        }
+        if (req.query.estado) {
+            conditions.push('estado = ?');
+            params.push(req.query.estado);
+        }
+
+        if (conditions.length > 0) {
+            sql += ` WHERE ` + conditions.join(' AND ');
+        }
+
+        db.query(sql, params, (err, results) => {
             if (err) {
                 console.error('Erro ao buscar oficinas:', err);
-                return res.status(500).json({ 
-                    success: false, 
-                    message: 'Erro ao buscar oficinas no banco de dados' 
+                return res.status(500).json({
+                    success: false,
+                    message: 'Erro ao buscar oficinas no banco de dados'
                 });
             }
 
@@ -37,10 +53,10 @@ router.get('/', async (req, res) => {
             });
         });
     } catch (error) {
-        console.error('Erro no endpoint /api/oficinas:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Erro interno no servidor' 
+        console.error('Erro no endpoint /api/oficina:', error);
+        res.status(500).json({
+            success:  false,
+            message: 'Erro interno no servidor'
         });
     }
 });
@@ -49,7 +65,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', (req, res) => {
     const { id } = req.params;
     const sql = `
-        SELECT 
+        SELECT
             id,
             usuario_id,
             nome,
@@ -57,25 +73,30 @@ router.get('/:id', (req, res) => {
             endereco,
             cidade,
             estado,
+            telefone,
             horario_abertura,
             horario_fechamento,
             dias_funcionamento,
             lat,
             lng
-        FROM oficina 
+        FROM oficina
         WHERE id = ?
     `;
-    
+
     db.query(sql, [id], (err, results) => {
         if (err) {
             console.error('Erro ao buscar oficina:', err);
-            return res.status(500).json({ error: 'Erro interno do servidor' });
+            return res.status(500).json({
+                error: 'Erro interno do servidor'
+            });
         }
-        
+
         if (results.length === 0) {
-            return res.status(404).json({ error: 'Oficina não encontrada' });
+            return res.status(404).json({
+                error: 'Oficina não encontrada'
+            });
         }
-        
+
         res.json(results[0]);
     });
 });

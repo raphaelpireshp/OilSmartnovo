@@ -195,7 +195,33 @@ document.addEventListener("DOMContentLoaded", function() {
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
+// Função para buscar as oficinas do seu backend e adicionar marcadores no mapa
+async function fetchAndDisplayWorkshops() {
+    try {
+        const response = await fetch('/api/oficina');
+        const data = await response.json();
 
+        if (data.success && data.data) {
+            data.data.forEach(oficina => {
+                const lat = oficina.lat;
+                const lng = oficina.lng;
+
+                // Certifica-se de que a latitude e longitude são válidas
+                if (lat && lng) {
+                    const marker = L.marker([lat, lng]).addTo(map);
+
+                    // Adiciona um popup com o nome e endereço da oficina
+                    marker.bindPopup(`
+                        <b>${oficina.nome}</b><br>
+                        ${oficina.endereco}, ${oficina.cidade} - ${oficina.estado}
+                    `);
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Erro ao buscar as oficinas:', error);
+    }
+}
         // Redimensiona o mapa quando a janela é redimensionada
         window.addEventListener("resize", function() {
             const newHeight = window.innerWidth <= 768 ? "300px" : "400px";
@@ -318,7 +344,6 @@ async function getOilRecommendation(modeloAnoId) {
 }
 
 
-    // Exibe as recomendações na tela (versão responsiva)
 function showRecommendations(recommendation) {
     const oilContainer = document.getElementById("recommended-oil");
     const filterContainer = document.getElementById("recommended-filter");
@@ -364,7 +389,7 @@ function showRecommendations(recommendation) {
         oilContainer.innerHTML = `
             <div class="product-card-content">
                 <div class="product-image">
-                    <img src="../img/oil-default.png" alt="${oil.nome}" loading="lazy">
+                    <img src="../img/oil-default.jpg" alt="${oil.nome}" loading="lazy">
                 </div>
                 <div class="product-details">
                     <h4>${oil.nome}</h4>
@@ -372,7 +397,7 @@ function showRecommendations(recommendation) {
                         <p><strong>Tipo:</strong> ${oil.tipo || 'N/A'}</p>
                         <p><strong>Viscosidade:</strong> ${oil.viscosidade || 'N/A'}</p>
                         <p><strong>Especificação:</strong> ${oil.especificacao || 'N/A'}</p>
-                                            </div>
+                    </div>
                     ${oil.preco ? `
                     <div class="product-price">
                         <strong>Preço estimado:</strong> 
@@ -405,52 +430,54 @@ function showRecommendations(recommendation) {
         `;
     }
 
-    // Exibe recomendação de filtro
-    if (recommendation.filtro) {
-        const filter = recommendation.filtro;
-        filterContainer.innerHTML = `
-            <div class="product-card-content">
-                <div class="product-image">
-                    <img src="../img/oil-filter.png" alt="${filter.nome}" loading="lazy">
+// Exibe recomendação de filtro (CÓDIGO CORRIGIDO)
+// Exibe recomendação de filtro (VERSÃO FINAL CORRIGIDA)
+if (recommendation.filtro) {
+    const filter = recommendation.filtro;
+    const precoFiltro = filter.preco || 0;
+    const precoFormatado = precoFiltro > 0 ? `R$ ${parseFloat(precoFiltro).toFixed(2)}` : 'Preço não disponível';
+    
+    filterContainer.innerHTML = `
+        <div class="product-card-content">
+            <div class="product-image">
+                <img src="../img/oil-filter.jpg" alt="${filter.nome}" loading="lazy">
+            </div>
+            <div class="product-details">
+                <h4>${filter.nome}</h4>
+                <div class="product-specs">
+                    <p><strong>Tipo:</strong> ${filter.tipo || 'N/A'}</p>
+                    <p><strong>Compatibilidade:</strong> ${filter.compatibilidade_modelo || 'N/A'}</p>
+                    <p><strong>Marca:</strong> ${filter.marca || 'N/A'}</p>
                 </div>
-                <div class="product-details">
-                    <h4>${filter.nome}</h4>
-                    <div class="product-specs">
-                        <p><strong>Tipo:</strong> ${filter.tipo || 'N/A'}</p>
-                        <p><strong>Compatibilidade:</strong> ${filter.compatibilidade_modelo || 'N/A'}</p>
-                        <p><strong>Marca:</strong> ${filter.marca || 'N/A'}</p>
-                    </div>
-                    ${filter.preco ? `
-                    <div class="product-price">
-                        <strong>Preço estimado:</strong> 
-                        <span class="price">R$ ${filter.preco.toFixed(2)}</span>
-                    </div>
-                    ` : ''}
+                <div class="product-price">
+                    <strong>Preço estimado:</strong> 
+                    <span class="price">${precoFormatado}</span>
                 </div>
             </div>
-            <div class="product-selection">
-                <label class="checkbox-container">
-                    <input type="checkbox" id="select-filter" checked>
-                    <span class="checkmark"></span>
-                    Incluir filtro no serviço
-                </label>
-            </div>
-        `;
-    } else {
-        filterContainer.innerHTML = `
-            <div class="no-recommendation">
-                <i class="fas fa-exclamation-triangle"></i>
-                <p>Nenhuma recomendação de filtro disponível</p>
-            </div>
-            <div class="product-selection">
-                <label class="checkbox-container">
-                    <input type="checkbox" id="select-filter" disabled>
-                    <span class="checkmark"></span>
-                    Incluir filtro no serviço
-                </label>
-            </div>
-        `;
-    }
+        </div>
+        <div class="product-selection">
+            <label class="checkbox-container">
+                <input type="checkbox" id="select-filter" checked>
+                <span class="checkmark"></span>
+                Incluir filtro no serviço
+            </label>
+        </div>
+    `;
+} else {
+    filterContainer.innerHTML = `
+        <div class="no-recommendation">
+            <i class="fas fa-exclamation-triangle"></i>
+            <p>Nenhuma recomendação de filtro disponível</p>
+        </div>
+        <div class="product-selection">
+            <label class="checkbox-container">
+                <input type="checkbox" id="select-filter" disabled>
+                <span class="checkmark"></span>
+                Incluir filtro no serviço
+            </label>
+        </div>
+    `;
+}
 
     // Adiciona event listeners aos checkboxes
     const oilCheckbox = document.getElementById("select-oil");
@@ -696,126 +723,157 @@ async function getUserLocation() {
     }
 
     // Busca oficinas próximas
-    async function searchNearbyWorkshops(lat, lng) {
-        showLoading(true);
-        try {
-            const response = await fetch(`/api/oficinas`);
-            if (!response.ok) throw new Error("Erro ao buscar oficinas");
-            
-            const data = await response.json();
-            
-            if (!data.success || !data.data || data.data.length === 0) {
-                throw new Error("Nenhuma oficina encontrada");
-            }
-
-            // Adiciona coordenadas simuladas para cada oficina
-           // Usa as coordenadas reais do banco
-displayWorkshops(data.data);
-
-
-            displayWorkshops(workshopsWithCoords);
-        } catch (error) {
-            console.error("Erro ao buscar oficinas:", error);
+// Busca oficinas próximas
+async function searchNearbyWorkshops(lat, lng) {
+    showLoading(true);
+    try {
+        console.log('Buscando oficinas do banco de dados...');
+        
+        const response = await fetch(`/api/oficina`);
+        
+        if (!response.ok) {
+            throw new Error(`Erro HTTP: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('Oficinas encontradas:', data);
+        
+        if (!data.success || !data.data || data.data.length === 0) {
+            showToast("Nenhuma oficina encontrada", "info");
             displayWorkshops([]);
-            showToast(error.message, "warning");
-        } finally {
-            showLoading(false);
-        }
-    }
-
-    // Exibe oficinas no mapa e na lista (versão responsiva)
-    function displayWorkshops(workshops) {
-        const mapContainer = document.querySelector(".map-container");
-        
-        // Cria ou atualiza o container de lista de oficinas
-        let listContainer = document.querySelector(".workshop-list-container");
-        if (!listContainer) {
-            listContainer = document.createElement("div");
-            listContainer.className = "workshop-list-container";
-            mapContainer.parentNode.insertBefore(listContainer, mapContainer.nextSibling);
-        }
-        
-        listContainer.innerHTML = "";
-
-        // Limpa marcadores antigos (exceto o do usuário)
-        markers.filter(m => m.options.icon?.options?.className !== "user-marker")
-               .forEach(m => map.removeLayer(m));
-        
-        markers = markers.filter(m => m.options.icon?.options?.className === "user-marker");
-
-        if (!workshops || workshops.length === 0) {
-            listContainer.innerHTML = "<p class='no-workshops'>Nenhuma oficina encontrada</p>";
             return;
         }
 
-        // Ícone das oficinas
-        const workshopIcon = L.divIcon({
-            className: "workshop-marker",
-            html: '<div style="background: #e63946; width: 30px; height: 30px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"></div>',
-            iconSize: [30, 30],
-            iconAnchor: [15, 30],
-            popupAnchor: [0, -30]
+        // Filtra apenas oficinas com coordenadas válidas
+        const oficinasValidas = data.data.filter(workshop => {
+            const latNum = parseFloat(workshop.lat);
+            const lngNum = parseFloat(workshop.lng);
+            return !isNaN(latNum) && !isNaN(lngNum);
         });
 
-        // Adiciona cada oficina no mapa e na lista
-        workshops.forEach(workshop => {
-            // Marcador no mapa
-            const marker = L.marker([workshop.lat, workshop.lng], { icon: workshopIcon })
-                .addTo(map)
-                .bindPopup(`
-                    <div class="workshop-popup">
-                        <h4>${workshop.nome}</h4>
-                        <p><i class="fas fa-map-marker-alt"></i> ${workshop.endereco}, ${workshop.cidade}/${workshop.estado}</p>
-                        <p><i class="fas fa-phone"></i> ${workshop.telefone || 'Não informado'}</p>
-                        <button onclick="selectWorkshop(${workshop.id})" class="select-workshop-btn">
-                            Selecionar
-                        </button>
-                    </div>
-                `);
+        if (oficinasValidas.length === 0) {
+            showToast("Oficinas encontradas, mas sem coordenadas válidas", "warning");
+            return;
+        }
 
-            markers.push(marker);
+        console.log('Oficinas com coordenadas válidas:', oficinasValidas);
+        displayWorkshops(oficinasValidas);
+        
+    } catch (error) {
+        console.error("Erro ao buscar oficinas:", error);
+        showToast("Erro ao carregar oficinas. Tente novamente.", "error");
+    } finally {
+        showLoading(false);
+    }
+}
 
-            // Item na lista
-            const workshopItem = document.createElement("div");
-            workshopItem.className = "workshop-item";
-            workshopItem.dataset.id = workshop.id;
-            workshopItem.innerHTML = `
-                <div class="workshop-info">
+// Exibe oficinas no mapa e na lista (versão responsiva)
+function displayWorkshops(workshops) {
+    const mapContainer = document.querySelector(".map-container");
+    
+    // Cria ou atualiza o container de lista de oficinas
+    let listContainer = document.querySelector(".workshop-list-container");
+    if (!listContainer) {
+        listContainer = document.createElement("div");
+        listContainer.className = "workshop-list-container";
+        mapContainer.parentNode.insertBefore(listContainer, mapContainer.nextSibling);
+    }
+    
+    listContainer.innerHTML = "";
+
+    // Limpa marcadores antigos (exceto o do usuário)
+    markers.filter(m => m.options.icon?.options?.className !== "user-marker")
+           .forEach(m => map.removeLayer(m));
+    
+    markers = markers.filter(m => m.options.icon?.options?.className === "user-marker");
+
+    if (!workshops || workshops.length === 0) {
+        listContainer.innerHTML = "<p class='no-workshops'>Nenhuma oficina encontrada</p>";
+        return;
+    }
+
+    // Ícone das oficinas
+    const workshopIcon = L.divIcon({
+        className: "workshop-marker",
+        html: '<div style="background: #e63946; width: 30px; height: 30px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"></div>',
+        iconSize: [30, 30],
+        iconAnchor: [15, 30],
+        popupAnchor: [0, -30]
+    });
+
+    // Adiciona cada oficina no mapa e na lista
+    workshops.forEach(workshop => {
+        // CONVERTE COORDENADAS DE STRING PARA NÚMERO
+        const lat = parseFloat(workshop.lat);
+        const lng = parseFloat(workshop.lng);
+        
+        // Verifica se as coordenadas são válidas
+        if (isNaN(lat) || isNaN(lng)) {
+            console.warn('Coordenadas inválidas para oficina:', workshop);
+            return;
+        }
+
+        // Marcador no mapa
+        const marker = L.marker([lat, lng], { icon: workshopIcon })
+            .addTo(map)
+            .bindPopup(`
+                <div class="workshop-popup">
                     <h4>${workshop.nome}</h4>
-                    <p class="address"><i class="fas fa-map-marker-alt"></i> ${workshop.endereco}, ${workshop.cidade}/${workshop.estado}</p>
-                    <p class="phone"><i class="fas fa-phone"></i> ${workshop.telefone || 'Não informado'}</p>
-                    <p class="hours"><i class="fas fa-clock"></i> ${workshop.horario_abertura} - ${workshop.horario_fechamento}</p>
+                    <p><i class="fas fa-map-marker-alt"></i> ${workshop.endereco}, ${workshop.cidade}/${workshop.estado}</p>
+                    <p><i class="fas fa-phone"></i> ${workshop.telefone || 'Não informado'}</p>
+                    <button onclick="selectWorkshop(${workshop.id})" class="select-workshop-btn">
+                        Selecionar
+                    </button>
                 </div>
-                <button class="btn select-btn" onclick="selectWorkshop(${workshop.id})">Selecionar</button>
-            `;
-            listContainer.appendChild(workshopItem);
-        });
+            `);
 
-        // Ajusta o zoom para mostrar todos os marcadores
+        markers.push(marker);
+
+        // Item na lista
+        const workshopItem = document.createElement("div");
+        workshopItem.className = "workshop-item";
+        workshopItem.dataset.id = workshop.id;
+        workshopItem.innerHTML = `
+            <div class="workshop-info">
+                <h4>${workshop.nome}</h4>
+                <p class="address"><i class="fas fa-map-marker-alt"></i> ${workshop.endereco}, ${workshop.cidade}/${workshop.estado}</p>
+                <p class="phone"><i class="fas fa-phone"></i> ${workshop.telefone || 'Não informado'}</p>
+                <p class="hours"><i class="fas fa-clock"></i> ${workshop.horario_abertura} - ${workshop.horario_fechamento}</p>
+            </div>
+            <button class="btn select-btn" onclick="selectWorkshop(${workshop.id})">Selecionar</button>
+        `;
+        listContainer.appendChild(workshopItem);
+    });
+
+    // Ajusta o zoom para mostrar todos os marcadores
+    if (markers.length > 0) {
         const bounds = L.latLngBounds(markers.map(m => m.getLatLng()));
         map.fitBounds(bounds.pad(0.2));
     }
+}
 
     // ==================== FUNÇÕES DE OFICINAS ====================
 
-// Seleciona uma oficina (CORRIGIDA)
+// Seleciona uma oficina
 window.selectWorkshop = async function(workshopId) {
     showLoading(true);
     try {
         // Busca os detalhes completos da oficina
-        const response = await fetch(`/api/oficinas/${workshopId}`);
+        const response = await fetch(`/api/oficina/${workshopId}`);
         if (!response.ok) throw new Error("Erro ao carregar oficina");
         
         const workshopData = await response.json();
         selectedWorkshop = workshopData;
 
-        // Destaca a oficina selecionada na lista
+        // CONVERTE COORDENADAS PARA NÚMERO
+        if (selectedWorkshop.lat) selectedWorkshop.lat = parseFloat(selectedWorkshop.lat);
+        if (selectedWorkshop.lng) selectedWorkshop.lng = parseFloat(selectedWorkshop.lng);
+
+        // Destaca a oficina selecionada
         document.querySelectorAll(".workshop-item").forEach(item => {
             item.classList.remove("selected");
             if (parseInt(item.dataset.id) === parseInt(workshopId)) {
                 item.classList.add("selected");
-                
-                // Adiciona animação de seleção
                 item.style.animation = "pulse 0.5s ease";
                 setTimeout(() => {
                     item.style.animation = "";
@@ -823,11 +881,16 @@ window.selectWorkshop = async function(workshopId) {
             }
         });
 
+        // Centraliza o mapa na oficina selecionada
+        if (selectedWorkshop.lat && selectedWorkshop.lng) {
+            map.setView([selectedWorkshop.lat, selectedWorkshop.lng], 15);
+        }
+
         showToast(`Oficina "${workshopData.nome}" selecionada!`);
         return true;
     } catch (error) {
         console.error("Erro ao selecionar oficina:", error);
-        showToast("Erro ao selecionar a oficina. Tente novamente.", "error");
+        showToast("Erro ao selecionar a oficina", "error");
         return false;
     } finally {
         showLoading(false);
@@ -1027,7 +1090,7 @@ async function validateStep2() {
     
     // Verifica se a oficina selecionada ainda está válida
     try {
-        const response = await fetch(`/api/oficinas/${selectedWorkshop.id}`);
+        const response = await fetch(`/api/oficina/${selectedWorkshop.id}`);
         if (!response.ok) throw new Error("Oficina não disponível");
         
         // Atualiza os dados da oficina
@@ -1081,10 +1144,9 @@ async function validateStep3() {
     return true;
 }
 
-// Mostra detalhes do agendamento confirmado
-// Mostra detalhes do agendamento confirmado (CORRIGIDA)
+
 // ==================== FUNÇÕES DE CONFIRMAÇÃO ====================
-// Mostra detalhes do agendamento confirmado
+// Mostra detalhes do agendamento confirmado (CORRIGIDA)
 function showConfirmationDetails() {
     // Obtém todos os dados armazenados
     const selectedProducts = getSelectedProducts();
@@ -1098,16 +1160,16 @@ function showConfirmationDetails() {
     // Formata a data para exibição
     const formattedDate = formatDateForDisplay(scheduleDateValue);
     
-    // Calcula totais
+    // Calcula totais (CORRIGIDO - usando parseFloat)
     let totalOil = 0;
     let totalFilter = 0;
     let totalService = 0;
     
-    if (selectedProducts.oil && oilRecommendation.oleo) {
+    if (selectedProducts.oil && oilRecommendation.oleo && oilRecommendation.oleo.preco) {
         totalOil = parseFloat(oilRecommendation.oleo.preco) || 0;
     }
     
-    if (selectedProducts.filter && oilRecommendation.filtro) {
+    if (selectedProducts.filter && oilRecommendation.filtro && oilRecommendation.filtro.preco) {
         totalFilter = parseFloat(oilRecommendation.filtro.preco) || 0;
     }
     
@@ -1166,7 +1228,7 @@ function showConfirmationDetails() {
         <p class="total-amount"><strong>Total do Serviço:</strong> R$ ${totalService.toFixed(2)}</p>
     `;
     
-    // Adiciona informações do cliente (com verificação)
+    // Adiciona informações do cliente
     html += `
         <p><strong>Cliente:</strong> ${customerData.name || 'Não informado'}</p>
         <p><strong>CPF:</strong> ${customerData.cpf || 'Não informado'}</p>
@@ -1175,6 +1237,7 @@ function showConfirmationDetails() {
     `;
     
     confirmationDetails.innerHTML = html;
+
     
     // DEBUG: Mostrar no console o que está sendo salvo
     console.log('Dados do cliente salvos:', customerData);
@@ -1453,16 +1516,53 @@ vehicleForm.addEventListener("submit", async function(e) {
 
     // ==================== INICIALIZAÇÃO ====================
 
-    function init() {
-        initMap();
-        populateBrands();
-        setMinScheduleDate();
-        goToStep(1);
-        handleResponsiveLayout();
-        
+function init() {
+    initMap();
+    populateBrands();
+    setMinScheduleDate();
+    goToStep(1);
+    handleResponsiveLayout();
+    
+
         // Adiciona listener para redimensionamento da janela
         window.addEventListener("resize", handleResponsiveLayout);
     }
 
     init();
 });
+
+
+async function getOilRecommendation(modeloAnoId) {
+    showLoading(true);
+    try {
+        const response = await fetch(`/api/recomendacoes?modelo_ano_id=${modeloAnoId}`);
+        const result = await response.json();
+        
+        console.log("DEBUG - Resposta completa da API:", result); // ADICIONE ESTA LINHA
+        
+        if (!result.success) {
+            showToast(result.message, "error");
+            return null;
+        }
+        
+        // DEBUG: Verificar especificamente os preços
+        if (result.data.oleo) {
+            console.log("DEBUG - Preço do óleo:", result.data.oleo.preco);
+        }
+        if (result.data.filtro) {
+            console.log("DEBUG - Preço do filtro:", result.data.filtro.preco);
+        }
+        
+        // Armazena os dados da recomendação para uso posterior
+        sessionStorage.setItem('oilRecommendation', JSON.stringify(result.data));
+        
+        return result.data;
+
+    } catch (error) {
+        console.error("Erro ao obter recomendação:", error);
+        showToast("Erro de comunicação ao obter recomendação.", "error");
+        return null;
+    } finally {
+        showLoading(false);
+    }
+}

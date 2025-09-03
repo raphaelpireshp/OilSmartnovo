@@ -3249,3 +3249,38 @@ input[type="checkbox"]:disabled {
     min-width: 120px;
     display: inline-block;
 }
+
+/* Estilos para o calendário */
+input[type="date"] {
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    width: 100%;
+}
+
+input[type="date"]:focus {
+    border-color: #1d3557;
+    outline: none;
+}
+
+/* Estilo para horários indisponíveis */
+select option:disabled {
+    color: #ccc;
+    background-color: #f8f9fa;
+}
+
+/* Loading para horários */
+.loading-horarios {
+    text-align: center;
+    padding: 10px;
+    color: #666;
+}
+
+/* Mensagem de nenhum horário */
+.no-horarios {
+    text-align: center;
+    padding: 10px;
+    color: #e63946;
+    font-style: italic;
+}

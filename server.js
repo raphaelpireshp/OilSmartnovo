@@ -26,7 +26,7 @@ const geocodeRoutes = require('./routes/geocode');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/agendamentos', agendamentoRoutes);
-app.use('/api/oficinas', oficinaRoutes);
+app.use('/api/oficina', oficinaRoutes);
 app.use('/api/veiculos', veiculoRoutes);
 app.use('/api/marcas', marcaRoutes);
 app.use('/api/modelos', modeloRoutes);
