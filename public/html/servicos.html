@@ -525,58 +525,79 @@
             }
         }
     </style>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const downloadBtn = document.getElementById("download-pdf");
-            const confirmationSection = document.querySelector("#step4 .confirmation-container");
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const downloadBtn = document.getElementById("download-pdf");
+    const confirmationSection = document.querySelector("#step4 .confirmation-container");
 
-            if (downloadBtn && confirmationSection) {
-                downloadBtn.addEventListener("click", async function () {
-                    const toast = document.getElementById('toast');
-                    if (toast) {
-                        toast.innerText = "Gerando PDF...";
-                        toast.classList.add("show");
-                        setTimeout(() => toast.classList.remove("show"), 2000);
-                    }
-
-                    html2canvas(confirmationSection, {
-                        scale: 2,
-                        backgroundColor: "#ffffff",
-                        onclone: function (clonedDoc) {
-                            // Garante que todos os estilos sejam aplicados no clone
-                            const clonedSection = clonedDoc.querySelector(".confirmation-container");
-                            if (clonedSection) {
-                                clonedSection.style.width = "100%";
-                                clonedSection.style.padding = "20px";
-                            }
-                        }
-                    }).then(canvas => {
-                        const imgData = canvas.toDataURL("image/png");
-
-                        const { jsPDF } = window.jspdf;
-                        const pdf = new jsPDF({
-                            orientation: "portrait",
-                            unit: "mm",
-                            format: "a4"
-                        });
-
-                        const pageWidth = pdf.internal.pageSize.getWidth();
-                        const imgWidth = pageWidth - 20;
-                        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-                        pdf.addImage(imgData, "PNG", 10, 10, imgWidth, imgHeight);
-
-                        // Adiciona data de geração no rodapé
-                        const currentDate = new Date().toLocaleString('pt-BR');
-                        pdf.setFontSize(10);
-                        pdf.text(`Comprovante gerado em: ${currentDate}`, 10, pdf.internal.pageSize.getHeight() - 10);
-
-                        pdf.save("Comprovante-Agendamento-OilSmart.pdf");
-                    });
-                });
+    if (downloadBtn && confirmationSection) {
+        downloadBtn.addEventListener("click", async function () {
+            const toast = document.getElementById('toast');
+            if (toast) {
+                toast.innerText = "Gerando PDF...";
+                toast.classList.add("show");
+                setTimeout(() => toast.classList.remove("show"), 2000);
             }
+
+            html2canvas(confirmationSection, {
+                scale: 2,
+                backgroundColor: "#ffffff",
+                onclone: function (clonedDoc) {
+                    const clonedSection = clonedDoc.querySelector(".confirmation-container");
+                    if (clonedSection) {
+                        clonedSection.style.width = "100%";
+                        clonedSection.style.padding = "20px";
+                    }
+                }
+            }).then(canvas => {
+                const imgData = canvas.toDataURL("image/png");
+
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({
+                    orientation: "portrait",
+                    unit: "mm",
+                    format: "a4"
+                });
+
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+                const imgWidth = pageWidth - 20; // margem lateral
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+                let position = 10; // margem topo
+                let heightLeft = imgHeight;
+
+                // primeira página
+                pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight - 20;
+
+                // adiciona páginas extras se necessário
+                while (heightLeft > 0) {
+                    pdf.addPage();
+                    position = 10;
+                    pdf.addImage(
+                        imgData,
+                        "PNG",
+                        10,
+                        position - (imgHeight - heightLeft),
+                        imgWidth,
+                        imgHeight
+                    );
+                    heightLeft -= pageHeight - 20;
+                }
+
+                // rodapé com data
+                const currentDate = new Date().toLocaleString('pt-BR');
+                pdf.setFontSize(10);
+                pdf.text(`Comprovante gerado em: ${currentDate}`, 10, pageHeight - 10);
+
+                pdf.save("Comprovante-Agendamento-OilSmart.pdf");
+            });
         });
-    </script>
+    }
+});
+</script>
+
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="../js/servicos.js"></script>

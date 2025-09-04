@@ -2827,22 +2827,124 @@ body {
     cursor: not-allowed;
 }
 
+/* ===== SELECTION SUMMARY - ESTILO ATUALIZADO ===== */
 .selection-summary {
-    background: #f8f9fa;
-    padding: 15px;
-    border-radius: 8px;
-    margin: 20px 0;
+    background: linear-gradient(135deg, rgba(42, 157, 143, 0.1) 0%, rgba(29, 53, 87, 0.1) 100%);
+    padding: 20px 25px;
+    border-radius: 16px;
+    margin: 25px 0;
     border-left: 4px solid #2a9d8f;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(42, 157, 143, 0.2);
+}
+
+.selection-summary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    border-color: rgba(42, 157, 143, 0.4);
+}
+
+.selection-summary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, rgba(42, 157, 143, 0.1) 0%, rgba(29, 53, 87, 0.1) 100%);
+    border-radius: 0 0 0 80px;
+    z-index: 0;
 }
 
 .selection-summary h4 {
-    margin: 0 0 10px 0;
+    margin: 0 0 12px 0;
     color: #1d3557;
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    z-index: 1;
+}
+
+.selection-summary h4::before {
+
+    font-size: 1.2rem;
 }
 
 #selected-items {
     margin: 0;
     font-weight: 500;
+    font-size: 1rem;
+    color: #2a9d8f;
+    position: relative;
+    z-index: 1;
+    padding: 12px 15px;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 10px;
+    border: 1px solid rgba(42, 157, 143, 0.2);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#selected-items::before {
+    content: '✓';
+    color: #2a9d8f;
+    font-weight: bold;
+}
+
+/* Estado quando nenhum produto está selecionado */
+.selection-summary.empty {
+    border-left-color: #e63946;
+    background: linear-gradient(135deg, rgba(230, 57, 70, 0.1) 0%, rgba(29, 53, 87, 0.1) 100%);
+}
+
+.selection-summary.empty h4 {
+    color: #e63946;
+}
+
+.selection-summary.empty #selected-items {
+    color: #e63946;
+    background: rgba(255, 255, 255, 0.7);
+    border-color: rgba(230, 57, 70, 0.2);
+}
+
+.selection-summary.empty #selected-items::before {
+    content: '⚠';
+    color: #e63946;
+}
+
+/* Adicionando animação de destaque */
+@keyframes highlightSummary {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+.selection-summary.highlight {
+    animation: highlightSummary 0.5s ease;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .selection-summary {
+        padding: 18px 20px;
+        margin: 20px 0;
+    }
+    
+    .selection-summary h4 {
+        font-size: 1rem;
+    }
+    
+    #selected-items {
+        font-size: 0.95rem;
+        padding: 10px 12px;
+    }
 }
 
 /* Estado desabilitado */
@@ -3250,40 +3352,227 @@ input[type="checkbox"]:disabled {
     display: inline-block;
 }
 
-/* Estilos para o calendário */
-input[type="date"] {
-    padding: 12px;
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    font-size: 16px;
-    width: 100%;
-}
+/* ===== INPUT DE DATA E ESTADOS DE HORÁRIOS - ESTILO ATUALIZADO E OTIMIZADO ===== */
 
-input[type="date"]:focus {
-    border-color: #1d3557;
+/* Estilos Base para Input de Data */
+input[type="date"] {
+    width: 100%;
+    padding: 16px 20px;
+    border: 2px solid var(--border-color);
+    border-radius: 16px;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
     outline: none;
 }
 
-/* Estilo para horários indisponíveis */
+/* Ícone Personalizado para Input de Data */
+input[type="date"] {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%23b49434\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Crect x=\'3\' y=\'4\' width=\'18\' height=\'18\' rx=\'2\' ry=\'2\'%3E%3C/rect%3E%3Cline x1=\'16\' y1=\'2\' x2=\'16\' y2=\'6\'%3E%3C/line%3E%3Cline x1=\'8\' y1=\'2\' x2=\'8\' y2=\'6\'%3E%3C/line%3E%3Cline x1=\'3\' y1=\'10\' x2=\'21\' y2=\'10\'%3E%3C/line%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 18px center;
+    background-size: 20px;
+    padding-right: 50px;
+}
+
+/* Efeitos de Interação (Hover e Focus) */
+input[type="date"]:hover {
+    border-color: rgba(180, 148, 52, 0.4);
+    box-shadow: 0 4px 12px rgba(180, 148, 52, 0.1);
+}
+
+input[type="date"]:focus {
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 4px rgba(180, 148, 52, 0.15);
+    transform: translateY(-2px);
+}
+
+/* Ocultar Ícone Padrão do Calendário */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    opacity: 0;
+    cursor: pointer;
+    position: absolute;
+    right: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Estilização do Calendário Nativo (WebKit) */
+input[type="date"]::-webkit-datetime-edit {
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+    padding: 2px;
+}
+
+input[type="date"]::-webkit-datetime-edit-text {
+    color: var(--secondary-color);
+    padding: 0 4px;
+}
+
+/* ===== ESTILOS PARA SELEÇÃO DE HORÁRIOS ===== */
+
+/* Opções Desabilitadas (Horários Indisponíveis) */
 select option:disabled {
-    color: #ccc;
-    background-color: #f8f9fa;
-}
-
-/* Loading para horários */
-.loading-horarios {
-    text-align: center;
-    padding: 10px;
-    color: #666;
-}
-
-/* Mensagem de nenhum horário */
-.no-horarios {
-    text-align: center;
-    padding: 10px;
-    color: #e63946;
+    color: #a0aec0;
+    background-color: #f7fafc;
     font-style: italic;
 }
+
+/* Indicador de Carregamento de Horários */
+.loading-horarios {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-light);
+    font-size: 0.95rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    animation: pulse 1.5s ease-in-out infinite; /* Animação aplicada diretamente */
+}
+
+.loading-horarios::before {
+    content: '';
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--border-color);
+    border-top: 2px solid var(--secondary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Mensagem de Nenhum Horário Disponível */
+.no-horarios {
+    text-align: center;
+    padding: 20px;
+    color: #e53e3e;
+    font-style: italic;
+    background-color: rgba(229, 62, 62, 0.05);
+    border-radius: 12px;
+    border: 1px dashed rgba(229, 62, 62, 0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.no-horarios::before {
+    content: '⏰';
+    font-size: 1.5rem;
+    font-style: normal;
+}
+
+/* Container do Select de Horários */
+.time-select-container {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.time-select-container select {
+    width: 100%;
+    padding: 16px 20px;
+    border: 2px solid var(--border-color);
+    border-radius: 16px;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'20\' height=\'20\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%23b49434\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Cpath d=\'m6 9 6 6 6-6\'%3E%3C/path\'%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 18px center;
+    background-size: 20px;
+    padding-right: 50px;
+    cursor: pointer;
+}
+
+.time-select-container select:focus {
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 4px rgba(180, 148, 52, 0.15);
+    outline: none;
+}
+
+/* Badges de Status de Horário */
+.horario-disponivel,
+.horario-indisponivel {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-left: 8px;
+}
+
+.horario-disponivel {
+    background-color: rgba(72, 187, 120, 0.1);
+    color: #48bb78;
+}
+
+.horario-indisponivel {
+    background-color: rgba(229, 62, 62, 0.1);
+    color: #e53e3e;
+}
+
+/* ===== ANIMAÇÕES ===== */
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+/* ===== RESPONSIVIDADE ===== */
+
+@media (max-width: 768px) {
+    input[type="date"],
+    .time-select-container select {
+        padding: 14px 16px;
+        font-size: 16px;
+        background-position: right 16px center;
+        padding-right: 45px;
+    }
+    
+    .loading-horarios,
+    .no-horarios {
+        padding: 16px;
+        font-size: 0.9rem;
+    }
+}
+
+/* ===== SUPORTE A DARK MODE ===== */
+
+@media (prefers-color-scheme: dark) {
+    input[type="date"] {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%23d4b15f\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Crect x=\'3\' y=\'4\' width=\'18\' height=\'18\' rx=\'2\' ry=\'2\'%3E%3C/rect%3E%3Cline x1=\'16\' y1=\'2\' x2=\'16\' y2=\'6\'%3E%3C/line\'%3E%3Cline x1=\'8\' y1=\'2\' x2=\'8\' y2=\'6\'%3E%3C/line\'%3E%3Cline x1=\'3\' y1=\'10\' x2=\'21\' y2=\'10\'%3E%3C/line\'%3E%3C/svg\'%3E");
+    }
+    
+    select option:disabled {
+        color: #718096;
+        background-color: #2d3748;
+    }
+    
+    .no-horarios {
+        background-color: rgba(229, 62, 62, 0.1);
+        border-color: rgba(229, 62, 62, 0.2);
+    }
+}
+
+
+
 
 
 
@@ -3376,4 +3665,486 @@ select option:disabled {
         font-size: 12px;
         text-align: center;
     }
+}
+
+/* Adicione estilos para a distância */
+.workshop-item .distance {
+    color: #e63946;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.workshop-popup .fa-route {
+    color: #e63946;
+    margin-right: 5px;
+}
+
+.workshop-item .distance .fa-route {
+    color: #e63946;
+    margin-right: 5px;
+}
+
+/* Estilo para destacar a distância */
+.distance-badge {
+    background-color: #e63946;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* Barra de rolagem personalizada (Chrome, Edge, Opera, Safari) */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1; /* fundo do trilho */
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--secondary-color); /* usa sua cor */
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8a6f26; /* tom mais escuro ao passar o mouse */
+}
+
+/* Barra de rolagem no Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--secondary-color) #384d5e;
+}
+
+
+
+/* ===== RECOMMENDATION SECTION - ESTILOS MELHORADOS ===== */
+.recommendation-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    margin: 30px 0;
+}
+
+.product-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s ease;
+    border: 2px solid var(--border-color);
+    overflow: hidden;
+    position: relative;
+}
+
+.product-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 35px rgba(0, 0, 0, 0.15);
+    border-color: rgba(180, 148, 52, 0.4);
+}
+
+.product-card-header {
+    background: linear-gradient(135deg, rgba(180, 148, 52, 0.1), rgba(212, 177, 95, 0.15));
+    padding: 15px 20px;
+    border-bottom: 1px solid rgba(180, 148, 52, 0.1);
+}
+
+.product-card-header h3 {
+    color: var(--secondary-color);
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.product-card-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.product-image-container {
+    width: 100%;
+    height: 160px;
+    background: var(--bg-color);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    position: relative;
+}
+
+.product-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    transition: all 0.4s ease;
+}
+
+.product-card:hover .product-image {
+    transform: scale(1.1);
+}
+
+.product-details {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.product-specs {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.product-specs p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-light);
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.product-specs strong {
+    color: var(--primary-color);
+    min-width: 100px;
+    font-weight: 600;
+}
+
+.product-price {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.price {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--secondary-color);
+}
+
+.product-selection {
+    padding: 15px 20px;
+    background: rgba(180, 148, 52, 0.05);
+    border-top: 1px solid rgba(180, 148, 52, 0.1);
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--primary-color);
+    transition: all 0.3s ease;
+    padding: 5px;
+    border-radius: 6px;
+}
+
+.checkbox-container:hover {
+    background: rgba(180, 148, 52, 0.1);
+}
+
+.checkbox-container input[type="checkbox"] {
+    display: none;
+}
+
+.checkmark {
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border: 2px solid var(--secondary-color);
+    border-radius: 4px;
+    margin-right: 12px;
+    position: relative;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.checkbox-container input[type="checkbox"]:checked + .checkmark {
+    background: var(--secondary-color);
+    border-color: var(--secondary-color);
+}
+
+.checkbox-container input[type="checkbox"]:checked + .checkmark::after {
+    content: "✓";
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.checkbox-container input[type="checkbox"]:disabled + .checkmark {
+    background: #ccc;
+    border-color: #999;
+    cursor: not-allowed;
+}
+
+.checkbox-container input[type="checkbox"]:disabled ~ span {
+    color: #999;
+    cursor: not-allowed;
+}
+
+/* Estado quando não há recomendação */
+.no-recommendation {
+    text-align: center;
+    padding: 30px 20px;
+    color: var(--text-light);
+}
+
+.no-recommendation i {
+    font-size: 2rem;
+    color: #ccc;
+    margin-bottom: 15px;
+    display: block;
+}
+
+.no-recommendation p {
+    margin: 0;
+    font-style: italic;
+}
+
+/* Badge de recomendação automática */
+.recommendation-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+    color: white;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(180, 148, 52, 0.3);
+    z-index: 2;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .recommendation-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .product-card-content {
+        padding: 15px;
+    }
+    
+    .product-image-container {
+        height: 140px;
+    }
+    
+    .product-specs p {
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .product-specs strong {
+        min-width: auto;
+    }
+}
+
+/* Animações */
+@keyframes productHighlight {
+    0% { box-shadow: 0 0 0 0 rgba(180, 148, 52, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(180, 148, 52, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(180, 148, 52, 0); }
+}
+
+.product-card.highlight {
+    animation: productHighlight 1s ease;
+}
+
+/* ===== POPUPS DO LEAFLET - ESTILO ATUALIZADO ===== */
+.leaflet-popup-content-wrapper {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    color: #1d3557;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    border-radius: 16px;
+    padding: 2px;
+    border: 2px solid rgba(180, 148, 52, 0.3);
+    overflow: hidden;
+}
+
+.leaflet-popup-content {
+    margin: 15px 18px;
+    line-height: 1.5;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.95rem;
+}
+
+.leaflet-popup-tip {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    box-shadow: 0 3px 14px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(180, 148, 52, 0.2);
+}
+
+/* Conteúdo personalizado do popup */
+.workshop-popup {
+    min-width: 250px;
+    padding: 5px;
+}
+
+.workshop-popup h4 {
+    color: #1d3557;
+    margin: 0 0 12px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding-bottom: 8px;
+    border-bottom: 2px solid rgba(180, 148, 52, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.workshop-popup h4::before {
+    content: '🔧';
+    font-size: 1rem;
+}
+
+.workshop-popup p {
+    margin: 8px 0;
+    color: #384d5e;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+}
+
+.workshop-popup i {
+    color: #b49434;
+    width: 16px;
+    text-align: center;
+}
+
+.workshop-popup .distance {
+    color: #e63946;
+    font-weight: 600;
+}
+
+.workshop-popup .distance i {
+    color: #e63946;
+}
+
+.select-workshop-btn {
+    background: linear-gradient(135deg, #1d3557, #2a4f6d);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    width: 100%;
+    margin-top: 12px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.select-workshop-btn:hover {
+    background: linear-gradient(135deg, #2a4f6d, #1d3557);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(29, 53, 87, 0.3);
+}
+
+.select-workshop-btn::before {
+    content: '✓';
+    font-weight: bold;
+}
+
+/* Popup para localização do usuário */
+.user-popup h4 {
+    color: #2a9d8f;
+    border-bottom-color: rgba(42, 157, 143, 0.3);
+}
+
+.user-popup h4::before {
+    content: '📍';
+}
+
+/* Animações para os popups */
+@keyframes popupAppear {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.leaflet-popup {
+    animation: popupAppear 0.3s ease;
+}
+
+/* Responsividade para mobile */
+@media (max-width: 768px) {
+    .leaflet-popup-content-wrapper {
+        border-radius: 14px;
+        max-width: 280px;
+    }
+    
+    .leaflet-popup-content {
+        margin: 12px 15px;
+        font-size: 0.9rem;
+    }
+    
+    .workshop-popup {
+        min-width: 220px;
+    }
+    
+    .workshop-popup h4 {
+        font-size: 1rem;
+    }
+    
+    .select-workshop-btn {
+        padding: 8px 16px;
+        font-size: 0.85rem;
+    }
+}
+
+/* Efeito de destaque quando o popup é aberto */
+.leaflet-popup-content-wrapper:hover {
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+}
+
+/* Estilo para o botão de fechar do popup */
+.leaflet-container a.leaflet-popup-close-button {
+    color: #1d3557;
+    padding: 6px 8px 0 0;
+    font-size: 1.2rem;
+    transition: color 0.3s ease;
+}
+
+.leaflet-container a.leaflet-popup-close-button:hover {
+    color: #e63946;
+}
+
+/* Gradiente sutil no fundo do popup */
+.leaflet-popup-content-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #b49434, #d4b15f);
+    opacity: 0.8;
+    z-index: 1;
 }

@@ -723,7 +723,7 @@ async function getUserLocation() {
     }
 
     // Busca oficinas próximas
-// Busca oficinas próximas
+// Busca oficinas próximas e calcula distâncias
 async function searchNearbyWorkshops(lat, lng) {
     showLoading(true);
     try {
@@ -756,8 +756,25 @@ async function searchNearbyWorkshops(lat, lng) {
             return;
         }
 
-        console.log('Oficinas com coordenadas válidas:', oficinasValidas);
-        displayWorkshops(oficinasValidas);
+        // Calcula distância para cada oficina
+        const oficinasComDistancia = oficinasValidas.map(workshop => {
+            const workshopLat = parseFloat(workshop.lat);
+            const workshopLng = parseFloat(workshop.lng);
+            
+            // Calcula distância usando fórmula de Haversine
+            const distancia = calcularDistancia(lat, lng, workshopLat, workshopLng);
+            
+            return {
+                ...workshop,
+                distancia: distancia
+            };
+        });
+
+        // Ordena por distância (mais próximo primeiro)
+        oficinasComDistancia.sort((a, b) => a.distancia - b.distancia);
+
+        console.log('Oficinas ordenadas por distância:', oficinasComDistancia);
+        displayWorkshops(oficinasComDistancia);
         
     } catch (error) {
         console.error("Erro ao buscar oficinas:", error);
@@ -765,6 +782,27 @@ async function searchNearbyWorkshops(lat, lng) {
     } finally {
         showLoading(false);
     }
+}
+
+// Função para calcular distância usando fórmula de Haversine
+function calcularDistancia(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Raio da Terra em km
+    const dLat = deg2rad(lat2 - lat1);
+    const dLon = deg2rad(lon2 - lon1);
+    
+    const a = 
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+    
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const distancia = R * c; // Distância em km
+    
+    return distancia;
+}
+
+function deg2rad(deg) {
+    return deg * (Math.PI/180);
 }
 
 // Exibe oficinas no mapa e na lista (versão responsiva)
@@ -803,7 +841,6 @@ function displayWorkshops(workshops) {
 
     // Adiciona cada oficina no mapa e na lista
     workshops.forEach(workshop => {
-        // CONVERTE COORDENADAS DE STRING PARA NÚMERO
         const lat = parseFloat(workshop.lat);
         const lng = parseFloat(workshop.lng);
         
@@ -813,6 +850,11 @@ function displayWorkshops(workshops) {
             return;
         }
 
+        // Formata a distância
+        const distanciaFormatada = workshop.distancia < 1 
+            ? `${(workshop.distancia * 1000).toFixed(0)} m` 
+            : `${workshop.distancia.toFixed(1)} km`;
+
         // Marcador no mapa
         const marker = L.marker([lat, lng], { icon: workshopIcon })
             .addTo(map)
@@ -821,6 +863,7 @@ function displayWorkshops(workshops) {
                     <h4>${workshop.nome}</h4>
                     <p><i class="fas fa-map-marker-alt"></i> ${workshop.endereco}, ${workshop.cidade}/${workshop.estado}</p>
                     <p><i class="fas fa-phone"></i> ${workshop.telefone || 'Não informado'}</p>
+                    <p><i class="fas fa-route"></i> ${distanciaFormatada}</p>
                     <button onclick="selectWorkshop(${workshop.id})" class="select-workshop-btn">
                         Selecionar
                     </button>
@@ -836,6 +879,7 @@ function displayWorkshops(workshops) {
         workshopItem.innerHTML = `
             <div class="workshop-info">
                 <h4>${workshop.nome}</h4>
+                <p class="distance"><i class="fas fa-route"></i> ${distanciaFormatada}</p>
                 <p class="address"><i class="fas fa-map-marker-alt"></i> ${workshop.endereco}, ${workshop.cidade}/${workshop.estado}</p>
                 <p class="phone"><i class="fas fa-phone"></i> ${workshop.telefone || 'Não informado'}</p>
                 <p class="hours"><i class="fas fa-clock"></i> ${workshop.horario_abertura} - ${workshop.horario_fechamento}</p>
@@ -1584,3 +1628,121 @@ function updateProgressBar(step) {
         }
     });
 }
+
+
+// Na função displayWorkshops, você pode adicionar cores diferentes baseadas na distância:
+function getDistanceColor(distancia) {
+    if (distancia < 0.5) return '#2a9d8f';     // Super perto
+    if (distancia < 1) return '#3a86ff';       // Muito perto
+    if (distancia < 3) return '#f4a261';       // Perto
+    if (distancia < 8) return '#ff9f1c';       // Moderado
+    if (distancia < 15) return '#ff6b6b';      // Um pouco longe
+    return '#e63946';                          // Muito longe
+}
+
+// E modifique o item da lista para usar cores diferentes:
+workshopItem.innerHTML = `
+    <div class="workshop-info">
+        <h4>${workshop.nome}</h4>
+        <p class="distance" style="color: ${getDistanceColor(workshop.distancia)};">
+            <i class="fas fa-route"></i> ${distanciaFormatada}
+        </p>
+        <p class="address"><i class="fas fa-map-marker-alt"></i> ${workshop.endereco}, ${workshop.cidade}/${workshop.estado}</p>
+        <p class="phone"><i class="fas fa-phone"></i> ${workshop.telefone || 'Não informado'}</p>
+        <p class="hours"><i class="fas fa-clock"></i> ${workshop.horario_abertura} - ${workshop.horario_fechamento}</p>
+    </div>
+    <button class="btn select-btn" onclick="selectWorkshop(${workshop.id})">Selecionar</button>
+`;
+
+
+
+// Atualiza o resumo da seleção
+function updateSelectionSummary() {
+    const summaryElement = document.getElementById("selected-items");
+    const summaryContainer = document.querySelector(".selection-summary");
+    const selections = [];
+    
+    if (selectedProducts.oil) {
+        selections.push("Óleo");
+    }
+    if (selectedProducts.filter) {
+        selections.push("Filtro");
+    }
+    
+    if (selections.length === 0) {
+        summaryElement.textContent = "Nenhum produto selecionado";
+        summaryElement.style.color = "#e63946";
+        summaryContainer.classList.add("empty");
+        summaryContainer.classList.remove("highlight");
+    } else {
+        summaryElement.textContent = selections.join(" + ");
+        summaryElement.style.color = "#2a9d8f";
+        summaryContainer.classList.remove("empty");
+        summaryContainer.classList.add("highlight");
+        
+        // Remove a classe de destaque após a animação
+        setTimeout(() => {
+            summaryContainer.classList.remove("highlight");
+        }, 500);
+    }
+}
+
+// Adicione esta função para inicializar o summary
+function initSelectionSummary() {
+    const selectionContainer = document.createElement("div");
+    selectionContainer.className = "selection-summary";
+    selectionContainer.innerHTML = `
+        <h4>Resumo da Seleção</h4>
+        <p id="selected-items">Carregando...</p>
+    `;
+    
+    // Insere o summary após os cards de recomendação
+    const recommendationContainer = document.querySelector(".recommendation-container");
+    if (recommendationContainer) {
+        recommendationContainer.parentNode.insertBefore(selectionContainer, recommendationContainer.nextSibling);
+    }
+    
+    // Inicializa o summary
+    updateSelectionSummary();
+}
+
+// Chame initSelectionSummary() quando a página carregar
+document.addEventListener("DOMContentLoaded", function() {
+    initSelectionSummary();
+});
+
+// Função para melhorar a experiência do input de data
+function enhanceDateInput() {
+    const dateInput = document.querySelector('input[type="date"]');
+    
+    if (dateInput) {
+        // Adicionar um label dinâmico
+        const today = new Date();
+        const minDate = new Date();
+        minDate.setDate(today.getDate() + 1);
+        
+        // Formatar a data mínima para o formato YYYY-MM-DD
+        const minDateString = minDate.toISOString().split('T')[0];
+        
+        // Definir atributos min e max
+        dateInput.min = minDateString;
+        
+        const maxDate = new Date();
+        maxDate.setMonth(today.getMonth() + 3);
+        dateInput.max = maxDate.toISOString().split('T')[0];
+        
+        // Adicionar placeholder personalizado
+        dateInput.addEventListener('focus', function() {
+            this.classList.add('focused');
+        });
+        
+        dateInput.addEventListener('blur', function() {
+            this.classList.remove('focused');
+        });
+    }
+}
+
+// Inicializar quando o DOM estiver carregado
+document.addEventListener('DOMContentLoaded', function() {
+    enhanceDateInput();
+});
