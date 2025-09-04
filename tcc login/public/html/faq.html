@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Perguntas Frequentes - OilSmart</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .header {
+      background-color: #263f54;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .logo img {
+      height: 60px;
+    }
+
+    .faq-content {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      padding: 40px;
+      margin-top: 30px;
+    }
+
+    .faq-content h1 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+      color: #263f54;
+    }
+
+    .faq-item {
+      border-bottom: 1px solid #e0e0e0;
+      padding: 15px 0;
+    }
+
+    .faq-question {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #b49434;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .faq-question i {
+      transition: transform 0.3s;
+    }
+
+    .faq-answer {
+      display: none;
+      padding-top: 10px;
+      font-size: 0.95rem;
+      color: #555;
+    }
+
+    .faq-item.open .faq-answer {
+      display: block;
+    }
+
+    .faq-item.open .faq-question i {
+      transform: rotate(180deg);
+    }
+
+    .footer {
+      background-color: #263f54;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      margin-top: 50px;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <a href="/html/index.html" class="logo"><img src="/img/LogoIOil.png" alt="OilSmart"></a>
+    </div>
+  </header>
+
+  <main class="faq-content container">
+    <h1>Perguntas Frequentes</h1>
+
+    <div class="faq-item">
+      <div class="faq-question">Como faço para agendar uma troca de óleo? <i class="fas fa-chevron-down"></i></div>
+      <div class="faq-answer">Basta acessar a página "Serviços", selecionar o tipo de serviço e agendar com a oficina parceira mais próxima.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">Preciso me cadastrar para usar o site? <i class="fas fa-chevron-down"></i></div>
+      <div class="faq-answer">Sim, o cadastro é necessário para que possamos armazenar os dados do seu veículo e histórico de serviços.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">Quais dados são coletados pela OilSmart? <i class="fas fa-chevron-down"></i></div>
+      <div class="faq-answer">Coletamos dados como nome, e-mail, telefone, localização (com permissão) e informações do seu veículo, conforme nossa Política de Privacidade.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">Posso cancelar um agendamento? <i class="fas fa-chevron-down"></i></div>
+      <div class="faq-answer">Sim, você pode cancelar com até 1 hora de antecedência diretamente pela área de "Agenda" em seu perfil.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">A OilSmart realiza os serviços diretamente? <i class="fas fa-chevron-down"></i></div>
+      <div class="faq-answer">Não. A OilSmart conecta você com oficinas parceiras, mas não realiza os serviços diretamente.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">Como posso entrar em contato com o suporte? <i class="fas fa-chevron-down"></i></div>
+      <div class="faq-answer">Você pode nos contatar pelo e-mail <strong>contato@oilsmart.com.br</strong>.</div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>© 2025 OilSmart - Todos os direitos reservados.</p>
+    </div>
+  </footer>
+
+  <script>
+    const items = document.querySelectorAll('.faq-item');
+    items.forEach(item => {
+      item.querySelector('.faq-question').addEventListener('click', () => {
+        item.classList.toggle('open');
+      });
+    });
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  </script>
+</body>
+</html>

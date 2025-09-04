@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - OilSmart</title>
+    <link rel="stylesheet" href="/css/login.css">
+</head>
+<body>
+    <div class="login-card">
+        <h1 class="login-title">Crie sua conta</h1>
+        <p class="login-subtitle">Junte-se à OilSmart</p>
+
+        <div class="divider"></div>
+
+        <form id="registerForm">
+            <h2 class="section-title">Nome completo</h2>
+            <input type="text" id="register-fullname" class="input-field" placeholder="Digite seu nome completo" required>
+
+            <h2 class="section-title">E-mail</h2>
+            <input type="email" id="register-email" class="input-field" placeholder="Digite seu e-mail" required>
+
+            <h2 class="section-title">Senha</h2>
+            <input type="password" id="register-password" class="input-field" placeholder="Crie uma senha (mínimo 6 caracteres)" required>
+
+            <h2 class="section-title">Confirmar Senha</h2>
+            <input type="password" id="register-confirm-password" class="input-field" placeholder="Repita sua senha" required>
+
+            <div class="password-options">
+                <label class="checkbox-container">
+                    <input type="checkbox" id="register-terms" required>
+                    Eu concordo com os <a href="#" class="forgot-password">Termos</a> e <a href="#" class="forgot-password">Política de Privacidade</a>
+                </label>
+            </div>
+
+            <div class="divider"></div>
+
+            <button type="submit" class="login-button">Criar conta</button>
+
+            <p class="register-text">Já tem uma conta? <a href="login.html" class="register-link">Faça login</a></p>
+        </form>
+    </div>
+
+    <script>
+document.getElementById('registerForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    // Obter valores dos campos
+    const nome = document.getElementById('register-fullname').value.trim();
+    const email = document.getElementById('register-email').value.trim();
+    const senha = document.getElementById('register-password').value;
+    const confirmarSenha = document.getElementById('register-confirm-password').value;
+    const termosAceitos = document.getElementById('register-terms').checked;
+
+    // Validações básicas
+    if (!nome) {
+        alert('Por favor, informe seu nome completo');
+        return;
+    }
+
+    if (nome.split(' ').length < 2) {
+        alert('Por favor, informe seu nome e sobrenome');
+        return;
+    }
+
+    if (!email) {
+        alert('Por favor, informe seu e-mail');
+        return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        alert('Por favor, informe um e-mail válido');
+        return;
+    }
+
+    if (!senha) {
+        alert('Por favor, crie uma senha');
+        return;
+    }
+
+    if (senha.length < 6) {
+        alert('A senha deve ter pelo menos 6 caracteres');
+        return;
+    }
+
+    if (senha !== confirmarSenha) {
+        alert('As senhas não coincidem');
+        return;
+    }
+
+    if (!termosAceitos) {
+        alert('Você precisa aceitar os termos e condições');
+        return;
+    }
+
+    try {
+        console.log('Enviando dados:', { nome, email, senha: '***' });
+
+        // Enviar dados para o servidor
+        const response = await fetch('http://localhost:3000/api/auth/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                nome: nome,
+                email: email,
+                senha: senha,
+                telefone: '',
+                cpf: '',
+                endereco: '',
+                cep: '',
+                cidade: '',
+                estado: ''
+            })
+        });
+
+        console.log('Resposta do servidor:', response.status);
+
+        // Verificar se a resposta é JSON
+        const contentType = response.headers.get('content-type');
+        let result;
+        
+        if (contentType && contentType.includes('application/json')) {
+            result = await response.json();
+        } else {
+            const text = await response.text();
+            throw new Error(`Resposta não é JSON: ${text}`);
+        }
+
+        console.log('Resultado:', result);
+
+        if (result.success) {
+            alert(`Conta criada com sucesso! Bem-vindo(a), ${nome}`);
+            window.location.href = 'login.html';
+        } else {
+            alert(result.message);
+        }
+    } catch (error) {
+        console.error('Erro completo:', error);
+        alert(`Erro: ${error.message}\n\nVerifique o console para mais detalhes.`);
+    }
+});
+
+// Testar conexão ao carregar a página
+document.addEventListener('DOMContentLoaded', async function() {
+    try {
+        const response = await fetch('http://localhost:3000/api/test');
+        if (response.ok) {
+            const data = await response.json();
+            console.log('✅ Servidor conectado:', data);
+        }
+    } catch (error) {
+        console.warn('❌ Não foi possível conectar ao servidor:', error.message);
+        alert('Servidor não está respondendo. Execute: node server.js');
+    }
+});
+</script>
+</body>
+</html>

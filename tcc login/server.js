@@ -1,45 +1,20 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const path = require('path');
-const cors = require('cors');
-require('dotenv').config();
-
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 3000;
 
-// Middlewares
-app.use(cors());
+// Middleware para JSON
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Servir arquivos estáticos
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Conexão com banco
 const db = require('./database/db');
 
-// Importar rotas
-const authRoutes = require('./routes/auth');
-const agendamentoRoutes = require('./routes/agendamento');
-const oficinaRoutes = require('./routes/oficina');
-const veiculoRoutes = require('./routes/veiculo');
-const marcaRoutes = require('./routes/marca');
-const modeloRoutes = require('./routes/modelo');
-const modeloAnoRoutes = require('./routes/modeloAno');
-const recomendacaoRoutes = require('./routes/recomendacao');
-const geocodeRoutes = require('./routes/geocode');
-
-// Usar rotas
-app.use('/api/auth', authRoutes);
-app.use('/api/agendamentos', agendamentoRoutes);
-app.use('/api/oficina', oficinaRoutes);
-app.use('/api/veiculos', veiculoRoutes);
-app.use('/api/marcas', marcaRoutes);
-app.use('/api/modelos', modeloRoutes);
-app.use('/api/modelo_anos', modeloAnoRoutes);
-app.use('/api/recomendacoes', recomendacaoRoutes);
-app.use('/api/geocode', geocodeRoutes);
-app.use('/api/contact', require('./routes/contact'));
-
-// Rotas de autenticação (mantidas do arquivo antigo)
+// Rota de Login
 app.post('/api/auth/login', (req, res) => {
     const { email, senha } = req.body;
 
@@ -86,14 +61,16 @@ app.post('/api/auth/login', (req, res) => {
     });
 });
 
+// Rota de logout
 app.post('/api/auth/logout', (req, res) => {
     res.json({ success: true, message: 'Logout realizado com sucesso!' });
 });
 
+// Rota de Registro
 app.post('/api/auth/register', async (req, res) => {
     const { nome, email, senha, telefone, cpf, endereco, cep, cidade, estado } = req.body;
 
-    console.log('Dados recebidos:', req.body);
+    console.log('Dados recebidos:', req.body); // Para debug
 
     try {
         // Verificar se o email já existe
@@ -139,36 +116,14 @@ app.post('/api/auth/register', async (req, res) => {
     }
 });
 
-// Rotas de produtos (do arquivo novo)
-app.get('/api/produtos/oleo/:id', (req, res) => {
-    const { id } = req.params;
-    db.query('SELECT * FROM produto_oleo WHERE id = ?', [id], (err, results) => {
-        if (err) {
-            console.error('Erro ao buscar óleo:', err);
-            return res.status(500).json({ error: 'Erro interno do servidor' });
-        }
-        res.json(results[0] || null);
-    });
-});
-
-app.get('/api/produtos/filtro/:id', (req, res) => {
-    const { id } = req.params;
-    db.query('SELECT * FROM produto_filtro WHERE id = ?', [id], (err, results) => {
-        if (err) {
-            console.error('Erro ao buscar filtro:', err);
-            return res.status(500).json({ error: 'Erro interno do servidor' });
-        }
-        res.json(results[0] || null);
-    });
-});
-
-// Rotas gerais
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/html/index.html'));
-});
-
+// Rota de teste simples
 app.get('/api/test', (req, res) => {
     res.json({ message: 'Servidor funcionando!', timestamp: new Date() });
+});
+
+// Página inicial
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/html/index.html'));
 });
 
 // Iniciar servidor
