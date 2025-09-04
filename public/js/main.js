@@ -1642,3 +1642,52 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+
+// main.js - Arquivo JavaScript unificado para o site OilSmart
+
+document.addEventListener('DOMContentLoaded', function() {
+    // =============================================
+    // FUNCIONALIDADES GLOBAIS (todas as páginas)
+    // =============================================
+
+    // ... (todo o código que você já tinha aqui permanece igual) ...
+    // Não mexi em nada da parte de login, modais, mapa, etc.
+
+    // =============================================
+    // FORMULÁRIO DE CONTATO (contato.html)
+    // =============================================
+    if (document.getElementById('contact-form')) {
+        const contactForm = document.getElementById('contact-form');
+
+        contactForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('contact-name').value.trim();
+            const email = document.getElementById('contact-email').value.trim();
+            const phone = document.getElementById('contact-phone').value.trim();
+            const subject = document.getElementById('contact-subject').value.trim();
+            const message = document.getElementById('contact-message').value.trim();
+
+            try {
+                const res = await fetch('/api/contact', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, phone, subject, message })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    alert("✅ Mensagem enviada com sucesso!");
+                    contactForm.reset();
+                } else {
+                    alert("⚠️ Erro: " + data.message);
+                }
+            } catch (error) {
+                console.error("Erro ao enviar formulário:", error);
+                alert("❌ Erro no envio. Tente novamente.");
+            }
+        });
+    }
+});
