@@ -1,43 +1,52 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - OilSmart</title>
     <link rel="stylesheet" href="/css/login.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-
 <body>
     <div class="login-card">
-        <h1 class="login-title">Faça login na sua conta</h1>
-        <p class="login-subtitle">Bem-vindo de volta à OilSmart</p>
+        <div class="logo-container">
+            <div class="logo">OS</div>
+            <h1 class="login-title">Bem-vindo de volta</h1>
+        </div>
+        <p class="login-subtitle">Acesse sua conta para continuar gerenciando seus veículos</p>
 
         <div class="divider"></div>
 
         <form id="loginForm">
-            <h2 class="section-title">E-mail</h2>
-            <input type="email" id="email" class="input-field" placeholder="Digite seu e-mail" required>
+            <div class="form-group">
+                <label for="email" class="section-title">E-mail</label>
+                <input type="email" id="email" class="input-field" placeholder="seu.email@exemplo.com" required>
+            </div>
 
-            <h2 class="section-title">Senha</h2>
-            <input type="password" id="password" class="input-field" placeholder="Digite sua senha" required>
+            <div class="form-group">
+                <label for="password" class="section-title">Senha</label>
+                <input type="password" id="password" class="input-field" placeholder="Digite sua senha" required>
+                <a href="#" class="forgot-password">Esqueceu sua senha?</a>
+            </div>
 
             <div class="password-options">
                 <label class="checkbox-container">
                     <input type="checkbox" id="remember-me">
-                    Lembrar de mim
+                    <span class="checkmark"></span>
+                    Manter conectado
                 </label>
-                <a href="#" class="forgot-password">Esqueceu a senha?</a>
             </div>
 
             <div class="divider"></div>
 
-            <button type="submit" class="login-button">Entrar</button>
+            <button type="submit" class="login-button">
+                <span class="button-text">Acessar minha conta</span>
+            </button>
 
-            <p class="register-text">Não tem uma conta? <a href="cadastro.html" class="register-link">Cadastre-se</a>
-            </p>
+            <p class="register-text">Não tem uma conta? <a href="cadastro.html" class="register-link">Cadastre-se gratuitamente</a></p>
         </form>
     </div>
+
 
     <script>
         document.getElementById('loginForm').addEventListener('submit', async function (e) {

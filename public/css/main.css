@@ -265,32 +265,150 @@ body {
 .action-icons {
     display: flex;
     align-items: center;
-    gap: 12px;
-    position: relative;
-    z-index: 1002;
+    gap: 15px;
 }
 
 .user-icon {
     color: var(--f8f9fa);
-    font-size: 1.3rem;
-    transition: all 0.3s ease;
-    width: 45px;
-    height: 45px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    cursor: pointer;
+    font-size: 1.2rem;
+    transition: var(--transition);
 }
 
 .user-icon:hover {
     color: var(--secondary-color);
-    transform: scale(1.08);
-    background: rgba(180, 148, 52, 0.15);
-    box-shadow: 0 4px 12px rgba(180, 148, 52, 0.2);
+}
+
+/* User Dropdown */
+.user-dropdown {
+    position: relative;
+    cursor: pointer;
+}
+
+.user-dropdown .user-icon {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 20px;
+    background-color: rgba(255, 255, 255, 0.1);
+    transition: background-color 0.3s ease;
+}
+
+.user-dropdown .user-icon:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.user-dropdown .user-icon i {
+    font-size: 1rem;
+}
+
+.user-dropdown .login-status {
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    min-width: 220px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+    z-index: 1000;
+    padding: 10px 0;
+}
+
+.dropdown-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.user-info {
+    padding: 10px 20px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 10px;
+}
+
+.user-info strong {
+    display: block;
+    font-size: 1rem;
+    color: var(--primary-color);
+    margin-bottom: 2px;
+}
+
+.user-info span {
+    font-size: 0.85rem;
+    color: var(--text-light);
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    color: var(--text-color);
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+
+.dropdown-item i {
+    color: var(--secondary-color);
+}
+
+.dropdown-item:hover {
+    background-color: #f5f5f5;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background-color: #eee;
+    margin: 5px 0;
+}
+
+@media (max-width: 1024px) {
+    .action-icons {
+        margin-top: 0;
+        justify-content: flex-end;
+        width: auto;
+    }
+
+    .user-dropdown {
+        position: static;
+    }
+
+    .dropdown-menu {
+        position: fixed;
+        top: 85px; /* Altura do header */
+        left: 0;
+        width: 100%;
+        max-width: none;
+        border-radius: 0;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        border-top: 1px solid #eee;
+        padding: 15px 0;
+    }
+
+    .dropdown-menu.show {
+        transform: translateY(0);
+    }
+
+    .user-info,
+    .dropdown-item {
+        padding: 12px 25px;
+    }
+}
+
+@media (max-width: 480px) {
+    .dropdown-menu {
+        top: 75px; /* Altura do header em mobile */
+    }
 }
 
 /* Menu Hamburger Moderno */

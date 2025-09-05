@@ -12,7 +12,7 @@ document.getElementById('register-form').addEventListener('submit', async (event
     }
 
     try {
-        const response = await fetch('http://localhost:3000/api/registro', {
+        const response = await fetch('http://localhost:3000/api/auth/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -24,7 +24,7 @@ document.getElementById('register-form').addEventListener('submit', async (event
 
         if (response.ok) {
             alert('Cadastro realizado com sucesso! Agora faça login.');
-            window.location.href = 'login.html';  // Redireciona para o login
+            window.location.href = 'login.html';
         } else {
             alert(data.erro || 'Falha no cadastro');
         }

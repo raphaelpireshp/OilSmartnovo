@@ -5,41 +5,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro - OilSmart</title>
     <link rel="stylesheet" href="/css/login.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="login-card">
-        <h1 class="login-title">Crie sua conta</h1>
-        <p class="login-subtitle">Junte-se à OilSmart</p>
+        <div class="logo-container">
+            <div class="logo">OS</div>
+            <h1 class="login-title">Junte-se à OilSmart</h1>
+        </div>
+        <p class="login-subtitle">Crie sua conta e comece a gerenciar seus veículos com inteligência</p>
 
         <div class="divider"></div>
 
         <form id="registerForm">
-            <h2 class="section-title">Nome completo</h2>
-            <input type="text" id="register-fullname" class="input-field" placeholder="Digite seu nome completo" required>
+            <div class="form-group">
+                <label for="register-fullname" class="section-title">Nome completo</label>
+                <input type="text" id="register-fullname" class="input-field" placeholder="Digite seu nome completo" required>
+                <small class="field-hint">Informe seu nome e sobrenome</small>
+            </div>
 
-            <h2 class="section-title">E-mail</h2>
-            <input type="email" id="register-email" class="input-field" placeholder="Digite seu e-mail" required>
+            <div class="form-group">
+                <label for="register-email" class="section-title">E-mail</label>
+                <input type="email" id="register-email" class="input-field" placeholder="seu.email@exemplo.com" required>
+                <small class="field-hint">Utilizaremos este e-mail para contato</small>
+            </div>
 
-            <h2 class="section-title">Senha</h2>
-            <input type="password" id="register-password" class="input-field" placeholder="Crie uma senha (mínimo 6 caracteres)" required>
+            <div class="form-group">
+                <label for="register-password" class="section-title">Senha</label>
+                <input type="password" id="register-password" class="input-field" placeholder="Crie uma senha segura" required>
+                <small class="field-hint">Mínimo de 6 caracteres</small>
+            </div>
 
-            <h2 class="section-title">Confirmar Senha</h2>
-            <input type="password" id="register-confirm-password" class="input-field" placeholder="Repita sua senha" required>
+            <div class="form-group">
+                <label for="register-confirm-password" class="section-title">Confirmar Senha</label>
+                <input type="password" id="register-confirm-password" class="input-field" placeholder="Digite a mesma senha" required>
+                <small class="field-hint">As senhas devem coincidir</small>
+            </div>
 
             <div class="password-options">
                 <label class="checkbox-container">
                     <input type="checkbox" id="register-terms" required>
-                    Eu concordo com os <a href="#" class="forgot-password">Termos</a> e <a href="#" class="forgot-password">Política de Privacidade</a>
+                    <span class="checkmark"></span>
+                    Concordo com os <a href="/html/termos.html" class="link">Termos de Serviço</a> e <a href="/html/politicas.html" class="link">Política de Privacidade</a>
                 </label>
             </div>
 
             <div class="divider"></div>
 
-            <button type="submit" class="login-button">Criar conta</button>
+            <button type="submit" class="login-button">
+                <span class="button-text">Criar minha conta</span>
+            </button>
 
-            <p class="register-text">Já tem uma conta? <a href="login.html" class="register-link">Faça login</a></p>
+            <p class="register-text">Já possui uma conta? <a href="login.html" class="register-link">Faça login aqui</a></p>
         </form>
     </div>
+
 
     <script>
 document.getElementById('registerForm').addEventListener('submit', async function (e) {

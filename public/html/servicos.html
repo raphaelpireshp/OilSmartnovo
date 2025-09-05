@@ -11,11 +11,14 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/auth.css">
+<script src="/js/auth.js" defer></script>
 
     <link rel="icon" href="/img/tentativa4.png" type="image/x-icon">
 </head>
 
-<link rel="stylesheet" href="../css/main.css">
+
 </head>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -67,9 +70,29 @@
 
                     </ul>
                 </nav>
-                <div class="action-icons">
-                    <a href="#" class="user-icon" id="login-btn"><i class="fas fa-user"></i></a>
-                </div>
+<div class="action-icons">
+    <div class="user-dropdown" id="user-dropdown">
+        <div class="user-icon" id="login-btn">
+            <i class="fas fa-user"></i>
+            <span class="login-status" id="login-status">Login</span>
+        </div>
+        <div class="dropdown-menu" id="dropdown-menu">
+            <div class="user-info">
+                <strong id="user-display-name">Usuário</strong>
+                <span id="user-email">email@exemplo.com</span>
+            </div>
+            <div class="dropdown-divider"></div>
+
+            <a href="/html/agenda.html" class="dropdown-item">
+                <i class="fas fa-calendar-alt"></i> Meus Agendamentos
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="/html/index.html" id="logout-btn" class="dropdown-item">
+                <i class="fas fa-sign-out-alt"></i> Sair
+            </a>
+        </div>
+    </div>
+</div>
             </div>
         </div>
     </header>
@@ -344,49 +367,7 @@
 
     <div id="toast" class="toast"></div>
 
-    <!-- Modal de Login -->
-    <div class="modal" id="login-modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <div class="modal-header">
-                <h2>Faça login na sua conta</h2>
-                <p>Bem-vindo de volta à OilSmart</p>
-            </div>
-            <form class="login-form">
-                <div class="form-group">
-                    <label for="login-email">E-mail</label>
-                    <input type="email" id="login-email" placeholder="Digite seu e-mail" required>
-                </div>
-                <div class="form-group">
-                    <label for="login-password">Senha</label>
-                    <div class="password-input">
-                        <input type="password" id="login-password" placeholder="Digite sua senha" required>
-                        <button type="button" class="toggle-password">
-                            <i class="far fa-eye"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="form-options">
-                    <label class="remember-me">
-                        <input type="checkbox"> Lembrar de mim
-                    </label>
-                    <a href="#" class="forgot-password">Esqueceu a senha?</a>
-                </div>
-                <button type="submit" class="btn btn-primary btn-block">Entrar</button>
-            </form>
-            <div class="divider">
-                <span>ou</span>
-            </div>
-            <div class="social-login">
-                <button class="social-btn google">
-                    <i class="fab fa-google"></i> Continuar com Google
-                </button>
-            </div>
-            <div class="register-link">
-                Não tem uma conta? <a href="#">Cadastre-se</a>
-            </div>
-        </div>
-    </div>
+
     <script>
         // Correção do menu hamburguer para a página de serviços
         document.addEventListener('DOMContentLoaded', function () {
@@ -601,6 +582,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="../js/servicos.js"></script>
+    <script src="/js/main.js"></script>
 </body>
 
 </html>

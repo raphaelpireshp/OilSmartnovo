@@ -1,129 +1,288 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Política de Privacidade - OilSmart</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background-color: #f9f9f9;
-      color: #333;
-      margin: 0;
-      padding: 0;
-    }
-
-    .container {
-      max-width: 960px;
-      margin: auto;
-      padding: 20px;
-    }
-
-    .header {
-      background-color: #263f54;
-      padding: 20px;
-      text-align: center;
-    }
-
-    .logo img {
-      height: 60px;
-    }
-
-    .privacy-content {
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-      padding: 40px;
-      margin-top: 30px;
-    }
-
-    .privacy-content h1 {
-      font-size: 2rem;
-      margin-bottom: 20px;
-      color: #263f54;
-    }
-
-    .privacy-content h2 {
-      margin-top: 30px;
-      font-size: 1.3rem;
-      color: #b49434;
-    }
-
-    .privacy-content p,
-    .privacy-content li {
-      font-size: 1rem;
-      line-height: 1.6;
-      color: #555;
-    }
-
-    .privacy-content ul {
-      padding-left: 20px;
-    }
-
-    .last-updated {
-      margin-top: 40px;
-      font-size: 0.9rem;
-      color: #888;
-      text-align: right;
-    }
-
-    .footer {
-      background-color: #263f54;
-      color: white;
-      text-align: center;
-      padding: 20px;
-      margin-top: 50px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Política de Privacidade - OilSmart</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/main.css">
 </head>
 <body>
-  <header class="header">
-    <div class="container">
-      <a href="/html/index.html" class="logo"><img src="/img/LogoIOil.png" alt="OilSmart"></a>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="index.html" class="logo">
+                    <img src="../img/LogoIOil.png" alt="OilSmart">
+                </a>
+                
+                <div class="nav" id="nav">
+                    <ul class="nav__list">
+                        <li><a href="index.html">Início</a></li>
+                        <li><a href="servicos.html">Serviços</a></li>
+                        <li><a href="sobre.html">Sobre</a></li>
+                        <li><a href="agenda.html">Agenda</a></li>
+                        <li><a href="contatos.html">Contatos</a></li>
+                        <li><a href="faq.html">FAQ</a></li>
+                    </ul>
+                </div>
+                
+                <div class="action-icons">
+                    <div class="user-dropdown">
+                        <div class="user-ico">
+                            <i class="fas fa-user-circle"></i>
+                            <span class="login-status">Entrar</span>
+                        </div>
+                        <div class="dropdown-menu">
+                            <div class="user-info">
+                                <strong>Visitante</strong>
+                                <span>Entre ou cadastre-se</span>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" class="dropdown-item" data-modal="login">
+                                <i class="fas fa-sign-in-alt"></i>
+                                Fazer Login
+                            </a>
+                            <a href="#" class="dropdown-item" data-modal="register">
+                                <i class="fas fa-user-plus"></i>
+                                Criar Conta
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <button class="hamburger" id="hamburger">
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                    </button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <h1 class="page-title">Política de Privacidade</h1>
+            <p class="page-subtitle">Entenda como coletamos, usamos e protegemos suas informações.</p>
+            
+            <div class="privacy-content" style="background: var(--card-bg); padding: 40px; border-radius: var(--border-radius); box-shadow: var(--card-shadow); margin-top: 30px;">
+                <p>A sua privacidade é importante para nós. Esta política explica como coletamos, usamos, compartilhamos e protegemos suas informações pessoais quando você utiliza os serviços da OilSmart.</p>
+
+                <h2 style="color: var(--secondary-color); margin-top: 30px;">1. Informações Coletadas</h2>
+                <p>Coletamos os seguintes tipos de informações quando você utiliza nossa plataforma:</p>
+                <ul style="padding-left: 20px; margin-bottom: 20px;">
+                    <li><strong>Informações de cadastro:</strong> nome, e-mail, telefone, endereço</li>
+                    <li><strong>Dados do veículo:</strong> marca, modelo, ano, tipo de motor, quilometragem</li>
+                    <li><strong>Informações de localização:</strong> coletadas com sua permissão para encontrar oficinas próximas</li>
+                    <li><strong>Dados de uso:</strong> histórico de serviços, preferências, interações com a plataforma</li>
+                    <li><strong>Informações de pagamento:</strong> processadas de forma segura por nossos parceiros</li>
+                </ul>
+
+                <h2 style="color: var(--secondary-color); margin-top: 30px;">2. Uso dos Dados</h2>
+                <p>Utilizamos suas informações para:</p>
+                <ul style="padding-left: 20px; margin-bottom: 20px;">
+                    <li>Fornecer recomendações personalizadas de óleo para seu veículo</li>
+                    <li>Localizar e conectar você com oficinas parceiras próximas</li>
+                    <li>Gerenciar agendamentos de serviços e enviar lembretes</li>
+                    <li>Melhorar continuamente a experiência do usuário em nossa plataforma</li>
+                    <li>Enviar comunicações relevantes sobre serviços, promoções e novidades (com sua permissão)</li>
+                    <li>Garantir a segurança de sua conta e de nossos serviços</li>
+                </ul>
+
+                <h2 style="color: var(--secondary-color); margin-top: 30px;">3. Compartilhamento de Informações</h2>
+                <p>Seus dados pessoais não são vendidos a terceiros. Podemos compartilhar informações nas seguintes situações:</p>
+                <ul style="padding-left: 20px; margin-bottom: 20px;">
+                    <li><strong>Oficinas parceiras:</strong> informações necessárias para realizar os serviços agendados</li>
+                    <li><strong>Prestadores de serviços:</strong> empresas que nos auxiliam na operação da plataforma (sempre com contratos de confidencialidade)</li>
+                    <li><strong>Obrigações legais:</strong> quando exigido por lei, regulamento ou processo legal</li>
+                    <li><strong>Proteção de direitos:</strong> para proteger os direitos, propriedade ou segurança da OilSmart, nossos usuários ou do público</li>
+                </ul>
+
+                <h2 style="color: var(--secondary-color); margin-top: 30px;">4. Segurança dos Dados</h2>
+                <p>Implementamos medidas técnicas e organizacionais robustas para proteger suas informações:</p>
+                <ul style="padding-left: 20px; margin-bottom: 20px;">
+                    <li>Criptografia de dados em trânsito e em repouso</li>
+                    <li>Autenticação segura e controle de acesso</li>
+                    <li>Monitoramento contínuo de segurança</li>
+                    <li>Backups regulares e planos de recuperação de desastres</li>
+                    <li>Treinamento de equipe em proteção de dados</li>
+                </ul>
+
+                <h2 style="color: var(--secondary-color); margin-top: 30px;">5. Seus Direitos</h2>
+                <p>Você tem o direito de:</p>
+                <ul style="padding-left: 20px; margin-bottom: 20px;">
+                    <li>Acessar e revisar suas informações pessoais</li>
+                    <li>Corrigir dados inexatos ou incompletos</li>
+                    <li>Solicitar a exclusão de seus dados pessoais</li>
+                    <li>Opor-se ao processamento de seus dados para determinadas finalidades</li>
+                    <li>Receber seus dados em formato estruturado e portátil</li>
+                    <li>Retirar seu consentimento a qualquer momento</li>
+                </ul>
+                <p>Para exercer esses direitos, entre em contato conosco através do e-mail <strong>contato@oilsmart.com.br</strong>.</p>
+
+                <h2 style="color: var(--secondary-color); margin-top: 30px;">6. Retenção de Dados</h2>
+                <p>Manteremos suas informações pessoais apenas pelo tempo necessário para cumprir as finalidades descritas nesta política, respeitando os prazos legais aplicáveis. Após esse período, seus dados serão anonimizados ou excluídos com segurança.</p>
+
+                <h2 style="color: var(--secondary-color); margin-top: 30px;">7. Cookies e Tecnologias Semelhantes</h2>
+                <p>Utilizamos cookies e tecnologias similares para melhorar sua experiência, analisar o uso de nossos serviços e personalizar conteúdo e anúncios. Você pode gerenciar suas preferências de cookies através das configurações do seu navegador.</p>
+
+                <h2 style="color: var(--secondary-color); margin-top: 30px;">8. Alterações nesta Política</h2>
+                <p>Podemos atualizar esta política periodicamente para refletir mudanças em nossas práticas ou por outros motivos operacionais, legais ou regulatórios. A versão mais recente estará sempre disponível em nosso site, com a data de última atualização.</p>
+
+                <h2 style="color: var(--secondary-color); margin-top: 30px;">9. Contato</h2>
+                <p>Se você tiver dúvidas, preocupações ou solicitações relacionadas a esta Política de Privacidade ou ao tratamento de seus dados pessoais, entre em contato conosco:</p>
+                <p><strong>E-mail:</strong> contato@oilsmart.com.br<br>
+                <strong>Endereço:</strong> São Paulo, Brasil</p>
+
+                <p class="last-updated" style="margin-top: 40px; font-size: 0.9rem; color: var(--text-light); text-align: right;">Última atualização: Maio de 2025</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <img src="../img/LogoIOil.png" alt="OilSmart">
+                    <p>Conectando você às melhores oficinas e produtos para o cuidado do seu veículo.</p>
+                </div>
+                
+                <div class="footer-links">
+                    <h3>Links Rápidos</h3>
+                    <ul>
+                        <li><a href="index.html">Início</a></li>
+                        <li><a href="servicos.html">Serviços</a></li>
+                        <li><a href="sobre.html">Sobre Nós</a></li>
+                        <li><a href="agenda.html">Minha Agenda</a></li>
+                        <li><a href="contatos.html">Contato</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-links">
+                    <h3>Suporte</h3>
+                    <ul>
+                        <li><a href="faq.html">Perguntas Frequentes</a></li>
+                        <li><a href="politicas.html">Política de Privacidade</a></li>
+                        <li><a href="termos.html">Termos de Serviço</a></li>
+                        <li><a href="contatos.html">Fale Conosco</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-contact">
+                    <h3>Contato</h3>
+                    <p><i class="fas fa-envelope"></i> contato@oilsmart.com.br</p>
+                    <p><i class="fas fa-phone"></i> (11) 3456-7890</p>
+                    <p><i class="fas fa-map-marker-alt"></i> São Paulo, Brasil</p>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2025 OilSmart. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div class="modal" id="login-modal">
+        <div class="modal-content">
+            <button class="close-modal">&times;</button>
+            <div class="modal-header">
+                <h2>Fazer Login</h2>
+                <p>Entre na sua conta para acessar todos os recursos</p>
+            </div>
+            <form class="login-form">
+                <div class="form-group">
+                    <label for="login-email">E-mail</label>
+                    <input type="email" id="login-email" placeholder="Seu e-mail" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Senha</label>
+                    <input type="password" id="login-password" placeholder="Sua senha" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+            </form>
+            <div class="divider">ou</div>
+            <div class="social-login">
+                <button class="social-btn google">
+                    <i class="fab fa-google"></i>
+                    Entrar com Google
+                </button>
+            </div>
+            <div class="register-link">
+                Não tem uma conta? <a href="#" data-modal="register">Cadastre-se</a>
+            </div>
+        </div>
     </div>
-  </header>
 
-  <main class="privacy-content container">
-    <h1>Política de Privacidade</h1>
-    <p>A sua privacidade é importante para nós. Esta política explica como coletamos, usamos e protegemos suas informações ao utilizar a OilSmart.</p>
-
-    <h2>1. Informações Coletadas</h2>
-    <p>Coletamos dados como nome, e-mail, telefone, localização (com permissão) e informações do veículo para melhorar nossos serviços.</p>
-
-    <h2>2. Uso dos Dados</h2>
-    <ul>
-      <li>Recomendar óleo ideal para seu veículo</li>
-      <li>Localizar oficinas próximas</li>
-      <li>Agendar serviços e enviar notificações</li>
-      <li>Melhorar a experiência do usuário na plataforma</li>
-    </ul>
-
-    <h2>3. Compartilhamento</h2>
-    <p>Seus dados não são vendidos. Eles podem ser compartilhados apenas com oficinas parceiras para realizar os serviços agendados.</p>
-
-    <h2>4. Segurança</h2>
-    <p>Adotamos boas práticas de segurança digital, como criptografia, autenticação e proteção dos servidores.</p>
-
-    <h2>5. Direitos do Usuário</h2>
-    <p>Você pode solicitar a exclusão ou atualização dos seus dados a qualquer momento através do e-mail <strong>contato@oilsmart.com.br</strong>.</p>
-
-    <h2>6. Alterações</h2>
-    <p>Reservamo-nos o direito de alterar esta política. A versão mais recente estará sempre disponível neste site.</p>
-
-    <p class="last-updated">Última atualização: Maio de 2025</p>
-  </main>
-
-  <footer class="footer">
-    <div class="container">
-      <p>© 2025 OilSmart - Todos os direitos reservados.</p>
+    <!-- Register Modal -->
+    <div class="modal" id="register-modal">
+        <div class="modal-content">
+            <button class="close-modal">&times;</button>
+            <div class="modal-header">
+                <h2>Criar Conta</h2>
+                <p>Junte-se à nossa comunidade</p>
+            </div>
+            <form class="login-form">
+                <div class="form-group">
+                    <label for="register-name">Nome Completo</label>
+                    <input type="text" id="register-name" placeholder="Seu nome completo" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-email">E-mail</label>
+                    <input type="email" id="register-email" placeholder="Seu e-mail" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Senha</label>
+                    <input type="password" id="register-password" placeholder="Crie uma senha" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-confirm-password">Confirmar Senha</label>
+                    <input type="password" id="register-confirm-password" placeholder="Repita sua senha" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Criar Conta</button>
+            </form>
+            <div class="divider">ou</div>
+            <div class="social-login">
+                <button class="social-btn google">
+                    <i class="fab fa-google"></i>
+                    Cadastrar com Google
+                </button>
+            </div>
+            <div class="register-link">
+                Já tem uma conta? <a href="#" data-modal="login">Faça login</a>
+            </div>
+        </div>
     </div>
-  </footer>
 
-  <script>
-    // Rolagem ao topo ao abrir a página
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  </script>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script src="../js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize modals and mobile menu
+            initModals();
+            initMobileMenu();
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        
+        function initModals() {
+            // Modal functionality would be implemented here
+        }
+        
+        function initMobileMenu() {
+            // Mobile menu functionality would be implemented here
+        }
+    </script>
 </body>
 </html>

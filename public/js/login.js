@@ -10,7 +10,7 @@ document.getElementById('login-form').addEventListener('submit', async (event) =
     }
 
     try {
-        const response = await fetch('http://localhost:3000/api/login', {
+        const response = await fetch('http://localhost:3000/api/auth/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -21,8 +21,9 @@ document.getElementById('login-form').addEventListener('submit', async (event) =
         const data = await response.json();
 
         if (response.ok) {
-            localStorage.setItem('token', data.token);  // Salva o token
-            window.location.href = 'agenda.html';  // Redireciona para a agenda
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.usuario));
+            window.location.href = 'agenda.html';
         } else {
             alert(data.erro || 'Falha no login');
         }
