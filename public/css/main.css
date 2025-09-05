@@ -4154,6 +4154,50 @@ select option:disabled {
 
 
 /* ===== ESTILOS DO DROPDOWN DO USUÁRIO ===== */
+.user-dropdown {
+    position: relative;
+    cursor: pointer;
+}
+
+.user-ico {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 15px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: var(--f8f9fa);
+}
+
+.user-ico:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.login-status {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 250px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    padding: 15px 0;
+    z-index: 1000;
+    display: none;
+    animation: fadeIn 0.2s ease;
+    margin-top: 10px;
+}
+
+.dropdown-menu.show {
+    display: block;
+}
+
 .user-info {
     padding: 0 15px 10px;
     border-bottom: 1px solid #eee;
@@ -4170,67 +4214,6 @@ select option:disabled {
 .user-info span {
     color: #666;
     font-size: 12px;
-}
-
-.user-dropdown {
-    position: relative;
-    cursor: pointer;
-}
-
-.user-ico {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 15px;
-    border-radius: 8px;
-    transition: background-color 0.3s ease;
-    text-decoration: none;
-    color: inherit;
-}
-
-.user-dropdown.user-logged-in .login-status {
-    color: #4CAF50;
-    font-weight: 600;
-}
-
-
-.user-ico:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-}
-
-.login-status {
-    font-size: 0.9rem;
-}
-
-.dropdown-menu {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    width: 250px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    padding: 15px 0;
-    z-index: 1000;
-    display: none;
-    animation: fadeIn 0.2s ease;
-}
-
-.dropdown-menu.show {
-    display: block;
-}
-
-.dropdown-menu a {
-    color: #333;
-    padding: 8px 12px;
-    text-decoration: none;
-    display: block;
-    font-size: 0.9rem;
-    transition: background-color 0.3s;
-}
-
-.dropdown-menu a:hover {
-    background-color: #f1f1f1;
 }
 
 .dropdown-divider {
@@ -4280,7 +4263,13 @@ select option:disabled {
     color: #FF6B00;
 }
 
-/* Responsivo */
+/* Animações */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsividade */
 @media (max-width: 768px) {
     .dropdown-menu {
         position: fixed;
