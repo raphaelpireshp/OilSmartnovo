@@ -23,33 +23,13 @@
                         <li><a href="servicos.html">Serviços</a></li>
                         <li><a href="sobre.html">Sobre</a></li>
                         <li><a href="agenda.html">Agenda</a></li>
-                        <li><a href="contatos.html">Contatos</a></li>
+                        <li><a href="contato.html">Contatos</a></li>
                         <li><a href="faq.html" class="active">FAQ</a></li>
                     </ul>
                 </div>
                 
                 <div class="action-icons">
-                    <div class="user-dropdown">
-                        <div class="user-ico">
-                            <i class="fas fa-user-circle"></i>
-                            <span class="login-status">Entrar</span>
-                        </div>
-                        <div class="dropdown-menu">
-                            <div class="user-info">
-                                <strong>Visitante</strong>
-                                <span>Entre ou cadastre-se</span>
-                            </div>
-                            <div class="dropdown-divider"></div>
-                            <a href="#" class="dropdown-item" data-modal="login">
-                                <i class="fas fa-sign-in-alt"></i>
-                                Fazer Login
-                            </a>
-                            <a href="#" class="dropdown-item" data-modal="register">
-                                <i class="fas fa-user-plus"></i>
-                                Criar Conta
-                            </a>
-                        </div>
-                    </div>
+
                     
                     <button class="hamburger" id="hamburger">
                         <span class="hamburger-line"></span>
@@ -169,7 +149,7 @@
                         <li><a href="servicos.html">Serviços</a></li>
                         <li><a href="sobre.html">Sobre Nós</a></li>
                         <li><a href="agenda.html">Minha Agenda</a></li>
-                        <li><a href="contatos.html">Contato</a></li>
+                        <li><a href="contato.html">Contato</a></li>
                     </ul>
                 </div>
                 
@@ -179,7 +159,7 @@
                         <li><a href="faq.html">Perguntas Frequentes</a></li>
                         <li><a href="politicas.html">Política de Privacidade</a></li>
                         <li><a href="termos.html">Termos de Serviço</a></li>
-                        <li><a href="contatos.html">Fale Conosco</a></li>
+                        <li><a href="contato.html">Fale Conosco</a></li>
                     </ul>
                 </div>
                 
@@ -198,77 +178,7 @@
     </footer>
 
     <!-- Login Modal -->
-    <div class="modal" id="login-modal">
-        <div class="modal-content">
-            <button class="close-modal">&times;</button>
-            <div class="modal-header">
-                <h2>Fazer Login</h2>
-                <p>Entre na sua conta para acessar todos os recursos</p>
-            </div>
-            <form class="login-form">
-                <div class="form-group">
-                    <label for="login-email">E-mail</label>
-                    <input type="email" id="login-email" placeholder="Seu e-mail" required>
-                </div>
-                <div class="form-group">
-                    <label for="login-password">Senha</label>
-                    <input type="password" id="login-password" placeholder="Sua senha" required>
-                </div>
-                <button type="submit" class="btn btn-primary btn-block">Entrar</button>
-            </form>
-            <div class="divider">ou</div>
-            <div class="social-login">
-                <button class="social-btn google">
-                    <i class="fab fa-google"></i>
-                    Entrar com Google
-                </button>
-            </div>
-            <div class="register-link">
-                Não tem uma conta? <a href="#" data-modal="register">Cadastre-se</a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Register Modal -->
-    <div class="modal" id="register-modal">
-        <div class="modal-content">
-            <button class="close-modal">&times;</button>
-            <div class="modal-header">
-                <h2>Criar Conta</h2>
-                <p>Junte-se à nossa comunidade</p>
-            </div>
-            <form class="login-form">
-                <div class="form-group">
-                    <label for="register-name">Nome Completo</label>
-                    <input type="text" id="register-name" placeholder="Seu nome completo" required>
-                </div>
-                <div class="form-group">
-                    <label for="register-email">E-mail</label>
-                    <input type="email" id="register-email" placeholder="Seu e-mail" required>
-                </div>
-                <div class="form-group">
-                    <label for="register-password">Senha</label>
-                    <input type="password" id="register-password" placeholder="Crie uma senha" required>
-                </div>
-                <div class="form-group">
-                    <label for="register-confirm-password">Confirmar Senha</label>
-                    <input type="password" id="register-confirm-password" placeholder="Repita sua senha" required>
-                </div>
-                <button type="submit" class="btn btn-primary btn-block">Criar Conta</button>
-            </form>
-            <div class="divider">ou</div>
-            <div class="social-login">
-                <button class="social-btn google">
-                    <i class="fab fa-google"></i>
-                    Cadastrar com Google
-                </button>
-            </div>
-            <div class="register-link">
-                Já tem uma conta? <a href="#" data-modal="login">Faça login</a>
-            </div>
-        </div>
-    </div>
-
+   
     <!-- Loading Overlay -->
     <div id="loading-overlay">
         <div class="loader"></div>
