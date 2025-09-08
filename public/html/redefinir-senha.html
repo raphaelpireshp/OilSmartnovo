@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redefinir Senha - OilSmart</title>
+    <link rel="stylesheet" href="/css/login.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <link rel="icon" href="/img/tentativa4.png" type="image/x-icon">
+
+</head>
+<body>
+    <div class="login-card">
+        <div class="logo-container">
+            <div class="logo">OS</div>
+            <h1 class="login-title">Redefinir Senha</h1>
+        </div>
+        <p class="login-subtitle">Crie uma nova senha para sua conta</p>
+
+        <div class="divider"></div>
+
+        <form id="resetForm">
+            <input type="hidden" id="reset-token" value="">
+            
+            <div class="form-group">
+                <label for="reset-password" class="section-title">Nova Senha</label>
+                <input type="password" id="reset-password" class="input-field" placeholder="Crie uma nova senha segura" required>
+                <small class="field-hint">Mínimo de 6 caracteres</small>
+            </div>
+
+            <div class="form-group">
+                <label for="reset-confirm-password" class="section-title">Confirmar Nova Senha</label>
+                <input type="password" id="reset-confirm-password" class="input-field" placeholder="Digite a mesma senha" required>
+                <small class="field-hint">As senhas devem coincidir</small>
+            </div>
+
+            <div class="divider"></div>
+
+            <button type="submit" class="login-button">
+                <span class="button-text">Redefinir Senha</span>
+            </button>
+
+            <p class="register-text">Lembrou sua senha? <a href="login.html" class="register-link">Faça login aqui</a></p>
+        </form>
+    </div>
+
+    <script>
+        // Extrair token da URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        
+        if (token) {
+            document.getElementById('reset-token').value = token;
+        } else {
+            alert('Token de redefinição não encontrado. Solicite uma nova recuperação.');
+            window.location.href = 'esqueci-senha.html';
+        }
+
+        document.getElementById('resetForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const token = document.getElementById('reset-token').value;
+            const senha = document.getElementById('reset-password').value;
+            const confirmarSenha = document.getElementById('reset-confirm-password').value;
+
+            if (!senha) {
+                alert('Por favor, informe a nova senha');
+                return;
+            }
+
+            if (senha.length < 6) {
+                alert('A senha deve ter pelo menos 6 caracteres');
+                return;
+            }
+
+            if (senha !== confirmarSenha) {
+                alert('As senhas não coincidem');
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:3000/api/auth/reset-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ token, senha })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('Senha redefinida com sucesso!');
+                    window.location.href = 'login.html';
+                } else {
+                    alert(result.message);
+                }
+            } catch (error) {
+                console.error('Erro ao redefinir senha:', error);
+                alert('Erro ao conectar com o servidor. Tente novamente.');
+            }
+        });
+    </script>
+</body>
+</html>
