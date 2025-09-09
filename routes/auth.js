@@ -166,7 +166,7 @@ router.post('/forgot-password', async (req, res) => {
                         const transporter = await createTransporter();
                         
                         // Enviar email
-                        const resetLink = `http://localhost:3000/redefinir-senha.html?token=${resetToken}`;
+                        const resetLink = `http://localhost:3000/html/redefinir-senha.html?token=${resetToken}`;
                         
                         const mailOptions = {
                             to: email,
@@ -181,7 +181,7 @@ router.post('/forgot-password', async (req, res) => {
                                     <p>Este link expira em 1 hora.</p>
                                     <p>Se você não solicitou esta redefinição, ignore este email.</p>
                                     <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
-                                    <p style="color: #777; font-size: 12px;">Equipe OilSmart</p>
+                                    <p style="color: #b49434; font-size: 12px;">Equipe OilSmart</p>
                                 </div>
                             `
                         };
