@@ -1149,15 +1149,8 @@ AND table_schema = DATABASE()
 AND column_name = 'preco';
 
 
--- Tabela de contatos
-CREATE TABLE contatos (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(100) NOT NULL,
-    email VARCHAR(100) NOT NULL,
-    telefone VARCHAR(20),
-    assunto VARCHAR(100) NOT NULL,
-    mensagem TEXT NOT NULL,
-    data_contato DATETIME DEFAULT CURRENT_TIMESTAMP
-);
+ALTER TABLE usuario 
+ADD COLUMN reset_token VARCHAR(255) NULL,
+ADD COLUMN reset_token_expiry BIGINT NULL;
 
-SHOW TABLES LIKE 'contatos';
+
