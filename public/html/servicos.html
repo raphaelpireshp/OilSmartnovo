@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,8 +13,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="/css/main.css">
-<link rel="stylesheet" href="/css/auth.css">
-<script src="/js/auth.js" defer></script>
+    <link rel="stylesheet" href="/css/auth.css">
+    <script src="/js/auth.js" defer></script>
 
     <link rel="icon" href="/img/tentativa4.png" type="image/x-icon">
 </head>
@@ -22,7 +23,7 @@
 </head>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const hamburger = document.getElementById("hamburger");
+const hamburger = document.getElementById("hamburger-menu");
         const nav = document.getElementById("nav");
 
         if (hamburger && nav) {
@@ -50,15 +51,16 @@
     <header class="header">
         <div class="container">
             <div class="navbar">
-                <div class="logo">
-                    <a href="index.html"><img src="/img/oilamarelo.png" alt="OilSmart"></a>
-                </div>
 
-                <button class="hamburger" id="hamburger">
+
+                <button class="hamburger-menu" id="hamburger">
                     <span class="hamburger-line"></span>
                     <span class="hamburger-line"></span>
                     <span class="hamburger-line"></span>
                 </button>
+                                <div class="logo">
+                    <a href="index.html"><img src="/img/oilamarelo.png" alt="OilSmart"></a>
+                </div>
 
                 <nav class="nav" id="nav">
                     <ul class="nav__list">
@@ -70,56 +72,56 @@
 
                     </ul>
                 </nav>
-<div class="action-icons">
-    <div class="user-dropdown" id="user-dropdown">
-        <div class="user-icon" id="login-btn">
-            <i class="fas fa-user"></i>
-            <span class="login-status" id="login-status">Login</span>
-        </div>
-        <div class="dropdown-menu" id="dropdown-menu">
-            <div class="user-info">
-                <strong id="user-display-name">Usuário</strong>
-                <span id="user-email">email@exemplo.com</span>
-            </div>
-            <div class="dropdown-divider"></div>
+                <div class="action-icons">
+                    <div class="user-dropdown" id="user-dropdown">
+                        <div class="user-icon" id="login-btn">
+                            <i class="fas fa-user"></i>
+                            <span class="login-status" id="login-status">Login</span>
+                        </div>
+                        <div class="dropdown-menu" id="dropdown-menu">
+                            <div class="user-info">
+                                <strong id="user-display-name">Usuário</strong>
+                                <span id="user-email">email@exemplo.com</span>
+                            </div>
+                            <div class="dropdown-divider"></div>
 
-            <a href="/html/agenda.html" class="dropdown-item">
-                <i class="fas fa-calendar-alt"></i> Meus Agendamentos
-            </a>
-            <div class="dropdown-divider"></div>
-            <a href="/html/index.html" id="logout-btn" class="dropdown-item">
-                <i class="fas fa-sign-out-alt"></i> Sair
-            </a>
-        </div>
-    </div>
-</div>
+                            <a href="/html/agenda.html" class="dropdown-item">
+                                <i class="fas fa-calendar-alt"></i> Meus Agendamentos
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="/html/index.html" id="logout-btn" class="dropdown-item">
+                                <i class="fas fa-sign-out-alt"></i> Sair
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </header>
 
     <main class="main-content">
         <div class="container">
-<div class="progress-container">
-    <div class="progress-bar">
-        <div class="progress-step active">
-            <div class="step-bubble">1</div>
-            <span class="step-label">Veículo</span>
-        </div>
-        <div class="progress-step">
-            <div class="step-bubble">2</div>
-            <span class="step-label">Produtos</span>
-        </div>
-        <div class="progress-step">
-            <div class="step-bubble">3</div>
-            <span class="step-label">Agendamento</span>
-        </div>
-        <div class="progress-step">
-            <div class="step-bubble">4</div>
-            <span class="step-label">Confirmação</span>
-        </div>
-        <div class="progress-line"></div>
-    </div>
-</div>
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-step active">
+                        <div class="step-bubble">1</div>
+                        <span class="step-label">Veículo</span>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-bubble">2</div>
+                        <span class="step-label">Produtos</span>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-bubble">3</div>
+                        <span class="step-label">Agendamento</span>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-bubble">4</div>
+                        <span class="step-label">Confirmação</span>
+                    </div>
+                    <div class="progress-line"></div>
+                </div>
+            </div>
 
             <h1 class="page-title">Agendamento para Troca de Óleo</h1>
             <p class="page-subtitle">Encontre o óleo e filtro perfeitos para seu veículo</p>
@@ -506,78 +508,78 @@
             }
         }
     </style>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const downloadBtn = document.getElementById("download-pdf");
-    const confirmationSection = document.querySelector("#step4 .confirmation-container");
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const downloadBtn = document.getElementById("download-pdf");
+            const confirmationSection = document.querySelector("#step4 .confirmation-container");
 
-    if (downloadBtn && confirmationSection) {
-        downloadBtn.addEventListener("click", async function () {
-            const toast = document.getElementById('toast');
-            if (toast) {
-                toast.innerText = "Gerando PDF...";
-                toast.classList.add("show");
-                setTimeout(() => toast.classList.remove("show"), 2000);
-            }
-
-            html2canvas(confirmationSection, {
-                scale: 2,
-                backgroundColor: "#ffffff",
-                onclone: function (clonedDoc) {
-                    const clonedSection = clonedDoc.querySelector(".confirmation-container");
-                    if (clonedSection) {
-                        clonedSection.style.width = "100%";
-                        clonedSection.style.padding = "20px";
+            if (downloadBtn && confirmationSection) {
+                downloadBtn.addEventListener("click", async function () {
+                    const toast = document.getElementById('toast');
+                    if (toast) {
+                        toast.innerText = "Gerando PDF...";
+                        toast.classList.add("show");
+                        setTimeout(() => toast.classList.remove("show"), 2000);
                     }
-                }
-            }).then(canvas => {
-                const imgData = canvas.toDataURL("image/png");
 
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF({
-                    orientation: "portrait",
-                    unit: "mm",
-                    format: "a4"
+                    html2canvas(confirmationSection, {
+                        scale: 2,
+                        backgroundColor: "#ffffff",
+                        onclone: function (clonedDoc) {
+                            const clonedSection = clonedDoc.querySelector(".confirmation-container");
+                            if (clonedSection) {
+                                clonedSection.style.width = "100%";
+                                clonedSection.style.padding = "20px";
+                            }
+                        }
+                    }).then(canvas => {
+                        const imgData = canvas.toDataURL("image/png");
+
+                        const { jsPDF } = window.jspdf;
+                        const pdf = new jsPDF({
+                            orientation: "portrait",
+                            unit: "mm",
+                            format: "a4"
+                        });
+
+                        const pageWidth = pdf.internal.pageSize.getWidth();
+                        const pageHeight = pdf.internal.pageSize.getHeight();
+                        const imgWidth = pageWidth - 20; // margem lateral
+                        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+                        let position = 10; // margem topo
+                        let heightLeft = imgHeight;
+
+                        // primeira página
+                        pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight - 20;
+
+                        // adiciona páginas extras se necessário
+                        while (heightLeft > 0) {
+                            pdf.addPage();
+                            position = 10;
+                            pdf.addImage(
+                                imgData,
+                                "PNG",
+                                10,
+                                position - (imgHeight - heightLeft),
+                                imgWidth,
+                                imgHeight
+                            );
+                            heightLeft -= pageHeight - 20;
+                        }
+
+                        // rodapé com data
+                        const currentDate = new Date().toLocaleString('pt-BR');
+                        pdf.setFontSize(10);
+                        pdf.text(`Comprovante gerado em: ${currentDate}`, 10, pageHeight - 10);
+
+                        pdf.save("Comprovante-Agendamento-OilSmart.pdf");
+                    });
                 });
-
-                const pageWidth = pdf.internal.pageSize.getWidth();
-                const pageHeight = pdf.internal.pageSize.getHeight();
-                const imgWidth = pageWidth - 20; // margem lateral
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-                let position = 10; // margem topo
-                let heightLeft = imgHeight;
-
-                // primeira página
-                pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight - 20;
-
-                // adiciona páginas extras se necessário
-                while (heightLeft > 0) {
-                    pdf.addPage();
-                    position = 10;
-                    pdf.addImage(
-                        imgData,
-                        "PNG",
-                        10,
-                        position - (imgHeight - heightLeft),
-                        imgWidth,
-                        imgHeight
-                    );
-                    heightLeft -= pageHeight - 20;
-                }
-
-                // rodapé com data
-                const currentDate = new Date().toLocaleString('pt-BR');
-                pdf.setFontSize(10);
-                pdf.text(`Comprovante gerado em: ${currentDate}`, 10, pageHeight - 10);
-
-                pdf.save("Comprovante-Agendamento-OilSmart.pdf");
-            });
+            }
         });
-    }
-});
-</script>
+    </script>
 
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>

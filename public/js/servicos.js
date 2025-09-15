@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const togglePassword = document.querySelector(".toggle-password");
     const passwordInput = document.getElementById("login-password");
     const hamburgerMenu = document.getElementById("hamburger-menu");
-    const mobileNav = document.getElementById("mobile-nav");
+    const mobileNav = document.getElementById("nav");
 
     // ==================== VARIÁVEIS GLOBAIS ====================
     let userLocation = null;
