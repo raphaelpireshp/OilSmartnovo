@@ -123,20 +123,22 @@ CREATE TABLE recomendacao (
 );
 
 -- Tabela de agendamentos
+-- Tabela de agendamentos (atualizada)
 CREATE TABLE agendamento (
     id INT AUTO_INCREMENT PRIMARY KEY,
     cliente_id INT NOT NULL,
     oficina_id INT NOT NULL,
-    veiculo_id INT NOT NULL,
-    funcionario_id INT,
+    veiculo_id INT NULL,
     data_agendamento DATETIME NOT NULL,
-    status ENUM('pendente', 'confirmado', 'cancelado', 'concluido') DEFAULT 'pendente',
+    servicos TEXT,
+    produtos TEXT,
+    observacoes TEXT,
     codigo_confirmacao VARCHAR(10) UNIQUE,
+    status ENUM('pendente', 'confirmado', 'cancelado', 'concluido') DEFAULT 'pendente',
     data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (cliente_id) REFERENCES usuario(id) ON DELETE CASCADE,
     FOREIGN KEY (oficina_id) REFERENCES oficina(id) ON DELETE CASCADE,
-    FOREIGN KEY (veiculo_id) REFERENCES veiculo(id) ON DELETE CASCADE,
-    FOREIGN KEY (funcionario_id) REFERENCES funcionario(id) ON DELETE SET NULL
+    FOREIGN KEY (veiculo_id) REFERENCES veiculo(id) ON DELETE SET NULL
 );
 
 -- Tabela de divergências
@@ -1153,4 +1155,33 @@ ALTER TABLE usuario
 ADD COLUMN reset_token VARCHAR(255) NULL,
 ADD COLUMN reset_token_expiry BIGINT NULL;
 
+USE Oil;
 
+SELECT 
+    a.id,
+    u.nome AS cliente,
+    o.nome AS oficina,
+    v.placa AS veiculo,
+    a.data_agendamento,
+    a.servicos,
+    a.produtos,
+    a.observacoes,
+    a.codigo_confirmacao,
+    a.status
+FROM agendamento a
+JOIN usuario u ON a.cliente_id = u.id
+JOIN oficina o ON a.oficina_id = o.id
+LEFT JOIN veiculo v ON a.veiculo_id = v.id
+ORDER BY a.data_agendamento DESC;
+
+
+SELECT 
+    id,
+    nome,
+    email,
+    senha,
+    tipo,
+    telefone,
+    cpf,
+    cnpj
+FROM usuario;

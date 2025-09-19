@@ -99,8 +99,8 @@ router.post('/register', async (req, res) => {
             const senhaCriptografada = await bcrypt.hash(senha, 10);
 
             // Inserir usuário
-            db.query(`INSERT INTO usuario (nome, email, senha, tipo, telefone, cpf, endereco, cep, cidade, estado) 
-                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
+            db.query(`INSERT INTO usuario (nome, email, senha) 
+                     VALUES (?, ?, ?)`, 
                 [nome, email, senhaCriptografada, tipo || 'cliente', telefone, cpf, endereco, cep, cidade, estado], 
                 (err, result) => {
                     if (err) {

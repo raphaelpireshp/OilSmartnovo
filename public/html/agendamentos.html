@@ -1,0 +1,190 @@
+<style>
+/* Container principal da verificação */
+.login-verification-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(33, 63, 87, 0.95) 0%, rgba(180, 148, 52, 0.9) 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    backdrop-filter: blur(10px);
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Conteúdo da mensagem */
+.login-verification-content {
+    background: var(--card-bg);
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: var(--card-shadow);
+    max-width: 450px;
+    width: 90%;
+    animation: slideUp 0.5s ease-out;
+    border: 2px solid rgba(180, 148, 52, 0.3);
+}
+
+/* Ícone de alerta */
+.verification-icon {
+    font-size: 3.5rem;
+    color: var(--secondary-color);
+    margin-bottom: 20px;
+    animation: pulse 1.5s infinite;
+}
+
+/* Texto da mensagem */
+.verification-message {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    margin-bottom: 25px;
+    line-height: 1.5;
+    font-weight: 500;
+}
+
+/* Botão de redirecionamento */
+.verification-button {
+    background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 4px 15px rgba(180, 148, 52, 0.3);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.verification-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(180, 148, 52, 0.4);
+}
+
+/* Animações */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { 
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .login-verification-content {
+        padding: 30px 25px;
+        margin: 20px;
+    }
+    
+    .verification-icon {
+        font-size: 2.8rem;
+    }
+    
+    .verification-message {
+        font-size: 1.1rem;
+    }
+    
+    .verification-button {
+        padding: 10px 25px;
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-verification-content {
+        padding: 25px 20px;
+    }
+    
+    .verification-icon {
+        font-size: 2.5rem;
+    }
+    
+    .verification-message {
+        font-size: 1rem;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Criar elemento de verificação
+    const verificationContainer = document.createElement('div');
+    verificationContainer.className = 'login-verification-container';
+    verificationContainer.innerHTML = `
+        <div class="login-verification-content">
+            <div class="verification-icon">⏳</div>
+            <p class="verification-message">Verificando sua autenticação...</p>
+        </div>
+    `;
+    
+    document.body.appendChild(verificationContainer);
+    
+    // Verificar autenticação após um breve delay para exibir a mensagem
+    setTimeout(() => {
+        if (!window.authManager || !window.authManager.isUserLoggedIn()) {
+            verificationContainer.innerHTML = `
+                <div class="login-verification-content">
+                    <div class="verification-icon">🔒</div>
+                    <p class="verification-message">Você precisa fazer login para agendar um serviço!</p>
+                    <button class="verification-button" onclick="redirectToLogin()">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Fazer Login
+                    </button>
+                </div>
+            `;
+        } else {
+            // Usuário está logado - preencher dados e remover overlay
+            const userData = window.authManager.getUserData();
+            if (userData) {
+                const customerName = document.getElementById('customer-name');
+                const customerEmail = document.getElementById('customer-email');
+                
+                if (customerName) customerName.value = userData.nome || '';
+                if (customerEmail) customerEmail.value = userData.email || '';
+            }
+            
+            // Remover overlay com animação
+            verificationContainer.style.animation = 'fadeOut 0.5s ease forwards';
+            setTimeout(() => {
+                verificationContainer.remove();
+            }, 500);
+        }
+    }, 1000);
+});
+
+// Função para redirecionar para login
+function redirectToLogin() {
+    window.location.href = 'login.html';
+}
+
+// Adicionar animação de fadeOut
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; visibility: hidden; }
+    }
+`;
+document.head.appendChild(style);
+</script>

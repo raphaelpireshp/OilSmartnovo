@@ -75,3 +75,120 @@ app.get('/api/test', (req, res) => {
 app.listen(PORT, () => {
     console.log(`✅ Servidor rodando em http://localhost:${PORT}`);
 });
+
+// server.js - Modifique a rota de agendamentos
+app.post('/api/agendamentos', authenticateToken, async (req, res) => {
+    try {
+        const {
+            cliente_id,
+            oficina_id,
+            veiculo_id,
+            data_agendamento,
+            servicos,
+            produtos,
+            observacoes
+        } = req.body;
+
+        // Verificar se o cliente_id corresponde ao usuário logado
+        if (cliente_id !== req.user.id) {
+            return res.status(403).json({ 
+                success: false, 
+                message: 'Acesso não autorizado' 
+            });
+        }
+
+        // Gerar código único de agendamento
+        const codigoConfirmacao = 'OS' + Date.now().toString().slice(-8);
+        
+        const query = `
+            INSERT INTO agendamento 
+            (cliente_id, oficina_id, veiculo_id, data_agendamento, servicos, produtos, observacoes, codigo_confirmacao, status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pendente')
+        `;
+        
+        db.query(query, [
+            cliente_id,
+            oficina_id,
+            veiculo_id || null,
+            data_agendamento,
+            servicos,
+            produtos,
+            observacoes,
+            codigoConfirmacao
+        ], (err, result) => {
+            if (err) {
+                console.error('Erro ao criar agendamento:', err);
+                return res.status(500).json({ 
+                    success: false, 
+                    message: 'Erro ao criar agendamento' 
+                });
+            }
+            
+            res.json({
+                success: true,
+                message: 'Agendamento criado com sucesso',
+                agendamento_id: result.insertId,
+                codigo_confirmacao: codigoConfirmacao
+            });
+        });
+    } catch (error) {
+        console.error('Erro no agendamento:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Erro interno do servidor' 
+        });
+    }
+});
+
+// Middleware de autenticação
+function authenticateToken(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).json({ 
+            success: false, 
+            message: 'Token de acesso necessário' 
+        });
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET || 'seu_segredo_jwt', (err, user) => {
+        if (err) {
+            return res.status(403).json({ 
+                success: false, 
+                message: 'Token inválido' 
+            });
+        }
+        req.user = user;
+        next();
+    });
+}
+
+// server.js - Rota para buscar agendamentos do usuário
+app.get('/api/agendamentos/usuario/:userId', (req, res) => {
+    const { userId } = req.params;
+    
+    const query = `
+        SELECT a.*, o.nome as oficina_nome, o.endereco as oficina_endereco
+        FROM agendamento a
+        JOIN oficina o ON a.oficina_id = o.id
+        WHERE a.cliente_id = ?
+        ORDER BY a.data_agendamento DESC
+    `;
+    
+    db.query(query, [userId], (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar agendamentos:', err);
+            return res.status(500).json({ error: 'Erro interno do servidor' });
+        }
+        
+        // Parse dos dados JSON armazenados como texto
+        const agendamentos = results.map(ag => ({
+            ...ag,
+            servicos: JSON.parse(ag.servicos || '{}'),
+            produtos: JSON.parse(ag.produtos || '{}')
+        }));
+        
+        res.json(agendamentos);
+    });
+});

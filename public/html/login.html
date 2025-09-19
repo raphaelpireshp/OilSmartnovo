@@ -91,6 +91,8 @@
 
                 const result = await response.json();
                 console.log('Resultado do login:', result);
+const urlParams = new URLSearchParams(window.location.search);
+const redirect = urlParams.get('redirect');
 
                 if (result.success) {
                     // Login bem-sucedido
@@ -100,7 +102,8 @@
                     localStorage.setItem('user', JSON.stringify(result.user));
                     localStorage.setItem('isLoggedIn', 'true');
                     localStorage.setItem('userId', result.user.id);
-
+    localStorage.setItem('userId', result.user.id);
+    localStorage.setItem('token', result.token);
                     // Lembrar email se solicitado
                     if (rememberMe) {
                         localStorage.setItem('rememberedEmail', email);
@@ -110,7 +113,8 @@
 
                     // Redirecionar para a página inicial
                     window.location.href = 'index.html';
-                } else {
+                }
+                 else {
                     alert(result.message);
                 }
             } catch (error) {

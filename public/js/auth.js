@@ -94,6 +94,8 @@ class AuthManager {
         }
     }
 
+
+
     async handleLogin(form) {
         const email = form.querySelector('#login-email').value;
         const password = form.querySelector('#login-password').value;
@@ -114,6 +116,8 @@ class AuthManager {
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('userData', JSON.stringify(data.user));
                 localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                localStorage.setItem('userId', data.user.id); // Adicionado ID do usuário
                 
                 if (rememberMe) {
                     localStorage.setItem('rememberedEmail', email);
@@ -139,6 +143,8 @@ class AuthManager {
             this.showToast('Erro ao conectar com o servidor', 'error');
         }
     }
+
+
 
     handleLogout() {
         localStorage.removeItem('isLoggedIn');
@@ -192,9 +198,23 @@ class AuthManager {
             toast.style.transform = 'translateX(100%)';
         }, 3000);
     }
+    // auth.js - Adicione esta função na classe AuthManager
+isUserLoggedIn() {
+    return localStorage.getItem('isLoggedIn') === 'true';
+}
+
+getUserData() {
+    const userData = localStorage.getItem('userData');
+    return userData ? JSON.parse(userData) : null;
+}
+
+getUserId() {
+    return localStorage.getItem('userId');
+}
 }
 
 // Initialize auth manager when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     window.authManager = new AuthManager();
 });
+

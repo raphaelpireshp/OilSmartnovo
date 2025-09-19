@@ -370,6 +370,174 @@ const hamburger = document.getElementById("hamburger-menu");
     <div id="toast" class="toast"></div>
 
 
+
+
+<style>
+/* Estilos para a verificação de login */
+.login-verification-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(33, 63, 87, 0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    backdrop-filter: blur(8px);
+    animation: overlayFadeIn 0.4s ease-out;
+}
+
+.login-verification-container {
+    background: var(--card-bg);
+    padding: 2.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    text-align: center;
+    max-width: 450px;
+    width: 90%;
+    animation: modalSlideIn 0.5s ease-out;
+    border: 1px solid rgba(180, 148, 52, 0.2);
+}
+
+.login-verification-icon {
+    font-size: 3.5rem;
+    color: var(--secondary-color);
+    margin-bottom: 1.5rem;
+    animation: iconPulse 2s infinite;
+}
+
+.login-verification-title {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.login-verification-message {
+    color: var(--text-color);
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.login-verification-btn {
+    background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+    color: white;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 4px 15px rgba(180, 148, 52, 0.3);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.login-verification-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(180, 148, 52, 0.4);
+}
+
+/* Animações */
+@keyframes overlayFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes iconPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .login-verification-container {
+        padding: 2rem 1.5rem;
+    }
+    
+    .login-verification-icon {
+        font-size: 3rem;
+    }
+    
+    .login-verification-title {
+        font-size: 1.3rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-verification-container {
+        padding: 1.5rem;
+    }
+    
+    .login-verification-icon {
+        font-size: 2.5rem;
+    }
+    
+    .login-verification-title {
+        font-size: 1.2rem;
+    }
+    
+    .login-verification-btn {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Verificar se o usuário está logado usando o mesmo método do auth.js
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+    
+    if (!token || !userData) {
+        // Criar overlay de verificação
+        const overlay = document.createElement('div');
+        overlay.className = 'login-verification-overlay';
+        
+        // Criar conteúdo da verificação
+        const container = document.createElement('div');
+        container.className = 'login-verification-container';
+        
+        container.innerHTML = `
+            <div class="login-verification-icon">🔒</div>
+            <h2 class="login-verification-title">Acesso Restrito</h2>
+            <p class="login-verification-message">Você precisa fazer login para agendar um serviço!</p>
+            <button class="login-verification-btn" onclick="window.location.href='login.html'">
+                <i class="fas fa-sign-in-alt"></i>
+                Fazer Login
+            </button>
+        `;
+        
+        overlay.appendChild(container);
+        document.body.appendChild(overlay);
+    } else {
+        // Usuário está logado - preencher dados
+        const user = JSON.parse(userData);
+        const customerName = document.getElementById('customer-name');
+        const customerEmail = document.getElementById('customer-email');
+        
+        if (customerName) customerName.value = user.nome || '';
+        if (customerEmail) customerEmail.value = user.email || '';
+    }
+});
+</script>
     <script>
         // Correção do menu hamburguer para a página de serviços
         document.addEventListener('DOMContentLoaded', function () {
@@ -583,6 +751,7 @@ const hamburger = document.getElementById("hamburger-menu");
 
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="/js/agendamento.js"></script>
     <script src="../js/servicos.js"></script>
     <script src="/js/main.js"></script>
 </body>
