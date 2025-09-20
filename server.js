@@ -1,5 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const path = require('path');
 const cors = require('cors');
 require('dotenv').config();
@@ -15,6 +16,30 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Conexão com banco
 const db = require('./database/db');
+
+// Middleware de autenticação
+function authenticateToken(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).json({ 
+            success: false, 
+            message: 'Token de acesso necessário' 
+        });
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET || 'seu_segredo_jwt', (err, user) => {
+        if (err) {
+            return res.status(403).json({ 
+                success: false, 
+                message: 'Token inválido' 
+            });
+        }
+        req.user = user;
+        next();
+    });
+}
 
 // Importar rotas
 const authRoutes = require('./routes/auth');
@@ -76,7 +101,7 @@ app.listen(PORT, () => {
     console.log(`✅ Servidor rodando em http://localhost:${PORT}`);
 });
 
-// server.js - Modifique a rota de agendamentos
+// Rota para criar agendamento
 app.post('/api/agendamentos', authenticateToken, async (req, res) => {
     try {
         const {
@@ -97,6 +122,44 @@ app.post('/api/agendamentos', authenticateToken, async (req, res) => {
             });
         }
 
+        // Verificar se a oficina existe e é do tipo correto
+        const oficinaCheck = await new Promise((resolve, reject) => {
+            db.query(`
+                SELECT o.id, u.tipo 
+                FROM oficina o 
+                JOIN usuario u ON o.usuario_id = u.id 
+                WHERE o.id = ? AND u.tipo = 'oficina'
+            `, [oficina_id], (err, results) => {
+                if (err) reject(err);
+                resolve(results);
+            });
+        });
+
+        if (oficinaCheck.length === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Oficina não encontrada ou inválida' 
+            });
+        }
+
+        // Verificar se o veículo pertence ao cliente (se fornecido)
+        if (veiculo_id) {
+            const veiculoCheck = await new Promise((resolve, reject) => {
+                db.query('SELECT id FROM veiculo WHERE id = ? AND usuario_id = ?', 
+                    [veiculo_id, cliente_id], (err, results) => {
+                    if (err) reject(err);
+                    resolve(results);
+                });
+            });
+
+            if (veiculoCheck.length === 0) {
+                return res.status(404).json({ 
+                    success: false, 
+                    message: 'Veículo não encontrado ou não pertence ao cliente' 
+                });
+            }
+        }
+
         // Gerar código único de agendamento
         const codigoConfirmacao = 'OS' + Date.now().toString().slice(-8);
         
@@ -106,30 +169,27 @@ app.post('/api/agendamentos', authenticateToken, async (req, res) => {
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pendente')
         `;
         
-        db.query(query, [
-            cliente_id,
-            oficina_id,
-            veiculo_id || null,
-            data_agendamento,
-            servicos,
-            produtos,
-            observacoes,
-            codigoConfirmacao
-        ], (err, result) => {
-            if (err) {
-                console.error('Erro ao criar agendamento:', err);
-                return res.status(500).json({ 
-                    success: false, 
-                    message: 'Erro ao criar agendamento' 
-                });
-            }
-            
-            res.json({
-                success: true,
-                message: 'Agendamento criado com sucesso',
-                agendamento_id: result.insertId,
-                codigo_confirmacao: codigoConfirmacao
+        const result = await new Promise((resolve, reject) => {
+            db.query(query, [
+                cliente_id,
+                oficina_id,
+                veiculo_id || null,
+                data_agendamento,
+                JSON.stringify(servicos || {}),
+                JSON.stringify(produtos || {}),
+                observacoes || '',
+                codigoConfirmacao
+            ], (err, result) => {
+                if (err) reject(err);
+                resolve(result);
             });
+        });
+        
+        res.json({
+            success: true,
+            message: 'Agendamento criado com sucesso',
+            agendamento_id: result.insertId,
+            codigo_confirmacao: codigoConfirmacao
         });
     } catch (error) {
         console.error('Erro no agendamento:', error);
@@ -140,38 +200,27 @@ app.post('/api/agendamentos', authenticateToken, async (req, res) => {
     }
 });
 
-// Middleware de autenticação
-function authenticateToken(req, res, next) {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-
-    if (!token) {
-        return res.status(401).json({ 
-            success: false, 
-            message: 'Token de acesso necessário' 
-        });
-    }
-
-    jwt.verify(token, process.env.JWT_SECRET || 'seu_segredo_jwt', (err, user) => {
-        if (err) {
-            return res.status(403).json({ 
-                success: false, 
-                message: 'Token inválido' 
-            });
-        }
-        req.user = user;
-        next();
-    });
-}
-
-// server.js - Rota para buscar agendamentos do usuário
-app.get('/api/agendamentos/usuario/:userId', (req, res) => {
+// Rota para buscar agendamentos do usuário
+app.get('/api/agendamentos/usuario/:userId', authenticateToken, (req, res) => {
     const { userId } = req.params;
     
+    // Verificar se o usuário está tentando acessar seus próprios agendamentos
+    if (parseInt(userId) !== req.user.id) {
+        return res.status(403).json({ 
+            success: false, 
+            message: 'Acesso não autorizado' 
+        });
+    }
+    
     const query = `
-        SELECT a.*, o.nome as oficina_nome, o.endereco as oficina_endereco
+        SELECT a.*, o.nome as oficina_nome, o.endereco as oficina_endereco,
+               v.placa, m.nome as modelo_nome, ma.nome as marca_nome
         FROM agendamento a
         JOIN oficina o ON a.oficina_id = o.id
+        LEFT JOIN veiculo v ON a.veiculo_id = v.id
+        LEFT JOIN modelo_ano moano ON v.modelo_ano_id = moano.id
+        LEFT JOIN modelo m ON moano.modelo_id = m.id
+        LEFT JOIN marca ma ON m.marca_id = ma.id
         WHERE a.cliente_id = ?
         ORDER BY a.data_agendamento DESC
     `;
@@ -179,7 +228,10 @@ app.get('/api/agendamentos/usuario/:userId', (req, res) => {
     db.query(query, [userId], (err, results) => {
         if (err) {
             console.error('Erro ao buscar agendamentos:', err);
-            return res.status(500).json({ error: 'Erro interno do servidor' });
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro interno do servidor' 
+            });
         }
         
         // Parse dos dados JSON armazenados como texto
@@ -189,6 +241,71 @@ app.get('/api/agendamentos/usuario/:userId', (req, res) => {
             produtos: JSON.parse(ag.produtos || '{}')
         }));
         
-        res.json(agendamentos);
+        res.json({
+            success: true,
+            agendamentos: agendamentos
+        });
+    });
+});
+
+// Rota para buscar agendamentos da oficina
+app.get('/api/agendamentos/oficina/:oficinaId', authenticateToken, (req, res) => {
+    const { oficinaId } = req.params;
+    
+    // Verificar se o usuário é dono da oficina
+    const verificarOficina = `
+        SELECT id FROM oficina WHERE id = ? AND usuario_id = ?
+    `;
+    
+    db.query(verificarOficina, [oficinaId, req.user.id], (err, oficinaResults) => {
+        if (err) {
+            console.error('Erro ao verificar oficina:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro interno do servidor' 
+            });
+        }
+        
+        if (oficinaResults.length === 0) {
+            return res.status(403).json({ 
+                success: false, 
+                message: 'Acesso não autorizado à esta oficina' 
+            });
+        }
+        
+        const query = `
+            SELECT a.*, u.nome as cliente_nome, u.telefone as cliente_telefone,
+                   v.placa, m.nome as modelo_nome, ma.nome as marca_nome
+            FROM agendamento a
+            JOIN usuario u ON a.cliente_id = u.id
+            LEFT JOIN veiculo v ON a.veiculo_id = v.id
+            LEFT JOIN modelo_ano moano ON v.modelo_ano_id = moano.id
+            LEFT JOIN modelo m ON moano.modelo_id = m.id
+            LEFT JOIN marca ma ON m.marca_id = ma.id
+            WHERE a.oficina_id = ?
+            ORDER BY a.data_agendamento DESC
+        `;
+        
+        db.query(query, [oficinaId], (err, results) => {
+            if (err) {
+                console.error('Erro ao buscar agendamentos da oficina:', err);
+                return res.status(500).json({ 
+                    success: false, 
+                    message: 'Erro interno do servidor' 
+                });
+            }
+            
+            // Parse dos dados JSON armazenados como texto
+            const agendamentos = results.map(ag => ({
+                ...ag,
+                servicos: JSON.parse(ag.servicos || '{}'),
+                produtos: JSON.parse(ag.produtos || '{}')
+            }));
+            
+            res.json({
+                success: true,
+                agendamentos: agendamentos
+            });
+        });
     });
 });
