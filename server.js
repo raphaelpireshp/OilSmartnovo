@@ -309,3 +309,20 @@ app.get('/api/agendamentos/oficina/:oficinaId', authenticateToken, (req, res) =>
         });
     });
 });
+
+// Rota de teste para verificar a tabela agendamento_simples
+app.get('/api/test/agendamento-table', (req, res) => {
+    db.query('SELECT COUNT(*) as total FROM agendamento_simples', (err, results) => {
+        if (err) {
+            return res.status(500).json({ 
+                success: false, 
+                error: err.message 
+            });
+        }
+        res.json({ 
+            success: true, 
+            total_registros: results[0].total,
+            mensagem: 'Tabela agendamento_simples está acessível'
+        });
+    });
+});

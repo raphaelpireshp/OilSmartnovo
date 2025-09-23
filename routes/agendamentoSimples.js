@@ -10,7 +10,13 @@ function gerarCodigoConfirmacao() {
 }
 
 router.post('/', (req, res) => {
+    console.log('=== DADOS RECEBIDOS NO BACKEND ===');
+    console.log('Body completo:', JSON.stringify(req.body, null, 2));
+    console.log('==================================');
+
     const {
+        protocolo,
+        data_hora,
         oficina_nome,
         oficina_endereco,
         oficina_telefone,
@@ -20,20 +26,44 @@ router.post('/', (req, res) => {
         cliente_nome,
         cliente_cpf,
         cliente_telefone,
-        cliente_email,
-        data_hora
+        cliente_email
     } = req.body;
 
-    // Validação básica
-    if (!oficina_nome || !cliente_nome || !cliente_cpf || !cliente_telefone || !cliente_email || !data_hora) {
+    // VALIDAÇÃO MAIS FLEXÍVEL - apenas campos realmente essenciais
+    if (!cliente_nome || !cliente_telefone || !data_hora) {
+        console.log('Campos obrigatórios faltando:', {
+            cliente_nome: !!cliente_nome,
+            cliente_telefone: !!cliente_telefone,
+            data_hora: !!data_hora
+        });
+        
         return res.status(400).json({ 
             success: false, 
-            message: 'Campos obrigatórios: oficina_nome, cliente_nome, cliente_cpf, cliente_telefone, cliente_email, data_hora' 
+            message: 'Campos obrigatórios: nome, telefone e data/hora',
+            campos_recebidos: req.body
         });
     }
 
-    // Gerar código de confirmação único
-    const protocolo = gerarCodigoConfirmacao();
+    // Usar protocolo gerado ou gerar um novo
+    const protocoloFinal = protocolo || gerarCodigoConfirmacao();
+
+    // PREPARAR VALORES COM VALIDAÇÕES INDIVIDUAIS
+    const values = [
+        protocoloFinal,
+        data_hora || null,
+        oficina_nome || 'Oficina não especificada',
+        oficina_endereco || 'Endereço não informado',
+        oficina_telefone || 'Telefone não informado',
+        veiculo ? (typeof veiculo === 'string' ? veiculo : JSON.stringify(veiculo)) : 'Veículo não informado',
+        servicos ? (typeof servicos === 'string' ? servicos : JSON.stringify(servicos)) : 'Serviços não especificados',
+        parseFloat(total_servico) || 0.00,
+        cliente_nome,
+        cliente_cpf ? cliente_cpf.replace(/\D/g, '') : 'CPF não informado',
+        cliente_telefone,
+        cliente_email || 'email@naoinformado.com'
+    ];
+
+    console.log('Valores para inserção:', values);
 
     const query = `
         INSERT INTO agendamento_simples (
@@ -42,40 +72,32 @@ router.post('/', (req, res) => {
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
-    // CÓDIGO CORRIGIDO: O array de valores deve ter exatamente 12 itens
-    const values = [
-        protocolo,
-        data_hora,
-        oficina_nome,
-        oficina_endereco,
-        oficina_telefone,
-        JSON.stringify(veiculo), // Adicione veiculo aqui, convertido para JSON
-        JSON.stringify(servicos), // Adicione servicos aqui, convertido para JSON
-        total_servico,
-        cliente_nome,
-        cliente_cpf,
-        cliente_telefone,
-        cliente_email
-    ];
-
     db.query(query, values, (err, result) => {
         if (err) {
-            console.error('Erro ao salvar agendamento:', err);
+            console.error('❌ Erro MySQL ao salvar agendamento:', err);
+            console.error('SQL:', err.sql);
+            
             return res.status(500).json({ 
                 success: false, 
                 message: 'Erro ao salvar agendamento no banco de dados',
-                error: err.message 
+                error: err.sqlMessage || err.message,
+                sql: err.sql,
+                values: values
             });
         }
 
+        console.log('✅ Agendamento salvo com sucesso. ID:', result.insertId);
+        
         res.status(201).json({ 
             success: true, 
             agendamento_id: result.insertId,
-            codigo_confirmacao: protocolo,
+            codigo_confirmacao: protocoloFinal,
             message: 'Agendamento salvo com sucesso!'
         });
     });
 });
+
+// ... resto do código permanece igual
 
 // Rota para buscar agendamentos por oficina
 router.get('/oficina/:oficina_nome', (req, res) => {

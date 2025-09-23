@@ -557,11 +557,10 @@ function updateProductSelection() {
         goToStep(3);
     }
 
-    // Recupera a seleção de produtos
 // Recupera a seleção de produtos do sessionStorage
 function getSelectedProducts() {
     const saved = sessionStorage.getItem('selectedProducts');
-    return saved ? JSON.parse(saved) : { oil: true, filter: true }; // Default para ambos se não houver seleção
+    return saved ? JSON.parse(saved) : { oil: true, filter: true };
 }
 
     // ==================== FUNÇÕES DE LOCALIZAÇÃO E OFICINAS ====================
@@ -1012,8 +1011,17 @@ function generateTimeSlots(start, end, interval) {
 
 // ==================== FUNÇÕES DE AGENDAMENTO ====================
 
-// Processa o agendamento
+// Processa o agendamento e salva no banco - VERSÃO COMPLETA CORRIGIDA
+// Processa o agendamento e salva no banco - VERSÃO COMPLETA E CORRIGIDA
 async function processScheduling() {
+    console.log('Iniciando processScheduling...');
+    
+    // Verificar se o usuário está logado
+    if (!checkUserLoggedIn()) {
+        return false;
+    }
+
+    // Obter dados do formulário
     const scheduleDateValue = document.getElementById("schedule-date").value;
     const scheduleTime = document.getElementById("schedule-time").value;
     const customerName = document.getElementById("customer-name").value.trim();
@@ -1021,7 +1029,7 @@ async function processScheduling() {
     const customerPhone = document.getElementById("customer-phone").value.trim();
     const customerEmail = document.getElementById("customer-email").value.trim();
 
-    // Validação dos campos
+    // Validação básica dos campos obrigatórios
     if (!scheduleDateValue || !scheduleTime || !customerName || !customerCpf || !customerPhone || !customerEmail) {
         showToast("Preencha todos os campos obrigatórios", "error");
         return false;
@@ -1036,13 +1044,22 @@ async function processScheduling() {
         showToast("E-mail inválido", "error");
         return false;
     }
- try {
-        // Obter dados do usuário logado
-        const userData = JSON.parse(localStorage.getItem('user'));
-        
-        // Obter dados do veículo
-        const userVehicle = JSON.parse(sessionStorage.getItem('userVehicle') || '{}');
-        
+
+    if (!selectedWorkshop) {
+        showToast("Selecione uma oficina", "error");
+        return false;
+    }
+
+    // Verificar se há dados do veículo
+    const userVehicle = JSON.parse(sessionStorage.getItem('userVehicle') || '{}');
+    if (!userVehicle.modelo_ano_id) {
+        showToast("Dados do veículo não encontrados. Por favor, volte ao passo 1.", "error");
+        return false;
+    }
+
+    showLoading(true);
+    
+    try {
         // Obter produtos selecionados
         const selectedProducts = getSelectedProducts();
         const oilRecommendation = JSON.parse(sessionStorage.getItem('oilRecommendation') || '{}');
@@ -1069,38 +1086,241 @@ async function processScheduling() {
         if (selectedProducts.filter && oilRecommendation.filtro) {
             servicosArray.push(`Troca de Filtro: ${oilRecommendation.filtro.nome} - R$ ${totalFilter.toFixed(2)}`);
         }
-        
-        // Preparar dados para envio
+
+        // Formatar data e hora para o formato do banco
+        const dataHora = `${scheduleDateValue} ${scheduleTime}:00`;
+
+        // Gerar protocolo único
+        const protocolo = `OIL${Date.now().toString().slice(-8)}`;
+
+        // Preparar dados para envio - ESTRUTURA COMPLETA E CORRETA
         const agendamentoData = {
+            protocolo: protocolo,
+            data_hora: dataHora,
             oficina_nome: selectedWorkshop.nome,
             oficina_endereco: `${selectedWorkshop.endereco}, ${selectedWorkshop.cidade}/${selectedWorkshop.estado}`,
             oficina_telefone: selectedWorkshop.telefone || 'Não informado',
-            veiculo: `${userVehicle.marca} ${userVehicle.modelo} ${userVehicle.ano}${userVehicle.quilometragem ? ` - ${userVehicle.quilometragem} km` : ''}`,
-            servicos: servicosArray.join(' + '),
+            veiculo: `${userVehicle.marca || ''} ${userVehicle.modelo || ''} ${userVehicle.ano || ''}`.trim(),
+            servicos: servicosArray.join(' | '), // Converter array para string
             total_servico: totalService,
             cliente_nome: customerName,
-            cliente_cpf: customerCpf,
+            cliente_cpf: customerCpf.replace(/\D/g, ''), // Apenas números
             cliente_telefone: customerPhone,
-            cliente_email: customerEmail,
-            data_hora: `${scheduleDateValue} ${scheduleTime}:00`
+            cliente_email: customerEmail
         };
 
-        // Salvar no banco
+        console.log('Dados do agendamento para salvar:', agendamentoData);
+
+        // Salvar no banco usando a rota correta
         const result = await salvarAgendamentoNoBanco(agendamentoData);
         
-        // Armazenar código de confirmação
-        sessionStorage.setItem('codigoConfirmacao', result.codigo_confirmacao);
-        sessionStorage.setItem('agendamentoId', result.agendamento_id);
-        
-        return true;
+        if (result.success) {
+            // Armazenar dados para exibição na confirmação
+            sessionStorage.setItem('codigoConfirmacao', result.codigo_confirmacao || protocolo);
+            sessionStorage.setItem('agendamentoId', result.agendamento_id);
+            
+            // Salvar dados do cliente para exibição
+            const customerData = {
+                name: customerName,
+                cpf: customerCpf,
+                phone: customerPhone,
+                email: customerEmail
+            };
+            sessionStorage.setItem('customerData', JSON.stringify(customerData));
+            
+            // Salvar dados da oficina
+            sessionStorage.setItem('selectedWorkshop', JSON.stringify(selectedWorkshop));
+            
+            // Salvar dados do serviço
+            const serviceData = {
+                servicos: servicosArray,
+                total: totalService,
+                data: dataHora
+            };
+            sessionStorage.setItem('serviceData', JSON.stringify(serviceData));
+            
+            showToast('Agendamento salvo com sucesso!', 'success');
+            return true;
+        } else {
+            throw new Error(result.message || 'Erro ao salvar agendamento');
+        }
     } catch (error) {
         console.error('Erro no agendamento:', error);
-        showToast(error.message, 'error');
+        showToast(error.message || 'Erro ao processar agendamento', 'error');
         return false;
+    } finally {
+        showLoading(false);
     }
 }
 
-// Mostra detalhes do agendamento confirmado
+// Função para salvar agendamento no banco - VERSÃO CORRIGIDA
+async function salvarAgendamentoNoBanco(agendamentoData) {
+    console.log('🔄 Tentando salvar agendamento no banco...');
+    console.log('Dados enviados:', JSON.stringify(agendamentoData, null, 2));
+    
+    try {
+        const response = await fetch('/api/agendamento_simples', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(agendamentoData)
+        });
+        
+        console.log('Status da resposta:', response.status);
+        
+        // Tentar ler a resposta mesmo em caso de erro
+        const responseText = await response.text();
+        console.log('Resposta do servidor:', responseText);
+        
+        let result;
+        try {
+            result = JSON.parse(responseText);
+        } catch (e) {
+            throw new Error(`Resposta inválida do servidor: ${responseText}`);
+        }
+        
+        if (!response.ok) {
+            throw new Error(result.message || `Erro HTTP ${response.status}`);
+        }
+        
+        if (!result.success) {
+            throw new Error(result.message || 'Erro ao salvar agendamento');
+        }
+        
+        console.log('✅ Agendamento salvo com sucesso!', result);
+        return result;
+        
+    } catch (error) {
+        console.error('❌ Erro ao salvar agendamento no banco:', error);
+        throw error;
+    }
+}
+
+// Função auxiliar para verificar se o usuário está logado
+function checkUserLoggedIn() {
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+    
+    if (!token || !userData) {
+        showToast("Você precisa fazer login para agendar um serviço", "error");
+        setTimeout(() => {
+            window.location.href = 'login.html?redirect=servicos.html';
+        }, 2000);
+        return false;
+    }
+    return true;
+}
+
+// Função para mostrar detalhes da confirmação (atualizada)
+function showConfirmationDetails() {
+    const codigoConfirmacao = sessionStorage.getItem('codigoConfirmacao') || `OS${Date.now().toString().slice(-8)}`;
+    const customerData = JSON.parse(sessionStorage.getItem('customerData') || '{}');
+    const userVehicle = JSON.parse(sessionStorage.getItem('userVehicle') || '{}');
+    const selectedWorkshop = JSON.parse(sessionStorage.getItem('selectedWorkshop') || '{}');
+    const serviceData = JSON.parse(sessionStorage.getItem('serviceData') || '{}');
+    
+    // Formatar data para exibição
+    let dataFormatada = '';
+    if (serviceData.data) {
+        const data = new Date(serviceData.data);
+        dataFormatada = data.toLocaleDateString('pt-BR') + ' às ' + data.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
+    }
+    
+    const confirmationDetails = document.querySelector(".confirmation-details");
+    
+    let html = `
+        <div class="confirmation-section">
+            <h4>📋 Informações do Agendamento</h4>
+            <p><strong>Protocolo:</strong> ${codigoConfirmacao}</p>
+            <p><strong>Data e Horário:</strong> ${dataFormatada}</p>
+        </div>
+        
+        <div class="confirmation-section">
+            <h4>🏢 Oficina</h4>
+            <p><strong>Nome:</strong> ${selectedWorkshop.nome || 'Não informado'}</p>
+            <p><strong>Endereço:</strong> ${selectedWorkshop.endereco || 'Não informado'}, ${selectedWorkshop.cidade || ''}/${selectedWorkshop.estado || ''}</p>
+            <p><strong>Telefone:</strong> ${selectedWorkshop.telefone || 'Não informado'}</p>
+        </div>
+    `;
+    
+    // Informações do veículo
+    if (userVehicle.marca || userVehicle.modelo || userVehicle.ano) {
+        html += `
+            <div class="confirmation-section">
+                <h4>🚗 Veículo</h4>
+                <p><strong>Modelo:</strong> ${userVehicle.marca || ''} ${userVehicle.modelo || ''} ${userVehicle.ano || ''}</p>
+                ${userVehicle.quilometragem ? `<p><strong>Quilometragem:</strong> ${userVehicle.quilometragem} km</p>` : ''}
+            </div>
+        `;
+    }
+    
+    // Serviços selecionados
+    if (serviceData.servicos && serviceData.servicos.length > 0) {
+        html += `
+            <div class="confirmation-section">
+                <h4>🔧 Serviços</h4>
+                ${Array.isArray(serviceData.servicos) ? 
+                  serviceData.servicos.map(servico => `<p>• ${servico}</p>`).join('') : 
+                  `<p>• ${serviceData.servicos}</p>`}
+                ${serviceData.total ? `<p><strong>Total:</strong> R$ ${serviceData.total.toFixed(2)}</p>` : ''}
+            </div>
+        `;
+    }
+    
+    // Informações do cliente
+    html += `
+        <div class="confirmation-section">
+            <h4>👤 Cliente</h4>
+            <p><strong>Nome:</strong> ${customerData.name || 'Não informado'}</p>
+            <p><strong>CPF:</strong> ${customerData.cpf || 'Não informado'}</p>
+            <p><strong>Telefone:</strong> ${customerData.phone || 'Não informado'}</p>
+            <p><strong>E-mail:</strong> ${customerData.email || 'Não informado'}</p>
+        </div>
+    `;
+    
+    confirmationDetails.innerHTML = html;
+}
+
+// Função para validar o passo 3 (atualizada)
+async function validateStep3() {
+    const scheduleDateValue = document.getElementById("schedule-date").value;
+    const scheduleTime = document.getElementById("schedule-time").value;
+    const customerName = document.getElementById("customer-name").value.trim();
+    const customerCpf = document.getElementById("customer-cpf").value.trim();
+    const customerPhone = document.getElementById("customer-phone").value.trim();
+    const customerEmail = document.getElementById("customer-email").value.trim();
+
+    if (!scheduleDateValue || !scheduleTime || !customerName || !customerCpf || !customerPhone || !customerEmail) {
+        showToast("Preencha todos os campos obrigatórios", "error");
+        return false;
+    }
+
+    if (!validateCPF(customerCpf)) {
+        showToast("CPF inválido", "error");
+        return false;
+    }
+
+    if (!validateEmail(customerEmail)) {
+        showToast("E-mail inválido", "error");
+        return false;
+    }
+
+    if (!selectedWorkshop) {
+        showToast("Selecione uma oficina", "error");
+        return false;
+    }
+
+    // Verificar se a data é válida (não pode ser no passado)
+    const selectedDate = new Date(scheduleDateValue + 'T' + scheduleTime);
+    const now = new Date();
+    if (selectedDate < now) {
+        showToast("Selecione uma data e horário futuros", "error");
+        return false;
+    }
+
+    return true;
+}
 // Mostra detalhes do agendamento confirmado
 function showConfirmationDetails() {
     const codigoConfirmacao = sessionStorage.getItem('codigoConfirmacao') || `OS${Date.now().toString().slice(-8)}`;
@@ -1173,16 +1393,21 @@ function showConfirmationDetails() {
 }
 // ==================== FUNÇÕES DE NAVEGAÇÃO ====================
 
-// Navega entre os passos do formulário
+// Navega entre os passos do formulário - VERSÃO ATUALIZADA
 window.goToStep = async function(step) {
     if (step > currentStep) {
+        // Validação antes de avançar
         if (step === 2 && !validateStep1()) return;
         if (step === 3 && !await validateStep2()) return;
-        if (step === 4 && !await validateStep3()) return;
-        showConfirmationDetails(); // Atualiza os detalhes da confirmação
+        if (step === 4) {
+            // No passo 4, processar e salvar o agendamento
+            const success = await processScheduling();
+            if (!success) return;
+            showConfirmationDetails();
+        }
     }
 
-    // Resto do código existente...
+    // Atualiza a interface
     document.querySelectorAll(".service-step").forEach(s => s.classList.remove("active"));
     document.getElementById(`step${step}`).classList.add("active");
     
@@ -1192,10 +1417,7 @@ window.goToStep = async function(step) {
     
     currentStep = step;
 
-    if (step === 3 && selectedWorkshop) {
-        showSelectedWorkshop(selectedWorkshop);
-    }
-
+    // Rolagem suave para o passo atual
     document.getElementById(`step${step}`).scrollIntoView({
         behavior: "smooth",
         block: "start"
@@ -1328,6 +1550,74 @@ async function validateStep3() {
 
 
 
+// Função para debug detalhado antes do salvamento
+function debugAgendamentoCompleto() {
+    const userVehicle = JSON.parse(sessionStorage.getItem('userVehicle') || '{}');
+    const selectedProducts = getSelectedProducts();
+    const oilRecommendation = JSON.parse(sessionStorage.getItem('oilRecommendation') || '{}');
+    const customerData = JSON.parse(sessionStorage.getItem('customerData') || '{}');
+    
+    console.log('=== DEBUG COMPLETO DO AGENDAMENTO ===');
+    console.log('1. VEÍCULO:', userVehicle);
+    console.log('2. PRODUTOS SELECIONADOS:', selectedProducts);
+    console.log('3. RECOMENDAÇÃO:', oilRecommendation);
+    console.log('4. OFICINA SELECIONADA:', selectedWorkshop);
+    console.log('5. DADOS DO CLIENTE:', customerData);
+    console.log('6. DADOS DO FORMULÁRIO:');
+    console.log('   - Data:', document.getElementById("schedule-date").value);
+    console.log('   - Hora:', document.getElementById("schedule-time").value);
+    console.log('   - Nome:', document.getElementById("customer-name").value);
+    console.log('   - CPF:', document.getElementById("customer-cpf").value);
+    console.log('   - Telefone:', document.getElementById("customer-phone").value);
+    console.log('   - Email:', document.getElementById("customer-email").value);
+    console.log('=====================================');
+    
+    // Retorna os dados formatados para envio
+    return {
+        protocolo: `OIL${Date.now().toString().slice(-8)}`,
+        data_hora: `${document.getElementById("schedule-date").value} ${document.getElementById("schedule-time").value}:00`,
+        oficina_nome: selectedWorkshop?.nome || 'Oficina não selecionada',
+        oficina_endereco: selectedWorkshop ? `${selectedWorkshop.endereco}, ${selectedWorkshop.cidade}/${selectedWorkshop.estado}` : 'Endereço não informado',
+        oficina_telefone: selectedWorkshop?.telefone || 'Telefone não informado',
+        veiculo: userVehicle.marca && userVehicle.modelo && userVehicle.ano ? 
+            `${userVehicle.marca} ${userVehicle.modelo} ${userVehicle.ano}` : 'Veículo não informado',
+        servicos: getServicosFormatados(selectedProducts, oilRecommendation),
+        total_servico: calcularTotalServico(selectedProducts, oilRecommendation),
+        cliente_nome: customerData.name || document.getElementById("customer-name").value,
+        cliente_cpf: customerData.cpf || document.getElementById("customer-cpf").value,
+        cliente_telefone: customerData.phone || document.getElementById("customer-phone").value,
+        cliente_email: customerData.email || document.getElementById("customer-email").value
+    };
+}
+
+// Funções auxiliares para formatação
+function getServicosFormatados(selectedProducts, oilRecommendation) {
+    const servicos = [];
+    
+    if (selectedProducts.oil && oilRecommendation.oleo) {
+        servicos.push(`Óleo: ${oilRecommendation.oleo.nome}`);
+    }
+    
+    if (selectedProducts.filter && oilRecommendation.filtro) {
+        servicos.push(`Filtro: ${oilRecommendation.filtro.nome}`);
+    }
+    
+    return servicos.length > 0 ? servicos.join(' | ') : 'Serviços não especificados';
+}
+
+function calcularTotalServico(selectedProducts, oilRecommendation) {
+    let total = 0;
+    
+    if (selectedProducts.oil && oilRecommendation.oleo && oilRecommendation.oleo.preco) {
+        total += parseFloat(oilRecommendation.oleo.preco) || 0;
+    }
+    
+    if (selectedProducts.filter && oilRecommendation.filtro && oilRecommendation.filtro.preco) {
+        total += parseFloat(oilRecommendation.filtro.preco) || 0;
+    }
+    
+    return total;
+}
 
 // Função para debug - verificar o que está no sessionStorage
 function checkSessionStorage() {
@@ -1352,7 +1642,37 @@ function formatDateForDisplay(dateString) {
 
 
 // ==================== FUNÇÕES AUXILIARES ====================
+// Mostra/oculta o loading
+function showLoading(show) {
+    const loadingOverlay = document.getElementById("loading-overlay");
+    if (loadingOverlay) {
+        loadingOverlay.style.display = show ? "flex" : "none";
+    }
+}
 
+// Exibe mensagens toast (versão responsiva)
+function showToast(message, type = "success") {
+    const toast = document.getElementById("toast");
+    if (!toast) return;
+    
+    toast.textContent = message;
+    toast.className = `toast ${type} show`;
+    
+    // Ajuste de estilo para mobile
+    if (window.innerWidth <= 768) {
+        toast.style.width = "90%";
+        toast.style.left = "5%";
+        toast.style.transform = "none";
+    } else {
+        toast.style.width = "auto";
+        toast.style.left = "50%";
+        toast.style.transform = "translateX(-50%)";
+    }
+    
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, 3000);
+}
 // Validação de CPF (simplificada)
 function validateCPF(cpf) {
     cpf = cpf.replace(/\D/g, '');
@@ -1739,7 +2059,31 @@ function initSelectionSummary() {
     // Inicializa o summary
     updateSelectionSummary();
 }
+// Função para debug - verificar dados antes do salvamento
+function debugAgendamentoData() {
+    const userVehicle = JSON.parse(sessionStorage.getItem('userVehicle') || '{}');
+    const selectedProducts = getSelectedProducts();
+    const oilRecommendation = JSON.parse(sessionStorage.getItem('oilRecommendation') || '{}');
+    
+    console.log('=== DEBUG AGENDAMENTO ===');
+    console.log('Veículo:', userVehicle);
+    console.log('Produtos selecionados:', selectedProducts);
+    console.log('Recomendação:', oilRecommendation);
+    console.log('Oficina selecionada:', selectedWorkshop);
+    console.log('Dados do formulário:');
+    console.log('- Data:', document.getElementById("schedule-date").value);
+    console.log('- Hora:', document.getElementById("schedule-time").value);
+    console.log('- Nome:', document.getElementById("customer-name").value);
+    console.log('- CPF:', document.getElementById("customer-cpf").value);
+    console.log('- Telefone:', document.getElementById("customer-phone").value);
+    console.log('- Email:', document.getElementById("customer-email").value);
+    console.log('=========================');
+}
 
+// Chame esta função antes de salvar
+// debugAgendamentoData();
+
+// Chame esta função antes de salvar para verificar os dados
 // Chame initSelectionSummary() quando a página carregar
 document.addEventListener("DOMContentLoaded", function() {
     // === VERIFICAÇÃO DE LOGIN ===
@@ -1790,29 +2134,6 @@ function enhanceDateInput() {
 document.addEventListener('DOMContentLoaded', function() {
     enhanceDateInput();
 });
-
-async function salvarAgendamentoNoBanco(agendamentoData) {
-    showLoading(true);
-    try {
-        const response = await fetch('/api/agendamento_simples', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(agendamentoData)
-        });
-        const result = await response.json();
-        if (!response.ok || !result.success) {
-            throw new Error(result.message || 'Erro ao salvar agendamento');
-        }
-        showToast('Agendamento salvo com sucesso!', 'success');
-        return result;
-    } catch (error) {
-        console.error('Erro ao salvar agendamento no banco:', error);
-        showToast(error.message, 'error');
-        throw error;
-    } finally {
-        showLoading(false);
-    }
-}
 
 
 
