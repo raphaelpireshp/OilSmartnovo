@@ -43,7 +43,7 @@ function authenticateToken(req, res, next) {
 
 // Importar rotas
 const authRoutes = require('./routes/auth');
-const agendamentoRoutes = require('./routes/agendamento');
+const agendamentoSimplesRoutes = require('./routes/agendamentoSimples');
 const oficinaRoutes = require('./routes/oficina');
 const veiculoRoutes = require('./routes/veiculo');
 const marcaRoutes = require('./routes/marca');
@@ -54,7 +54,6 @@ const geocodeRoutes = require('./routes/geocode');
 
 // Usar rotas
 app.use('/api/auth', authRoutes);
-app.use('/api/agendamentos', agendamentoRoutes);
 app.use('/api/oficina', oficinaRoutes);
 app.use('/api/veiculos', veiculoRoutes);
 app.use('/api/marcas', marcaRoutes);
@@ -63,6 +62,7 @@ app.use('/api/modelo_anos', modeloAnoRoutes);
 app.use('/api/recomendacoes', recomendacaoRoutes);
 app.use('/api/geocode', geocodeRoutes);
 app.use('/api/contact', require('./routes/contact'));
+app.use('/api/agendamento_simples', agendamentoSimplesRoutes);
 
 // Rotas de produtos (do arquivo novo)
 app.get('/api/produtos/oleo/:id', (req, res) => {
@@ -102,103 +102,103 @@ app.listen(PORT, () => {
 });
 
 // Rota para criar agendamento
-app.post('/api/agendamentos', authenticateToken, async (req, res) => {
-    try {
-        const {
-            cliente_id,
-            oficina_id,
-            veiculo_id,
-            data_agendamento,
-            servicos,
-            produtos,
-            observacoes
-        } = req.body;
+// app.post('/api/agendamentos', authenticateToken, async (req, res) => {
+//     try {
+//         const {
+//             cliente_id,
+//             oficina_id,
+//             veiculo_id,
+//             data_agendamento,
+//             servicos,
+//             produtos,
+//             observacoes
+//         } = req.body;
 
-        // Verificar se o cliente_id corresponde ao usuário logado
-        if (cliente_id !== req.user.id) {
-            return res.status(403).json({ 
-                success: false, 
-                message: 'Acesso não autorizado' 
-            });
-        }
+//         // Verificar se o cliente_id corresponde ao usuário logado
+//         if (cliente_id !== req.user.id) {
+//             return res.status(403).json({ 
+//                 success: false, 
+//                 message: 'Acesso não autorizado' 
+//             });
+//         }
 
-        // Verificar se a oficina existe e é do tipo correto
-        const oficinaCheck = await new Promise((resolve, reject) => {
-            db.query(`
-                SELECT o.id, u.tipo 
-                FROM oficina o 
-                JOIN usuario u ON o.usuario_id = u.id 
-                WHERE o.id = ? AND u.tipo = 'oficina'
-            `, [oficina_id], (err, results) => {
-                if (err) reject(err);
-                resolve(results);
-            });
-        });
+//         // Verificar se a oficina existe e é do tipo correto
+//         const oficinaCheck = await new Promise((resolve, reject) => {
+//             db.query(`
+//                 SELECT o.id, u.tipo 
+//                 FROM oficina o 
+//                 JOIN usuario u ON o.usuario_id = u.id 
+//                 WHERE o.id = ? AND u.tipo = 'oficina'
+//             `, [oficina_id], (err, results) => {
+//                 if (err) reject(err);
+//                 resolve(results);
+//             });
+//         });
 
-        if (oficinaCheck.length === 0) {
-            return res.status(404).json({ 
-                success: false, 
-                message: 'Oficina não encontrada ou inválida' 
-            });
-        }
+//         if (oficinaCheck.length === 0) {
+//             return res.status(404).json({ 
+//                 success: false, 
+//                 message: 'Oficina não encontrada ou inválida' 
+//             });
+//         }
 
-        // Verificar se o veículo pertence ao cliente (se fornecido)
-        if (veiculo_id) {
-            const veiculoCheck = await new Promise((resolve, reject) => {
-                db.query('SELECT id FROM veiculo WHERE id = ? AND usuario_id = ?', 
-                    [veiculo_id, cliente_id], (err, results) => {
-                    if (err) reject(err);
-                    resolve(results);
-                });
-            });
+//         // Verificar se o veículo pertence ao cliente (se fornecido)
+//         if (veiculo_id) {
+//             const veiculoCheck = await new Promise((resolve, reject) => {
+//                 db.query('SELECT id FROM veiculo WHERE id = ? AND usuario_id = ?', 
+//                     [veiculo_id, cliente_id], (err, results) => {
+//                     if (err) reject(err);
+//                     resolve(results);
+//                 });
+//             });
 
-            if (veiculoCheck.length === 0) {
-                return res.status(404).json({ 
-                    success: false, 
-                    message: 'Veículo não encontrado ou não pertence ao cliente' 
-                });
-            }
-        }
+//             if (veiculoCheck.length === 0) {
+//                 return res.status(404).json({ 
+//                     success: false, 
+//                     message: 'Veículo não encontrado ou não pertence ao cliente' 
+//                 });
+//             }
+//         }
 
-        // Gerar código único de agendamento
-        const codigoConfirmacao = 'OS' + Date.now().toString().slice(-8);
+//         // Gerar código único de agendamento
+//         const codigoConfirmacao = 'OS' + Date.now().toString().slice(-8);
         
-        const query = `
-            INSERT INTO agendamento 
-            (cliente_id, oficina_id, veiculo_id, data_agendamento, servicos, produtos, observacoes, codigo_confirmacao, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pendente')
-        `;
+//         const query = `
+//             INSERT INTO agendamento 
+//             (cliente_id, oficina_id, veiculo_id, data_agendamento, servicos, produtos, observacoes, codigo_confirmacao, status)
+//             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pendente')
+//         `;
         
-        const result = await new Promise((resolve, reject) => {
-            db.query(query, [
-                cliente_id,
-                oficina_id,
-                veiculo_id || null,
-                data_agendamento,
-                JSON.stringify(servicos || {}),
-                JSON.stringify(produtos || {}),
-                observacoes || '',
-                codigoConfirmacao
-            ], (err, result) => {
-                if (err) reject(err);
-                resolve(result);
-            });
-        });
+//         const result = await new Promise((resolve, reject) => {
+//             db.query(query, [
+//                 cliente_id,
+//                 oficina_id,
+//                 veiculo_id || null,
+//                 data_agendamento,
+//                 JSON.stringify(servicos || {}),
+//                 JSON.stringify(produtos || {}),
+//                 observacoes || '',
+//                 codigoConfirmacao
+//             ], (err, result) => {
+//                 if (err) reject(err);
+//                 resolve(result);
+//             });
+//         });
         
-        res.json({
-            success: true,
-            message: 'Agendamento criado com sucesso',
-            agendamento_id: result.insertId,
-            codigo_confirmacao: codigoConfirmacao
-        });
-    } catch (error) {
-        console.error('Erro no agendamento:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Erro interno do servidor' 
-        });
-    }
-});
+//         res.json({
+//             success: true,
+//             message: 'Agendamento criado com sucesso',
+//             agendamento_id: result.insertId,
+//             codigo_confirmacao: codigoConfirmacao
+//         });
+//     } catch (error) {
+//         console.error('Erro no agendamento:', error);
+//         res.status(500).json({ 
+//             success: false, 
+//             message: 'Erro interno do servidor' 
+//         });
+//     }
+// });
 
 // Rota para buscar agendamentos do usuário
 app.get('/api/agendamentos/usuario/:userId', authenticateToken, (req, res) => {

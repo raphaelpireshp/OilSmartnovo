@@ -122,24 +122,7 @@ CREATE TABLE recomendacao (
     FOREIGN KEY (filtro_id) REFERENCES produto_filtro(id) ON DELETE SET NULL
 );
 
--- Tabela de agendamentos
--- Tabela de agendamentos (atualizada)
-CREATE TABLE agendamento (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    cliente_id INT NOT NULL,
-    oficina_id INT NOT NULL,
-    veiculo_id INT NULL,
-    data_agendamento DATETIME NOT NULL,
-    servicos TEXT,
-    produtos TEXT,
-    observacoes TEXT,
-    codigo_confirmacao VARCHAR(10) UNIQUE,
-    status ENUM('pendente', 'confirmado', 'cancelado', 'concluido') DEFAULT 'pendente',
-    data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (cliente_id) REFERENCES usuario(id) ON DELETE CASCADE,
-    FOREIGN KEY (oficina_id) REFERENCES oficina(id) ON DELETE CASCADE,
-    FOREIGN KEY (veiculo_id) REFERENCES veiculo(id) ON DELETE SET NULL
-);
+
 
 -- Tabela de divergências
 CREATE TABLE divergencia (
@@ -1185,3 +1168,40 @@ SELECT
     cpf,
     cnpj
 FROM usuario;
+
+
+SELECT 
+    a.*,
+    v.id AS veiculo_id,
+    v.placa,
+    o.nome AS oficina_nome,
+    o.endereco AS oficina_endereco
+FROM agendamento a
+LEFT JOIN veiculo v ON a.veiculo_id = v.id
+LEFT JOIN oficina o ON a.oficina_id = o.id
+ORDER BY a.id DESC;
+
+SELECT * FROM agendamento ORDER BY id DESC;
+
+SELECT id FROM veiculo;
+
+CREATE TABLE agendamento_simples (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    protocolo VARCHAR(20),
+    data_hora DATETIME,
+    oficina_nome VARCHAR(255),
+    oficina_endereco VARCHAR(255),
+    oficina_telefone VARCHAR(50),
+    veiculo VARCHAR(100),
+    servicos TEXT,
+    total_servico DECIMAL(10,2),
+    cliente_nome VARCHAR(100),
+    cliente_cpf VARCHAR(20),
+    cliente_telefone VARCHAR(50),
+    cliente_email VARCHAR(100)
+);
+
+
+SELECT * FROM agendamento_simples ORDER BY id DESC;
+
+SELECT * FROM agendamento_simples ORDER BY id DESC;
