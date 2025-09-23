@@ -1205,3 +1205,28 @@ CREATE TABLE agendamento_simples (
 SELECT * FROM agendamento_simples ORDER BY id DESC;
 
 SELECT * FROM agendamento_simples ORDER BY id DESC;
+
+SELECT 
+    a.id,
+    u.nome AS cliente,
+    o.nome AS oficina,
+    v.placa AS veiculo,
+    a.data_agendamento,
+    a.servicos,
+    a.produtos,
+    a.observacoes,
+    a.codigo_confirmacao,
+    a.status
+FROM agendamento a
+JOIN usuario u ON a.cliente_id = u.id
+JOIN oficina o ON a.oficina_id = o.id
+LEFT JOIN veiculo v ON a.veiculo_id = v.id
+ORDER BY a.data_agendamento DESC;
+
+SELECT * FROM agendamento ORDER BY id DESC;
+
+
+
+
+
+
