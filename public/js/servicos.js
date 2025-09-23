@@ -1011,7 +1011,6 @@ function generateTimeSlots(start, end, interval) {
 
 // ==================== FUNÇÕES DE AGENDAMENTO ====================
 
-// Processa o agendamento e salva no banco - VERSÃO COMPLETA CORRIGIDA
 // Processa o agendamento e salva no banco - VERSÃO COMPLETA E CORRIGIDA
 async function processScheduling() {
     console.log('Iniciando processScheduling...');
@@ -1086,7 +1085,15 @@ async function processScheduling() {
         if (selectedProducts.filter && oilRecommendation.filtro) {
             servicosArray.push(`Troca de Filtro: ${oilRecommendation.filtro.nome} - R$ ${totalFilter.toFixed(2)}`);
         }
-
+// CORREÇÃO: Verificar se é array antes de fazer join
+if (Array.isArray(servicosArray) && servicosArray.length > 0) {
+    servicos = servicosArray.join(' | ');
+} else if (typeof servicosArray === 'string') {
+    // Se já for string, usar diretamente (remover caracteres indesejados)
+    servicos = servicosArray.replace(/[\[\]"]/g, '').trim();
+} else {
+    servicos = 'Serviços não especificados';
+}
         // Formatar data e hora para o formato do banco
         const dataHora = `${scheduleDateValue} ${scheduleTime}:00`;
 

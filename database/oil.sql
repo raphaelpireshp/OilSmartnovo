@@ -1140,50 +1140,7 @@ ADD COLUMN reset_token_expiry BIGINT NULL;
 
 USE Oil;
 
-SELECT 
-    a.id,
-    u.nome AS cliente,
-    o.nome AS oficina,
-    v.placa AS veiculo,
-    a.data_agendamento,
-    a.servicos,
-    a.produtos,
-    a.observacoes,
-    a.codigo_confirmacao,
-    a.status
-FROM agendamento a
-JOIN usuario u ON a.cliente_id = u.id
-JOIN oficina o ON a.oficina_id = o.id
-LEFT JOIN veiculo v ON a.veiculo_id = v.id
-ORDER BY a.data_agendamento DESC;
 
-
-SELECT 
-    id,
-    nome,
-    email,
-    senha,
-    tipo,
-    telefone,
-    cpf,
-    cnpj
-FROM usuario;
-
-
-SELECT 
-    a.*,
-    v.id AS veiculo_id,
-    v.placa,
-    o.nome AS oficina_nome,
-    o.endereco AS oficina_endereco
-FROM agendamento a
-LEFT JOIN veiculo v ON a.veiculo_id = v.id
-LEFT JOIN oficina o ON a.oficina_id = o.id
-ORDER BY a.id DESC;
-
-SELECT * FROM agendamento ORDER BY id DESC;
-
-SELECT id FROM veiculo;
 
 CREATE TABLE agendamento_simples (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -1202,31 +1159,16 @@ CREATE TABLE agendamento_simples (
 );
 
 
-SELECT * FROM agendamento_simples ORDER BY id DESC;
 
-SELECT * FROM agendamento_simples ORDER BY id DESC;
-
-SELECT 
-    a.id,
-    u.nome AS cliente,
-    o.nome AS oficina,
-    v.placa AS veiculo,
-    a.data_agendamento,
-    a.servicos,
-    a.produtos,
-    a.observacoes,
-    a.codigo_confirmacao,
-    a.status
-FROM agendamento a
-JOIN usuario u ON a.cliente_id = u.id
-JOIN oficina o ON a.oficina_id = o.id
-LEFT JOIN veiculo v ON a.veiculo_id = v.id
-ORDER BY a.data_agendamento DESC;
-
-SELECT * FROM agendamento ORDER BY id DESC;
 
 
 
 
 
 
+SELECT * FROM agendamento_simples ORDER BY id DESC;
+
+UPDATE agendamento_simples 
+SET servicos = REPLACE(REPLACE(REPLACE(servicos, '[', ''), ']', ''), '"', '')
+WHERE (servicos LIKE '%[%' OR servicos LIKE '%]%' OR servicos LIKE '%"%')
+  AND id > 0;

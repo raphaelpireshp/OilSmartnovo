@@ -99,6 +99,16 @@
                     <div class="section-header">
                         <h2><i class="fas fa-history"></i> Histórico de Agendamentos</h2>
                         <div class="filter-options">
+                            <!-- Na seção de filtros, adicione: -->
+<div class="filter-group">
+    <label for="filter-status">Status:</label>
+    <select id="filter-status">
+        <option value="all">Todos</option>
+        <option value="pendentes">Pendentes</option>
+        <option value="concluidas">Concluídas</option>
+    </select>
+</div>
+<br>
                             <select id="filter-period">
                                 <option value="all">Todos</option>
                                 <option value="month">Últimos 30 dias</option>
@@ -196,7 +206,7 @@
         </div>
     </footer>
 
-   
+<script src="/js/agenda.js"></script>
 <script src="/js/main.js"></script>
 
 </body>

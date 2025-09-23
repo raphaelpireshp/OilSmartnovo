@@ -72,6 +72,20 @@ router.post('/', (req, res) => {
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
+
+    // No agendamentoSimples.js, adicione esta validação antes de salvar
+function limparServicos(servicos) {
+    if (!servicos) return 'Serviços não especificados';
+    
+    // Remover caracteres indesejados
+    return servicos.toString()
+        .replace(/[\[\]"]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+// E use na preparação dos dados:
+const servicosLimpos = limparServicos(servicos);
     db.query(query, values, (err, result) => {
         if (err) {
             console.error('❌ Erro MySQL ao salvar agendamento:', err);
@@ -175,3 +189,33 @@ router.get('/', (req, res) => {
 });
 
 module.exports = router;
+
+// Adicione esta rota no agendamentoSimples.js
+router.get('/:id', (req, res) => {
+    const { id } = req.params;
+
+    const query = 'SELECT * FROM agendamento_simples WHERE id = ?';
+    
+    db.query(query, [id], (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar agendamento:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao buscar agendamento' 
+            });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Agendamento não encontrado' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            data: results[0] 
+        });
+    });
+});
+
