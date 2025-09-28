@@ -1016,7 +1016,20 @@ async function processScheduling() {
     console.log('Iniciando processScheduling...');
     
     // Verificar se o usuário está logado
-    if (!checkUserLoggedIn()) {
+    const userData = localStorage.getItem('user');
+    if (!userData) {
+        showToast("Você precisa fazer login para agendar um serviço", "error");
+        setTimeout(() => {
+            window.location.href = 'login.html?redirect=servicos.html';
+        }, 2000);
+        return false;
+    }
+    
+    const user = JSON.parse(userData);
+    const usuario_id = user.id;
+    
+    if (!usuario_id) {
+        showToast("Erro: ID do usuário não encontrado", "error");
         return false;
     }
 
@@ -1113,7 +1126,8 @@ if (Array.isArray(servicosArray) && servicosArray.length > 0) {
             cliente_nome: customerName,
             cliente_cpf: customerCpf.replace(/\D/g, ''), // Apenas números
             cliente_telefone: customerPhone,
-            cliente_email: customerEmail
+            cliente_email: customerEmail,
+            usuario_id: usuario_id
         };
 
         console.log('Dados do agendamento para salvar:', agendamentoData);

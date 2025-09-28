@@ -124,6 +124,25 @@ CREATE TABLE recomendacao (
 
 
 
+-- Tabela de agendamento simples
+CREATE TABLE agendamento_simples (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    protocolo VARCHAR(20) NOT NULL UNIQUE,
+    data_hora DATETIME,
+    oficina_nome VARCHAR(100),
+    oficina_endereco VARCHAR(255),
+    oficina_telefone VARCHAR(20),
+    veiculo VARCHAR(255),
+    servicos TEXT,
+    total_servico DECIMAL(10, 2),
+    cliente_nome VARCHAR(100),
+    cliente_cpf VARCHAR(14),
+    cliente_telefone VARCHAR(20),
+    cliente_email VARCHAR(100),
+    usuario_id INT,
+    FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON DELETE SET NULL
+);
+
 -- Tabela de divergências
 CREATE TABLE divergencia (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -131,7 +150,7 @@ CREATE TABLE divergencia (
     descricao TEXT NOT NULL,
     resolvido BOOLEAN DEFAULT FALSE,
     data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (agendamento_id) REFERENCES agendamento(id) ON DELETE CASCADE
+    FOREIGN KEY (agendamento_id) REFERENCES agendamento_simples(id) ON DELETE CASCADE
 );
 
 -- ========================================
@@ -1142,21 +1161,8 @@ USE Oil;
 
 
 
-CREATE TABLE agendamento_simples (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    protocolo VARCHAR(20),
-    data_hora DATETIME,
-    oficina_nome VARCHAR(255),
-    oficina_endereco VARCHAR(255),
-    oficina_telefone VARCHAR(50),
-    veiculo VARCHAR(100),
-    servicos TEXT,
-    total_servico DECIMAL(10,2),
-    cliente_nome VARCHAR(100),
-    cliente_cpf VARCHAR(20),
-    cliente_telefone VARCHAR(50),
-    cliente_email VARCHAR(100)
-);
+
+
 
 
 
@@ -1172,3 +1178,13 @@ UPDATE agendamento_simples
 SET servicos = REPLACE(REPLACE(REPLACE(servicos, '[', ''), ']', ''), '"', '')
 WHERE (servicos LIKE '%[%' OR servicos LIKE '%]%' OR servicos LIKE '%"%')
   AND id > 0;
+
+
+ALTER TABLE agendamento_simples 
+ADD COLUMN usuario_id INT NULL AFTER cliente_email;
+
+-- Adicionar índice para melhor performance
+CREATE INDEX idx_agendamento_usuario ON agendamento_simples(usuario_id);
+
+
+

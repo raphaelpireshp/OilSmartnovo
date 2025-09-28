@@ -1,4 +1,29 @@
-// agenda.js - Gerenciamento de agendamentos para a página agenda.html
+// agenda.js - Adicione no início do arquivo
+
+// Verificar se o usuário está logado
+function checkAuthentication() {
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+    
+    if (!token || !userData) {
+        showToast('Você precisa fazer login para ver seus agendamentos', 'error');
+        setTimeout(() => {
+            window.location.href = '/html/login.html?redirect=agenda.html';
+        }, 2000);
+        return false;
+    }
+    return true;
+}
+
+// Modificar a função init
+function init() {
+    if (!checkAuthentication()) {
+        return;
+    }
+    
+    loadAppointments();
+    setupEventListeners();
+}
 
 document.addEventListener('DOMContentLoaded', function() {
     // Elementos do DOM
@@ -38,32 +63,53 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Carregar agendamentos do backend
-    async function loadAppointments() {
-        showLoading(true);
-        
-        try {
-            const response = await fetch('/api/agendamento_simples');
-            
-            if (!response.ok) {
-                throw new Error(`Erro HTTP: ${response.status}`);
-            }
-            
-            const result = await response.json();
-            
-            if (result.success) {
-                allAppointments = result.data || [];
-                displayAppointments(allAppointments);
-            } else {
-                throw new Error(result.message || 'Erro ao carregar agendamentos');
-            }
-            
-        } catch (error) {
-            console.error('Erro ao carregar agendamentos:', error);
-            showError('Erro ao carregar agendamentos. Tente recarregar a página.');
-        } finally {
-            showLoading(false);
+async function loadAppointments() {
+    showLoading(true);
+    
+    try {
+        // Obter ID do usuário logado
+        const userData = localStorage.getItem('user');
+        if (!userData) {
+            throw new Error('Usuário não está logado');
         }
+        
+        const user = JSON.parse(userData);
+        const userId = user.id;
+        
+        if (!userId) {
+            throw new Error('ID do usuário não encontrado');
+        }
+
+        // Buscar agendamentos específicos do usuário
+        const response = await fetch(`/api/agendamento_simples/usuario/${userId}`);
+        
+        if (!response.ok) {
+            throw new Error(`Erro HTTP: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            allAppointments = result.data || [];
+            displayAppointments(allAppointments);
+        } else {
+            throw new Error(result.message || 'Erro ao carregar agendamentos');
+        }
+        
+    } catch (error) {
+        console.error('Erro ao carregar agendamentos:', error);
+        showError('Erro ao carregar agendamentos. Verifique se está logado.');
+        
+        // Se não estiver logado, redirecionar para login
+        if (error.message.includes('não está logado')) {
+            setTimeout(() => {
+                window.location.href = '/html/login.html?redirect=agenda.html';
+            }, 2000);
+        }
+    } finally {
+        showLoading(false);
     }
+}
 
     // Filtrar agendamentos
     function filterAppointments() {

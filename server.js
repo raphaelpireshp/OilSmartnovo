@@ -326,3 +326,10 @@ app.get('/api/test/agendamento-table', (req, res) => {
         });
     });
 });
+
+
+
+
+
+module.exports.authenticateToken = authenticateToken;
+
