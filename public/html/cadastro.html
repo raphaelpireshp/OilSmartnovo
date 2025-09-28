@@ -1,71 +1,64 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro - OilSmart</title>
-    <link rel="stylesheet" href="/css/login.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-        <link rel="icon" href="/img/tentativa4.png" type="image/x-icon">
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro - OilSmart</title>
+  <link rel="stylesheet" href="/css/login.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="/img/tentativa4.png" type="image/x-icon">
 </head>
 <body>
-<div class="login-card">
-  <div class="logo-container">
-    <div class="logo">OS</div>
-    <h1 class="login-title">Junte-se Ã  OilSmart</h1>
-  </div>
-  <p class="login-subtitle">Crie sua conta e comece a gerenciar seus veÃ­culos com inteligÃªncia</p>
-
-  <div class="divider"></div>
-
-  <form id="registerForm">
-    <div class="form-group">
-      <label for="register-fullname" class="section-title">Nome completo</label>
-      <input type="text" id="register-fullname" class="input-field" placeholder="Digite seu nome completo" required>
-      <small class="field-hint">Informe seu nome e sobrenome</small>
+  <div class="login-card">
+    <div class="logo-container">
+      <div class="logo">OS</div>
+      <h1 class="login-title">Junte-se à OilSmart</h1>
     </div>
-
-    <div class="form-group">
-      <label for="register-email" class="section-title">E-mail</label>
-      <input type="email" id="register-email" class="input-field" placeholder="seu.email@exemplo.com" required>
-      <small class="field-hint">Utilizaremos este e-mail para contato</small>
-    </div>
-
-    <div class="form-group">
-      <label for="register-password" class="section-title">Senha</label>
-      <input type="password" id="register-password" class="input-field" placeholder="Crie uma senha segura" required>
-      <small class="field-hint">MÃ­nimo de 6 caracteres</small>
-    </div>
-
-    <div class="form-group">
-      <label for="register-confirm-password" class="section-title">Confirmar Senha</label>
-      <input type="password" id="register-confirm-password" class="input-field" placeholder="Digite a mesma senha" required>
-      <small class="field-hint">As senhas devem coincidir</small>
-    </div>
-
-    <div class="password-options">
-      <label class="checkbox-container">
-        <input type="checkbox" id="register-terms" required>
-        <span class="checkmark"></span>
-        Concordo com os <a href="/html/termos.html" class="link">Termos de ServiÃ§o</a> e <a href="/html/politicas.html" class="link">PolÃ­tica de Privacidade</a>
-      </label>
-    </div>
+    <p class="login-subtitle">Crie sua conta e comece a gerenciar seus veículos com inteligência</p>
 
     <div class="divider"></div>
 
-    <div class="button-group">
-      <button type="button" class="btn btn-secondary" onclick="window.location.href='login.html'">Voltar</button>
-      <button type="submit" class="btn btn-primary">Criar minha conta</button>
-    </div>
+    <form id="registerForm">
+      <div class="form-group">
+        <label for="register-fullname" class="section-title">Nome completo</label>
+        <input type="text" id="register-fullname" class="input-field" placeholder="Digite seu nome completo" required>
+      </div>
 
-    <p class="register-text">JÃ¡ possui uma conta? <a href="login.html" class="register-link">FaÃ§a login aqui</a></p>
-  </form>
-</div>
+      <div class="form-group">
+        <label for="register-email" class="section-title">E-mail</label>
+        <input type="email" id="register-email" class="input-field" placeholder="seu.email@exemplo.com" required>
+      </div>
 
+      <div class="form-group">
+        <label for="register-password" class="section-title">Senha</label>
+        <input type="password" id="register-password" class="input-field" placeholder="Crie uma senha segura" required>
+      </div>
 
+      <div class="form-group">
+        <label for="register-confirm-password" class="section-title">Confirmar Senha</label>
+        <input type="password" id="register-confirm-password" class="input-field" placeholder="Digite a mesma senha" required>
+      </div>
 
-    <script>
+      <div class="password-options">
+        <label class="checkbox-container">
+          <input type="checkbox" id="register-terms" required>
+          <span class="checkmark"></span>
+          Concordo com os <a href="/html/termos.html">Termos</a> e <a href="/html/politicas.html">Política</a>
+        </label>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="button-group">
+        <button type="button" class="btn btn-secondary" onclick="window.location.href='login.html'">Voltar</button>
+        <button type="submit" class="btn btn-primary">Criar minha conta</button>
+      </div>
+
+      <p class="register-text">Já possui uma conta? <a href="login.html" class="register-link">Faça login aqui</a></p>
+    </form>
+  </div>
+
+  <script>
 document.getElementById('registerForm').addEventListener('submit', async function (e) {
     e.preventDefault();
 
@@ -76,7 +69,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
     const confirmarSenha = document.getElementById('register-confirm-password').value;
     const termosAceitos = document.getElementById('register-terms').checked;
 
-    // ValidaÃ§Ãµes bÃ¡sicas
+    // Validações básicas
     if (!nome) {
         alert('Por favor, informe seu nome completo');
         return;
@@ -94,7 +87,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-        alert('Por favor, informe um e-mail vÃ¡lido');
+        alert('Por favor, informe um e-mail válido');
         return;
     }
 
@@ -109,12 +102,12 @@ document.getElementById('registerForm').addEventListener('submit', async functio
     }
 
     if (senha !== confirmarSenha) {
-        alert('As senhas nÃ£o coincidem');
+        alert('As senhas não coincidem');
         return;
     }
 
     if (!termosAceitos) {
-        alert('VocÃª precisa aceitar os termos e condiÃ§Ãµes');
+        alert('Você precisa aceitar os termos e condições');
         return;
     }
 
@@ -142,7 +135,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
 
         console.log('Resposta do servidor:', response.status);
 
-        // Verificar se a resposta Ã© JSON
+        // Verificar se a resposta é JSON
         const contentType = response.headers.get('content-type');
         let result;
         
@@ -150,7 +143,7 @@ document.getElementById('registerForm').addEventListener('submit', async functio
             result = await response.json();
         } else {
             const text = await response.text();
-            throw new Error(`Resposta nÃ£o Ã© JSON: ${text}`);
+            throw new Error(`Resposta não é JSON: ${text}`);
         }
 
         console.log('Resultado:', result);
@@ -167,17 +160,17 @@ document.getElementById('registerForm').addEventListener('submit', async functio
     }
 });
 
-// Testar conexÃ£o ao carregar a pÃ¡gina
+// Testar conexão ao carregar a página
 document.addEventListener('DOMContentLoaded', async function() {
     try {
         const response = await fetch('http://localhost:3000/api/test');
         if (response.ok) {
             const data = await response.json();
-            console.log('âœ… Servidor conectado:', data);
+            console.log('✅ Servidor conectado:', data);
         }
     } catch (error) {
-        console.warn('âŒ NÃ£o foi possÃ­vel conectar ao servidor:', error.message);
-        alert('Servidor nÃ£o estÃ¡ respondendo. Execute: node server.js');
+        console.warn('❌ Não foi possível conectar ao servidor:', error.message);
+        alert('Servidor não está respondendo. Execute: node server.js');
     }
 });
 </script>

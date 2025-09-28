@@ -1,50 +1,41 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recuperar Senha - OilSmart</title>
-    <link rel="stylesheet" href="/css/login.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-        <link rel="icon" href="/img/tentativa4.png" type="image/x-icon">
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recuperar Senha - OilSmart</title>
+  <link rel="stylesheet" href="/css/login.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="/img/tentativa4.png" type="image/x-icon">
 </head>
 <body>
-    <div class="login-card">
-        <div class="logo-container">
-            <div class="logo">OS</div>
-            <h1 class="login-title">Recuperar Senha</h1>
-        </div>
-        <p class="login-subtitle">Informe seu e-mail para receber instruÃ§Ãµes de redefiniÃ§Ã£o</p>
-
-        <div class="divider"></div>
-
-        <form id="recoveryForm">
-            <div class="form-group">
-                <label for="recovery-email" class="section-title">E-mail</label>
-                <input type="email" id="recovery-email" class="input-field" placeholder="seu.email@exemplo.com" required>
-                <small class="field-hint">Enviaremos um link de recuperaÃ§Ã£o para este e-mail</small>
-            </div>
-
-            <div class="divider"></div>
-<!-- Adicione esta linha antes do botÃ£o de enviar instruÃ§Ãµes -->
-<div class="button-group">
-    <button type="button" class="back-button" onclick="window.location.href='login.html'">
-        <span class="button-text">Voltar</span>
-    </button>
-    <button type="submit" class="login-button">
-        <span class="button-text">Enviar instruÃ§Ãµes</span>
-    </button>
-</div>
-            <button type="submit" class="login-button">
-                <span class="button-text">Enviar instruÃ§Ãµes</span>
-            </button>
-
-            <p class="register-text">Lembrou sua senha? <a href="login.html" class="register-link">FaÃ§a login aqui</a></p>
-        </form>
+  <div class="login-card">
+    <div class="logo-container">
+      <div class="logo">OS</div>
+      <h1 class="login-title">Recuperar Senha</h1>
     </div>
+    <p class="login-subtitle">Informe seu e-mail para receber instruções de redefinição</p>
 
-    <script>
+    <div class="divider"></div>
+
+    <form id="recoveryForm">
+      <div class="form-group">
+        <label for="recovery-email" class="section-title">E-mail</label>
+        <input type="email" id="recovery-email" class="input-field" placeholder="seu.email@exemplo.com" required>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="button-group">
+        <button type="button" class="btn btn-secondary" onclick="window.location.href='login.html'">Voltar</button>
+        <button type="submit" class="btn btn-primary">Enviar instruções</button>
+      </div>
+
+      <p class="register-text">Lembrou sua senha? <a href="login.html" class="register-link">Faça login aqui</a></p>
+    </form>
+  </div>
+
+  <script>
         document.getElementById('recoveryForm').addEventListener('submit', async function (e) {
             e.preventDefault();
 
@@ -57,7 +48,7 @@
 
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
-                alert('Por favor, informe um e-mail vÃ¡lido');
+                alert('Por favor, informe um e-mail válido');
                 return;
             }
 
@@ -73,13 +64,13 @@
                 const result = await response.json();
 
                 if (result.success) {
-                    alert('InstruÃ§Ãµes de recuperaÃ§Ã£o enviadas para seu e-mail!');
+                    alert('Instruções de recuperação enviadas para seu e-mail!');
                     window.location.href = 'login.html';
                 } else {
                     alert(result.message);
                 }
             } catch (error) {
-                console.error('Erro ao solicitar recuperaÃ§Ã£o:', error);
+                console.error('Erro ao solicitar recuperação:', error);
                 alert('Erro ao conectar com o servidor. Tente novamente.');
             }
         });

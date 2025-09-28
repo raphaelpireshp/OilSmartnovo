@@ -1,61 +1,55 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - OilSmart </title>
-    <link rel="stylesheet" href="/css/login.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-        <link rel="icon" href="/img/tentativa4.png" type="image/x-icon">
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - OilSmart</title>
+  <link rel="stylesheet" href="/css/login.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="/img/tentativa4.png" type="image/x-icon">
 </head>
 <body>
-    <div class="login-card">
-        <div class="logo-container">
-            <div class="logo">OS</div>
-            <h1 class="login-title">Bem-vindo de volta</h1>
-        </div>
-        <p class="login-subtitle">Acesse sua conta para continuar gerenciando seus veÃ­culos</p>
-
-        <div class="divider"></div>
-
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="email" class="section-title">E-mail</label>
-                <input type="email" id="email" class="input-field" placeholder="seu.email@exemplo.com" required>
-            </div>
-
-<div class="form-group">
-    <label for="password" class="section-title">Senha</label>
-    <input type="password" id="password" class="input-field" placeholder="Digite sua senha" required>
-    <a href="esqueci-senha.html" class="forgot-password">Esqueceu sua senha?</a>
-</div>
-
-            <div class="password-options">
-                <label class="checkbox-container">
-                    <input type="checkbox" id="remember-me">
-                    <span class="checkmark"></span>
-                    Manter conectado
-                </label>
-            </div>
-
-            <div class="divider"></div>
-<!-- Adicione esta linha antes do botÃ£o de redefinir senha -->
-<div class="button-group">
-    <button type="button" class="back-button" onclick="window.location.href='index.html'">
-        <span class="button-text">Voltar</span>
-    </button>
-
-            <button type="submit" class="login-button">
-                <span class="button-text">Acessar minha conta</span>
-            </button>
-
-            <p class="register-text">NÃ£o tem uma conta? <a href="cadastro.html" class="register-link">Cadastre-se gratuitamente</a></p>
-        </form>
+  <div class="login-card">
+    <div class="logo-container">
+      <div class="logo">OS</div>
+      <h1 class="login-title">Bem-vindo de volta</h1>
     </div>
+    <p class="login-subtitle">Acesse sua conta para continuar gerenciando seus veículos</p>
 
+    <div class="divider"></div>
 
-    <script>
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="email" class="section-title">E-mail</label>
+        <input type="email" id="email" class="input-field" placeholder="seu.email@exemplo.com" required>
+      </div>
+
+      <div class="form-group">
+        <label for="password" class="section-title">Senha</label>
+        <input type="password" id="password" class="input-field" placeholder="Digite sua senha" required>
+        <a href="esqueci-senha.html" class="forgot-password">Esqueceu sua senha?</a>
+      </div>
+
+      <div class="password-options">
+        <label class="checkbox-container">
+          <input type="checkbox" id="remember-me">
+          <span class="checkmark"></span>
+          Manter conectado
+        </label>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="button-group">
+        <button type="button" class="btn btn-secondary" onclick="window.location.href='index.html'">Voltar</button>
+        <button type="submit" class="btn btn-primary">Acessar minha conta</button>
+      </div>
+
+      <p class="register-text">Não tem uma conta? <a href="cadastro.html" class="register-link">Cadastre-se gratuitamente</a></p>
+    </form>
+  </div>
+
+  <script>
         document.getElementById('loginForm').addEventListener('submit', async function (e) {
             e.preventDefault();
 
@@ -66,10 +60,10 @@
             try {
                 console.log('Tentando login com:', email);
                 
-                // Primeiro teste se o servidor estÃ¡ respondendo
+                // Primeiro teste se o servidor está respondendo
                 const testResponse = await fetch('http://localhost:3000/api/test');
                 if (!testResponse.ok) {
-                    throw new Error('Servidor nÃ£o estÃ¡ respondendo');
+                    throw new Error('Servidor não está respondendo');
                 }
 
                 // Fazer login
@@ -86,12 +80,12 @@
 
                 console.log('Status da resposta:', response.status);
 
-                // Verificar se a resposta Ã© JSON
+                // Verificar se a resposta é JSON
                 const contentType = response.headers.get('content-type');
                 if (!contentType || !contentType.includes('application/json')) {
                     const text = await response.text();
-                    console.error('Resposta nÃ£o Ã© JSON:', text);
-                    throw new Error('Resposta invÃ¡lida do servidor');
+                    console.error('Resposta não é JSON:', text);
+                    throw new Error('Resposta inválida do servidor');
                 }
 
                 const result = await response.json();
@@ -103,7 +97,7 @@ const redirect = urlParams.get('redirect');
                     // Login bem-sucedido
                     alert(`Bem-vindo(a) de volta, ${result.user.nome || email.split('@')[0]}!`);
 
-                    // Armazenar informaÃ§Ãµes do usuÃ¡rio
+                    // Armazenar informações do usuário
                     localStorage.setItem('user', JSON.stringify(result.user));
                     localStorage.setItem('isLoggedIn', 'true');
                     localStorage.setItem('userId', result.user.id);
@@ -116,7 +110,7 @@ const redirect = urlParams.get('redirect');
                         localStorage.removeItem('rememberedEmail');
                     }
 
-                    // Redirecionar para a pÃ¡gina inicial
+                    // Redirecionar para a página inicial
                     window.location.href = 'index.html';
                 }
                  else {
@@ -124,11 +118,11 @@ const redirect = urlParams.get('redirect');
                 }
             } catch (error) {
                 console.error('Erro completo no login:', error);
-                alert('Erro ao conectar com o servidor. Verifique se o servidor estÃ¡ rodando: node server.js');
+                alert('Erro ao conectar com o servidor. Verifique se o servidor está rodando: node server.js');
             }
         });
 
-        // Preencher email salvo ao carregar a pÃ¡gina
+        // Preencher email salvo ao carregar a página
         document.addEventListener('DOMContentLoaded', function () {
             const storedEmail = localStorage.getItem('rememberedEmail');
             if (storedEmail) {
@@ -139,7 +133,7 @@ const redirect = urlParams.get('redirect');
                 }
             }
 
-            // Testar conexÃ£o com servidor
+            // Testar conexão com servidor
             testServerConnection();
         });
 
@@ -148,10 +142,10 @@ const redirect = urlParams.get('redirect');
                 const response = await fetch('http://localhost:3000/api/test');
                 if (response.ok) {
                     const data = await response.json();
-                    console.log('âœ… Servidor conectado:', data);
+                    console.log('✅ Servidor conectado:', data);
                 }
             } catch (error) {
-                console.warn('âŒ NÃ£o foi possÃ­vel conectar ao servidor:', error.message);
+                console.warn('❌ Não foi possível conectar ao servidor:', error.message);
             }
         }
     </script>

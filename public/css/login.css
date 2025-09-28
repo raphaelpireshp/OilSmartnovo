@@ -432,3 +432,44 @@ body {
   color: #155724;
   border: 1px solid #c3e6cb;
 }
+
+/* === BOTÕES PADRÃO === */
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.btn {
+  padding: 14px 22px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Principal */
+.btn-primary {
+  background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(180, 148, 52, 0.3);
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(180, 148, 52, 0.4);
+}
+
+/* Secundário */
+.btn-secondary {
+  background: #d4b15f;
+  color: var(--text-color);
+  border: 2px solid var(--border-color);
+}
+.btn-secondary:hover {
+  background: #213f57;
+  transform: translateY(-2px);
+}
