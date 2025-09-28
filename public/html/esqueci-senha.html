@@ -7,8 +7,48 @@
   <link rel="stylesheet" href="/css/login.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" href="/img/tentativa4.png" type="image/x-icon">
+  <style>
+    /* Estilos para o indicador de carregamento */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      display: none;
+    }
+    
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #3498db;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  </style>
 </head>
 <body>
+  <!-- Overlay de carregamento -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+  </div>
+
   <div class="login-card">
     <div class="logo-container">
       <div class="logo">OS</div>
@@ -27,8 +67,8 @@
       <div class="divider"></div>
 
       <div class="button-group">
-        <button type="button" class="btn btn-secondary" onclick="window.location.href='login.html'">Voltar</button>
-        <button type="submit" class="btn btn-primary">Enviar instruções</button>
+        <button type="button" class="btn btn-secondary" id="backButton" onclick="window.location.href='login.html'">Voltar</button>
+        <button type="submit" class="btn btn-primary" id="submitButton">Enviar instruções</button>
       </div>
 
       <p class="register-text">Lembrou sua senha? <a href="login.html" class="register-link">Faça login aqui</a></p>
@@ -36,44 +76,57 @@
   </div>
 
   <script>
-        document.getElementById('recoveryForm').addEventListener('submit', async function (e) {
-            e.preventDefault();
+    document.getElementById('recoveryForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
 
-            const email = document.getElementById('recovery-email').value.trim();
+      const email = document.getElementById('recovery-email').value.trim();
+      const submitButton = document.getElementById('submitButton');
+      const backButton = document.getElementById('backButton');
+      const loadingOverlay = document.getElementById('loadingOverlay');
 
-            if (!email) {
-                alert('Por favor, informe seu e-mail');
-                return;
-            }
+      if (!email) {
+        alert('Por favor, informe seu e-mail');
+        return;
+      }
 
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                alert('Por favor, informe um e-mail válido');
-                return;
-            }
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        alert('Por favor, informe um e-mail válido');
+        return;
+      }
 
-            try {
-                const response = await fetch('http://localhost:3000/api/auth/forgot-password', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ email })
-                });
+      // Mostrar carregamento e desabilitar botões
+      loadingOverlay.style.display = 'flex';
+      submitButton.disabled = true;
+      backButton.disabled = true;
 
-                const result = await response.json();
-
-                if (result.success) {
-                    alert('Instruções de recuperação enviadas para seu e-mail!');
-                    window.location.href = 'login.html';
-                } else {
-                    alert(result.message);
-                }
-            } catch (error) {
-                console.error('Erro ao solicitar recuperação:', error);
-                alert('Erro ao conectar com o servidor. Tente novamente.');
-            }
+      try {
+        const response = await fetch('http://localhost:3000/api/auth/forgot-password', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email })
         });
-    </script>
+
+        const result = await response.json();
+
+        if (result.success) {
+          alert('Instruções de recuperação enviadas para seu e-mail!');
+          window.location.href = 'login.html';
+        } else {
+          alert(result.message);
+        }
+      } catch (error) {
+        console.error('Erro ao solicitar recuperação:', error);
+        alert('Erro ao conectar com o servidor. Tente novamente.');
+      } finally {
+        // Sempre esconder o carregamento e reabilitar os botões
+        loadingOverlay.style.display = 'none';
+        submitButton.disabled = false;
+        backButton.disabled = false;
+      }
+    });
+  </script>
 </body>
 </html>
