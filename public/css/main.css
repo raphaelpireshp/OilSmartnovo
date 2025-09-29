@@ -4640,3 +4640,511 @@ select option:disabled {
         justify-content: center;
     }
 }
+
+/* ===============================
+   FILTROS E CONTROLES - VERSÃO RESPONSIVA
+=================================*/
+.filter-controls {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 25px;
+    padding: 15px 20px;
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e1e5eb;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+.filter-controls:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 160px;
+    flex: 1;
+}
+
+.filter-group label {
+    font-weight: 600;
+    font-size: 13px;
+    color: #495057;
+    margin-bottom: 2px;
+    letter-spacing: 0.3px;
+}
+
+.filter-select {
+    padding: 10px 12px;
+    border: 1px solid #d0d7de;
+    border-radius: 8px;
+    background: #fdfdfd;
+    font-size: 14px;
+    transition: border 0.2s ease, box-shadow 0.2s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 3px rgba(13,110,253,0.15);
+}
+
+/* Botão de ações dos filtros */
+.filter-actions {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+/* ===============================
+   BOTÕES
+=================================*/
+.btn-small {
+    padding: 7px 14px;
+    font-size: 13px;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.btn-primary {
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5c636a;
+    transform: translateY(-1px);
+}
+
+.btn-danger {
+    background: #dc3545;
+    border: 1px solid #dc3545;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #bb2d3b;
+    border-color: #b02a37;
+    transform: translateY(-1px);
+}
+
+/* ===============================
+   STATUS
+=================================*/
+.status-pending {
+    background: #fff8e1;
+    color: #8a6d3b;
+    border: 1px solid #ffe8a1;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.status-completed {
+    background: #e6f7ff;
+    color: #055160;
+    border: 1px solid #b6effb;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.status-cancelled {
+    background: #fde2e4;
+    color: #842029;
+    border: 1px solid #f5c2c7;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.status-expired {
+    background: #f1f3f5;
+    color: #495057;
+    border: 1px solid #dee2e6;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+/* ===============================
+   INFOS
+=================================*/
+.action-disabled {
+    color: #6c757d;
+    font-style: italic;
+    font-size: 14px;
+}
+
+.cancel-info {
+    background: #fff5f5;
+    padding: 12px 14px;
+    border-radius: 6px;
+    border-left: 4px solid #dc3545;
+    margin-top: 12px;
+}
+
+.cancel-info p {
+    margin: 0;
+    color: #842029;
+    font-size: 14px;
+}
+
+.price-info {
+    background: #ebf5ff;
+    padding: 10px 14px;
+    border-radius: 6px;
+    margin-top: 12px;
+}
+
+.price-info p {
+    margin: 0;
+    font-weight: 600;
+    color: #004085;
+}
+
+/* ===============================
+   VAZIO
+=================================*/
+.no-appointments {
+    text-align: center;
+    padding: 50px 20px;
+    color: #6c757d;
+}
+
+.no-appointments i {
+    font-size: 50px;
+    margin-bottom: 12px;
+    color: #adb5bd;
+}
+
+/* ===============================
+   RESPONSIVIDADE MELHORADA
+=================================*/
+
+/* Tablets e telas médias (768px - 1024px) */
+@media (max-width: 1024px) {
+    .filter-controls {
+        gap: 15px;
+        padding: 12px 16px;
+    }
+    
+    .filter-group {
+        min-width: 140px;
+    }
+}
+
+/* Tablets pequenos (576px - 768px) */
+@media (max-width: 768px) {
+    .filter-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        padding: 16px;
+    }
+    
+    .filter-group {
+        width: 100%;
+        min-width: unset;
+    }
+    
+    .filter-select {
+        width: 100%;
+        padding: 12px 14px;
+        font-size: 16px; /* Evita zoom no iOS */
+    }
+    
+    .filter-actions {
+        width: 100%;
+        justify-content: center;
+        margin-top: 8px;
+    }
+    
+    .btn-small {
+        flex: 1;
+        min-width: 120px;
+        max-width: 200px;
+        text-align: center;
+        padding: 10px 16px;
+    }
+}
+
+/* Smartphones (até 576px) */
+@media (max-width: 576px) {
+    .filter-controls {
+        margin-bottom: 20px;
+        padding: 12px;
+        border-radius: 8px;
+    }
+    
+    .filter-group {
+        margin-bottom: 4px;
+    }
+    
+    .filter-group label {
+        font-size: 14px;
+        margin-bottom: 4px;
+    }
+    
+    .filter-select {
+        padding: 14px 12px;
+        font-size: 16px;
+        border-radius: 6px;
+    }
+    
+    .filter-actions {
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 12px;
+    }
+    
+    .btn-small {
+        width: 100%;
+        max-width: none;
+        text-align: center;
+        padding: 12px 16px;
+        font-size: 14px;
+    }
+
+    .status-pending,
+    .status-completed,
+    .status-cancelled,
+    .status-expired {
+        display: block;
+        text-align: center;
+        margin: 4px 0;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    .cancel-info,
+    .price-info {
+        margin-top: 16px;
+        padding: 16px 12px;
+    }
+    
+    .no-appointments {
+        padding: 40px 16px;
+    }
+    
+    .no-appointments i {
+        font-size: 40px;
+    }
+}
+
+/* Smartphones muito pequenos (até 360px) */
+@media (max-width: 360px) {
+    .filter-controls {
+        padding: 10px;
+        gap: 10px;
+    }
+    
+    .filter-select {
+        padding: 12px 10px;
+        font-size: 16px;
+    }
+    
+    .btn-small {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+    
+    .filter-group label {
+        font-size: 13px;
+    }
+}
+
+/* ===============================
+   MELHORIAS DE ACESSIBILIDADE
+=================================*/
+
+/* Foco visível para navegação por teclado */
+.filter-select:focus,
+.btn-small:focus {
+    outline: 2px solid #0d6efd;
+    outline-offset: 2px;
+}
+
+/* Estados de hover para dispositivos que suportam */
+@media (hover: hover) {
+    .filter-select:hover {
+        border-color: #0d6efd;
+    }
+    
+    .btn-small:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+}
+
+/* Redução de movimento para usuários que preferem */
+@media (prefers-reduced-motion: reduce) {
+    .filter-controls,
+    .filter-select,
+    .btn-small {
+        transition: none;
+    }
+    
+    .btn-small:hover {
+        transform: none;
+    }
+}
+
+/* ===============================
+   LAYOUT FLEXÍVEL PARA FILTROS
+=================================*/
+
+/* Container flexível para múltiplos filtros */
+.filters-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: flex-end;
+}
+
+.filters-row .filter-group {
+    flex: 1;
+    min-width: 160px;
+}
+
+@media (max-width: 768px) {
+    .filters-row {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .filters-row .filter-group {
+        width: 100%;
+        min-width: unset;
+    }
+}
+
+/* Layout em grid para filtros complexos */
+.filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 15px;
+    align-items: end;
+}
+
+@media (max-width: 768px) {
+    .filters-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 576px) {
+    .filters-grid {
+        gap: 10px;
+    }
+}
+/* ===== MELHORIAS PARA O HEADER DA SEÇÃO DE HISTÓRICO ===== */
+.section-header {
+    display: block; /* Muda de flex para block */
+    margin-bottom: 25px;
+}
+
+.section-header h2 {
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid rgba(180, 148, 52, 0.2);
+}
+
+.filter-controls {
+    display: flex;
+    gap: 20px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    padding: 15px 20px;
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e1e5eb;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+/* Responsividade para o novo layout */
+@media (max-width: 768px) {
+    .section-header h2 {
+        font-size: 1.3rem;
+        text-align: center;
+    }
+    
+    .filter-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        padding: 16px;
+    }
+    
+    .filter-group {
+        width: 100%;
+        min-width: unset;
+    }
+    
+    .filter-select {
+        width: 100%;
+        padding: 12px 14px;
+        font-size: 16px;
+    }
+    
+    .filter-actions {
+        width: 100%;
+        justify-content: center;
+        margin-top: 8px;
+    }
+    
+    .btn-small {
+        flex: 1;
+        min-width: 120px;
+        max-width: 200px;
+        text-align: center;
+        padding: 10px 16px;
+    }
+}
+
+@media (max-width: 576px) {
+    .section-header h2 {
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+    }
+    
+    .filter-controls {
+        margin-bottom: 20px;
+        padding: 12px;
+        border-radius: 8px;
+    }
+}

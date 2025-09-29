@@ -331,4 +331,124 @@ router.get('/usuario/:usuario_id', (req, res) => {
         });
     });
 });
+// Adicione esta rota no final do arquivo agendamentoSimples.js
+
+// Rota para cancelar agendamento
+router.post('/:id/cancelar', (req, res) => {
+    const { id } = req.params;
+    const { motivo } = req.body;
+
+    console.log('🎯 Recebendo solicitação de cancelamento para agendamento:', id);
+    console.log('📝 Motivo:', motivo);
+
+    if (!motivo || motivo.trim() === '') {
+        return res.status(400).json({
+            success: false,
+            message: 'Motivo do cancelamento é obrigatório'
+        });
+    }
+
+    // Primeiro verificar se o agendamento existe e pode ser cancelado
+    const checkQuery = `
+        SELECT id, data_hora, status 
+        FROM agendamento_simples 
+        WHERE id = ?
+    `;
+
+    db.query(checkQuery, [id], (err, results) => {
+        if (err) {
+            console.error('❌ Erro ao verificar agendamento:', err);
+            return res.status(500).json({
+                success: false,
+                message: 'Erro ao verificar agendamento'
+            });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'Agendamento não encontrado'
+            });
+        }
+
+        const agendamento = results[0];
+        const dataAgendamento = new Date(agendamento.data_hora);
+        const agora = new Date();
+
+        // Verificar se já passou da data
+        if (dataAgendamento <= agora) {
+            return res.status(400).json({
+                success: false,
+                message: 'Não é possível cancelar agendamentos passados'
+            });
+        }
+
+        // Verificar se já está cancelado
+        if (agendamento.status === 'cancelado') {
+            return res.status(400).json({
+                success: false,
+                message: 'Este agendamento já está cancelado'
+            });
+        }
+
+        // Atualizar o agendamento
+        const updateQuery = `
+            UPDATE agendamento_simples 
+            SET status = 'cancelado',
+                motivo_cancelamento = ?,
+                data_cancelamento = NOW()
+            WHERE id = ?
+        `;
+
+        db.query(updateQuery, [motivo.trim(), id], (err, result) => {
+            if (err) {
+                console.error('❌ Erro ao cancelar agendamento:', err);
+                return res.status(500).json({
+                    success: false,
+                    message: 'Erro ao cancelar agendamento no banco de dados',
+                    error: err.message
+                });
+            }
+
+            if (result.affectedRows === 0) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Agendamento não encontrado para cancelamento'
+                });
+            }
+
+            console.log('✅ Agendamento cancelado com sucesso. ID:', id);
+            
+            res.json({
+                success: true,
+                message: 'Agendamento cancelado com sucesso!'
+            });
+        });
+    });
+});
+
+// Rota para atualizar status automaticamente (fora do prazo)
+router.post('/atualizar-status/automatico', (req, res) => {
+    const query = `
+        UPDATE agendamento_simples 
+        SET status = 'fora_prazo' 
+        WHERE data_hora < NOW() 
+        AND status IN ('pendente', 'confirmado')
+    `;
+    
+    db.query(query, (err, result) => {
+        if (err) {
+            console.error('Erro ao atualizar status automaticamente:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao atualizar status' 
+            });
+        }
+        
+        res.json({
+            success: true,
+            message: `${result.affectedRows} agendamentos atualizados para "fora do prazo"`
+        });
+    });
+});
 module.exports = router;

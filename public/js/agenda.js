@@ -1,47 +1,44 @@
-// agenda.js - Adicione no início do arquivo
-
-// Verificar se o usuário está logado
-function checkAuthentication() {
-    const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
-    
-    if (!token || !userData) {
-        showToast('Você precisa fazer login para ver seus agendamentos', 'error');
-        setTimeout(() => {
-            window.location.href = '/html/login.html?redirect=agenda.html';
-        }, 2000);
-        return false;
-    }
-    return true;
-}
-
-// Modificar a função init
-function init() {
-    if (!checkAuthentication()) {
-        return;
-    }
-    
-    loadAppointments();
-    setupEventListeners();
-}
-
+// agenda.js - Arquivo completo e funcional
 document.addEventListener('DOMContentLoaded', function() {
     // Elementos do DOM
     const appointmentsList = document.querySelector('.appointments-list');
     const filterPeriod = document.getElementById('filter-period');
-    const statusFilter = document.getElementById('filter-status'); // Você precisará adicionar este filtro no HTML
-    
+    const filterStatus = document.getElementById('filter-status');
+    const filterSort = document.getElementById('filter-sort');
+    const clearFiltersBtn = document.getElementById('clear-filters');
+
     // Estados
     let currentFilter = 'all';
     let currentStatusFilter = 'all';
+    let currentSort = 'newest';
     let allAppointments = [];
 
     // Inicialização
     init();
 
     function init() {
+        if (!checkAuthentication()) {
+            return;
+        }
+        
         loadAppointments();
         setupEventListeners();
+        verificarStatusPeriodicamente();
+    }
+
+    // Verificar se o usuário está logado
+    function checkAuthentication() {
+        const token = localStorage.getItem('token');
+        const userData = localStorage.getItem('user');
+        
+        if (!token || !userData) {
+            showToast('Você precisa fazer login para ver seus agendamentos', 'error');
+            setTimeout(() => {
+                window.location.href = '/html/login.html?redirect=agenda.html';
+            }, 2000);
+            return false;
+        }
+        return true;
     }
 
     function setupEventListeners() {
@@ -53,65 +50,88 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
-        // Filtro por status (você precisará adicionar este select no HTML)
-        if (statusFilter) {
-            statusFilter.addEventListener('change', function() {
+        // Filtro por status
+        if (filterStatus) {
+            filterStatus.addEventListener('change', function() {
                 currentStatusFilter = this.value;
+                filterAppointments();
+            });
+        }
+
+        // Ordenação
+        if (filterSort) {
+            filterSort.addEventListener('change', function() {
+                currentSort = this.value;
+                filterAppointments();
+            });
+        }
+
+        // Limpar filtros
+        if (clearFiltersBtn) {
+            clearFiltersBtn.addEventListener('click', function() {
+                currentFilter = 'all';
+                currentStatusFilter = 'all';
+                currentSort = 'newest';
+                
+                if (filterPeriod) filterPeriod.value = 'all';
+                if (filterStatus) filterStatus.value = 'all';
+                if (filterSort) filterSort.value = 'newest';
+                
                 filterAppointments();
             });
         }
     }
 
     // Carregar agendamentos do backend
-async function loadAppointments() {
-    showLoading(true);
-    
-    try {
-        // Obter ID do usuário logado
-        const userData = localStorage.getItem('user');
-        if (!userData) {
-            throw new Error('Usuário não está logado');
-        }
+    async function loadAppointments() {
+        showLoading(true);
         
-        const user = JSON.parse(userData);
-        const userId = user.id;
-        
-        if (!userId) {
-            throw new Error('ID do usuário não encontrado');
-        }
+        try {
+            // Obter ID do usuário logado
+            const userData = localStorage.getItem('user');
+            if (!userData) {
+                throw new Error('Usuário não está logado');
+            }
+            
+            const user = JSON.parse(userData);
+            const userId = user.id;
+            
+            if (!userId) {
+                throw new Error('ID do usuário não encontrado');
+            }
 
-        // Buscar agendamentos específicos do usuário
-        const response = await fetch(`/api/agendamento_simples/usuario/${userId}`);
-        
-        if (!response.ok) {
-            throw new Error(`Erro HTTP: ${response.status}`);
+            // Buscar agendamentos específicos do usuário
+            const response = await fetch(`/api/agendamento_simples/usuario/${userId}`);
+            
+            if (!response.ok) {
+                throw new Error(`Erro HTTP: ${response.status}`);
+            }
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                allAppointments = result.data || [];
+                displayAppointments(allAppointments);
+            } else {
+                throw new Error(result.message || 'Erro ao carregar agendamentos');
+            }
+            
+        } catch (error) {
+            console.error('Erro ao carregar agendamentos:', error);
+            showError('Erro ao carregar agendamentos. Verifique se está logado.');
+            
+            // Se não estiver logado, redirecionar para login
+            if (error.message.includes('não está logado')) {
+                setTimeout(() => {
+                    window.location.href = '/html/login.html?redirect=agenda.html';
+                }, 2000);
+            }
+        } finally {
+            showLoading(false);
         }
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            allAppointments = result.data || [];
-            displayAppointments(allAppointments);
-        } else {
-            throw new Error(result.message || 'Erro ao carregar agendamentos');
-        }
-        
-    } catch (error) {
-        console.error('Erro ao carregar agendamentos:', error);
-        showError('Erro ao carregar agendamentos. Verifique se está logado.');
-        
-        // Se não estiver logado, redirecionar para login
-        if (error.message.includes('não está logado')) {
-            setTimeout(() => {
-                window.location.href = '/html/login.html?redirect=agenda.html';
-            }, 2000);
-        }
-    } finally {
-        showLoading(false);
     }
-}
 
-    // Filtrar agendamentos
+    // Filtrar e ordenar agendamentos
     function filterAppointments() {
         let filtered = [...allAppointments];
 
@@ -122,15 +142,20 @@ async function loadAppointments() {
                 const appointmentDate = new Date(appointment.data_hora);
                 
                 switch (currentFilter) {
+                    case 'today':
+                        return isToday(appointmentDate);
+                    
+                    case 'week':
+                        return isThisWeek(appointmentDate);
+                    
                     case 'month':
-                        const monthAgo = new Date(now);
-                        monthAgo.setMonth(monthAgo.getMonth() - 1);
-                        return appointmentDate >= monthAgo;
+                        return isThisMonth(appointmentDate);
+                    
+                    case 'last_month':
+                        return isLastMonth(appointmentDate);
                     
                     case 'year':
-                        const yearAgo = new Date(now);
-                        yearAgo.setFullYear(yearAgo.getFullYear() - 1);
-                        return appointmentDate >= yearAgo;
+                        return isThisYear(appointmentDate);
                     
                     default:
                         return true;
@@ -138,21 +163,27 @@ async function loadAppointments() {
             });
         }
 
-        // Filtro por status (baseado na data/hora)
+        // Filtro por status
         if (currentStatusFilter !== 'all') {
             filtered = filtered.filter(appointment => {
                 const appointmentDate = new Date(appointment.data_hora);
                 const now = new Date();
                 
                 switch (currentStatusFilter) {
-                    case 'pendentes':
-                        return appointmentDate > now;
+                    case 'pendente':
+                        return appointment.status === 'pendente' || (appointmentDate > now && (!appointment.status || appointment.status === 'pendente'));
                     
-                    case 'concluidas':
-                        return appointmentDate <= now;
+                    case 'agendado':
+                        return appointment.status === 'confirmado' || (appointmentDate > now && appointment.status !== 'cancelado');
                     
-                    case 'canceladas':
+                    case 'concluido':
+                        return appointment.status === 'concluido';
+                    
+                    case 'cancelado':
                         return appointment.status === 'cancelado';
+                    
+                    case 'fora_prazo':
+                        return appointment.status === 'fora_prazo' || (appointmentDate < now && appointment.status !== 'concluido' && appointment.status !== 'cancelado');
                     
                     default:
                         return true;
@@ -160,93 +191,113 @@ async function loadAppointments() {
             });
         }
 
+        // Ordenação
+        filtered.sort((a, b) => {
+            const dateA = new Date(a.data_hora);
+            const dateB = new Date(b.data_hora);
+            
+            switch (currentSort) {
+                case 'newest':
+                    return dateB - dateA;
+                
+                case 'oldest':
+                    return dateA - dateB;
+                
+                case 'date_asc':
+                    return dateA - dateB;
+                
+                case 'date_desc':
+                    return dateB - dateA;
+                
+                default:
+                    return dateB - dateA;
+            }
+        });
+
         displayAppointments(filtered);
     }
 
     // Exibir agendamentos na página
-// Modifique a função displayAppointments no agenda.js
-function displayAppointments(appointments) {
-    if (!appointmentsList) return;
+    function displayAppointments(appointments) {
+        if (!appointmentsList) return;
 
-    if (appointments.length === 0) {
-        appointmentsList.innerHTML = `
-            <div class="no-appointments">
-                <i class="fas fa-calendar-times"></i>
-                <h3>Nenhum agendamento encontrado</h3>
-                <p>Não há agendamentos para os filtros selecionados.</p>
-            </div>
-        `;
-        return;
-    }
-
-    appointments.sort((a, b) => new Date(b.data_hora) - new Date(a.data_hora));
-
-    appointmentsList.innerHTML = appointments.map(appointment => {
-        const statusClass = getStatusClass(appointment);
-        const statusText = getStatusText(appointment);
-        
-        return `
-            <div class="appointment-card ${statusClass}" data-id="${appointment.id}">
-                <div class="appointment-header">
-                    <span class="protocol">Protocolo: ${appointment.protocolo || 'N/A'}</span>
-                    <span class="status ${statusClass}">${statusText}</span>
+        if (appointments.length === 0) {
+            appointmentsList.innerHTML = `
+                <div class="no-appointments">
+                    <i class="fas fa-calendar-times"></i>
+                    <h3>Nenhum agendamento encontrado</h3>
+                    <p>Não há agendamentos para os filtros selecionados.</p>
                 </div>
-                <div class="appointment-body">
-                    <div class="service-info">
-                        <h3>${appointment.servicos || 'Troca de Óleo'}</h3>
-                        <p><i class="fas fa-car"></i> ${appointment.veiculo || 'Veículo não informado'}</p>
-                        ${appointment.servicos ? `<p><i class="fas fa-oil-can"></i> ${appointment.servicos.replace(/[\[\]"]/g, '')}</p>` : ''}
+            `;
+            return;
+        }
+
+        appointmentsList.innerHTML = appointments.map(appointment => {
+            const statusClass = getStatusClass(appointment);
+            const statusText = getStatusText(appointment);
+            
+            return `
+                <div class="appointment-card ${statusClass}" data-id="${appointment.id}">
+                    <div class="appointment-header">
+                        <span class="protocol">Protocolo: ${appointment.protocolo || 'N/A'}</span>
+                        <span class="status ${statusClass}">${statusText}</span>
                     </div>
-                    <div class="date-info">
-                        <p><i class="far fa-calendar-alt"></i> ${formatDate(appointment.data_hora)}</p>
-                        <p><i class="far fa-clock"></i> ${formatTime(appointment.data_hora)}</p>
+                    <div class="appointment-body">
+                        <div class="service-info">
+                            <h3>${appointment.servicos || 'Troca de Óleo'}</h3>
+                            <p><i class="fas fa-car"></i> ${appointment.veiculo || 'Veículo não informado'}</p>
+                            ${appointment.servicos ? `<p><i class="fas fa-oil-can"></i> ${appointment.servicos.replace(/[\[\]"]/g, '')}</p>` : ''}
+                        </div>
+                        <div class="date-info">
+                            <p><i class="far fa-calendar-alt"></i> ${formatDate(appointment.data_hora)}</p>
+                            <p><i class="far fa-clock"></i> ${formatTime(appointment.data_hora)}</p>
+                        </div>
+                        <div class="location-info">
+                            <p><i class="fas fa-map-marker-alt"></i> ${appointment.oficina_nome || 'Oficina'}</p>
+                            <p>${appointment.oficina_endereco || 'Endereço não informado'}</p>
+                        </div>
+                        ${appointment.total_servico ? `
+                        <div class="price-info">
+                            <p><i class="fas fa-tag"></i> Total: R$ ${parseFloat(appointment.total_servico).toFixed(2)}</p>
+                        </div>
+                        ` : ''}
+                        ${appointment.motivo_cancelamento ? `
+                        <div class="cancel-info">
+                            <p><i class="fas fa-info-circle"></i> Motivo: ${appointment.motivo_cancelamento}</p>
+                        </div>
+                        ` : ''}
                     </div>
-                    <div class="location-info">
-                        <p><i class="fas fa-map-marker-alt"></i> ${appointment.oficina_nome || 'Oficina'}</p>
-                        <p>${appointment.oficina_endereco || 'Endereço não informado'}</p>
-                    </div>
-                    ${appointment.total_servico ? `
-                    <div class="price-info">
-                        <p><i class="fas fa-tag"></i> Total: R$ ${parseFloat(appointment.total_servico).toFixed(2)}</p>
-                    </div>
-                    ` : ''}
-                    ${appointment.motivo_cancelamento ? `
-                    <div class="cancel-info">
-                        <p><i class="fas fa-info-circle"></i> Motivo: ${appointment.motivo_cancelamento}</p>
-                    </div>
-                    ` : ''}
-                </div>
-                <div class="appointment-footer">
-                    ${statusClass !== 'cancelled' && statusClass !== 'expired' ? `
-                        <button class="btn btn-outline" onclick="repeatAppointment(${appointment.id})">
-                            <i class="fas fa-redo"></i> Repetir Agendamento
-                        </button>
-                        <button class="btn btn-outline" onclick="downloadInvoice(${appointment.id})">
-                            <i class="fas fa-file-invoice"></i> Comprovante
-                        </button>
-                        ${isFutureAppointment(appointment) ? `
-                        <button class="btn btn-outline btn-cancel" onclick="cancelAppointment(${appointment.id})">
-                            <i class="fas fa-times"></i> Cancelar
-                        </button>
+                    <div class="appointment-footer">
+                        ${statusClass !== 'cancelled' && statusClass !== 'expired' ? `
+                            <button class="btn btn-outline" onclick="repeatAppointment(${appointment.id})">
+                                <i class="fas fa-redo"></i> Repetir Agendamento
+                            </button>
+                            <button class="btn btn-outline" onclick="downloadInvoice(${appointment.id})">
+                                <i class="fas fa-file-invoice"></i> Comprovante
+                            </button>
+                            ${isFutureAppointment(appointment) ? `
+                            <button class="btn btn-outline btn-cancel" onclick="cancelAppointment(${appointment.id})">
+                                <i class="fas fa-times"></i> Cancelar
+                            </button>
+                            ` : `
+                            <button class="btn btn-outline" onclick="rateService(${appointment.id})">
+                                <i class="fas fa-star"></i> Avaliar Serviço
+                            </button>
+                            `}
                         ` : `
-                        <button class="btn btn-outline" onclick="rateService(${appointment.id})">
-                            <i class="fas fa-star"></i> Avaliar Serviço
-                        </button>
+                            <button class="btn btn-outline" onclick="repeatAppointment(${appointment.id})">
+                                <i class="fas fa-redo"></i> Novo Agendamento
+                            </button>
+                            <button class="btn btn-outline" onclick="downloadInvoice(${appointment.id})">
+                                <i class="fas fa-file-invoice"></i> Comprovante
+                            </button>
+                            <span class="text-muted">Ações indisponíveis</span>
                         `}
-                    ` : `
-                        <button class="btn btn-outline" onclick="repeatAppointment(${appointment.id})">
-                            <i class="fas fa-redo"></i> Novo Agendamento
-                        </button>
-                        <button class="btn btn-outline" onclick="downloadInvoice(${appointment.id})">
-                            <i class="fas fa-file-invoice"></i> Comprovante
-                        </button>
-                        <span class="text-muted">Ações indisponíveis</span>
-                    `}
+                    </div>
                 </div>
-            </div>
-        `;
-    }).join('');
-}
+            `;
+        }).join('');
+    }
 
     // Funções auxiliares
     function getStatusClass(appointment) {
@@ -255,8 +306,12 @@ function displayAppointments(appointments) {
         
         if (appointment.status === 'cancelado') {
             return 'cancelled';
+        } else if (appointment.status === 'fora_prazo') {
+            return 'expired';
         } else if (appointmentDate > now) {
             return 'pending';
+        } else if (appointment.status === 'concluido') {
+            return 'completed';
         } else {
             return 'expired';
         }
@@ -268,8 +323,12 @@ function displayAppointments(appointments) {
         
         if (appointment.status === 'cancelado') {
             return 'Cancelado';
+        } else if (appointment.status === 'fora_prazo') {
+            return 'Fora do Prazo';
         } else if (appointmentDate > now) {
             return 'Agendado';
+        } else if (appointment.status === 'concluido') {
+            return 'Concluído';
         } else {
             return 'Fora do Prazo';
         }
@@ -278,7 +337,7 @@ function displayAppointments(appointments) {
     function isFutureAppointment(appointment) {
         const appointmentDate = new Date(appointment.data_hora);
         const now = new Date();
-        return appointmentDate > now;
+        return appointmentDate > now && appointment.status !== 'cancelado';
     }
 
     function formatDate(dateString) {
@@ -294,6 +353,46 @@ function displayAppointments(appointments) {
         });
     }
 
+    // Funções de filtro por data
+    function isToday(date) {
+        const today = new Date();
+        return date.getDate() === today.getDate() &&
+               date.getMonth() === today.getMonth() &&
+               date.getFullYear() === today.getFullYear();
+    }
+
+    function isThisWeek(date) {
+        const today = new Date();
+        const startOfWeek = new Date(today);
+        startOfWeek.setDate(today.getDate() - today.getDay());
+        startOfWeek.setHours(0, 0, 0, 0);
+        
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 6);
+        endOfWeek.setHours(23, 59, 59, 999);
+        
+        return date >= startOfWeek && date <= endOfWeek;
+    }
+
+    function isThisMonth(date) {
+        const today = new Date();
+        return date.getMonth() === today.getMonth() &&
+               date.getFullYear() === today.getFullYear();
+    }
+
+    function isLastMonth(date) {
+        const today = new Date();
+        const lastMonth = today.getMonth() === 0 ? 11 : today.getMonth() - 1;
+        const year = today.getMonth() === 0 ? today.getFullYear() - 1 : today.getFullYear();
+        
+        return date.getMonth() === lastMonth && date.getFullYear() === year;
+    }
+
+    function isThisYear(date) {
+        const today = new Date();
+        return date.getFullYear() === today.getFullYear();
+    }
+
     function showLoading(show) {
         // Implemente um overlay de loading se necessário
         const loadingElement = document.getElementById('loading-agenda');
@@ -303,7 +402,6 @@ function displayAppointments(appointments) {
     }
 
     function showError(message) {
-        // Você pode usar o mesmo sistema de toast do main.js
         if (typeof showToast === 'function') {
             showToast(message, 'error');
         } else {
@@ -311,10 +409,24 @@ function displayAppointments(appointments) {
         }
     }
 
-    // Atualizar a cada 5 minutos para ver novos agendamentos
-    setInterval(() => {
-        loadAppointments();
-    }, 5 * 60 * 1000);
+    // Verificar status periodicamente
+    function verificarStatusPeriodicamente() {
+        // Atualizar status no servidor a cada hora
+        setInterval(async () => {
+            try {
+                await fetch('/api/agendamento_simples/atualizar-status/automatico', {
+                    method: 'POST'
+                });
+            } catch (error) {
+                console.error('Erro ao verificar status:', error);
+            }
+        }, 60 * 60 * 1000); // 1 hora
+        
+        // Recarregar agendamentos a cada 5 minutos
+        setInterval(() => {
+            loadAppointments();
+        }, 5 * 60 * 1000);
+    }
 });
 
 // Funções globais para os botões
@@ -456,7 +568,7 @@ async function cancelAppointment(appointmentId) {
             showToast('✅ Agendamento cancelado com sucesso!', 'success');
             // Recarregar a lista após 1 segundo
             setTimeout(() => {
-                loadAppointments();
+                location.reload();
             }, 1000);
         } else {
             throw new Error(result.message || 'Erro ao cancelar agendamento');
@@ -469,41 +581,56 @@ async function cancelAppointment(appointmentId) {
         showLoading(false);
     }
 }
-// Adicione esta função para verificar status periodicamente
-function verificarStatusPeriodicamente() {
-    // Atualizar status no servidor a cada hora
-    setInterval(async () => {
-        try {
-            await fetch('/api/agendamento_simples/atualizar-status', {
-                method: 'POST'
-            });
-        } catch (error) {
-            console.error('Erro ao verificar status:', error);
-        }
-    }, 60 * 60 * 1000); // 1 hora
-    
-    // Recarregar agendamentos a cada 5 minutos
-    setInterval(() => {
-        loadAppointments();
-    }, 5 * 60 * 1000);
-}
-
-// Chame esta função no init
-function init() {
-    if (!checkAuthentication()) {
-        return;
-    }
-    
-    loadAppointments();
-    setupEventListeners();
-    verificarStatusPeriodicamente(); // Adicione esta linha
-}
 
 function rateService(appointmentId) {
     alert('Sistema de avaliação em desenvolvimento!');
 }
 
+// Função auxiliar para mostrar toast (caso não exista no main.js)
+function showToast(message, type = 'info') {
+    // Se a função showToast não existir, criar uma simples
+    if (typeof window.showToast !== 'function') {
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            color: white;
+            z-index: 10000;
+            font-family: Arial, sans-serif;
+            max-width: 300px;
+            word-wrap: break-word;
+        `;
+        
+        switch (type) {
+            case 'success':
+                toast.style.backgroundColor = '#28a745';
+                break;
+            case 'error':
+                toast.style.backgroundColor = '#dc3545';
+                break;
+            case 'warning':
+                toast.style.backgroundColor = '#ffc107';
+                toast.style.color = '#212529';
+                break;
+            default:
+                toast.style.backgroundColor = '#17a2b8';
+        }
+        
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            document.body.removeChild(toast);
+        }, 5000);
+    } else {
+        window.showToast(message, type);
+    }
+}
 
+// CSS adicional para estilização
 const additionalCSS = `
 /* Status dos agendamentos */
 .status.pending {
@@ -578,6 +705,83 @@ const additionalCSS = `
 .appointment-card.expired .btn:hover {
     transform: none;
     box-shadow: none;
+}
+
+/* Estilo para quando não há agendamentos */
+.no-appointments {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6c757d;
+}
+
+.no-appointments i {
+    font-size: 64px;
+    margin-bottom: 20px;
+    color: #dee2e6;
+}
+
+.no-appointments h3 {
+    margin-bottom: 10px;
+    color: #495057;
+}
+
+.no-appointments p {
+    font-size: 16px;
+}
+
+/* Botão de cancelar específico */
+.btn-cancel {
+    background: #dc3545 !important;
+    color: white !important;
+    border-color: #dc3545 !important;
+}
+
+.btn-cancel:hover {
+    background: #c82333 !important;
+    border-color: #bd2130 !important;
+}
+
+/* Informações de cancelamento */
+.cancel-info {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+    border-left: 4px solid #dc3545;
+}
+
+.cancel-info p {
+    margin: 0;
+    color: #721c24;
+    font-size: 14px;
+}
+
+/* Filtros */
+.filter-controls {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: white;
+    font-size: 14px;
+}
+
+.btn-small {
+    padding: 6px 12px;
+    font-size: 13px;
 }
 `;
 
