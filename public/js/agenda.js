@@ -152,8 +152,7 @@ async function loadAppointments() {
                         return appointmentDate <= now;
                     
                     case 'canceladas':
-                        // Você precisaria adicionar um campo "status" na sua tabela para isso
-                        return false;
+                        return appointment.status === 'cancelado';
                     
                     default:
                         return true;
@@ -254,7 +253,9 @@ function displayAppointments(appointments) {
         const appointmentDate = new Date(appointment.data_hora);
         const now = new Date();
         
-        if (appointmentDate > now) {
+        if (appointment.status === 'cancelado') {
+            return 'cancelled';
+        } else if (appointmentDate > now) {
             return 'pending';
         } else {
             return 'expired';
@@ -265,7 +266,9 @@ function displayAppointments(appointments) {
         const appointmentDate = new Date(appointment.data_hora);
         const now = new Date();
         
-        if (appointmentDate > now) {
+        if (appointment.status === 'cancelado') {
+            return 'Cancelado';
+        } else if (appointmentDate > now) {
             return 'Agendado';
         } else {
             return 'Fora do Prazo';
