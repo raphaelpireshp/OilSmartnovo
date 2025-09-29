@@ -697,3 +697,90 @@ function clearError(form, fieldId) {
         errorElement.textContent = '';
     }
 }
+// Mover ícone de login para dentro do menu hamburger em mobile - VERSÃO CORRIGIDA
+document.addEventListener('DOMContentLoaded', function() {
+    const actionIcons = document.querySelector('.action-icons');
+    const nav = document.getElementById('nav');
+    const hamburger = document.getElementById('hamburger');
+    const navbar = document.querySelector('.navbar');
+    
+    // Cria uma cópia do action-icons para o mobile
+    let mobileActionIcons = null;
+    
+    function handleMobileMenu() {
+        if (window.innerWidth <= 768) {
+            // Mobile - cria cópia dentro do nav se não existir
+            if (actionIcons && nav && !mobileActionIcons) {
+                mobileActionIcons = actionIcons.cloneNode(true);
+                mobileActionIcons.classList.add('mobile-actions');
+                nav.appendChild(mobileActionIcons);
+                
+                // Adiciona eventos aos elementos clonados
+                setupClonedActionIcons(mobileActionIcons);
+            }
+            
+            // Controla visibilidade baseado no menu
+            if (mobileActionIcons) {
+                mobileActionIcons.style.display = nav.classList.contains('active') ? 'flex' : 'none';
+            }
+            
+            // Esconde o original no mobile
+            if (actionIcons) {
+                actionIcons.style.display = 'none';
+            }
+        } else {
+            // Desktop - mostra o original e remove a cópia do mobile
+            if (actionIcons) {
+                actionIcons.style.display = 'flex';
+            }
+            
+            if (mobileActionIcons) {
+                mobileActionIcons.remove();
+                mobileActionIcons = null;
+            }
+        }
+    }
+    
+    // Configura eventos para os elementos clonados
+    function setupClonedActionIcons(clonedIcons) {
+        const dropdown = clonedIcons.querySelector('.user-dropdown');
+        const loginBtn = clonedIcons.querySelector('#login-btn');
+        
+        if (dropdown) {
+            dropdown.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const dropdownMenu = this.querySelector('.dropdown-menu');
+                if (dropdownMenu) {
+                    dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+                }
+            });
+        }
+    }
+    
+    // Controla visibilidade quando hamburger é clicado
+    if (hamburger && nav) {
+        hamburger.addEventListener('click', function() {
+            setTimeout(() => {
+                if (window.innerWidth <= 768 && mobileActionIcons) {
+                    mobileActionIcons.style.display = nav.classList.contains('active') ? 'flex' : 'none';
+                }
+            }, 10);
+        });
+    }
+    
+    // Fecha dropdown ao clicar fora (para versão mobile também)
+    document.addEventListener('click', function(e) {
+        if (mobileActionIcons) {
+            const dropdownMenu = mobileActionIcons.querySelector('.dropdown-menu');
+            const userDropdown = mobileActionIcons.querySelector('.user-dropdown');
+            
+            if (dropdownMenu && userDropdown && !userDropdown.contains(e.target)) {
+                dropdownMenu.style.display = 'none';
+            }
+        }
+    });
+    
+    // Executa inicialmente e no resize
+    handleMobileMenu();
+    window.addEventListener('resize', handleMobileMenu);
+});
