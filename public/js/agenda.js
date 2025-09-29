@@ -228,13 +228,9 @@ function displayProximoAgendamento(agendamento) {
                 </div>
             </div>
             <div class="reminder-actions">
-                <button class="btn btn-outline" onclick="verDetalhesAgendamento(${agendamento.id})">
-                    <i class="fas fa-eye"></i> Ver Detalhes
-                </button>
+
                 ${diffDays > 1 ? `
-                <button class="btn btn-outline btn-warning" onclick="cancelAppointment(${agendamento.id})">
-                    <i class="fas fa-times"></i> Cancelar
-                </button>
+
                 ` : ''}
                 <button class="btn btn-primary" onclick="reagendarServico(${agendamento.id})">
                     <i class="fas fa-copy"></i> Repetir Este Serviço
@@ -499,9 +495,7 @@ function init() {
                             <button class="btn btn-outline" onclick="repeatAppointment(${appointment.id})">
                                 <i class="fas fa-redo"></i> Repetir Agendamento
                             </button>
-                            <button class="btn btn-outline" onclick="downloadInvoice(${appointment.id})">
-                                <i class="fas fa-file-invoice"></i> Comprovante
-                            </button>
+
                             ${isFutureAppointment(appointment) ? `
                             <button class="btn btn-outline btn-cancel" onclick="cancelAppointment(${appointment.id})">
                                 <i class="fas fa-times"></i> Cancelar
@@ -515,9 +509,7 @@ function init() {
                             <button class="btn btn-outline" onclick="repeatAppointment(${appointment.id})">
                                 <i class="fas fa-redo"></i> Novo Agendamento
                             </button>
-                            <button class="btn btn-outline" onclick="downloadInvoice(${appointment.id})">
-                                <i class="fas fa-file-invoice"></i> Comprovante
-                            </button>
+
                             <span class="text-muted">Ações indisponíveis</span>
                         `}
                     </div>
