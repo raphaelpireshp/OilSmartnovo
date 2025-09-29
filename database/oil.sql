@@ -1187,4 +1187,8 @@ ADD COLUMN usuario_id INT NULL AFTER cliente_email;
 CREATE INDEX idx_agendamento_usuario ON agendamento_simples(usuario_id);
 
 
+ALTER TABLE agendamento_simples 
+ADD COLUMN status ENUM('pendente', 'confirmado', 'concluido', 'cancelado', 'fora_prazo') DEFAULT 'pendente',
+ADD COLUMN data_conclusao DATETIME NULL,
+ADD COLUMN motivo_cancelamento TEXT NULL;
 
