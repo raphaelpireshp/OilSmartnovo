@@ -1956,34 +1956,7 @@ body {
     margin-bottom: 5px;
 }
 
-/* ===== APPOINTMENT CARDS (AGENDA) ===== */
-.appointments-list {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
 
-.appointment-card {
-    background-color: var(--light-color);
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
-    overflow: hidden;
-    transition: var(--transition);
-}
-
-.appointment-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-}
-
-.appointment-header {
-    padding: 15px 20px;
-    background-color: var(--bg-color);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid var(--border-color);
-}
 
 .protocol {
     font-size: 0.85rem;
@@ -2012,12 +1985,7 @@ body {
     color: var(--danger-color);
 }
 
-.appointment-body {
-    padding: 20px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-}
+
 
 .service-info h3 {
     font-size: 1.2rem;
@@ -2536,9 +2504,7 @@ body {
         display: none;
     }
     
-    .appointment-card {
-        margin-bottom: 15px;
-    }
+
     
     .appointment-header, 
     .appointment-body, 
@@ -4508,20 +4474,6 @@ select option:disabled {
     gap: 8px;
 }
 
-.appointment-card {
-    background: var(--card-bg);
-    border-radius: 15px;
-    box-shadow: var(--card-shadow);
-    margin-bottom: 25px;
-    overflow: hidden;
-    transition: var(--transition);
-    border: 1px solid var(--border-color);
-}
-
-.appointment-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-}
 
 .appointment-header {
     padding: 20px;
@@ -4598,15 +4550,7 @@ select option:disabled {
     flex-wrap: wrap;
 }
 
-.btn-cancel {
-    color: #dc3545;
-    border-color: #dc3545;
-}
 
-.btn-cancel:hover {
-    background: #dc3545;
-    color: white;
-}
 
 /* Responsividade */
 @media (max-width: 768px) {
@@ -5147,4 +5091,584 @@ select option:disabled {
         padding: 12px;
         border-radius: 8px;
     }
+}
+
+/* Estilos para o modal de cancelamento */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.modal-title {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.modal-text {
+    margin-bottom: 15px;
+    color: #666;
+}
+
+.modal-textarea {
+    width: 100%;
+    height: 100px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+.modal-buttons {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.modal-cancel-btn {
+    padding: 10px 20px;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.modal-confirm-btn {
+    padding: 10px 20px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Loading overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10001;
+    color: white;
+    font-size: 18px;
+}
+
+.loading-content {
+    text-align: center;
+}
+
+.spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 15px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ===== MELHORIAS PARA A PÁGINA DE AGENDAMENTOS ===== */
+
+/* Estilos aprimorados para os cards de agendamento */
+.appointment-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    margin-bottom: 25px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 1px solid var(--border-color);
+    position: relative;
+}
+
+
+
+.appointment-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 100%;
+    background: var(--secondary-color);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+
+
+.appointment-card.completed::before {
+    background: var(--success-color);
+    opacity: 1;
+}
+
+.appointment-card.pending::before {
+    background: var(--warning-color);
+    opacity: 1;
+}
+
+
+
+.protocol {
+    font-weight: 600;
+    color: var(--primary-color);
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+}
+
+.status {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status.completed {
+    background: rgba(40, 167, 69, 0.15);
+    color: var(--success-color);
+    border: 1px solid rgba(40, 167, 69, 0.3);
+}
+
+.status.pending {
+    background: rgba(255, 193, 7, 0.15);
+    color: var(--warning-color);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.status.cancelled {
+    background: rgba(220, 53, 69, 0.15);
+    color: var(--danger-color);
+    border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+.appointment-body {
+    padding: 25px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+}
+
+.service-info h3 {
+    color: var(--secondary-color);
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.service-info h3::before {
+    content: '🔧';
+    font-size: 1.2rem;
+}
+
+.service-info p, .date-info p, .location-info p {
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--text-color);
+    font-size: 0.95rem;
+}
+
+.service-info i, .date-info i, .location-info i {
+    color: var(--secondary-color);
+    width: 18px;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.price-info {
+    background: linear-gradient(135deg, rgba(180, 148, 52, 0.08), rgba(212, 177, 95, 0.12));
+    padding: 15px 20px;
+    border-radius: 12px;
+    margin-top: 15px;
+    border: 1px solid rgba(180, 148, 52, 0.15);
+}
+
+.price-info p {
+    margin: 0;
+    font-weight: 700;
+    color: var(--secondary-color);
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cancel-info {
+    background: rgba(220, 53, 69, 0.08);
+    padding: 15px 20px;
+    border-radius: 12px;
+    margin-top: 15px;
+    border-left: 4px solid var(--danger-color);
+}
+
+.cancel-info p {
+    margin: 0;
+    color: var(--danger-color);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.appointment-footer {
+    padding: 20px 25px;
+    background: var(--light-color);
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.appointment-footer .btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.appointment-footer .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.text-muted {
+    color: var(--text-light) !important;
+    font-style: italic;
+    padding: 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Botão de download de comprovante destacado */
+.btn-download {
+    background: linear-gradient(135deg, var(--success-color), #20c997);
+    color: white;
+    border: none;
+}
+
+.btn-download:hover {
+    background: linear-gradient(135deg, #20c997, var(--success-color));
+}
+
+/* Estilos para o modal de confirmação de download */
+.download-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 10000;
+    justify-content: center;
+    align-items: center;
+}
+
+.download-modal.show {
+    display: flex;
+}
+
+.download-modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 16px;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    animation: modalAppear 0.3s ease;
+}
+
+@keyframes modalAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.download-icon {
+    font-size: 3rem;
+    color: var(--success-color);
+    margin-bottom: 20px;
+}
+
+.download-modal h3 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+}
+
+.download-modal p {
+    color: var(--text-light);
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+.download-modal-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .appointment-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+        padding: 20px;
+    }
+    
+    .appointment-body {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 20px;
+    }
+    
+    .appointment-footer {
+        flex-direction: column;
+        padding: 20px;
+    }
+    
+    .appointment-footer .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .download-modal-buttons {
+        flex-direction: column;
+    }
+}
+
+/* Estados de loading para os botões */
+.btn.loading {
+    position: relative;
+    color: transparent;
+}
+
+.btn.loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    margin-left: -10px;
+    margin-top: -10px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    border-right-color: transparent;
+    animation: button-loading 0.8s linear infinite;
+}
+
+@keyframes button-loading {
+    from {
+        transform: rotate(0);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Estilos para os diferentes estados do lembrete */
+.reminder-card.next-appointment {
+    background: linear-gradient(135deg, #e7f3ff 0%, #d1e7ff 100%);
+    border-left: 4px solid #0066cc;
+}
+
+.reminder-card.reminder-urgent {
+    background: linear-gradient(135deg, #ffe7e7 0%, #ffd1d1 100%);
+    border-left: 4px solid #dc3545;
+}
+
+.reminder-icon.urgent {
+    background: #dc3545 !important;
+    color: white !important;
+}
+
+.btn-warning {
+    background: #ffc107 !important;
+    color: #212529 !important;
+    border-color: #ffc107 !important;
+}
+
+.btn-warning:hover {
+    background: #e0a800 !important;
+    border-color: #d39e00 !important;
+}
+
+/* Melhorar a visualização dos cards */
+.appointment-card {
+    transition: all 0.3s ease;
+}
+
+.appointment-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Animações */
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(0, 102, 204, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(0, 102, 204, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(0, 102, 204, 0); }
+}
+
+@keyframes highlight {
+    0% { background-color: rgba(255, 193, 7, 0.3); }
+    100% { background-color: transparent; }
+}
+
+/* Estilos para o modal de download */
+.download-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.download-modal.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.download-modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    transform: translateY(-20px);
+    transition: transform 0.3s ease;
+}
+
+.download-modal.show .download-modal-content {
+    transform: translateY(0);
+}
+
+.download-icon {
+    font-size: 48px;
+    color: #28a745;
+    margin-bottom: 20px;
+}
+
+.download-modal h3 {
+    color: #213f57;
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+}
+
+.download-modal p {
+    color: #666;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.download-modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+/* Estilo para botão de loading */
+.btn.loading {
+    position: relative;
+    color: transparent !important;
+}
+
+.btn.loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    border-right-color: transparent;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Melhorar aparência dos botões na agenda */
+.appointment-footer .btn {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.appointment-footer .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Feedback visual para download */
+@keyframes downloadPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.95); }
+    100% { transform: scale(1); }
+}
+
+.btn-download-complete {
+    animation: downloadPulse 0.5s ease;
+    background-color: #28a745 !important;
 }

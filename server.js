@@ -5,6 +5,7 @@ const path = require('path');
 const cors = require('cors');
 require('dotenv').config();
 
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -51,6 +52,8 @@ const modeloRoutes = require('./routes/modelo');
 const modeloAnoRoutes = require('./routes/modeloAno');
 const recomendacaoRoutes = require('./routes/recomendacao');
 const geocodeRoutes = require('./routes/geocode');
+const lembreteTrocaOleoRoutes = require('./routes/lembreteTrocaOleo');
+
 
 // Usar rotas
 app.use('/api/auth', authRoutes);
@@ -63,6 +66,8 @@ app.use('/api/recomendacoes', recomendacaoRoutes);
 app.use('/api/geocode', geocodeRoutes);
 app.use('/api/contact', require('./routes/contact'));
 app.use('/api/agendamento_simples', agendamentoSimplesRoutes);
+app.use('/api/lembretes_troca_oleo', lembreteTrocaOleoRoutes);
+
 
 // Rotas de produtos (do arquivo novo)
 app.get('/api/produtos/oleo/:id', (req, res) => {

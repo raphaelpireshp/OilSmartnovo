@@ -8,66 +8,61 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="icon" href="/img/tentativa4.png" type="image/x-icon"></head>
+    <link rel="icon" href="/img/tentativa4.png" type="image/x-icon">
     <link rel="stylesheet" href="/css/auth.css">
-<script src="/js/auth.js" defer></script>
-
-
-
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="/js/auth.js" defer></script>
 </head>
 <body>
     <header class="header">
         <div class="container">
-           
-<div class="navbar">
-    <button class="hamburger" id="hamburger">
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-    </button>
+            <div class="navbar">
+                <button class="hamburger" id="hamburger">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
 
-    <div class="logo">
-        <a href="index.html"><img src="/img/oilamarelo.png" alt="OilSmart"></a>
-    </div>
-            
-            <nav class="nav" id="nav">
-                <ul class="nav__list">
-
-                    <li><a href="/html/index.html">Início</a></li>
-                    <li><a href="/html/servicos.html">Serviços</a></li>
-                                                            <li><a href="/html/agenda.html" class="active">Agenda</a></li>
-                    <li><a href="/html/sobre.html">Sobre</a></li>
-                                                                    <li><a href="/html/contato.html">Contato</a></li>
-
-                </ul>
-            </nav>
-            
-<div class="action-icons">
-    <div class="user-dropdown" id="user-dropdown">
-        <div class="user-icon" id="login-btn">
-            <i class="fas fa-user"></i>
-            <span class="login-status" id="login-status">Login</span>
-        </div>
-        <div class="dropdown-menu" id="dropdown-menu">
-            <div class="user-info">
-                <strong id="user-display-name">Usuário</strong>
-                <span id="user-email">email@exemplo.com</span>
+                <div class="logo">
+                    <a href="index.html"><img src="/img/oilamarelo.png" alt="OilSmart"></a>
+                </div>
+                
+                <nav class="nav" id="nav">
+                    <ul class="nav__list">
+                        <li><a href="/html/index.html">Início</a></li>
+                        <li><a href="/html/servicos.html">Serviços</a></li>
+                        <li><a href="/html/agenda.html" class="active">Agenda</a></li>
+                        <li><a href="/html/sobre.html">Sobre</a></li>
+                        <li><a href="/html/contato.html">Contato</a></li>
+                    </ul>
+                </nav>
+                
+                <div class="action-icons">
+                    <div class="user-dropdown" id="user-dropdown">
+                        <div class="user-icon" id="login-btn">
+                            <i class="fas fa-user"></i>
+                            <span class="login-status" id="login-status">Login</span>
+                        </div>
+                        <div class="dropdown-menu" id="dropdown-menu">
+                            <div class="user-info">
+                                <strong id="user-display-name">Usuário</strong>
+                                <span id="user-email">email@exemplo.com</span>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <a href="/html/agenda.html" class="dropdown-item">
+                                <i class="fas fa-calendar-alt"></i> Meus Agendamentos
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="/html/index.html" id="logout-btn" class="dropdown-item">
+                                <i class="fas fa-sign-out-alt"></i> Sair
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="dropdown-divider"></div>
-
-            <a href="/html/agenda.html" class="dropdown-item">
-                <i class="fas fa-calendar-alt"></i> Meus Agendamentos
-            </a>
-            <div class="dropdown-divider"></div>
-            <a href="/html/index.html" id="logout-btn" class="dropdown-item">
-                <i class="fas fa-sign-out-alt"></i> Sair
-            </a>
         </div>
-    </div>
-</div>
-        </div>
-    </div>
-</header>
+    </header>
 
     <main class="main-content">
         <div class="container">
@@ -94,52 +89,51 @@
                     </div>
                 </section>
 
+                <section class="history-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-history"></i> Histórico de Agendamentos</h2>
+                        <div class="filter-controls">
+                            <div class="filter-group">
+                                <label for="filter-status"><i class="fas fa-filter"></i> Status:</label>
+                                <select id="filter-status" class="filter-select">
+                                    <option value="all">Todos os Status</option>
+                                    <option value="pendente">Pendentes</option>
+                                    <option value="agendado">Agendados</option>
+                                    <option value="concluido">Concluídos</option>
+                                    <option value="cancelado">Cancelados</option>
+                                    <option value="fora_prazo">Fora do Prazo</option>
+                                </select>
+                            </div>
+                            
+                            <div class="filter-group">
+                                <label for="filter-period"><i class="fas fa-calendar"></i> Período:</label>
+                                <select id="filter-period" class="filter-select">
+                                    <option value="all">Todos os Períodos</option>
+                                    <option value="today">Hoje</option>
+                                    <option value="week">Esta Semana</option>
+                                    <option value="month">Este Mês</option>
+                                    <option value="last_month">Mês Passado</option>
+                                    <option value="year">Este Ano</option>
+                                </select>
+                            </div>
 
-<section class="history-section">
-    <div class="section-header">
-        <h2><i class="fas fa-history"></i> Histórico de Agendamentos</h2>
-        <div class="filter-controls">
-            <div class="filter-group">
-                <label for="filter-status"><i class="fas fa-filter"></i> Status:</label>
-                <select id="filter-status" class="filter-select">
-                    <option value="all">Todos os Status</option>
-                    <option value="pendente">Pendentes</option>
-                    <option value="agendado">Agendados</option>
-                    <option value="concluido">Concluídos</option>
-                    <option value="cancelado">Cancelados</option>
-                    <option value="fora_prazo">Fora do Prazo</option>
-                </select>
-            </div>
-            
-            <div class="filter-group">
-                <label for="filter-period"><i class="fas fa-calendar"></i> Período:</label>
-                <select id="filter-period" class="filter-select">
-                    <option value="all">Todos os Períodos</option>
-                    <option value="today">Hoje</option>
-                    <option value="week">Esta Semana</option>
-                    <option value="month">Este Mês</option>
-                    <option value="last_month">Mês Passado</option>
-                    <option value="year">Este Ano</option>
-                </select>
-            </div>
+                            <div class="filter-group">
+                                <label for="filter-sort"><i class="fas fa-sort"></i> Ordenar:</label>
+                                <select id="filter-sort" class="filter-select">
+                                    <option value="newest">Mais Recentes</option>
+                                    <option value="oldest">Mais Antigos</option>
+                                    <option value="date_asc">Data (Crescente)</option>
+                                    <option value="date_desc">Data (Decrescente)</option>
+                                </select>
+                            </div>
 
-            <div class="filter-group">
-                <label for="filter-sort"><i class="fas fa-sort"></i> Ordenar:</label>
-                <select id="filter-sort" class="filter-select">
-                    <option value="newest">Mais Recentes</option>
-                    <option value="oldest">Mais Antigos</option>
-                    <option value="date_asc">Data (Crescente)</option>
-                    <option value="date_desc">Data (Decrescente)</option>
-                </select>
-            </div>
-
-            <button id="clear-filters" class="btn btn-outline btn-small">
-                <i class="fas fa-times"></i> Limpar Filtros
-            </button>
-        </div>
-    </div>
+                            <button id="clear-filters" class="btn btn-outline btn-small">
+                                <i class="fas fa-times"></i> Limpar Filtros
+                            </button>
+                        </div>
+                    </div>
                     
-    <div class="appointments-list">
+                    <div class="appointments-list">
                         <!-- Agendamento 1 -->
                         <div class="appointment-card">
                             <div class="appointment-header">
@@ -160,11 +154,14 @@
                                     <p><i class="fas fa-map-marker-alt"></i> OilSmart - Unidade Paulista</p>
                                     <p>Av. Paulista, 1000 - São Paulo/SP</p>
                                 </div>
+                                <div class="price-info">
+                                    <p><i class="fas fa-tag"></i> Total: R$ 189,90</p>
+                                </div>
                             </div>
                             <div class="appointment-footer">
-                                <button class="btn btn-outline"><i class="fas fa-redo"></i> Repetir Agendamento</button>
-                                <button class="btn btn-outline"><i class="fas fa-file-invoice"></i> Nota Fiscal</button>
-                                <button class="btn btn-outline"><i class="fas fa-star"></i> Avaliar Serviço</button>
+                                <button class="btn btn-outline" onclick="repeatAppointment(1)"><i class="fas fa-redo"></i> Repetir Agendamento</button>
+                                <button class="btn btn-outline" onclick="downloadInvoice(1)"><i class="fas fa-file-invoice"></i> Comprovante</button>
+                                <button class="btn btn-outline" onclick="rateService(1)"><i class="fas fa-star"></i> Avaliar Serviço</button>
                             </div>
                         </div>
                         
@@ -188,11 +185,45 @@
                                     <p><i class="fas fa-map-marker-alt"></i> OilSmart - Unidade Morumbi</p>
                                     <p>Av. Morumbi, 2500 - São Paulo/SP</p>
                                 </div>
+                                <div class="price-info">
+                                    <p><i class="fas fa-tag"></i> Total: R$ 320,50</p>
+                                </div>
                             </div>
                             <div class="appointment-footer">
-                                <button class="btn btn-outline"><i class="fas fa-redo"></i> Repetir Agendamento</button>
-                                <button class="btn btn-outline"><i class="fas fa-file-invoice"></i> Nota Fiscal</button>
-                                <button class="btn btn-outline"><i class="fas fa-star"></i> Avaliar Serviço</button>
+                                <button class="btn btn-outline" onclick="repeatAppointment(2)"><i class="fas fa-redo"></i> Repetir Agendamento</button>
+                                <button class="btn btn-outline" onclick="downloadInvoice(2)"><i class="fas fa-file-invoice"></i> Comprovante</button>
+                                <button class="btn btn-outline" onclick="rateService(2)"><i class="fas fa-star"></i> Avaliar Serviço</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Agendamento 3 - Cancelado -->
+                        <div class="appointment-card cancelled">
+                            <div class="appointment-header">
+                                <span class="protocol">Protocolo: #OIL20230910-003</span>
+                                <span class="status cancelled">Cancelado</span>
+                            </div>
+                            <div class="appointment-body">
+                                <div class="service-info">
+                                    <h3>Troca de Óleo Semissintético</h3>
+                                    <p><i class="fas fa-car"></i> Fiat Uno 1.0 2018</p>
+                                    <p><i class="fas fa-oil-can"></i> Óleo Semissintético 10W-40</p>
+                                </div>
+                                <div class="date-info">
+                                    <p><i class="far fa-calendar-alt"></i> 10/09/2023</p>
+                                    <p><i class="far fa-clock"></i> 09:00 - 10:30</p>
+                                </div>
+                                <div class="location-info">
+                                    <p><i class="fas fa-map-marker-alt"></i> OilSmart - Unidade Centro</p>
+                                    <p>Rua da Consolação, 500 - São Paulo/SP</p>
+                                </div>
+                                <div class="cancel-info">
+                                    <p><i class="fas fa-info-circle"></i> Motivo: Mudança de planos</p>
+                                </div>
+                            </div>
+                            <div class="appointment-footer">
+                                <button class="btn btn-outline" onclick="repeatAppointment(3)"><i class="fas fa-redo"></i> Novo Agendamento</button>
+                                <button class="btn btn-outline" onclick="downloadInvoice(3)"><i class="fas fa-file-invoice"></i> Comprovante</button>
+                                <span class="text-muted">Ações indisponíveis</span>
                             </div>
                         </div>
                     </div>
@@ -228,8 +259,7 @@
         </div>
     </footer>
 
-<script src="/js/agenda.js"></script>
-<script src="/js/main.js"></script>
-
+    <script src="/js/agenda.js"></script>
+    <script src="/js/main.js"></script>
 </body>
 </html>

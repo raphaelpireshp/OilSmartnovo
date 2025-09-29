@@ -451,4 +451,84 @@ router.post('/atualizar-status/automatico', (req, res) => {
         });
     });
 });
+
+
+// agendamentoSimples.js - Adicione esta rota
+
+// Rota para buscar último veículo agendado não cancelado do usuário
+router.get('/usuario/:usuario_id/ultimo-veiculo', (req, res) => {
+    const { usuario_id } = req.params;
+
+    const query = `
+        SELECT * FROM agendamento_simples 
+        WHERE usuario_id = ? 
+        AND status NOT IN ('cancelado', 'fora_prazo')
+        AND data_hora <= NOW()
+        ORDER BY data_hora DESC 
+        LIMIT 1
+    `;
+
+    db.query(query, [usuario_id], (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar último veículo agendado:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao buscar último veículo' 
+            });
+        }
+
+        if (results.length === 0) {
+            return res.json({ 
+                success: true, 
+                data: null,
+                message: 'Nenhum agendamento anterior encontrado' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            data: results[0] 
+        });
+    });
+});
+
+
+// agendamentoSimples.js - Adicione esta rota
+
+// Rota para buscar último agendamento concluído do usuário
+router.get('/usuario/:usuario_id/ultimo-concluido', (req, res) => {
+    const { usuario_id } = req.params;
+
+    const query = `
+        SELECT * FROM agendamento_simples 
+        WHERE usuario_id = ? 
+        AND status IN ('concluido', 'confirmado')
+        AND data_hora <= NOW()
+        ORDER BY data_hora DESC 
+        LIMIT 1
+    `;
+
+    db.query(query, [usuario_id], (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar último agendamento concluído:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao buscar último agendamento' 
+            });
+        }
+
+        if (results.length === 0) {
+            return res.json({ 
+                success: true, 
+                data: null,
+                message: 'Nenhum agendamento concluído encontrado' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            data: results[0] 
+        });
+    });
+});
 module.exports = router;
