@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OilSmart - Sistema Administrativo</title>
+    <link rel="stylesheet" href="/css/adm.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Container de Autenticação -->
+    <div id="authContainer" class="auth-container">
+        <!-- Card de Login -->
+        <div id="loginCard" class="auth-card">
+            <div class="auth-logo">
+                <i class="fas fa-oil-can"></i>
+            </div>
+            <h2 class="auth-title">Login OilSmart</h2>
+            <form id="loginForm" class="auth-form">
+                <div class="form-group-auth">
+                    <label for="loginEmail">E-mail</label>
+                    <input type="email" id="loginEmail" placeholder="seu@email.com" required>
+                </div>
+                <div class="form-group-auth">
+                    <label for="loginSenha">Senha</label>
+                    <input type="password" id="loginSenha" placeholder="Sua senha" required>
+                </div>
+                <button type="submit" class="auth-btn">Entrar no Sistema</button>
+                <div id="loginError" class="auth-error">
+                    E-mail ou senha incorretos. Tente novamente.
+                </div>
+            </form>
+            <div class="auth-links">
+                <a href="#" class="auth-link" onclick="mostrarCadastro()">Criar nova conta</a>
+                <a href="#" class="auth-link">Esqueci minha senha</a>
+            </div>
+        </div>
+
+        <!-- Card de Cadastro -->
+        <div id="cadastroCard" class="auth-card" style="display: none;">
+            <div class="auth-logo">
+                <i class="fas fa-oil-can"></i>
+            </div>
+            <h2 class="auth-title">Criar Conta</h2>
+            <form id="cadastroForm" class="auth-form">
+                <div class="form-group-auth">
+                    <label for="cadastroNome">Nome Completo</label>
+                    <input type="text" id="cadastroNome" placeholder="Seu nome completo" required>
+                </div>
+                <div class="form-group-auth">
+                    <label for="cadastroEmail">E-mail</label>
+                    <input type="email" id="cadastroEmail" placeholder="seu@email.com" required>
+                </div>
+                <div class="form-group-auth">
+                    <label for="cadastroSenha">Senha</label>
+                    <input type="password" id="cadastroSenha" placeholder="Mínimo 6 caracteres" required>
+                </div>
+                <div class="form-group-auth">
+                    <label for="cadastroConfirmarSenha">Confirmar Senha</label>
+                    <input type="password" id="cadastroConfirmarSenha" placeholder="Digite novamente a senha" required>
+                </div>
+                <button type="submit" class="auth-btn">Criar Conta</button>
+                <div id="cadastroError" class="auth-error" style="display: none;">
+                    Erro no cadastro. Verifique os dados.
+                </div>
+            </form>
+            <div class="auth-links">
+                <a href="#" class="auth-link" onclick="voltarParaLogin()">Voltar para o login</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container Administrativo -->
+    <div id="adminContainer" style="display: none;">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="fas fa-oil-can"></i>
+                </div>
+                <h3>OilSmart</h3>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link active" onclick="navegarPara('dashboard')">
+                            <i class="fas fa-home"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" onclick="navegarPara('produtos')">
+                            <i class="fas fa-box"></i>
+                            <span>Produtos</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" onclick="navegarPara('vendas')">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span>Vendas</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" onclick="navegarPara('funcionarios')">
+                            <i class="fas fa-users"></i>
+                            <span>Funcionários</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" onclick="navegarPara('relatorios')">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Relatórios</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <span class="user-name">Administrador</span>
+                        <span class="user-role">Super Admin</span>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="fazerLogout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Overlay para sidebar em mobile -->
+        <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+        <!-- Conteúdo Principal -->
+        <main class="main-content">
+            <header class="main-header">
+                <div class="header-left">
+                    <button class="sidebar-toggle" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 id="pageTitle" class="page-title">Dashboard</h1>
+                </div>
+                <div class="header-right">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Pesquisar...">
+                    </div>
+                    <button class="notification-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </button>
+                    <div class="date-time">
+                        <span id="currentDate">Segunda-feira, 1 de Janeiro de 2023</span>
+                        <span id="currentTime">00:00:00</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-area">
+                <!-- Dashboard -->
+                <section id="dashboard" class="content-section active">
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-icon">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <div class="metric-content">
+                                <h3>TOTAL DE VENDAS</h3>
+                                <div id="totalVendas" class="metric-value">R$ 0,00</div>
+                                <div class="metric-change positive">
+                                    <i class="fas fa-arrow-up"></i> 12% desde o mês passado
+                                </div>
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-icon">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <div class="metric-content">
+                                <h3>PRODUTOS</h3>
+                                <div id="totalProdutos" class="metric-value">0</div>
+                                <div class="metric-change neutral">
+                                    <i class="fas fa-minus"></i> Sem alteração
+                                </div>
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="metric-content">
+                                <h3>FUNCIONÁRIOS</h3>
+                                <div id="totalFuncionarios" class="metric-value">0</div>
+                                <div class="metric-change positive">
+                                    <i class="fas fa-arrow-up"></i> 5% desde o mês passado
+                                </div>
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="metric-content">
+                                <h3>VENDAS PENDENTES</h3>
+                                <div id="vendasPendentes" class="metric-value">0</div>
+                                <div class="metric-change negative">
+                                    <i class="fas fa-arrow-down"></i> 3% desde o mês passado
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>Vendas Mensais</h3>
+                                <select>
+                                    <option>2023</option>
+                                    <option>2022</option>
+                                </select>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="vendasChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>Vendas por Categoria</h3>
+                                <select>
+                                    <option>2023</option>
+                                    <option>2022</option>
+                                </select>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="categoriasChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="activities-section">
+                        <div class="activities-card">
+                            <div class="card-header">
+                                <h3>Atividades Recentes</h3>
+                                <a href="#" class="view-all">Ver tudo</a>
+                            </div>
+                            <div id="atividadesList" class="activities-list">
+                                <!-- Atividades serão carregadas via JavaScript -->
+                            </div>
+                        </div>
+                        <div class="activities-card">
+                            <div class="card-header">
+                                <h3>Status de Estoque</h3>
+                                <a href="#" class="view-all">Ver detalhes</a>
+                            </div>
+                            <div class="activities-list">
+                                <div class="activity-item">
+                                    <div class="activity-icon" style="background-color: rgba(220, 53, 69, 0.1); color: #dc3545;">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <div class="activity-title">Produtos com estoque crítico</div>
+                                        <div class="activity-time">0 produtos com menos de 5 unidades</div>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon" style="background-color: rgba(255, 193, 7, 0.1); color: #ffc107;">
+                                        <i class="fas fa-info-circle"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <div class="activity-title">Produtos com estoque baixo</div>
+                                        <div class="activity-time">0 produtos com menos de 15 unidades</div>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon" style="background-color: rgba(40, 167, 69, 0.1); color: #28a745;">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <div class="activity-title">Estoque suficiente</div>
+                                        <div class="activity-time">0 produtos com estoque adequado</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Produtos -->
+                <section id="produtos" class="content-section">
+                    <div class="section-header">
+                        <h2>Gerenciamento de Produtos</h2>
+                        <button class="btn btn-primary" onclick="abrirModalProduto()">
+                            <i class="fas fa-plus"></i> Novo Produto
+                        </button>
+                    </div>
+
+                    <div id="produtosGrid" class="produtos-grid">
+                        <!-- Produtos serão carregados via JavaScript -->
+                    </div>
+                </section>
+
+                <!-- Vendas -->
+                <section id="vendas" class="content-section">
+                    <div class="section-header">
+                        <h2>Histórico de Vendas</h2>
+                        <button class="btn btn-primary" onclick="abrirModalVenda()">
+                            <i class="fas fa-plus"></i> Nova Venda
+                        </button>
+                    </div>
+
+                    <div class="vendas-summary">
+                        <div class="summary-card">
+                            <h4>Total de Vendas</h4>
+                            <div id="resumoTotalVendas" class="summary-value">R$ 0,00</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Vendas Confirmadas</h4>
+                            <div id="resumoVendasConfirmadas" class="summary-value">0</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Vendas Pendentes</h4>
+                            <div id="resumoVendasPendentes" class="summary-value">0</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>Média por Venda</h4>
+                            <div id="resumoMediaVendas" class="summary-value">R$ 0,00</div>
+                        </div>
+                    </div>
+
+                    <div class="filters-bar">
+                        <div class="filter-group">
+                            <label for="filtroData">Data</label>
+                            <input type="date" id="filtroData">
+                        </div>
+                        <div class="filter-group">
+                            <label for="filtroStatus">Status</label>
+                            <select id="filtroStatus">
+                                <option value="">Todos</option>
+                                <option value="pendente">Pendente</option>
+                                <option value="confirmado">Confirmado</option>
+                                <option value="cancelado">Cancelado</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="filtroCliente">Cliente</label>
+                            <input type="text" id="filtroCliente" placeholder="Nome do cliente">
+                        </div>
+                        <div class="filter-group">
+                            <label>&nbsp;</label>
+                            <button class="btn btn-primary">
+                                <i class="fas fa-filter"></i> Filtrar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Data</th>
+                                    <th>Cliente</th>
+                                    <th>Itens</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="vendasTable">
+                                <!-- Vendas serão carregadas via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Funcionários -->
+                <section id="funcionarios" class="content-section">
+                    <div class="section-header">
+                        <h2>Gerenciamento de Funcionários</h2>
+                        <button class="btn btn-primary" onclick="abrirModalFuncionario()">
+                            <i class="fas fa-plus"></i> Novo Funcionário
+                        </button>
+                    </div>
+
+                    <div id="funcionariosGrid" class="funcionarios-grid">
+                        <!-- Funcionários serão carregados via JavaScript -->
+                    </div>
+                </section>
+
+                <!-- Relatórios -->
+                <section id="relatorios" class="content-section">
+                    <div class="section-header">
+                        <h2>Relatórios</h2>
+                    </div>
+
+                    <div class="relatorios-grid">
+                        <div class="relatorio-card">
+                            <i class="fas fa-shopping-cart"></i>
+                            <h3>Relatório de Vendas</h3>
+                            <p>Gere relatórios detalhados de vendas por período, incluindo totais, produtos mais vendidos e análise de desempenho.</p>
+                            <button class="btn btn-primary" onclick="gerarRelatorioVendas()">
+                                <i class="fas fa-download"></i> Gerar Relatório
+                            </button>
+                        </div>
+                        <div class="relatorio-card">
+                            <i class="fas fa-box"></i>
+                            <h3>Relatório de Estoque</h3>
+                            <p>Relatório completo do estoque atual, incluindo produtos com baixa quantidade e necessidade de reposição.</p>
+                            <button class="btn btn-primary" onclick="gerarRelatorioEstoque()">
+                                <i class="fas fa-download"></i> Gerar Relatório
+                            </button>
+                        </div>
+                        <div class="relatorio-card">
+                            <i class="fas fa-users"></i>
+                            <h3>Relatório de Funcionários</h3>
+                            <p>Relatório com informações dos funcionários, cargos, departamentos e status no sistema.</p>
+                            <button class="btn btn-primary" onclick="gerarRelatorioFuncionarios()">
+                                <i class="fas fa-download"></i> Gerar Relatório
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Produto -->
+    <div id="modalProduto" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalProdutoTitulo">Adicionar Produto</h3>
+                <button class="close-modal" onclick="fecharModal('modalProduto')">&times;</button>
+            </div>
+            <form id="produtoForm" class="modal-body">
+                <input type="hidden" id="produtoId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="produtoNome">Nome do Produto</label>
+                        <input type="text" id="produtoNome" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="produtoCategoria">Categoria</label>
+                        <select id="produtoCategoria" required>
+                            <option value="">Selecione uma categoria</option>
+                            <option value="Óleos">Óleos</option>
+                            <option value="Filtros">Filtros</option>
+                            <option value="Aditivos">Aditivos</option>
+                            <option value="Acessórios">Acessórios</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="produtoMarca">Marca</label>
+                        <input type="text" id="produtoMarca" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="produtoPreco">Preço (R$)</label>
+                        <input type="number" id="produtoPreco" step="0.01" min="0" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="produtoEstoque">Quantidade em Estoque</label>
+                        <input type="number" id="produtoEstoque" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="produtoImagem">Imagem do Produto</label>
+                        <input type="file" id="produtoImagem" accept="image/*">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="produtoDescricao">Descrição</label>
+                    <textarea id="produtoDescricao" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Prévia da Imagem</label>
+                    <div class="image-upload">
+                        <div id="produtoImagemPreview" class="image-preview">
+                            <div class="placeholder">Imagem do produto</div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="fecharModal('modalProduto')">Cancelar</button>
+                <button type="submit" form="produtoForm" class="btn btn-primary">Salvar Produto</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Funcionário -->
+    <div id="modalFuncionario" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalFuncionarioTitulo">Adicionar Funcionário</h3>
+                <button class="close-modal" onclick="fecharModal('modalFuncionario')">&times;</button>
+            </div>
+            <form id="funcionarioForm" class="modal-body">
+                <input type="hidden" id="funcionarioId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="funcionarioNome">Nome Completo</label>
+                        <input type="text" id="funcionarioNome" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="funcionarioEmail">E-mail</label>
+                        <input type="email" id="funcionarioEmail" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="funcionarioTelefone">Telefone</label>
+                        <input type="tel" id="funcionarioTelefone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="funcionarioCargo">Cargo</label>
+                        <input type="text" id="funcionarioCargo" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="funcionarioDepartamento">Departamento</label>
+                        <select id="funcionarioDepartamento" required>
+                            <option value="">Selecione um departamento</option>
+                            <option value="Vendas">Vendas</option>
+                            <option value="Administração">Administração</option>
+                            <option value="Logística">Logística</option>
+                            <option value="TI">TI</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="funcionarioStatus">Status</label>
+                        <select id="funcionarioStatus" required>
+                            <option value="ativo">Ativo</option>
+                            <option value="inativo">Inativo</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="fecharModal('modalFuncionario')">Cancelar</button>
+                <button type="submit" form="funcionarioForm" class="btn btn-primary">Salvar Funcionário</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detalhes da Venda -->
+    <div id="modalVendaDetalhes" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Detalhes da Venda</h3>
+                <button class="close-modal" onclick="fecharModal('modalVendaDetalhes')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Conteúdo será preenchido via JavaScript -->
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="fecharModal('modalVendaDetalhes')">Fechar</button>
+                <button type="button" class="btn btn-primary">Imprimir</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="   /js/adm.js"></script>
+</body>
+</html>
