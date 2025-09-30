@@ -384,31 +384,142 @@ body {
     }
 
     .dropdown-menu {
-        position: fixed;
-        top: 85px; /* Altura do header */
-        left: 0;
-        width: 100%;
-        max-width: none;
-        border-radius: 0;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-        border-top: 1px solid #eee;
-        padding: 15px 0;
+        position: fixed !important;
+        top: 85px !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: auto !important;
+        max-width: none !important;
+        border-radius: 0 !important;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1) !important;
+        border-top: 1px solid #eee !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        background-color: white !important;
+        z-index: 9999 !important;
+        overflow: visible !important;
     }
 
     .dropdown-menu.show {
-        transform: translateY(0);
+        transform: translateY(0) !important;
+        display: block !important;
     }
 
-    .user-info,
+    .user-info {
+        width: 100% !important;
+        height: auto !important;
+        min-height: 100px !important;
+        padding: 25px !important;
+        margin: 0 !important;
+        border-bottom: 2px solid #ddd !important;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+        box-sizing: border-box !important;
+        overflow: visible !important;
+    }
+    
+    .user-info strong {
+        width: 100% !important;
+        height: auto !important;
+        font-size: 1.3rem !important;
+        color: #213f57 !important;
+        margin: 0 0 10px 0 !important;
+        padding: 0 !important;
+        display: block !important;
+        font-weight: 700 !important;
+        line-height: 1.5 !important;
+        text-align: left !important;
+        overflow: visible !important;
+        white-space: normal !important;
+        word-break: break-word !important;
+    }
+    
+    .user-info span {
+        width: 100% !important;
+        height: auto !important;
+        font-size: 1.1rem !important;
+        color: #6c757d !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: block !important;
+        line-height: 1.5 !important;
+        text-align: left !important;
+        overflow: visible !important;
+        white-space: normal !important;
+        word-break: break-word !important;
+    }
+
     .dropdown-item {
-        padding: 12px 25px;
+        width: 100% !important;
+        padding: 20px 25px !important;
+        font-size: 1.1rem !important;
+        border-bottom: 1px solid #f0f0f0 !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 15px !important;
+        box-sizing: border-box !important;
+    }
+    
+    .dropdown-item:last-child {
+        border-bottom: none !important;
+    }
+    
+    .dropdown-item i {
+        font-size: 1.2rem !important;
+        width: 25px !important;
+        text-align: center !important;
+        flex-shrink: 0 !important;
     }
 }
 
 @media (max-width: 480px) {
     .dropdown-menu {
-        top: 75px; /* Altura do header em mobile */
+        top: 75px !important;
     }
+    
+    .user-info {
+        padding: 20px !important;
+        min-height: 90px !important;
+    }
+    
+    .user-info strong {
+        font-size: 1.2rem !important;
+    }
+    
+    .user-info span {
+        font-size: 1rem !important;
+    }
+    
+    .dropdown-item {
+        padding: 18px 20px !important;
+        font-size: 1rem !important;
+    }
+}
+
+/* Força absoluta para os elementos específicos */
+#user-display-name {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: static !important;
+    z-index: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    white-space: normal !important;
+}
+
+#user-email {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: static !important;
+    z-index: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    white-space: normal !important;
 }
 
 /* Menu Hamburger Moderno */
@@ -4370,8 +4481,10 @@ select option:disabled {
         transform: translateY(0);
     }
     
-    .user-ico .login-status {
-        display: none;
+    .user-icon .login-status {
+        display: inline-block !important;
+        font-size: 0.8rem;
+        color: white;
     }
 }
 
@@ -5673,3 +5786,89 @@ select option:disabled {
     background-color: #28a745 !important;
 }
 
+
+
+/* ===== CORREÇÃO DO STATUS DO USUÁRIO NO MODO RESPONSIVO ===== */
+
+/* Garantir que o status do usuário seja visível em mobile */
+@media (max-width: 768px) {
+    .user-icon .login-status {
+        display: inline-block !important;
+        font-size: 0.85rem;
+        margin-left: 8px;
+        color: white;
+        white-space: nowrap;
+    }
+    
+    .user-icon {
+        padding: 8px 12px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        display: flex !important;
+        align-items: center;
+        gap: 8px;
+    }
+}
+
+/* Para telas muito pequenas */
+@media (max-width: 480px) {
+    .user-icon .login-status {
+        font-size: 0.8rem;
+        margin-left: 6px;
+    }
+    
+    .user-icon {
+        padding: 6px 10px;
+        gap: 6px;
+    }
+}
+
+/* Garantir que o dropdown funcione corretamente no mobile */
+@media (max-width: 1024px) {
+    .user-dropdown {
+        position: static;
+    }
+    
+    .dropdown-menu {
+        position: fixed;
+        top: 85px;
+        left: 0;
+        width: 100%;
+        max-width: none;
+        border-radius: 0;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        border-top: 1px solid #eee;
+        padding: 15px 0;
+    }
+}
+/* ===== GARANTIR VISIBILIDADE DO STATUS EM TODAS AS TELAS ===== */
+@media (max-width: 1024px) {
+    .user-dropdown .user-icon .login-status {
+        display: inline-block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        color: white !important;
+        font-size: 0.85rem;
+    }
+    
+    .user-dropdown .user-icon {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+    }
+}
+
+/* Correção específica para o menu mobile */
+@media (max-width: 768px) {
+    .nav.active ~ .action-icons .user-dropdown .user-icon .login-status {
+        display: inline-block !important;
+        color: white !important;
+    }
+    
+    /* Garantir que o elemento seja sempre visível no header mobile */
+    .header .user-dropdown .user-icon .login-status {
+        display: inline-block !important;
+        color: white !important;
+        font-weight: 500;
+    }
+}

@@ -96,25 +96,43 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Atualizar interface com dados do usuário
     function updateUserInterface(user) {
-        // Mostrar nome completo se existir, senão mostra parte do email
-        if (user.nome) {
-            loginStatus.textContent = user.nome.split(' ')[0]; // Primeiro nome apenas
-            if (userDisplayName) {
-                userDisplayName.textContent = user.nome;
+        console.log('Atualizando interface com dados:', user); // Debug
+        
+        // Atualizar o status de login no header
+        if (loginStatus) {
+            if (user.nome) {
+                loginStatus.textContent = user.nome.split(' ')[0]; // Primeiro nome apenas
+            } else if (user.email) {
+                const username = user.email.split('@')[0];
+                loginStatus.textContent = username;
+            } else {
+                loginStatus.textContent = 'Minha Conta';
             }
-        } else if (user.email) {
-            const username = user.email.split('@')[0];
-            loginStatus.textContent = username;
-            if (userDisplayName) {
-                userDisplayName.textContent = username;
-            }
-        } else {
-            loginStatus.textContent = 'Minha Conta';
         }
 
-        // Mostrar email no dropdown
-        if (userEmail && user.email) {
-            userEmail.textContent = user.email;
+        // Atualizar nome no dropdown
+        if (userDisplayName) {
+            if (user.nome) {
+                userDisplayName.textContent = user.nome;
+            } else if (user.email) {
+                userDisplayName.textContent = user.email.split('@')[0];
+            } else {
+                userDisplayName.textContent = 'Usuário';
+            }
+        }
+
+        // Atualizar email no dropdown
+        if (userEmail) {
+            if (user.email) {
+                userEmail.textContent = user.email;
+            } else {
+                userEmail.textContent = 'email@exemplo.com';
+            }
+        }
+
+        // Marcar como logado
+        if (userDropdown) {
+            userDropdown.classList.add('user-logged-in');
         }
     }
 
@@ -171,21 +189,29 @@ document.addEventListener('DOMContentLoaded', function () {
             e.stopPropagation();
 
             const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            const userData = JSON.parse(localStorage.getItem('userData') || localStorage.getItem('user') || '{}');
 
-            if (!isLoggedIn) {
-                // Se não estiver logado, redirecionar para login
-                window.location.href = '/html/login.html';
+            if (!isLoggedIn || !userData.email) {
+                // Se não estiver logado, abrir modal de login em vez de redirecionar
+                if (loginModal) {
+                    showModal(loginModal);
+                } else {
+                    window.location.href = '/html/login.html';
+                }
                 return;
             }
 
             // Se estiver logado, abrir/fechar dropdown
-            const isVisible = dropdownMenu.style.display === 'block';
-            dropdownMenu.style.display = isVisible ? 'none' : 'block';
-
-            // Atualizar dados do usuário quando abrir o dropdown
-            if (!isVisible) {
-                const userData = JSON.parse(localStorage.getItem('user') || '{}');
+            const isVisible = dropdownMenu.classList.contains('show') || dropdownMenu.style.display === 'block';
+            
+            if (isVisible) {
+                dropdownMenu.classList.remove('show');
+                dropdownMenu.style.display = 'none';
+            } else {
+                // Atualizar dados do usuário antes de mostrar o dropdown
                 updateUserInterface(userData);
+                dropdownMenu.classList.add('show');
+                dropdownMenu.style.display = 'block';
             }
         });
     }
@@ -198,12 +224,13 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Verificar login ao carregar a página
-    document.addEventListener('DOMContentLoaded', function () {
-        checkLoginStatus();
-    });
+    checkLoginStatus();
 
     // Verificar login também quando a página ganha foco
     window.addEventListener('focus', checkLoginStatus);
+    
+    // Verificar login periodicamente (a cada 30 segundos)
+    setInterval(checkLoginStatus, 30000);
 
     // 3. Modal de Login (comum a todas as páginas)
     const loginModal = document.getElementById('login-modal');
