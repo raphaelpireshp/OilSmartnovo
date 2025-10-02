@@ -1180,15 +1180,36 @@ WHERE (servicos LIKE '%[%' OR servicos LIKE '%]%' OR servicos LIKE '%"%')
   AND id > 0;
 
 
-ALTER TABLE agendamento_simples 
-ADD COLUMN usuario_id INT NULL AFTER cliente_email;
 
--- Adicionar índice para melhor performance
-CREATE INDEX idx_agendamento_usuario ON agendamento_simples(usuario_id);
+
 
 
 ALTER TABLE agendamento_simples 
 ADD COLUMN status ENUM('pendente', 'confirmado', 'concluido', 'cancelado', 'fora_prazo') DEFAULT 'pendente',
 ADD COLUMN data_conclusao DATETIME NULL,
 ADD COLUMN motivo_cancelamento TEXT NULL;
+
+
+-- Adicionar a coluna oficina_id na tabela agendamento_simples
+ALTER TABLE agendamento_simples ADD COLUMN oficina_id INT;
+
+-- Adicionar chave estrangeira (opcional, mas recomendado)
+ALTER TABLE agendamento_simples 
+ADD CONSTRAINT fk_agendamento_oficina 
+FOREIGN KEY (oficina_id) REFERENCES oficinas(id);
+
+-- Atualizar os agendamentos existentes com um valor padrão (por exemplo, oficina_id = 1)
+UPDATE agendamento_simples SET oficina_id = 1 WHERE oficina_id IS NULL;
+
+
+-- Adicionar colunas para cancelamento na tabela agendamento_simples
+ALTER TABLE agendamento_simples 
+ADD COLUMN data_cancelamento DATETIME NULL;
+
+-- Verificar se as colunas foram adicionadas
+DESCRIBE agendamento_simples;
+
+
+
+
 

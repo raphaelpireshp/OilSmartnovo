@@ -1011,7 +1011,7 @@ function generateTimeSlots(start, end, interval) {
 
 // ==================== FUNÇÕES DE AGENDAMENTO ====================
 
-// Processa o agendamento e salva no banco - VERSÃO COMPLETA E CORRIGIDA
+// Processa o agendamento e salva no banco - VERSÃO ATUALIZADA COM OFICINA_ID
 async function processScheduling() {
     console.log('Iniciando processScheduling...');
     
@@ -1098,41 +1098,34 @@ async function processScheduling() {
         if (selectedProducts.filter && oilRecommendation.filtro) {
             servicosArray.push(`Troca de Filtro: ${oilRecommendation.filtro.nome} - R$ ${totalFilter.toFixed(2)}`);
         }
-// CORREÇÃO: Verificar se é array antes de fazer join
-if (Array.isArray(servicosArray) && servicosArray.length > 0) {
-    servicos = servicosArray.join(' | ');
-} else if (typeof servicosArray === 'string') {
-    // Se já for string, usar diretamente (remover caracteres indesejados)
-    servicos = servicosArray.replace(/[\[\]"]/g, '').trim();
-} else {
-    servicos = 'Serviços não especificados';
-}
+
         // Formatar data e hora para o formato do banco
         const dataHora = `${scheduleDateValue} ${scheduleTime}:00`;
 
         // Gerar protocolo único
         const protocolo = `OIL${Date.now().toString().slice(-8)}`;
 
-        // Preparar dados para envio - ESTRUTURA COMPLETA E CORRETA
-        const agendamentoData = {
-            protocolo: protocolo,
-            data_hora: dataHora,
-            oficina_nome: selectedWorkshop.nome,
-            oficina_endereco: `${selectedWorkshop.endereco}, ${selectedWorkshop.cidade}/${selectedWorkshop.estado}`,
-            oficina_telefone: selectedWorkshop.telefone || 'Não informado',
-            veiculo: `${userVehicle.marca || ''} ${userVehicle.modelo || ''} ${userVehicle.ano || ''}`.trim(),
-            servicos: servicosArray.join(' | '), // Converter array para string
-            total_servico: totalService,
-            cliente_nome: customerName,
-            cliente_cpf: customerCpf.replace(/\D/g, ''), // Apenas números
-            cliente_telefone: customerPhone,
-            cliente_email: customerEmail,
-            usuario_id: usuario_id
-        };
+// No processScheduling(), atualize o agendamentoData:
+const agendamentoData = {
+    protocolo: protocolo,
+    data_hora: dataHora,
+    oficina_nome: selectedWorkshop.nome,
+    oficina_endereco: `${selectedWorkshop.endereco}, ${selectedWorkshop.cidade}/${selectedWorkshop.estado}`,
+    oficina_telefone: selectedWorkshop.telefone || 'Não informado',
+    oficina_id: selectedWorkshop.id, // ← JÁ EXISTE, CONFIRMAR QUE ESTÁ SENDO ENVIADO
+    veiculo: `${userVehicle.marca || ''} ${userVehicle.modelo || ''} ${userVehicle.ano || ''}`.trim(),
+    servicos: servicosArray.join(' | '),
+    total_servico: totalService,
+    cliente_nome: customerName,
+    cliente_cpf: customerCpf.replace(/\D/g, ''),
+    cliente_telefone: customerPhone,
+    cliente_email: customerEmail,
+    usuario_id: usuario_id
+};
 
-        console.log('Dados do agendamento para salvar:', agendamentoData);
+console.log('Dados do agendamento para salvar:', agendamentoData);
 
-        // Salvar no banco usando a rota correta
+        // Salvar no banco
         const result = await salvarAgendamentoNoBanco(agendamentoData);
         
         if (result.success) {
@@ -2285,3 +2278,4 @@ document.addEventListener('DOMContentLoaded', function() {
     handleMobileMenu();
     window.addEventListener('resize', handleMobileMenu);
 });
+

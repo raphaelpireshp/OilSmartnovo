@@ -20,11 +20,10 @@ function limparServicos(servicos) {
         .trim();
 }
 
-// Rota POST para criar agendamento
+// ROTA ORIGINAL PARA CLIENTES - MODIFICADA
 router.post("/", (req, res) => {
-    console.log('=== DADOS RECEBIDOS NO BACKEND ===');
+    console.log('=== DADOS RECEBIDOS NO BACKEND (CLIENTE) ===');
     console.log('Body completo:', JSON.stringify(req.body, null, 2));
-    console.log('==================================');
 
     const {
         protocolo,
@@ -32,6 +31,7 @@ router.post("/", (req, res) => {
         oficina_nome,
         oficina_endereco,
         oficina_telefone,
+        oficina_id, // ← ADICIONAR ESTE CAMPO
         veiculo,
         servicos,
         total_servico,
@@ -42,26 +42,27 @@ router.post("/", (req, res) => {
         usuario_id
     } = req.body;
 
-    // VALIDAÇÃO MAIS FLEXÍVEL - apenas campos realmente essenciais
-    if (!cliente_nome || !cliente_telefone || !data_hora) {
-        console.log('Campos obrigatórios faltando:', {
+    // VALIDAÇÃO ATUALIZADA
+    if (!cliente_nome || !cliente_telefone || !data_hora || !usuario_id || !oficina_id) {
+        console.log('Campos obrigatórios faltando para cliente:', {
             cliente_nome: !!cliente_nome,
             cliente_telefone: !!cliente_telefone,
-            data_hora: !!data_hora
+            data_hora: !!data_hora,
+            usuario_id: !!usuario_id,
+            oficina_id: !!oficina_id
         });
         
         return res.status(400).json({ 
             success: false, 
-            message: 'Campos obrigatórios: nome, telefone e data/hora',
+            message: 'Campos obrigatórios: nome, telefone, data/hora, usuario_id E oficina_id',
             campos_recebidos: req.body
         });
     }
 
-    // Usar protocolo gerado ou gerar um novo
     const protocoloFinal = protocolo || gerarCodigoConfirmacao();
     const servicosLimpos = limparServicos(servicos);
 
-    // PREPARAR VALORES COM VALIDAÇÕES INDIVIDUAIS
+    // VALORES ATUALIZADOS (com oficina_id)
     const values = [
         protocoloFinal,
         data_hora || null,
@@ -75,21 +76,23 @@ router.post("/", (req, res) => {
         cliente_cpf ? cliente_cpf.replace(/\D/g, '') : 'CPF não informado',
         cliente_telefone,
         cliente_email || 'email@naoinformado.com',
-        usuario_id || null
+        usuario_id,
+        oficina_id // ← AGORA SALVA O oficina_id TAMBÉM
     ];
 
-    console.log('Valores para inserção:', values);
+    console.log('Valores para inserção (CLIENTE):', values);
 
     const query = `
         INSERT INTO agendamento_simples (
             protocolo, data_hora, oficina_nome, oficina_endereco, oficina_telefone,
-            veiculo, servicos, total_servico, cliente_nome, cliente_cpf, cliente_telefone, cliente_email, usuario_id
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            veiculo, servicos, total_servico, cliente_nome, 
+            cliente_cpf, cliente_telefone, cliente_email, usuario_id, oficina_id
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     db.query(query, values, (err, result) => {
         if (err) {
-            console.error('❌ Erro MySQL ao salvar agendamento:', err);
+            console.error('❌ Erro MySQL ao salvar agendamento CLIENTE:', err);
             console.error('SQL:', err.sql);
             
             return res.status(500).json({ 
@@ -101,7 +104,7 @@ router.post("/", (req, res) => {
             });
         }
 
-        console.log('✅ Agendamento salvo com sucesso. ID:', result.insertId);
+        console.log('✅ Agendamento CLIENTE salvo com sucesso. ID:', result.insertId);
         
         res.status(201).json({ 
             success: true, 
@@ -496,39 +499,150 @@ router.get('/usuario/:usuario_id/ultimo-veiculo', (req, res) => {
 // agendamentoSimples.js - Adicione esta rota
 
 // Rota para buscar último agendamento concluído do usuário
-router.get('/usuario/:usuario_id/ultimo-concluido', (req, res) => {
+// NO agendamentoSimples.js - Rota para buscar agendamentos por CLIENTE
+router.get("/cliente/:usuario_id", (req, res) => {
     const { usuario_id } = req.params;
 
     const query = `
         SELECT * FROM agendamento_simples 
-        WHERE usuario_id = ? 
-        AND status IN ('concluido', 'confirmado')
-        AND data_hora <= NOW()
-        ORDER BY data_hora DESC 
-        LIMIT 1
+        WHERE usuario_id = ?
+        ORDER BY data_hora DESC
     `;
 
     db.query(query, [usuario_id], (err, results) => {
         if (err) {
-            console.error('Erro ao buscar último agendamento concluído:', err);
+            console.error('Erro ao buscar agendamentos do cliente:', err);
             return res.status(500).json({ 
                 success: false, 
-                message: 'Erro ao buscar último agendamento' 
-            });
-        }
-
-        if (results.length === 0) {
-            return res.json({ 
-                success: true, 
-                data: null,
-                message: 'Nenhum agendamento concluído encontrado' 
+                message: 'Erro ao buscar agendamentos do cliente' 
             });
         }
 
         res.json({ 
             success: true, 
-            data: results[0] 
+            data: results 
+        });
+    });
+});
+
+// Rota para buscar agendamentos por OFICINA (para admin)
+router.get("/oficina/:oficina_id", (req, res) => {
+    const { oficina_id } = req.params;
+
+    const query = `
+        SELECT * FROM agendamento_simples 
+        WHERE oficina_id = ?
+        ORDER BY data_hora DESC
+    `;
+
+    db.query(query, [oficina_id], (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar agendamentos da oficina:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao buscar agendamentos' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            data: results 
+        });
+    });
+});
+// ROTA SEPARADA PARA ADMIN - NO agendamentoSimples.js
+router.post("/admin", (req, res) => {
+    console.log('=== AGENDAMENTO ADMIN RECEBIDO ===');
+    console.log('Body completo:', JSON.stringify(req.body, null, 2));
+
+    const {
+        protocolo,
+        data_hora,
+        oficina_nome,
+        oficina_endereco,
+        oficina_telefone,
+        oficina_id, // ← OBRIGATÓRIO para admin
+        veiculo,
+        servicos,
+        total_servico,
+        cliente_nome,
+        cliente_cpf,
+        cliente_telefone,
+        cliente_email
+        // ← SEM usuario_id para admin
+    } = req.body;
+
+    // VALIDAÇÃO ESPECÍFICA PARA ADMIN
+    if (!cliente_nome || !cliente_telefone || !data_hora || !oficina_id) {
+        console.log('Campos obrigatórios faltando para admin:', {
+            cliente_nome: !!cliente_nome,
+            cliente_telefone: !!cliente_telefone,
+            data_hora: !!data_hora,
+            oficina_id: !!oficina_id
+        });
+        
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Campos obrigatórios para admin: nome, telefone, data/hora e oficina_id',
+            campos_recebidos: req.body
+        });
+    }
+
+    // Usar protocolo gerado ou gerar um novo
+    const protocoloFinal = protocolo || gerarCodigoConfirmacao();
+    const servicosLimpos = limparServicos(servicos);
+
+    // PREPARAR VALORES PARA ADMIN (sem usuario_id, com oficina_id)
+    const values = [
+        protocoloFinal,
+        data_hora || null,
+        oficina_nome || 'Oficina não especificada',
+        oficina_endereco || 'Endereço não informado',
+        oficina_telefone || 'Telefone não informado',
+        veiculo ? (typeof veiculo === 'string' ? veiculo : JSON.stringify(veiculo)) : 'Veículo não informado',
+        servicosLimpos,
+        parseFloat(total_servico) || 0.00,
+        cliente_nome,
+        cliente_cpf ? cliente_cpf.replace(/\D/g, '') : 'CPF não informado',
+        cliente_telefone,
+        cliente_email || 'email@naoinformado.com',
+        null, // ← usuario_id SEMPRE null para admin
+        oficina_id // ← oficina_id OBRIGATÓRIO para admin
+    ];
+
+    console.log('Valores para inserção (ADMIN):', values);
+
+    const query = `
+        INSERT INTO agendamento_simples (
+            protocolo, data_hora, oficina_nome, oficina_endereco, oficina_telefone,
+            veiculo, servicos, total_servico, cliente_nome, 
+            cliente_cpf, cliente_telefone, cliente_email, usuario_id, oficina_id
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    db.query(query, values, (err, result) => {
+        if (err) {
+            console.error('❌ Erro MySQL ao salvar agendamento ADMIN:', err);
+            console.error('SQL:', err.sql);
+            
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao salvar agendamento no banco de dados',
+                error: err.sqlMessage || err.message,
+                sql: err.sql,
+                values: values
+            });
+        }
+
+        console.log('✅ Agendamento ADMIN salvo com sucesso. ID:', result.insertId);
+        
+        res.status(201).json({ 
+            success: true, 
+            agendamento_id: result.insertId,
+            codigo_confirmacao: protocoloFinal,
+            message: 'Agendamento salvo com sucesso!'
         });
     });
 });
 module.exports = router;
+
