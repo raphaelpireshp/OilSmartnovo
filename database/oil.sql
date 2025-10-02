@@ -1193,13 +1193,9 @@ ADD COLUMN motivo_cancelamento TEXT NULL;
 -- Adicionar a coluna oficina_id na tabela agendamento_simples
 ALTER TABLE agendamento_simples ADD COLUMN oficina_id INT;
 
--- Adicionar chave estrangeira (opcional, mas recomendado)
-ALTER TABLE agendamento_simples 
-ADD CONSTRAINT fk_agendamento_oficina 
-FOREIGN KEY (oficina_id) REFERENCES oficinas(id);
 
--- Atualizar os agendamentos existentes com um valor padrão (por exemplo, oficina_id = 1)
-UPDATE agendamento_simples SET oficina_id = 1 WHERE oficina_id IS NULL;
+
+
 
 
 -- Adicionar colunas para cancelamento na tabela agendamento_simples
@@ -1212,4 +1208,12 @@ DESCRIBE agendamento_simples;
 
 
 
+-- Adicione estas colunas se ainda não existirem
+ALTER TABLE agendamento_simples 
+ADD COLUMN protocolo_cliente VARCHAR(20) UNIQUE AFTER protocolo,
+ADD COLUMN cancelado_por ENUM('cliente', 'oficina') NULL;
 
+-- Atualize os protocolos existentes (se necessário)
+UPDATE agendamento_simples 
+SET protocolo_cliente = CONCAT('CLI', LPAD(id, 6, '0'))
+WHERE protocolo_cliente IS NULL;

@@ -149,16 +149,22 @@ router.get('/agendamentos/:id', checkOficinaAdmin, (req, res) => {
 // Atualizar status do agendamento
 router.put('/agendamentos/:id', checkOficinaAdmin, (req, res) => {
     const { id } = req.params;
-    const { status } = req.body;
+    const { status, motivo_cancelamento } = req.body;
     const oficina_id = req.session.admin.oficina_id;
 
-    const query = `
-        UPDATE agendamento_simples 
-        SET status = ? 
-        WHERE id = ? AND oficina_id = ?
-    `;
+    let query = `UPDATE agendamento_simples SET status = ?`;
+    const params = [status];
 
-    db.query(query, [status, id, oficina_id], (err, result) => {
+    // Se for cancelamento, adicionar motivo e data
+    if (status === 'cancelado' && motivo_cancelamento) {
+        query += `, motivo_cancelamento = ?, data_cancelamento = NOW()`;
+        params.push(motivo_cancelamento);
+    }
+
+    query += ` WHERE id = ? AND oficina_id = ?`;
+    params.push(id, oficina_id);
+
+    db.query(query, params, (err, result) => {
         if (err) {
             console.error('Erro ao atualizar agendamento:', err);
             return res.status(500).json({ 
@@ -177,6 +183,145 @@ router.put('/agendamentos/:id', checkOficinaAdmin, (req, res) => {
         res.json({ 
             success: true, 
             message: 'Status atualizado com sucesso!' 
+        });
+    });
+});
+
+// Adicionar protocolo ao agendamento
+router.put('/agendamentos/:id/protocolo', checkOficinaAdmin, (req, res) => {
+    const { id } = req.params;
+    const { protocolo, status } = req.body;
+    const oficina_id = req.session.admin.oficina_id;
+
+    const query = `
+        UPDATE agendamento_simples 
+        SET protocolo_cliente = ?, status = ?
+        WHERE id = ? AND oficina_id = ?
+    `;
+
+    db.query(query, [protocolo, status, id, oficina_id], (err, result) => {
+        if (err) {
+            console.error('Erro ao adicionar protocolo:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao adicionar protocolo' 
+            });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Agendamento não encontrado' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'Protocolo adicionado com sucesso!' 
+        });
+    });
+});
+
+// Registrar divergência
+router.put('/agendamentos/:id/divergencia', checkOficinaAdmin, (req, res) => {
+    const { id } = req.params;
+    const { divergencia, status } = req.body;
+    const oficina_id = req.session.admin.oficina_id;
+
+    const query = `
+        UPDATE agendamento_simples 
+        SET divergencia = ?, status = ?
+        WHERE id = ? AND oficina_id = ?
+    `;
+
+    db.query(query, [divergencia, status, id, oficina_id], (err, result) => {
+        if (err) {
+            console.error('Erro ao registrar divergência:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao registrar divergência' 
+            });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Agendamento não encontrado' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'Divergência registrada com sucesso!' 
+        });
+    });
+});
+// CONCLUIR POR PROTOCOLO (OILxxxx) — permite que o admin conclua usando o protocolo mostrado na agenda do cliente
+router.put('/agendamentos/concluir-por-protocolo', checkOficinaAdmin, (req, res) => {
+    try {
+        const { protocolo } = req.body;
+        const oficina_id = req.session.admin.oficina_id;
+
+        if (!protocolo || !protocolo.toString().trim()) {
+            return res.status(400).json({ success: false, message: 'Protocolo é obrigatório' });
+        }
+
+        const protocoloTrim = protocolo.toString().trim();
+
+        const query = `
+            UPDATE agendamento_simples
+            SET status = 'concluido', data_conclusao = NOW()
+            WHERE protocolo = ? AND oficina_id = ?
+        `;
+
+        db.query(query, [protocoloTrim, oficina_id], (err, result) => {
+            if (err) {
+                console.error('Erro ao concluir por protocolo:', err);
+                return res.status(500).json({ success: false, message: 'Erro ao concluir agendamento' });
+            }
+
+            if (result.affectedRows === 0) {
+                return res.status(404).json({ success: false, message: 'Protocolo não encontrado para sua oficina' });
+            }
+
+            return res.json({ success: true, message: 'Agendamento concluído com sucesso!' });
+        });
+    } catch (error) {
+        console.error('Erro na rota concluir-por-protocolo:', error);
+        res.status(500).json({ success: false, message: 'Erro interno' });
+    }
+});
+
+// Concluir agendamento (quando o cliente fornecer o protocolo)
+router.put('/agendamentos/:id/concluir', checkOficinaAdmin, (req, res) => {
+    const { id } = req.params;
+    const oficina_id = req.session.admin.oficina_id;
+
+    const query = `
+        UPDATE agendamento_simples 
+        SET status = 'concluido', data_conclusao = NOW()
+        WHERE id = ? AND oficina_id = ? AND protocolo_cliente IS NOT NULL
+    `;
+
+    db.query(query, [id, oficina_id], (err, result) => {
+        if (err) {
+            console.error('Erro ao concluir agendamento:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao concluir agendamento' 
+            });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Agendamento não encontrado ou sem protocolo definido' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'Agendamento concluído com sucesso!' 
         });
     });
 });

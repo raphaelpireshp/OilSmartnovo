@@ -1406,3 +1406,141 @@ body {
     font-size: 12px;
     color: #666;
 }
+
+/* Novos estilos para a área de agendamentos */
+.protocolo-badge {
+    background: #e3f2fd;
+    color: #1976d2;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    border: 1px solid #bbdefb;
+}
+
+.servicos-list {
+    max-width: 200px;
+    word-wrap: break-word;
+}
+
+.servico-total {
+    margin-top: 5px;
+    font-weight: bold;
+    color: #2e7d32;
+}
+
+.status-divergencia {
+    background: #fff3e0;
+    color: #ef6c00;
+    border: 1px solid #ffcc80;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.action-buttons .btn {
+    padding: 4px 8px;
+    font-size: 12px;
+}
+
+.btn-warning {
+    background: #ff9800;
+    color: white;
+    border: none;
+}
+
+.btn-warning:hover {
+    background: #f57c00;
+}
+
+/* Loading state */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Estilos para os botões de ação */
+.action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    align-items: center;
+}
+
+.protocol-input-container {
+    display: flex;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+.protocol-input {
+    padding: 4px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 12px;
+    width: 120px;
+}
+
+.btn-sm {
+    padding: 4px 8px;
+    font-size: 12px;
+}
+
+/* Status badges */
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.status-pendente {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-confirmado {
+    background: #d1edff;
+    color: #0c5460;
+}
+
+.status-concluido {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-cancelado {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.status-divergencia {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px dashed #ffc107;
+}
+
+/* Serviços e totais */
+.servicos-list {
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.servico-total {
+    font-weight: bold;
+    color: #28a745;
+    font-size: 11px;
+}

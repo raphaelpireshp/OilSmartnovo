@@ -331,6 +331,34 @@ app.put('/api/admin/agendamentos/:id', requireAdminAuth, (req, res) => {
         });
     });
 });
+// Concluir agendamento pelo protocolo "OILxxxx"
+app.put('/api/admin/agendamentos/concluir', requireAdminAuth, (req, res) => {
+    const { protocolo } = req.body;
+    const oficinaId = req.session.admin.oficina_id;
+
+    if (!protocolo) {
+        return res.status(400).json({ success: false, message: 'Protocolo é obrigatório' });
+    }
+
+    const query = `
+        UPDATE agendamento_simples
+        SET status = 'concluido', data_conclusao = NOW()
+        WHERE protocolo = ? AND oficina_id = ?
+    `;
+
+    db.query(query, [protocolo, oficinaId], (err, result) => {
+        if (err) {
+            console.error('Erro ao concluir agendamento:', err);
+            return res.status(500).json({ success: false, message: 'Erro no servidor' });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: 'Protocolo não encontrado para sua oficina' });
+        }
+
+        res.json({ success: true, message: 'Agendamento concluído com sucesso!' });
+    });
+});
 
 // Importar rotas existentes
 const authRoutes = require('./routes/auth');
@@ -533,4 +561,40 @@ app.get('/api/admin/relatorios/agendamentos', requireAdminAuth, (req, res) => {
             relatorio: results
         });
     });
+});
+
+// Adicionar protocolo ao agendamento
+app.put('/api/admin/agendamentos/:id/protocolo', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { protocolo, status } = req.body;
+
+        const query = `
+            UPDATE agendamento_simples 
+            SET protocolo = ?, 
+                status = ?
+            WHERE id = ?
+        `;
+
+        db.query(query, [protocolo, status, id], (err, result) => {
+            if (err) {
+                console.error('Erro ao adicionar protocolo:', err);
+                return res.status(500).json({
+                    success: false,
+                    message: 'Erro ao adicionar protocolo'
+                });
+            }
+
+            res.json({
+                success: true,
+                message: 'Protocolo adicionado com sucesso'
+            });
+        });
+    } catch (error) {
+        console.error('Erro:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erro interno do servidor'
+        });
+    }
 });

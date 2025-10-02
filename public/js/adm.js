@@ -99,7 +99,9 @@ async function loadAgendamentos(status = 'todos') {
     }
 }
 
-// Renderizar agendamentos na tabela
+// Renderizar agendamentos na tabela 
+// Renderizar agendamentos na tabela - VERSÃO ATUALIZADA
+// Renderizar agendamentos na tabela - VERSÃO CORRIGIDA
 function renderAgendamentos(agendamentos) {
     const tbody = document.getElementById('agendamentosTable');
     if (!tbody) return;
@@ -107,7 +109,7 @@ function renderAgendamentos(agendamentos) {
     if (agendamentos.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="9" class="text-center">Nenhum agendamento encontrado</td>
+                <td colspan="8" class="text-center">Nenhum agendamento encontrado</td>
             </tr>
         `;
         return;
@@ -115,42 +117,199 @@ function renderAgendamentos(agendamentos) {
 
     tbody.innerHTML = agendamentos.map(agendamento => `
         <tr>
-            <td>${agendamento.protocolo}</td>
-            <td>${formatDate(agendamento.data_hora)}</td>
-            <td>${agendamento.cliente_nome}</td>
+            <td>
+                <strong>${agendamento.cliente_nome}</strong>
+                ${agendamento.cliente_email ? `<br><small>${agendamento.cliente_email}</small>` : ''}
+            </td>
             <td>${agendamento.cliente_telefone}</td>
             <td>${agendamento.veiculo}</td>
-            <td>${agendamento.servicos}</td>
-            <td>R$ ${parseFloat(agendamento.total_servico || 0).toFixed(2)}</td>
+            <td>
+                <div class="servicos-list">
+                    ${agendamento.servicos}
+                </div>
+                ${agendamento.total_servico ? `<div class="servico-total">R$ ${parseFloat(agendamento.total_servico || 0).toFixed(2)}</div>` : ''}
+            </td>
+            <td>${formatDate(agendamento.data_hora)}</td>
             <td>
                 <span class="status-badge status-${agendamento.status || 'pendente'}">
                     ${getStatusText(agendamento.status || 'pendente')}
+                    ${agendamento.divergencia ? ' <i class="fas fa-exclamation-triangle"></i>' : ''}
                 </span>
+                ${agendamento.cancelado_por ? `<br><small>Cancelado por: ${agendamento.cancelado_por}</small>` : ''}
             </td>
             <td>
                 <div class="action-buttons">
+                    <!-- Botão Visualizar -->
                     <button class="btn btn-sm btn-outline" onclick="viewAgendamento(${agendamento.id})" title="Visualizar">
                         <i class="fas fa-eye"></i>
                     </button>
-                    ${agendamento.status === 'pendente' ? `
-                    <button class="btn btn-sm btn-primary" onclick="updateStatus(${agendamento.id}, 'confirmado')" title="Confirmar">
-                        <i class="fas fa-check"></i>
-                    </button>
-                    <button class="btn btn-sm btn-danger" onclick="showCancelModal(${agendamento.id})" title="Cancelar">
-                        <i class="fas fa-times"></i>
-                    </button>
+                    
+                    <!-- Botão Registrar Divergência -->
+                    ${(agendamento.status === 'pendente' || agendamento.status === 'confirmado') && !agendamento.divergencia ? `
+                        <button class="btn btn-sm btn-warning" onclick="registrarDivergencia(${agendamento.id})" title="Registrar Divergência">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </button>
                     ` : ''}
-                    ${agendamento.status === 'confirmado' ? `
-                    <button class="btn btn-sm btn-success" onclick="updateStatus(${agendamento.id}, 'concluido')" title="Concluir">
-                        <i class="fas fa-check-double"></i>
-                    </button>
+                    
+                    <!-- Botão Concluir (só aparece quando o cliente fornecer o protocolo) -->
+                    ${agendamento.status === 'confirmado' && agendamento.protocolo ? `
+                        <button class="btn btn-sm btn-success" onclick="concluirAgendamento(${agendamento.id})" title="Concluir Agendamento">
+                            <i class="fas fa-check-double"></i>
+                        </button>
                     ` : ''}
+                    
+                    <!-- Botão Cancelar -->
+                    ${agendamento.status === 'pendente' || agendamento.status === 'confirmado' ? `
+                        <button class="btn btn-sm btn-danger" onclick="cancelarAgendamento(${agendamento.id})" title="Cancelar">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    ` : ''}
+                    
+                    <!-- Campo para inserir protocolo (APARECE SEMPRE para agendamentos pendentes/confirmados SEM protocolo) -->
+                    ${(agendamento.status === 'pendente' || agendamento.status === 'confirmado') && !agendamento.protocolo ? `
+                        <div class="protocol-input-container" style="margin-top: 5px;">
+                            <input type="text" 
+                                   id="protocol-input-${agendamento.id}" 
+                                   placeholder="Digite o protocolo do cliente"
+                                   class="protocol-input"
+                                   style="padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; width: 120px;">
+                            <button class="btn btn-sm btn-info" onclick="adicionarProtocolo(${agendamento.id})" title="Adicionar Protocolo" style="margin-left: 5px;">
+                                <i class="fas fa-tag"></i> Add
+                            </button>
+                        </div>
+                    ` : ''}
+
+
                 </div>
             </td>
         </tr>
     `).join('');
 }
 
+// Adicionar protocolo ao agendamento
+// Adicionar protocolo ao agendamento - VERSÃO MELHORADA
+async function adicionarProtocolo(id) {
+    const inputElement = document.getElementById(`protocol-input-${id}`);
+    
+    if (!inputElement) {
+        const protocolo = prompt('Digite o protocolo fornecido pelo cliente:');
+        if (protocolo && protocolo.trim() !== '') {
+            await enviarProtocolo(id, protocolo.trim());
+        }
+        return;
+    }
+
+    const protocolo = inputElement.value.trim();
+    
+    if (!protocolo) {
+        showNotification('Por favor, digite o protocolo do cliente', 'warning');
+        inputElement.focus();
+        return;
+    }
+
+    await enviarProtocolo(id, protocolo);
+}
+
+async function enviarProtocolo(id, protocolo) {
+    try {
+        const response = await apiCall(`/api/admin/agendamentos/${id}/protocolo`, {
+            method: 'PUT',
+            body: JSON.stringify({ 
+                protocolo: protocolo,
+                status: 'confirmado' // Muda automaticamente para confirmado quando adiciona protocolo
+            })
+        });
+
+        if (response.ok) {
+            showNotification('✅ Protocolo adicionado com sucesso! Agora você pode concluir o agendamento quando o serviço for finalizado.', 'success');
+            loadAgendamentos();
+        } else {
+            const data = await response.json();
+            showNotification(data.message || 'Erro ao adicionar protocolo', 'error');
+        }
+    } catch (error) {
+        console.error('Erro ao adicionar protocolo:', error);
+        showNotification('Erro ao adicionar protocolo', 'error');
+    }
+}
+
+// Registrar divergência
+async function registrarDivergencia(id) {
+    const divergencia = prompt('Descreva a divergência encontrada (ex: Cliente não compareceu, Veículo diferente do agendado, etc.):');
+    
+    if (divergencia && divergencia.trim() !== '') {
+        try {
+            const response = await apiCall(`/api/admin/agendamentos/${id}/divergencia`, {
+                method: 'PUT',
+                body: JSON.stringify({ 
+                    divergencia: divergencia.trim(),
+                    status: 'divergencia'
+                })
+            });
+
+            if (response.ok) {
+                showNotification('Divergência registrada com sucesso!', 'warning');
+                loadAgendamentos();
+            }
+        } catch (error) {
+            console.error('Erro ao registrar divergência:', error);
+            showNotification('Erro ao registrar divergência', 'error');
+        }
+    }
+}
+
+// Concluir agendamento (quando o cliente fornecer o protocolo)
+async function concluirAgendamento(id) {
+    if (confirm('Deseja marcar este agendamento como CONCLUÍDO?\n\nEsta ação não pode ser desfeita.')) {
+        try {
+            const response = await apiCall(`/api/admin/agendamentos/${id}/concluir`, {
+                method: 'PUT'
+            });
+
+            if (response.ok) {
+                showNotification('Agendamento concluído com sucesso!', 'success');
+                loadAgendamentos();
+            } else {
+                const data = await response.json();
+                showNotification(data.message || 'Erro ao concluir agendamento', 'error');
+            }
+        } catch (error) {
+            console.error('Erro ao concluir agendamento:', error);
+            showNotification('Erro ao concluir agendamento', 'error');
+        }
+    }
+}
+
+// Cancelar agendamento - VERSÃO MELHORADA
+// Cancelar agendamento - VERSÃO MELHORADA
+async function cancelarAgendamento(id) {
+    const motivo = prompt('Digite o motivo do cancelamento (este motivo será visível para o cliente):');
+    
+    if (motivo && motivo.trim() !== '') {
+        if (confirm('Tem certeza que deseja cancelar este agendamento?\n\nO cliente será notificado sobre o cancelamento.')) {
+            try {
+                const response = await apiCall(`/api/admin/agendamentos/${id}/cancelar`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ 
+                        status: 'cancelado',
+                        motivo_cancelamento: motivo.trim(),
+                        cancelado_por: 'oficina'
+                    })
+                });
+
+                if (response.ok) {
+                    showNotification('Agendamento cancelado com sucesso! O cliente será notificado.', 'info');
+                    loadAgendamentos();
+                }
+            } catch (error) {
+                console.error('Erro ao cancelar agendamento:', error);
+                showNotification('Erro ao cancelar agendamento', 'error');
+            }
+        }
+    } else if (motivo !== null) {
+        showNotification('É necessário informar o motivo do cancelamento', 'warning');
+    }
+}
 // Carregar estoque
 async function loadEstoque() {
     try {
@@ -341,33 +500,7 @@ async function addProduct() {
     }
 }
 
-// Atualizar status do agendamento
-async function updateStatus(id, status) {
-    try {
-        const response = await apiCall(`/api/admin/agendamentos/${id}`, {
-            method: 'PUT',
-            body: JSON.stringify({ status })
-        });
-
-        if (response.ok) {
-            showNotification('Status atualizado com sucesso!', 'success');
-            loadAgendamentos();
-        }
-    } catch (error) {
-        console.error('Erro ao atualizar agendamento:', error);
-        showNotification('Erro ao atualizar agendamento', 'error');
-    }
-}
-
-// Mostrar modal de cancelamento
-function showCancelModal(id) {
-    const motivo = prompt('Digite o motivo do cancelamento:');
-    if (motivo !== null && motivo.trim() !== '') {
-        updateStatus(id, 'cancelado');
-    }
-}
-
-// Visualizar detalhes do agendamento
+// Visualizar detalhes do agendamento - VERSÃO ATUALIZADA
 async function viewAgendamento(id) {
     try {
         const response = await apiCall(`/api/admin/agendamentos/${id}`);
@@ -376,7 +509,6 @@ async function viewAgendamento(id) {
         const agendamento = data.agendamento;
 
         // Preencher modal de detalhes
-        document.getElementById('detailProtocolo').textContent = agendamento.protocolo;
         document.getElementById('detailData').textContent = formatDate(agendamento.data_hora);
         document.getElementById('detailCliente').textContent = agendamento.cliente_nome;
         document.getElementById('detailCpf').textContent = agendamento.cliente_cpf || 'Não informado';
@@ -388,6 +520,7 @@ async function viewAgendamento(id) {
         document.getElementById('detailStatus').textContent = getStatusText(agendamento.status || 'pendente');
         document.getElementById('detailStatus').className = `status-badge status-${agendamento.status || 'pendente'}`;
 
+        // Mostrar motivo do cancelamento se existir
         if (agendamento.motivo_cancelamento) {
             document.getElementById('detailMotivo').textContent = agendamento.motivo_cancelamento;
             document.getElementById('motivoContainer').style.display = 'block';
@@ -395,8 +528,17 @@ async function viewAgendamento(id) {
             document.getElementById('motivoContainer').style.display = 'none';
         }
 
+        // Mostrar divergência se existir
+if (agendamento.divergencia) {
+    document.getElementById('detailDivergencia').textContent = agendamento.divergencia;
+    document.getElementById('divergenciaContainer').style.display = 'block';
+} else {
+    document.getElementById('divergenciaContainer').style.display = 'none';
+}
+
         // Mostrar modal
         showModal('agendamentoDetailModal');
+
     } catch (error) {
         console.error('Erro ao carregar detalhes:', error);
         showNotification('Erro ao carregar detalhes do agendamento', 'error');
@@ -460,7 +602,8 @@ function getStatusText(status) {
         'confirmado': 'Confirmado',
         'concluido': 'Concluído',
         'cancelado': 'Cancelado',
-        'fora_prazo': 'Fora do Prazo'
+        'fora_prazo': 'Fora do Prazo',
+        'divergencia': 'Com Divergência'
     };
     return statusMap[status] || status;
 }
@@ -468,7 +611,7 @@ function getStatusText(status) {
 function showLoading(elementId) {
     const element = document.getElementById(elementId);
     if (element) {
-        element.innerHTML = '<tr><td colspan="10" class="text-center"><div class="loading"></div></td></tr>';
+        element.innerHTML = '<tr><td colspan="8" class="text-center"><div class="loading"></div></td></tr>';
     }
 }
 
@@ -491,7 +634,7 @@ function showNotification(message, type = 'info') {
         top: 20px;
         right: 20px;
         z-index: 9999;
-        background: ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#007bff'};
+        background: ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : type === 'warning' ? '#ffc107' : '#007bff'};
         color: white;
         padding: 15px 20px;
         border-radius: 5px;
@@ -649,3 +792,75 @@ document.addEventListener('DOMContentLoaded', async function() {
         loadDashboard();
     }
 });
+// ===== Concluir agendamento pelo protocolo =====
+document.getElementById("btnConcluir").addEventListener("click", concluirAgendamento);
+
+async function concluirAgendamento() {
+    const protocolo = document.getElementById("protocoloInput").value.trim();
+    const msg = document.getElementById("msgConcluir");
+
+    if (!protocolo) {
+        msg.innerText = "Digite um protocolo válido.";
+        msg.style.color = "red";
+        return;
+    }
+
+    try {
+        const response = await fetch("/api/admin/agendamentos/concluir", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ protocolo: protocolo })
+
+        });
+
+        const data = await response.json();
+        msg.innerText = data.message;
+        msg.style.color = data.success ? "green" : "red";
+
+        if (data.success && typeof carregarAgendamentos === "function") {
+            carregarAgendamentos(); // Atualiza a lista
+        }
+    } catch (error) {
+        console.error("Erro:", error);
+        msg.innerText = "Erro ao concluir agendamento.";
+        msg.style.color = "red";
+    }
+}
+// ===== Concluir agendamento por protocolo (campo único) =====
+// Coloque no final do adm.js. Espera que exista um input com id="protocoloInput" e button id="btnConcluir" no admindex.html
+if (document.getElementById('btnConcluir')) {
+    document.getElementById('btnConcluir').addEventListener('click', concluirPorProtocolo);
+}
+
+async function concluirPorProtocolo() {
+    const input = document.getElementById('protocoloInput');
+    const msgEl = document.getElementById('msgConcluir');
+    if (!input) return;
+
+    const protocolo = input.value.trim();
+    if (!protocolo) {
+        if (msgEl) { msgEl.innerText = 'Digite um protocolo válido.'; msgEl.style.color = 'red'; }
+        return;
+    }
+
+    if (!confirm(`Concluir agendamento com protocolo ${protocolo}? Esta ação marcará como CONCLUÍDO.`)) return;
+
+    try {
+        const response = await apiCall('/api/admin/agendamentos/concluir-por-protocolo', {
+            method: 'PUT',
+            body: JSON.stringify({ protocolo })
+        });
+
+        if (response.ok) {
+            if (msgEl) { msgEl.innerText = 'Agendamento concluído com sucesso!'; msgEl.style.color = 'green'; }
+            // Atualiza lista de agendamentos (reaproveita sua função existente)
+            if (typeof loadAgendamentos === 'function') loadAgendamentos();
+        } else {
+            const data = await response.json();
+            if (msgEl) { msgEl.innerText = data.message || 'Erro ao concluir'; msgEl.style.color = 'red'; }
+        }
+    } catch (err) {
+        console.error('Erro concluirPorProtocolo:', err);
+        if (msgEl) { msgEl.innerText = 'Erro ao concluir agendamento'; msgEl.style.color = 'red'; }
+    }
+}

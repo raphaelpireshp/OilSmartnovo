@@ -441,82 +441,95 @@ function init() {
     }
 
     // Exibir agendamentos na página
-    function displayAppointments(appointments) {
-        if (!appointmentsList) return;
+// Exibir agendamentos na página
+function displayAppointments(appointments) {
+    if (!appointmentsList) return;
 
-        if (appointments.length === 0) {
-            appointmentsList.innerHTML = `
-                <div class="no-appointments">
-                    <i class="fas fa-calendar-times"></i>
-                    <h3>Nenhum agendamento encontrado</h3>
-                    <p>Não há agendamentos para os filtros selecionados.</p>
-                </div>
-            `;
-            return;
-        }
-
-        appointmentsList.innerHTML = appointments.map(appointment => {
-            const statusClass = getStatusClass(appointment);
-            const statusText = getStatusText(appointment);
-            
-            return `
-                <div class="appointment-card ${statusClass}" data-id="${appointment.id}">
-                    <div class="appointment-header">
-                        <span class="protocol">Protocolo: ${appointment.protocolo || 'N/A'}</span>
-                        <span class="status ${statusClass}">${statusText}</span>
-                    </div>
-                    <div class="appointment-body">
-                        <div class="service-info">
-                            <h3>${appointment.servicos || 'Troca de Óleo'}</h3>
-                            <p><i class="fas fa-car"></i> ${appointment.veiculo || 'Veículo não informado'}</p>
-                            ${appointment.servicos ? `<p><i class="fas fa-oil-can"></i> ${appointment.servicos.replace(/[\[\]"]/g, '')}</p>` : ''}
-                        </div>
-                        <div class="date-info">
-                            <p><i class="far fa-calendar-alt"></i> ${formatDate(appointment.data_hora)}</p>
-                            <p><i class="far fa-clock"></i> ${formatTime(appointment.data_hora)}</p>
-                        </div>
-                        <div class="location-info">
-                            <p><i class="fas fa-map-marker-alt"></i> ${appointment.oficina_nome || 'Oficina'}</p>
-                            <p>${appointment.oficina_endereco || 'Endereço não informado'}</p>
-                        </div>
-                        ${appointment.total_servico ? `
-                        <div class="price-info">
-                            <p><i class="fas fa-tag"></i> Total: R$ ${parseFloat(appointment.total_servico).toFixed(2)}</p>
-                        </div>
-                        ` : ''}
-                        ${appointment.motivo_cancelamento ? `
-                        <div class="cancel-info">
-                            <p><i class="fas fa-info-circle"></i> Motivo: ${appointment.motivo_cancelamento}</p>
-                        </div>
-                        ` : ''}
-                    </div>
-                    <div class="appointment-footer">
-                        ${statusClass !== 'cancelled' && statusClass !== 'expired' ? `
-                            <button class="btn btn-outline" onclick="repeatAppointment(${appointment.id})">
-                                <i class="fas fa-redo"></i> Repetir Agendamento
-                            </button>
-
-                            ${isFutureAppointment(appointment) ? `
-                            <button class="btn btn-outline btn-cancel" onclick="cancelAppointment(${appointment.id})">
-                                <i class="fas fa-times"></i> Cancelar
-                            </button>
-                            ` : `
-                            <button class="btn btn-outline" onclick="rateService(${appointment.id})">
-                                <i class="fas fa-star"></i> Avaliar Serviço
-                            </button>
-                            `}
-                        ` : `
-                            <button class="btn btn-outline" onclick="repeatAppointment(${appointment.id})">
-                                <i class="fas fa-redo"></i> Novo Agendamento
-                            </button>
-
-                            <span class="text-muted">Ações indisponíveis</span>
-                        `}
-                    </div>
-                </div>
-            `;
-        }).join('');
+    if (appointments.length === 0) {
+        appointmentsList.innerHTML = `
+            <div class="no-appointments">
+                <i class="fas fa-calendar-times"></i>
+                <h3>Nenhum agendamento encontrado</h3>
+                <p>Não há agendamentos para os filtros selecionados.</p>
+            </div>
+        `;
+        return;
     }
+
+    appointmentsList.innerHTML = appointments.map(appointment => {
+        const statusClass = getStatusClass(appointment);
+        const statusText = getStatusText(appointment);
+        
+        // Mostrar quem cancelou, se aplicável
+        const cancelInfo = appointment.cancelado_por ? 
+            `<small style="display:block; margin-top:5px; color:#666;">Cancelado por: ${appointment.cancelado_por === 'cliente' ? 'Você' : 'Oficina'}</small>` : '';
+        
+        return `
+            <div class="appointment-card ${statusClass}" data-id="${appointment.id}">
+                <div class="appointment-header">
+                    <span class="protocol">Protocolo: ${appointment.protocolo || 'N/A'}</span>
+                    <span class="status ${statusClass}">
+                        ${statusText}
+                        ${cancelInfo}
+                    </span>
+                </div>
+                <div class="appointment-body">
+                    <div class="service-info">
+                        <h3>${appointment.servicos || 'Troca de Óleo'}</h3>
+                        <p><i class="fas fa-car"></i> ${appointment.veiculo || 'Veículo não informado'}</p>
+                        ${appointment.servicos ? `<p><i class="fas fa-oil-can"></i> ${appointment.servicos.replace(/[\[\]"]/g, '')}</p>` : ''}
+                    </div>
+                    <div class="date-info">
+                        <p><i class="far fa-calendar-alt"></i> ${formatDate(appointment.data_hora)}</p>
+                        <p><i class="far fa-clock"></i> ${formatTime(appointment.data_hora)}</p>
+                    </div>
+                    <div class="location-info">
+                        <p><i class="fas fa-map-marker-alt"></i> ${appointment.oficina_nome || 'Oficina'}</p>
+                        <p>${appointment.oficina_endereco || 'Endereço não informado'}</p>
+                    </div>
+                    ${appointment.total_servico ? `
+                    <div class="price-info">
+                        <p><i class="fas fa-tag"></i> Total: R$ ${parseFloat(appointment.total_servico).toFixed(2)}</p>
+                    </div>
+                    ` : ''}
+                    ${appointment.motivo_cancelamento ? `
+                    <div class="cancel-info">
+                        <p><i class="fas fa-info-circle"></i> Motivo: ${appointment.motivo_cancelamento}</p>
+                    </div>
+                    ` : ''}
+                    ${appointment.divergencia ? `
+                    <div class="divergence-info">
+                        <p><i class="fas fa-exclamation-triangle" style="color: #dc3545;"></i> 
+                        <strong>Divergência registrada pela oficina:</strong> ${appointment.divergencia}</p>
+                    </div>
+                    ` : ''}
+                </div>
+                <div class="appointment-footer">
+                    ${statusClass !== 'cancelled' && statusClass !== 'expired' ? `
+                        <button class="btn btn-outline" onclick="repeatAppointment(${appointment.id})">
+                            <i class="fas fa-redo"></i> Repetir Agendamento
+                        </button>
+
+                        ${isFutureAppointment(appointment) ? `
+                        <button class="btn btn-outline btn-cancel" onclick="cancelAppointment(${appointment.id})">
+                            <i class="fas fa-times"></i> Cancelar
+                        </button>
+                        ` : `
+                        <button class="btn btn-outline" onclick="rateService(${appointment.id})">
+                            <i class="fas fa-star"></i> Avaliar Serviço
+                        </button>
+                        `}
+                    ` : `
+                        <button class="btn btn-outline" onclick="repeatAppointment(${appointment.id})">
+                            <i class="fas fa-redo"></i> Novo Agendamento
+                        </button>
+                        <span class="text-muted">Ações indisponíveis</span>
+                    `}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
 
     // Funções auxiliares
     function getStatusClass(appointment) {
@@ -936,7 +949,7 @@ async function cancelAppointment(appointmentId) {
         return;
     }
     
-    // Pedir motivo do cancelamento com um modal mais amigável
+    // Pedir motivo do cancelamento
     const motivo = await showCancelReasonModal();
     
     if (!motivo) {
@@ -944,7 +957,7 @@ async function cancelAppointment(appointmentId) {
         return;
     }
     
-    if (!confirm('Tem certeza que deseja cancelar este agendamento?\nEsta ação não pode ser desfeita.')) {
+    if (!confirm('Tem certeza que deseja cancelar este agendamento?\n\nA oficina será notificada sobre o cancelamento.')) {
         return;
     }
     
@@ -959,17 +972,20 @@ async function cancelAppointment(appointmentId) {
                 'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({ 
-                motivo: motivo.trim() || 'Cancelado pelo cliente' 
+                motivo: motivo.trim() || 'Cancelado pelo cliente',
+                cancelado_por: 'cliente'
             })
         });
         
         const result = await response.json();
-        
-if (result.success) {
-    if (confirm('✅ Agendamento cancelado com sucesso!\n\nDeseja atualizar a página agora?')) {
-        location.reload();
-    }
-} else {
+
+        if (result.success) {
+            showToast('✅ Agendamento cancelado com sucesso! A oficina foi notificada.', 'success');
+            // Atualizar a interface
+            setTimeout(() => {
+                loadAppointments();
+            }, 1500);
+        } else {
             throw new Error(result.message || 'Erro ao cancelar agendamento');
         }
         
