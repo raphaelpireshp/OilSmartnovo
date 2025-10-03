@@ -901,7 +901,6 @@ function displayWorkshops(workshops) {
                 <p class="address"><i class="fas fa-map-marker-alt"></i> ${workshop.endereco}, ${workshop.cidade}/${workshop.estado}</p>
                 <p class="phone"><i class="fas fa-phone"></i> ${workshop.telefone || 'Não informado'}</p>
                 <p class="hours"><i class="fas fa-clock"></i> ${horarioFormatado}</p>
-                <p class="days"><i class="fas fa-calendar"></i> ${diasFormatados}</p>
             </div>
             <button class="btn select-btn" onclick="selectWorkshop(${workshop.id})">Selecionar</button>
         `;
@@ -1012,26 +1011,58 @@ window.selectWorkshop = async function(workshopId) {
 
 // Mostra detalhes da oficina selecionada (versão responsiva)
 // FUNÇÃO ATUALIZADA - Mostrar detalhes da oficina selecionada
-function showSelectedWorkshop(workshop) {
-    selectedWorkshopDiv.innerHTML = `
-        <div class="selected-workshop-card">
-            <h3>${workshop.nome}</h3>
-            <p><i class="fas fa-map-marker-alt"></i> ${workshop.endereco}, ${workshop.cidade}/${workshop.estado}</p>
-            <p><i class="fas fa-phone"></i> ${workshop.telefone || 'Não informado'}</p>
-            <p><i class="fas fa-clock"></i> ${workshop.horario_abertura} - ${workshop.horario_fechamento}</p>
-            <p><i class="fas fa-calendar"></i> Segunda a Sexta</p>
-            <p><small style="color: #e63946;"><i class="fas fa-info-circle"></i> Não funciona aos sábados e domingos</small></p>
-        </div>
-    `;
+// Mostrar detalhes da oficina selecionada - VERSÃO ATUALIZADA
+async function showSelectedWorkshop(workshop) {
+    try {
+        // Buscar dados atualizados da oficina
+        const response = await fetch(`/api/oficina/${workshop.id}/detalhes`);
+        if (!response.ok) throw new Error("Erro ao carregar dados da oficina");
+        
+        const workshopData = await response.json();
+        const updatedWorkshop = workshopData.oficina;
+        
+        // Atualizar a oficina selecionada com dados frescos
+        selectedWorkshop = updatedWorkshop;
 
-    // Atualizar horários disponíveis
-    const dateInput = document.getElementById("schedule-date");
-    if (dateInput.value) {
-        const selectedDate = new Date(dateInput.value);
-        generateAvailableTimeSlots(workshop, selectedDate);
+        // Formatar dias de funcionamento para exibição
+        const diasFormatados = formatDiasFuncionamento(updatedWorkshop.dias_funcionamento);
+        
+        // Formatar horário para exibição
+        const horarioFormatado = formatHorarioFuncionamento(
+            updatedWorkshop.horario_abertura, 
+            updatedWorkshop.horario_fechamento
+        );
+
+        selectedWorkshopDiv.innerHTML = `
+            <div class="selected-workshop-card">
+                <h3>${updatedWorkshop.nome}</h3>
+                <p><i class="fas fa-map-marker-alt"></i> ${updatedWorkshop.endereco}, ${updatedWorkshop.cidade}/${updatedWorkshop.estado}</p>
+                <p><i class="fas fa-phone"></i> ${updatedWorkshop.telefone || 'Não informado'}</p>
+                <p><i class="fas fa-clock"></i> ${horarioFormatado}</p>
+                <p><i class="fas fa-calendar"></i> ${diasFormatados}</p>
+            </div>
+        `;
+
+        // Atualizar horários disponíveis se já houver data selecionada
+        const dateInput = document.getElementById("schedule-date");
+        if (dateInput.value) {
+            const selectedDate = new Date(dateInput.value);
+            await generateAvailableTimeSlots(updatedWorkshop, selectedDate);
+        }
+        
+    } catch (error) {
+        console.error('❌ Erro ao carregar detalhes da oficina:', error);
+        // Fallback para dados básicos
+        selectedWorkshopDiv.innerHTML = `
+            <div class="selected-workshop-card">
+                <h3>${workshop.nome}</h3>
+                <p><i class="fas fa-map-marker-alt"></i> ${workshop.endereco}, ${workshop.cidade}/${workshop.estado}</p>
+                <p><i class="fas fa-phone"></i> ${workshop.telefone || 'Não informado'}</p>
+                <p style="color: #e63946;"><i class="fas fa-exclamation-triangle"></i> Horários podem estar desatualizados</p>
+            </div>
+        `;
     }
 }
-
 
 
 // Função para gerar horários disponíveis baseado no horário da oficina
@@ -1451,7 +1482,7 @@ async function validateStep3() {
         if (!isValidDayForWorkshop(selectedDate, selectedWorkshop)) {
             const dayNames = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
             const dayOfWeek = dayNames[selectedDate.getDay()];
-            showToast(`A oficina "${selectedWorkshop.nome}" não funciona aos ${dayOfWeek}s`, "error");
+            showToast(`A oficina "${selectedWorkshop.nome}" não funciona aos domingos ${dayOfWeek}s`, "error");
             return false;
         }
 
@@ -2619,32 +2650,191 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-// Função para validar se a oficina funciona no dia selecionado
+// Função corrigida para validar dias de funcionamento
 // FUNÇÃO CORRIGIDA - Validação de dias de funcionamento
 function isValidDayForWorkshop(selectedDate, workshop) {
     if (!selectedDate || !workshop) {
         console.error('❌ Dados inválidos para validação:', { selectedDate, workshop });
-        return true; // Por segurança, assume que funciona
+        return false;
     }
     
     const dayOfWeek = selectedDate.getDay(); // 0 = Domingo, 1 = Segunda, etc.
+    const dayNames = ['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'];
+    const diaSemana = dayNames[dayOfWeek];
     
     console.log('🔍 Validando dia da oficina:', {
-        dataSelecionada: selectedDate.toLocaleDateString('pt-BR'),
-        diaDaSemana: dayOfWeek,
-        nomeDia: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'][dayOfWeek],
+        data: selectedDate.toLocaleDateString('pt-BR'),
+        diaDaSemana: diaSemana,
+        dias_funcionamento: workshop.dias_funcionamento,
         oficina: workshop.nome
     });
+
+    // Se não tem dias definidos, assume padrão (segunda a sábado)
+    if (!workshop.dias_funcionamento || workshop.dias_funcionamento.trim() === '') {
+        const valido = dayOfWeek !== 0; // Não funciona domingos
+        console.log('📅 Usando padrão (segunda a sábado):', valido);
+        return valido;
+    }
     
-    // SÓ NÃO FUNCIONA AOS SÁBADOS (6) E DOMINGOS (0)
-    // Segunda a Sexta (1-5) FUNCIONAM NORMALMENTE
-    const isValid = dayOfWeek !== 0 && dayOfWeek !== 6;
+    // Converte para array e limpa os valores
+    const diasArray = workshop.dias_funcionamento.toLowerCase()
+        .split(',')
+        .map(dia => dia.trim())
+        .filter(dia => dia.length > 0);
     
-    console.log('✅ Oficina funciona neste dia?', isValid);
+    const isValid = diasArray.includes(diaSemana);
+    
+    console.log('✅ Resultado da validação:', {
+        dia: diaSemana,
+        dias_configurados: diasArray,
+        valido: isValid
+    });
     
     return isValid;
 }
+// Função para buscar horários ocupados do banco
+async function getHorariosOcupados(workshopId, data) {
+    try {
+        const response = await fetch(`/api/oficina/${workshopId}/horarios-ocupados/${data}`);
+        
+        if (!response.ok) {
+            throw new Error('Erro ao buscar horários ocupados');
+        }
+        
+        const data = await response.json();
+        return data.data || [];
+    } catch (error) {
+        console.warn('⚠️ Erro ao buscar horários ocupados, retornando vazio:', error);
+        return [];
+    }
+}
 
+// FUNÇÃO NOVA - Mostrar prévia de horários ao selecionar oficina
+async function showWorkshopSchedulePreview(workshop) {
+    try {
+        // Buscar dados atualizados da oficina
+        const response = await fetch(`/api/oficina/${workshop.id}/detalhes`);
+        if (!response.ok) throw new Error("Erro ao carregar dados da oficina");
+        
+        const workshopData = await response.json();
+        const updatedWorkshop = workshopData.oficina;
+
+        // Formatar dias de funcionamento
+        const diasFormatados = formatDiasFuncionamento(updatedWorkshop.dias_funcionamento);
+        
+        // Formatar horário
+        const horarioFormatado = formatHorarioFuncionamento(
+            updatedWorkshop.horario_abertura, 
+            updatedWorkshop.horario_fechamento
+        );
+
+        // Gerar próxima data disponível
+        const nextAvailableDate = getNextAvailableDate(updatedWorkshop);
+        
+        // Buscar horários disponíveis para a próxima data
+        const availableSlots = await getAvailableTimeSlotsForDate(updatedWorkshop, nextAvailableDate);
+
+        selectedWorkshopDiv.innerHTML = `
+            <div class="selected-workshop-card">
+                <h3>${updatedWorkshop.nome}</h3>
+                <p><i class="fas fa-map-marker-alt"></i> ${updatedWorkshop.endereco}, ${updatedWorkshop.cidade}/${updatedWorkshop.estado}</p>
+                <p><i class="fas fa-phone"></i> ${updatedWorkshop.telefone || 'Não informado'}</p>
+                <p><i class="fas fa-clock"></i> ${horarioFormatado}</p>
+                <p><i class="fas fa-calendar"></i> ${diasFormatados}</p>
+                
+                <!-- PRÉVIA DE HORÁRIOS DISPONÍVEIS -->
+                <div class="schedule-preview" style="margin-top: 15px; padding: 12px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #2a9d8f;">
+                    <h4 style="margin: 0 0 8px 0; color: #2a9d8f; font-size: 14px;">
+                        <i class="fas fa-calendar-check"></i> Próximos Horários Disponíveis
+                    </h4>
+                    <p style="margin: 0 0 8px 0; font-size: 13px; color: #495057;">
+                        <strong>Próxima data:</strong> ${nextAvailableDate.toLocaleDateString('pt-BR')}
+                    </p>
+                    <div class="available-slots-preview" style="display: flex; flex-wrap: wrap; gap: 6px;">
+                        ${availableSlots.slice(0, 6).map(slot => 
+                            `<span style="background: #2a9d8f; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 500;">${slot}</span>`
+                        ).join('')}
+                        ${availableSlots.length > 6 ? 
+                            `<span style="background: #6c757d; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 500;">+${availableSlots.length - 6} mais</span>` : 
+                            ''
+                        }
+                        ${availableSlots.length === 0 ? 
+                            `<span style="background: #e63946; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 500;">Nenhum horário disponível</span>` : 
+                            ''
+                        }
+                    </div>
+                    <p style="margin: 8px 0 0 0; font-size: 12px; color: #6c757d;">
+                        <i class="fas fa-info-circle"></i> Selecione uma data para ver todos os horários
+                    </p>
+                </div>
+            </div>
+        `;
+
+        // Configurar a data mínima no calendário
+        setMinScheduleDate(updatedWorkshop);
+
+    } catch (error) {
+        console.error('❌ Erro ao carregar prévia da oficina:', error);
+        // Fallback sem a prévia
+        selectedWorkshopDiv.innerHTML = `
+            <div class="selected-workshop-card">
+                <h3>${workshop.nome}</h3>
+                <p><i class="fas fa-map-marker-alt"></i> ${workshop.endereco}, ${workshop.cidade}/${workshop.estado}</p>
+                <p><i class="fas fa-phone"></i> ${workshop.telefone || 'Não informado'}</p>
+                <p style="color: #e63946;"><i class="fas fa-exclamation-triangle"></i> Selecione uma data para ver horários disponíveis</p>
+            </div>
+        `;
+    }
+}
+
+// FUNÇÃO AUXILIAR - Encontrar próxima data disponível
+function getNextAvailableDate(workshop) {
+    const today = new Date();
+    let nextDate = new Date(today);
+    
+    // Procura pelos próximos 7 dias uma data válida
+    for (let i = 0; i < 7; i++) {
+        if (isValidDayForWorkshop(nextDate, workshop)) {
+            return nextDate;
+        }
+        nextDate.setDate(nextDate.getDate() + 1);
+    }
+    
+    // Se não encontrou em 7 dias, retorna hoje + 7 dias
+    return new Date(today.setDate(today.getDate() + 7));
+}
+
+// FUNÇÃO AUXILIAR - Buscar horários disponíveis para uma data
+async function getAvailableTimeSlotsForDate(workshop, date) {
+    try {
+        const startTime = workshop.horario_abertura || "08:00";
+        const endTime = workshop.horario_fechamento || "18:00";
+        const interval = 30;
+
+        const slots = generateTimeSlots(startTime, endTime, interval);
+        const horariosOcupados = await getHorariosOcupados(workshop.id, date.toISOString().split('T')[0]);
+        
+        const now = new Date();
+        const isToday = date.toDateString() === now.toDateString();
+        
+        return slots.filter(time => {
+            // Verificar se é horário passado (se for hoje)
+            if (isToday) {
+                const [hours, minutes] = time.split(':').map(Number);
+                const slotTime = new Date();
+                slotTime.setHours(hours, minutes, 0, 0);
+                if (slotTime <= now) return false;
+            }
+
+            // Verificar se está ocupado
+            return !horariosOcupados.includes(time);
+        });
+        
+    } catch (error) {
+        console.error('Erro ao buscar horários disponíveis:', error);
+        return [];
+    }
+}
 // Função para gerar horários disponíveis baseado no horário da oficina
 function generateAvailableTimeSlots(workshop, selectedDate) {
     const timeSelect = document.getElementById("schedule-time");
@@ -2715,42 +2905,53 @@ function updateAvailableTimeSlots(workshop) {
     }
 }
 
-/// FUNÇÃO SIMPLIFICADA - Geração de horários disponíveis
+// Função corrigida para gerar horários baseado nos dados da oficina do banco
 async function generateAvailableTimeSlots(workshop, selectedDate) {
     const timeSelect = document.getElementById("schedule-time");
-    
-    // Verificar se é um dia válido (não sábado ou domingo)
-    if (!isValidDayForWorkshop(selectedDate, workshop)) {
-        const dayNames = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
-        const dayOfWeek = dayNames[selectedDate.getDay()];
-        
-        timeSelect.innerHTML = '';
-        const option = document.createElement("option");
-        option.value = "";
-        option.textContent = `Oficina não funciona aos ${dayOfWeek}s`;
-        option.disabled = true;
-        timeSelect.appendChild(option);
-        
-        // Desabilitar botão de continuar
-        const continueButton = document.querySelector('button[onclick="goToStep(4)"]');
-        if (continueButton) continueButton.disabled = true;
-        
-        return;
-    }
-
-    // Se chegou aqui, é um dia útil - mostrar "Carregando..."
     timeSelect.innerHTML = '<option value="" disabled selected>Carregando horários...</option>';
 
     try {
-        const startTime = workshop.horario_abertura || "08:00";
-        const endTime = workshop.horario_fechamento || "18:00";
-        const interval = 30;
+        // Buscar dados atualizados da oficina
+        const response = await fetch(`/api/oficina/${workshop.id}/detalhes`);
+        if (!response.ok) throw new Error("Erro ao carregar dados da oficina");
+        
+        const workshopData = await response.json();
+        const updatedWorkshop = workshopData.oficina;
+
+        // Verificar se é um dia válido
+        if (!isValidDayForWorkshop(selectedDate, updatedWorkshop)) {
+            const dayNames = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+            const dayOfWeek = dayNames[selectedDate.getDay()];
+            
+            timeSelect.innerHTML = '';
+            const option = document.createElement("option");
+            option.value = "";
+            option.textContent = `Oficina não funciona aos ${dayOfWeek}s`;
+            option.disabled = true;
+            timeSelect.appendChild(option);
+            
+            // Desabilitar botão de continuar
+            const continueButton = document.querySelector('button[onclick="goToStep(4)"]');
+            if (continueButton) continueButton.disabled = true;
+            
+            return;
+        }
 
         // Buscar horários ocupados
         const dataFormatada = selectedDate.toISOString().split('T')[0];
-        const horariosOcupados = await getHorariosOcupados(workshop.id, dataFormatada);
+        const horariosOcupados = await getHorariosOcupados(updatedWorkshop.id, dataFormatada);
         
-        console.log('📅 Horários ocupados encontrados:', horariosOcupados);
+        console.log('📅 Horários da oficina:', {
+            abertura: updatedWorkshop.horario_abertura,
+            fechamento: updatedWorkshop.horario_fechamento,
+            dias: updatedWorkshop.dias_funcionamento,
+            ocupados: horariosOcupados
+        });
+
+        // Gerar slots baseado no horário da oficina
+        const startTime = updatedWorkshop.horario_abertura || "08:00";
+        const endTime = updatedWorkshop.horario_fechamento || "18:00";
+        const interval = 30;
 
         const slots = generateTimeSlots(startTime, endTime, interval);
         const now = new Date();
@@ -2799,7 +3000,7 @@ async function generateAvailableTimeSlots(workshop, selectedDate) {
             timeSelect.innerHTML = '';
             const noSlotsOption = document.createElement("option");
             noSlotsOption.value = "";
-            noSlotsOption.textContent = "Nenhum horário disponível";
+            noSlotsOption.textContent = "Nenhum horário disponível para esta data";
             noSlotsOption.disabled = true;
             timeSelect.appendChild(noSlotsOption);
         }
@@ -2812,6 +3013,20 @@ async function generateAvailableTimeSlots(workshop, selectedDate) {
 
     } catch (error) {
         console.error('❌ Erro ao carregar horários:', error);
-        timeSelect.innerHTML = '<option value="" disabled selected>Erro ao carregar horários</option>';
+        timeSelect.innerHTML = '<option value="" disabled selected>Erro ao carregar horários disponíveis</option>';
     }
 }
+
+// Event listener para atualizar horários quando a data mudar
+document.addEventListener('DOMContentLoaded', function() {
+    const dateInput = document.getElementById("schedule-date");
+    
+    if (dateInput) {
+        dateInput.addEventListener('change', async function() {
+            if (this.value && selectedWorkshop) {
+                const selectedDate = new Date(this.value);
+                await generateAvailableTimeSlots(selectedWorkshop, selectedDate);
+            }
+        });
+    }
+});

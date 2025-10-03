@@ -456,6 +456,87 @@ router.delete('/estoque/:id', checkOficinaAdmin, (req, res) => {
     });
 });
 
+// adminRoutes.js - ADICIONAR ESTAS ROTAS
+
+// Carregar configurações da oficina
+router.get('/configuracoes', checkOficinaAdmin, (req, res) => {
+    const oficina_id = req.session.admin.oficina_id;
+
+    const query = `
+        SELECT * FROM oficina 
+        WHERE id = ?
+    `;
+
+    db.query(query, [oficina_id], (err, results) => {
+        if (err) {
+            console.error('Erro ao carregar configurações:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao carregar configurações' 
+            });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Oficina não encontrada' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            oficina: results[0] 
+        });
+    });
+});
+
+// Salvar configurações da oficina
+router.put('/configuracoes', checkOficinaAdmin, (req, res) => {
+    const oficina_id = req.session.admin.oficina_id;
+    const { 
+        nome, 
+        telefone, 
+        endereco, 
+        horario_abertura, 
+        horario_fechamento, 
+        dias_funcionamento 
+    } = req.body;
+
+    const query = `
+        UPDATE oficina 
+        SET nome = ?, telefone = ?, endereco = ?, 
+            horario_abertura = ?, horario_fechamento = ?, dias_funcionamento = ?,
+            updated_at = NOW()
+        WHERE id = ?
+    `;
+
+    db.query(query, [
+        nome, telefone, endereco, 
+        horario_abertura, horario_fechamento, dias_funcionamento,
+        oficina_id
+    ], (err, result) => {
+        if (err) {
+            console.error('Erro ao salvar configurações:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao salvar configurações' 
+            });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Oficina não encontrada' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'Configurações salvas com sucesso!' 
+        });
+    });
+});
+
 // Relatórios de agendamentos
 router.get('/relatorios/agendamentos', checkOficinaAdmin, (req, res) => {
     const oficina_id = req.session.admin.oficina_id;

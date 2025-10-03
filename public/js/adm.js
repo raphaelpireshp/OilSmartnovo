@@ -980,3 +980,169 @@ window.debugProtocolos = debugProtocolos;
 
 // Chamar esta função no console do navegador para debug
 window.debugProtocolos = debugProtocolos;
+
+
+// adm.js - COMPLETAR funções de configurações
+
+// Carregar configurações da oficina
+async function loadConfiguracoes() {
+    try {
+        const response = await apiCall('/api/admin/configuracoes');
+        const data = await response.json();
+
+        if (data.success && data.oficina) {
+            const oficina = data.oficina;
+            
+            // Preencher horários
+            if (oficina.horario_abertura) {
+                document.getElementById('horarioAbertura').value = oficina.horario_abertura.substring(0, 5);
+            }
+            if (oficina.horario_fechamento) {
+                document.getElementById('horarioFechamento').value = oficina.horario_fechamento.substring(0, 5);
+            }
+            
+            // Preencher dias de funcionamento
+            if (oficina.dias_funcionamento) {
+                const diasArray = oficina.dias_funcionamento.toLowerCase().split(',');
+                diasArray.forEach(dia => {
+                    const checkbox = document.getElementById(dia.trim());
+                    if (checkbox) {
+                        checkbox.checked = true;
+                    }
+                });
+            }
+            
+            // Preencher informações da oficina
+            if (oficina.nome) {
+                document.getElementById('oficinaNome').value = oficina.nome;
+            }
+            if (oficina.telefone) {
+                document.getElementById('oficinaTelefone').value = oficina.telefone;
+            }
+            if (oficina.endereco) {
+                document.getElementById('oficinaEndereco').value = oficina.endereco;
+            }
+            
+            // Atualizar preview
+            atualizarPreviewHorario();
+        }
+    } catch (error) {
+        console.error('Erro ao carregar configurações:', error);
+        showNotification('Erro ao carregar configurações', 'error');
+    }
+}
+
+// Salvar configurações
+async function salvarConfiguracoes() {
+    try {
+        // Coletar dados
+        const horarioAbertura = document.getElementById('horarioAbertura').value;
+        const horarioFechamento = document.getElementById('horarioFechamento').value;
+        
+        // Coletar dias selecionados
+        const diasSelecionados = [];
+        const diasCheckboxes = document.querySelectorAll('.dias-semana-grid input[type="checkbox"]:checked');
+        diasCheckboxes.forEach(checkbox => {
+            diasSelecionados.push(checkbox.value);
+        });
+        
+        const dados = {
+            nome: document.getElementById('oficinaNome').value,
+            telefone: document.getElementById('oficinaTelefone').value,
+            endereco: document.getElementById('oficinaEndereco').value,
+            horario_abertura: horarioAbertura + ':00',
+            horario_fechamento: horarioFechamento + ':00',
+            dias_funcionamento: diasSelecionados.join(',')
+        };
+
+        const response = await apiCall('/api/admin/configuracoes', {
+            method: 'PUT',
+            body: JSON.stringify(dados)
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showNotification('Configurações salvas com sucesso!', 'success');
+            atualizarPreviewHorario();
+            
+            // Atualizar o nome da oficina no header se foi alterado
+            const oficinaNameElement = document.getElementById('oficinaName');
+            if (oficinaNameElement && dados.nome) {
+                oficinaNameElement.textContent = dados.nome;
+            }
+        } else {
+            showNotification(data.message || 'Erro ao salvar configurações', 'error');
+        }
+    } catch (error) {
+        console.error('Erro ao salvar configurações:', error);
+        showNotification('Erro ao salvar configurações', 'error');
+    }
+}
+
+// Atualizar preview do horário
+function atualizarPreviewHorario() {
+    const preview = document.getElementById('previewHorario');
+    const horarioAbertura = document.getElementById('horarioAbertura').value;
+    const horarioFechamento = document.getElementById('horarioFechamento').value;
+    
+    if (!preview) return;
+    
+    if (!horarioAbertura || !horarioFechamento) {
+        preview.innerHTML = '<p>Configure os horários de abertura e fechamento</p>';
+        return;
+    }
+    
+    const diasSemana = [
+        { id: 'segunda', nome: 'Segunda-feira' },
+        { id: 'terca', nome: 'Terça-feira' },
+        { id: 'quarta', nome: 'Quarta-feira' },
+        { id: 'quinta', nome: 'Quinta-feira' },
+        { id: 'sexta', nome: 'Sexta-feira' },
+        { id: 'sabado', nome: 'Sábado' },
+        { id: 'domingo', nome: 'Domingo' }
+    ];
+    
+    let html = '<div class="horario-preview-list">';
+    
+    diasSemana.forEach(dia => {
+        const checkbox = document.getElementById(dia.id);
+        const estaAberto = checkbox && checkbox.checked;
+        
+        html += `
+            <div class="horario-item">
+                <span class="dia-semana">${dia.nome}</span>
+                <span class="${estaAberto ? 'horario-funcionamento' : 'horario-fechado'}">
+                    ${estaAberto ? `${horarioAbertura} - ${horarioFechamento}` : 'Fechado'}
+                </span>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    preview.innerHTML = html;
+}
+// Event listeners para atualizar preview em tempo real
+document.addEventListener('DOMContentLoaded', function() {
+    // Atualizar preview quando horários mudarem
+    const horarioInputs = document.querySelectorAll('#horarioAbertura, #horarioFechamento');
+    horarioInputs.forEach(input => {
+        input.addEventListener('change', atualizarPreviewHorario);
+    });
+    
+    // Atualizar preview quando dias mudarem
+    const diaCheckboxes = document.querySelectorAll('.dias-semana-grid input[type="checkbox"]');
+    diaCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', atualizarPreviewHorario);
+    });
+    
+    // Adicionar ao switch case de navegação
+    const originalShowSection = window.showSection;
+    window.showSection = function(sectionId) {
+        originalShowSection(sectionId);
+        
+        if (sectionId === 'configuracoes') {
+            loadConfiguracoes();
+        }
+    };
+});

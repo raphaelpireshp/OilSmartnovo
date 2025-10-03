@@ -46,6 +46,12 @@
                             <span>Relatórios</span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" onclick="showSection('configuracoes')">
+                            <i class="fas fa-cog"></i>
+                            <span>Configurações</span>
+                        </a>
+                    </li>
                 </ul>
             </nav>
 
@@ -240,100 +246,99 @@
                     </div>
                 </section>
 
-<!-- Agendamentos Section -->
-<section id="agendamentos" class="content-section">
-    <div class="section-header">
-        <h2>Gerenciar Agendamentos</h2>
-        <div class="header-actions">
-            <button class="btn btn-primary" onclick="loadAgendamentos()">
-                <i class="fas fa-sync-alt"></i>
-                Atualizar
-            </button>
-        </div>
-    </div>
+                <!-- Agendamentos Section -->
+                <section id="agendamentos" class="content-section">
+                    <div class="section-header">
+                        <h2>Gerenciar Agendamentos</h2>
+                        <div class="header-actions">
+                            <button class="btn btn-primary" onclick="loadAgendamentos()">
+                                <i class="fas fa-sync-alt"></i>
+                                Atualizar
+                            </button>
+                        </div>
+                    </div>
 
-    <!-- Filters -->
-    <div class="filters-bar">
-        <div class="filter-group">
-            <label for="statusFilter">Status</label>
-            <select id="statusFilter">
-                <option value="todos">Todos</option>
-                <option value="pendente">Pendentes</option>
-                <option value="confirmado">Confirmados</option>
-                <option value="concluido">Concluídos</option>
-                <option value="cancelado">Cancelados</option>
-                <option value="divergencia">Com Divergência</option>
-            </select>
-        </div>
-        <div class="filter-group">
-            <label for="dataFilter">Data</label>
-            <input type="date" id="dataFilter">
-        </div>
-    </div>
+                    <!-- Filters -->
+                    <div class="filters-bar">
+                        <div class="filter-group">
+                            <label for="statusFilter">Status</label>
+                            <select id="statusFilter">
+                                <option value="todos">Todos</option>
+                                <option value="pendente">Pendentes</option>
+                                <option value="confirmado">Confirmados</option>
+                                <option value="concluido">Concluídos</option>
+                                <option value="cancelado">Cancelados</option>
+                                <option value="divergencia">Com Divergência</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="dataFilter">Data</label>
+                            <input type="date" id="dataFilter">
+                        </div>
+                    </div>
 
-    <!-- Agendamentos Table -->
-    <div class="table-container">
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>Cliente</th>
-                    <th>Telefone</th>
-                    <th>Veículo</th>
-                    <th>Serviços</th>
-                    <th>Data/Hora</th>
-                    <th>Status</th>
-                    <th>Ações</th>
-                </tr>
-                            <!-- Área para concluir agendamento -->
-<!-- Seção Concluir Agendamento pelo Protocolo - VERSÃO ESTILIZADA -->
-<section class="concluir-agendamento">
-    <h2>
-        <i class="fas fa-check-double protocolo-icon"></i>
-        Concluir Agendamento pelo Protocolo
-    </h2>
-    
-    <div class="protocolo-container">
-        <div class="protocolo-input-group">
-            <label for="protocoloInput">
-                <i class="fas fa-tag"></i>
-                Digite o protocolo do cliente:
-            </label>
-            <input 
-                type="text" 
-                id="protocoloInput" 
-                class="protocolo-input"
-                placeholder="Ex: OIL20231201-001"
-                maxlength="20"
-            >
-        </div>
-        
-        <button id="btnConcluir" class="btn-concluir-protocolo">
-            <i class="fas fa-check-circle protocolo-icon"></i>
-            Concluir Agendamento
-        </button>
-    </div>
-    
-    <div id="msgConcluir" class="protocolo-message">
-        <!-- Mensagens serão inseridas aqui via JavaScript -->
-    </div>
-    
-    <div style="margin-top: 15px; font-size: 0.85rem; color: #6c757d;">
-        <i class="fas fa-info-circle"></i>
-        <strong>Dica:</strong> O protocolo é fornecido ao cliente no momento do agendamento.
-    </div>
-</section>
+                    <!-- Área para concluir agendamento -->
+                    <section class="concluir-agendamento">
+                        <h2>
+                            <i class="fas fa-check-double protocolo-icon"></i>
+                            Concluir Agendamento pelo Protocolo
+                        </h2>
+                        
+                        <div class="protocolo-container">
+                            <div class="protocolo-input-group">
+                                <label for="protocoloInput">
+                                    <i class="fas fa-tag"></i>
+                                    Digite o protocolo do cliente:
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="protocoloInput" 
+                                    class="protocolo-input"
+                                    placeholder="Ex: OIL20231201-001"
+                                    maxlength="20"
+                                >
+                            </div>
+                            
+                            <button id="btnConcluir" class="btn-concluir-protocolo">
+                                <i class="fas fa-check-circle protocolo-icon"></i>
+                                Concluir Agendamento
+                            </button>
+                        </div>
+                        
+                        <div id="msgConcluir" class="protocolo-message">
+                            <!-- Mensagens serão inseridas aqui via JavaScript -->
+                        </div>
+                        
+                        <div style="margin-top: 15px; font-size: 0.85rem; color: #6c757d;">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Dica:</strong> O protocolo é fornecido ao cliente no momento do agendamento.
+                        </div>
+                    </section>
 
-            </thead>
-            <tbody id="agendamentosTable">
-                <tr>
-                    <td colspan="8" class="text-center">
-                        <div class="loading"></div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</section>
+                    <!-- Agendamentos Table -->
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Cliente</th>
+                                    <th>Telefone</th>
+                                    <th>Veículo</th>
+                                    <th>Serviços</th>
+                                    <th>Data/Hora</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="agendamentosTable">
+                                <tr>
+                                    <td colspan="8" class="text-center">
+                                        <div class="loading"></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
 
                 <!-- Estoque Section -->
                 <section id="estoque" class="content-section">
@@ -343,6 +348,10 @@
                             <button class="btn btn-primary" onclick="loadEstoque()">
                                 <i class="fas fa-sync-alt"></i>
                                 Atualizar
+                            </button>
+                            <button class="btn btn-success" onclick="showAddProductModal()">
+                                <i class="fas fa-plus"></i>
+                                Adicionar Produto
                             </button>
                         </div>
                     </div>
@@ -357,11 +366,12 @@
                                     <th>Tipo</th>
                                     <th>Quantidade</th>
                                     <th>Preço</th>
+                                    <th>Ações</th>
                                 </tr>
                             </thead>
                             <tbody id="estoqueTable">
                                 <tr>
-                                    <td colspan="5" class="text-center">
+                                    <td colspan="6" class="text-center">
                                         <div class="loading"></div>
                                     </td>
                                 </tr>
@@ -412,6 +422,112 @@
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+                </section>
+
+                <!-- Configurações Section -->
+                <section id="configuracoes" class="content-section">
+                    <div class="section-header">
+                        <h2>Configurações da Oficina</h2>
+                        <div class="header-actions">
+                            <button class="btn btn-primary" onclick="salvarConfiguracoes()">
+                                <i class="fas fa-save"></i>
+                                Salvar Configurações
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="configuracoes-container">
+                        <!-- Horário de Funcionamento -->
+                        <div class="config-card">
+                            <div class="config-header">
+                                <h3><i class="fas fa-clock"></i> Horário de Funcionamento</h3>
+                            </div>
+                            <div class="config-body">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="horarioAbertura">Horário de Abertura</label>
+                                        <input type="time" id="horarioAbertura" class="time-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="horarioFechamento">Horário de Fechamento</label>
+                                        <input type="time" id="horarioFechamento" class="time-input">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dias de Funcionamento -->
+                        <div class="config-card">
+                            <div class="config-header">
+                                <h3><i class="fas fa-calendar-alt"></i> Dias de Funcionamento</h3>
+                            </div>
+                            <div class="config-body">
+                                <div class="dias-semana-grid">
+                                    <label class="dia-checkbox">
+                                        <input type="checkbox" id="segunda" value="segunda">
+                                        <span class="dia-label">Segunda-feira</span>
+                                    </label>
+                                    <label class="dia-checkbox">
+                                        <input type="checkbox" id="terca" value="terca">
+                                        <span class="dia-label">Terça-feira</span>
+                                    </label>
+                                    <label class="dia-checkbox">
+                                        <input type="checkbox" id="quarta" value="quarta">
+                                        <span class="dia-label">Quarta-feira</span>
+                                    </label>
+                                    <label class="dia-checkbox">
+                                        <input type="checkbox" id="quinta" value="quinta">
+                                        <span class="dia-label">Quinta-feira</span>
+                                    </label>
+                                    <label class="dia-checkbox">
+                                        <input type="checkbox" id="sexta" value="sexta">
+                                        <span class="dia-label">Sexta-feira</span>
+                                    </label>
+                                    <label class="dia-checkbox">
+                                        <input type="checkbox" id="sabado" value="sabado">
+                                        <span class="dia-label">Sábado</span>
+                                    </label>
+                                    <label class="dia-checkbox">
+                                        <input type="checkbox" id="domingo" value="domingo">
+                                        <span class="dia-label">Domingo</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Informações da Oficina -->
+                        <div class="config-card">
+                            <div class="config-header">
+                                <h3><i class="fas fa-info-circle"></i> Informações da Oficina</h3>
+                            </div>
+                            <div class="config-body">
+                                <div class="form-group">
+                                    <label for="oficinaNome">Nome da Oficina</label>
+                                    <input type="text" id="oficinaNome" class="form-input" placeholder="Nome da sua oficina">
+                                </div>
+                                <div class="form-group">
+                                    <label for="oficinaTelefone">Telefone</label>
+                                    <input type="text" id="oficinaTelefone" class="form-input" placeholder="(11) 99999-9999">
+                                </div>
+                                <div class="form-group">
+                                    <label for="oficinaEndereco">Endereço Completo</label>
+                                    <textarea id="oficinaEndereco" class="form-textarea" placeholder="Endereço completo da oficina" rows="3"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Preview do Horário -->
+                        <div class="config-card">
+                            <div class="config-header">
+                                <h3><i class="fas fa-eye"></i> Preview do Horário</h3>
+                            </div>
+                            <div class="config-body">
+                                <div id="previewHorario" class="preview-horario">
+                                    <p>Seu horário de funcionamento será exibido aqui</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </section>
             </div>
@@ -482,15 +598,13 @@
                         <div class="detail-value" id="detailMotivo">-</div>
                     </div>
                 </div>
+                <div class="form-row" id="divergenciaContainer" style="display: none;">
+                    <div class="form-group" style="flex: 2;">
+                        <label>Divergência Registrada:</label>
+                        <div class="detail-value" id="detailDivergencia" style="color: #d32f2f; font-style: italic;"></div>
+                    </div>
+                </div>
             </div>
-
-<!-- No modal agendamentoDetailModal, adicione esta seção: -->
-<div class="form-row" id="divergenciaContainer" style="display: none;">
-    <div class="form-group" style="flex: 2;">
-        <label>Divergência Registrada:</label>
-        <div class="detail-value" id="detailDivergencia" style="color: #d32f2f; font-style: italic;"></div>
-    </div>
-</div>
             <div class="modal-actions">
                 <button class="btn btn-secondary" onclick="hideModal('agendamentoDetailModal')">Fechar</button>
             </div>
@@ -517,91 +631,145 @@
         });
 
         // Função para melhorar a experiência do usuário
-function enhanceProtocolSection() {
-    const protocoloInput = document.getElementById('protocoloInput');
-    const btnConcluir = document.getElementById('btnConcluir');
-    const msgConcluir = document.getElementById('msgConcluir');
-    const section = document.querySelector('.concluir-agendamento');
+        function enhanceProtocolSection() {
+            const protocoloInput = document.getElementById('protocoloInput');
+            const btnConcluir = document.getElementById('btnConcluir');
+            const msgConcluir = document.getElementById('msgConcluir');
+            const section = document.querySelector('.concluir-agendamento');
 
-    // Focar no input quando a seção for clicada
-    section.addEventListener('click', function() {
-        protocoloInput.focus();
-    });
+            // Focar no input quando a seção for clicada
+            section.addEventListener('click', function() {
+                protocoloInput.focus();
+            });
 
-    // Validar input em tempo real
-    protocoloInput.addEventListener('input', function() {
-        const value = this.value.trim();
-        
-        if (value.length > 0) {
-            this.style.borderColor = '#28a745';
-            btnConcluir.disabled = false;
-        } else {
-            this.style.borderColor = '#e9ecef';
-            btnConcluir.disabled = true;
+            // Validar input em tempo real
+            protocoloInput.addEventListener('input', function() {
+                const value = this.value.trim();
+                
+                if (value.length > 0) {
+                    this.style.borderColor = '#28a745';
+                    btnConcluir.disabled = false;
+                } else {
+                    this.style.borderColor = '#e9ecef';
+                    btnConcluir.disabled = true;
+                }
+                
+                // Esconder mensagem quando o usuário digitar
+                hideMessage();
+            });
+
+            // Enter para submeter
+            protocoloInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !btnConcluir.disabled) {
+                    btnConcluir.click();
+                }
+            });
+
+            // Feedback visual no botão
+            btnConcluir.addEventListener('mouseenter', function() {
+                if (!this.disabled) {
+                    this.style.transform = 'translateY(-2px)';
+                }
+            });
+
+            btnConcluir.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
         }
-        
-        // Esconder mensagem quando o usuário digitar
-        hideMessage();
-    });
 
-    // Enter para submeter
-    protocoloInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter' && !btnConcluir.disabled) {
-            btnConcluir.click();
+        // Funções auxiliares para mensagens
+        function showMessage(message, type = 'info') {
+            const msgEl = document.getElementById('msgConcluir');
+            msgEl.textContent = message;
+            msgEl.className = `protocolo-message show ${type}`;
+            msgEl.style.display = 'block';
         }
-    });
 
-    // Feedback visual no botão
-    btnConcluir.addEventListener('mouseenter', function() {
-        if (!this.disabled) {
-            this.style.transform = 'translateY(-2px)';
+        function hideMessage() {
+            const msgEl = document.getElementById('msgConcluir');
+            msgEl.style.display = 'none';
+            msgEl.className = 'protocolo-message';
         }
-    });
 
-    btnConcluir.addEventListener('mouseleave', function() {
-        this.style.transform = 'translateY(0)';
-    });
-}
+        function showLoading() {
+            const btn = document.getElementById('btnConcluir');
+            btn.classList.add('loading');
+            btn.disabled = true;
+        }
 
-// Funções auxiliares para mensagens
-function showMessage(message, type = 'info') {
-    const msgEl = document.getElementById('msgConcluir');
-    msgEl.textContent = message;
-    msgEl.className = `protocolo-message show ${type}`;
-    msgEl.style.display = 'block';
-}
+        function hideLoading() {
+            const btn = document.getElementById('btnConcluir');
+            btn.classList.remove('loading');
+            btn.disabled = false;
+        }
 
-function hideMessage() {
-    const msgEl = document.getElementById('msgConcluir');
-    msgEl.style.display = 'none';
-    msgEl.className = 'protocolo-message';
-}
+        // Destacar a seção
+        function highlightSection() {
+            const section = document.querySelector('.concluir-agendamento');
+            section.classList.add('highlight');
+            setTimeout(() => {
+                section.classList.remove('highlight');
+            }, 2000);
+        }
 
-function showLoading() {
-    const btn = document.getElementById('btnConcluir');
-    btn.classList.add('loading');
-    btn.disabled = true;
-}
+        // Inicializar quando o DOM estiver carregado
+        document.addEventListener('DOMContentLoaded', function() {
+            enhanceProtocolSection();
+            
+            // Event listeners para configurações
+            const horarioInputs = document.querySelectorAll('#horarioAbertura, #horarioFechamento');
+            horarioInputs.forEach(input => {
+                input.addEventListener('change', atualizarPreviewHorario);
+            });
+            
+            const diaCheckboxes = document.querySelectorAll('.dias-semana-grid input[type="checkbox"]');
+            diaCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', atualizarPreviewHorario);
+            });
+        });
 
-function hideLoading() {
-    const btn = document.getElementById('btnConcluir');
-    btn.classList.remove('loading');
-    btn.disabled = false;
-}
-
-// Destacar a seção
-function highlightSection() {
-    const section = document.querySelector('.concluir-agendamento');
-    section.classList.add('highlight');
-    setTimeout(() => {
-        section.classList.remove('highlight');
-    }, 2000);
-}
-
-// Inicializar quando o DOM estiver carregado
-document.addEventListener('DOMContentLoaded', function() {
-    enhanceProtocolSection();
-});
+        // Funções para configurações
+        function atualizarPreviewHorario() {
+            const preview = document.getElementById('previewHorario');
+            const horarioAbertura = document.getElementById('horarioAbertura').value;
+            const horarioFechamento = document.getElementById('horarioFechamento').value;
+            
+            if (!preview) return;
+            
+            if (!horarioAbertura || !horarioFechamento) {
+                preview.innerHTML = '<p>Configure os horários de abertura e fechamento</p>';
+                return;
+            }
+            
+            const diasSemana = [
+                { id: 'segunda', nome: 'Segunda-feira' },
+                { id: 'terca', nome: 'Terça-feira' },
+                { id: 'quarta', nome: 'Quarta-feira' },
+                { id: 'quinta', nome: 'Quinta-feira' },
+                { id: 'sexta', nome: 'Sexta-feira' },
+                { id: 'sabado', nome: 'Sábado' },
+                { id: 'domingo', nome: 'Domingo' }
+            ];
+            
+            let html = '<div class="horario-preview-list">';
+            
+            diasSemana.forEach(dia => {
+                const checkbox = document.getElementById(dia.id);
+                const estaAberto = checkbox && checkbox.checked;
+                
+                html += `
+                    <div class="horario-item">
+                        <span class="dia-semana">${dia.nome}</span>
+                        <span class="${estaAberto ? 'horario-funcionamento' : 'horario-fechado'}">
+                            ${estaAberto ? `${horarioAbertura} - ${horarioFechamento}` : 'Fechado'}
+                        </span>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            preview.innerHTML = html;
+        }
     </script>
 </body>
 </html>

@@ -39,11 +39,6 @@ function requireAdminAuth(req, res, next) {
     next();
 }
 
-// Middleware de log para debug
-app.use('/api/admin/*', (req, res, next) => {
-    console.log(`📝 Rota ADMIN acessada: ${req.method} ${req.originalUrl}`);
-    next();
-});
 
 // Rotas de autenticação administrativa
 app.post('/api/admin/login', async (req, res) => {
@@ -287,6 +282,360 @@ app.put('/api/admin/concluir-protocolo', requireAdminAuth, (req, res) => {
     });
 });
 
+// ========== ROTAS DE CONFIGURAÇÕES DA OFICINA ==========
+
+// Carregar configurações da oficina
+app.get('/api/admin/configuracoes', requireAdminAuth, (req, res) => {
+    const oficinaId = req.session.admin.oficina_id;
+
+    const query = `
+        SELECT * FROM oficina 
+        WHERE id = ?
+    `;
+
+    db.query(query, [oficinaId], (err, results) => {
+        if (err) {
+            console.error('Erro ao carregar configurações:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro interno do servidor' 
+            });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Oficina não encontrada' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            oficina: results[0] 
+        });
+    });
+});
+
+// Salvar configurações da oficina
+app.put('/api/admin/configuracoes', requireAdminAuth, (req, res) => {
+    const oficinaId = req.session.admin.oficina_id;
+    const { 
+        nome, 
+        telefone, 
+        endereco, 
+        horario_abertura, 
+        horario_fechamento, 
+        dias_funcionamento 
+    } = req.body;
+
+    console.log('💾 Salvando configurações para oficina:', oficinaId);
+    console.log('📝 Dados recebidos:', {
+        nome,
+        telefone,
+        endereco,
+        horario_abertura,
+        horario_fechamento,
+        dias_funcionamento
+    });
+
+    const query = `
+        UPDATE oficina 
+        SET nome = ?, 
+            telefone = ?, 
+            endereco = ?, 
+            horario_abertura = ?, 
+            horario_fechamento = ?, 
+            dias_funcionamento = ?,
+            updated_at = NOW()
+        WHERE id = ?
+    `;
+
+    db.query(query, [
+        nome, 
+        telefone, 
+        endereco, 
+        horario_abertura, 
+        horario_fechamento, 
+        dias_funcionamento,
+        oficinaId
+    ], (err, result) => {
+        if (err) {
+            console.error('❌ Erro ao salvar configurações:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro interno do servidor' 
+            });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Oficina não encontrada' 
+            });
+        }
+
+        console.log('✅ Configurações salvas com sucesso!');
+        
+        res.json({ 
+            success: true, 
+            message: 'Configurações salvas com sucesso!' 
+        });
+    });
+});
+
+// Rota para buscar horários de funcionamento da oficina
+app.get('/api/admin/horarios-funcionamento', requireAdminAuth, (req, res) => {
+    const oficinaId = req.session.admin.oficina_id;
+
+    const query = `
+        SELECT 
+            horario_abertura,
+            horario_fechamento,
+            dias_funcionamento
+        FROM oficina 
+        WHERE id = ?
+    `;
+
+    db.query(query, [oficinaId], (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar horários:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro interno do servidor' 
+            });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Oficina não encontrada' 
+            });
+        }
+
+        const oficina = results[0];
+        
+        res.json({ 
+            success: true, 
+            horarios: {
+                abertura: oficina.horario_abertura,
+                fechamento: oficina.horario_fechamento,
+                dias: oficina.dias_funcionamento
+            }
+        });
+    });
+});
+
+// Rota para verificar disponibilidade de horário
+app.get('/api/admin/verificar-disponibilidade', requireAdminAuth, (req, res) => {
+    const oficinaId = req.session.admin.oficina_id;
+    const { data, hora } = req.query;
+
+    if (!data || !hora) {
+        return res.status(400).json({
+            success: false,
+            message: 'Data e hora são obrigatórios'
+        });
+    }
+
+    // Verificar se já existe agendamento no mesmo horário
+    const query = `
+        SELECT COUNT(*) as total
+        FROM agendamento_simples 
+        WHERE oficina_id = ? 
+        AND DATE(data_hora) = ? 
+        AND TIME(data_hora) = ?
+        AND status NOT IN ('cancelado', 'fora_prazo')
+    `;
+
+    db.query(query, [oficinaId, data, hora + ':00'], (err, results) => {
+        if (err) {
+            console.error('Erro ao verificar disponibilidade:', err);
+            return res.status(500).json({
+                success: false,
+                message: 'Erro interno do servidor'
+            });
+        }
+
+        const disponivel = results[0].total === 0;
+        
+        res.json({
+            success: true,
+            disponivel: disponivel,
+            mensagem: disponivel ? 'Horário disponível' : 'Horário já ocupado'
+        });
+    });
+});
+
+// ========== ROTAS ADICIONAIS PARA O SISTEMA DE AGENDAMENTO ==========
+
+// Rota para buscar informações completas da oficina (usada pelo frontend cliente)
+app.get('/api/oficina/:id/detalhes', (req, res) => {
+    const { id } = req.params;
+
+    const query = `
+        SELECT 
+            id,
+            nome,
+            endereco,
+            cidade,
+            estado,
+            telefone,
+            horario_abertura,
+            horario_fechamento,
+            dias_funcionamento,
+            lat,
+            lng
+        FROM oficina 
+        WHERE id = ?
+    `;
+
+    db.query(query, [id], (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar detalhes da oficina:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro interno do servidor' 
+            });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Oficina não encontrada' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            oficina: results[0] 
+        });
+    });
+});
+
+// Rota para buscar todas as oficinas com informações completas
+app.get('/api/oficinas-completas', (req, res) => {
+    const query = `
+        SELECT 
+            id,
+            nome,
+            endereco,
+            cidade,
+            estado,
+            telefone,
+            horario_abertura,
+            horario_fechamento,
+            dias_funcionamento,
+            lat,
+            lng
+        FROM oficina 
+        WHERE horario_abertura IS NOT NULL 
+        AND horario_fechamento IS NOT NULL
+        AND dias_funcionamento IS NOT NULL
+        ORDER BY nome
+    `;
+
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar oficinas:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro interno do servidor' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            data: results 
+        });
+    });
+});
+
+// Rota para buscar horários ocupados de uma oficina em uma data específica
+app.get('/api/oficina/:id/horarios-ocupados/:data', (req, res) => {
+    const { id, data } = req.params;
+
+    // Validar parâmetros
+    if (!id || !data) {
+        return res.status(400).json({
+            success: false,
+            message: 'ID da oficina e data são obrigatórios'
+        });
+    }
+
+    // Validar formato da data (YYYY-MM-DD)
+    const dataRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dataRegex.test(data)) {
+        return res.status(400).json({
+            success: false,
+            message: 'Formato de data inválido. Use YYYY-MM-DD'
+        });
+    }
+
+    const query = `
+        SELECT TIME(data_hora) as hora
+        FROM agendamento_simples 
+        WHERE oficina_id = ? 
+        AND DATE(data_hora) = ?
+        AND status NOT IN ('cancelado', 'fora_prazo')
+        ORDER BY hora
+    `;
+
+    db.query(query, [id, data], (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar horários ocupados:', err);
+            return res.status(500).json({
+                success: false,
+                message: 'Erro interno do servidor'
+            });
+        }
+
+        // Extrair apenas a parte da hora (HH:MM)
+        const horariosOcupados = results.map(item => {
+            return item.hora.substring(0, 5); // Pega apenas HH:MM
+        });
+
+        res.json({
+            success: true,
+            data: horariosOcupados
+        });
+    });
+});
+
+// ========== ROTA PARA ATUALIZAR COORDENADAS DA OFICINA ==========
+
+app.put('/api/admin/oficina/coordenadas', requireAdminAuth, (req, res) => {
+    const oficinaId = req.session.admin.oficina_id;
+    const { lat, lng } = req.body;
+
+    const query = `
+        UPDATE oficina 
+        SET lat = ?, lng = ?, updated_at = NOW()
+        WHERE id = ?
+    `;
+
+    db.query(query, [lat, lng, oficinaId], (err, result) => {
+        if (err) {
+            console.error('Erro ao atualizar coordenadas:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro interno do servidor' 
+            });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Oficina não encontrada' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'Coordenadas atualizadas com sucesso!' 
+        });
+    });
+});
+
 // ========== ROTAS ADMINISTRATIVAS PRINCIPAIS ==========
 
 // Dashboard
@@ -520,8 +869,7 @@ app.put('/api/admin/agendamentos/:id/protocolo', requireAdminAuth, (req, res) =>
     });
 });
 
-
-// No server.js - CORRIGIR a rota de divergência
+// Registrar divergência
 app.put('/api/admin/agendamentos/:id/divergencia', requireAdminAuth, (req, res) => {
     const { id } = req.params;
     const { divergencia, status } = req.body;
@@ -561,6 +909,7 @@ app.put('/api/admin/agendamentos/:id/divergencia', requireAdminAuth, (req, res) 
         });
     });
 });
+
 // Cancelar agendamento
 app.put('/api/admin/agendamentos/:id/cancelar', requireAdminAuth, (req, res) => {
     const { id } = req.params;
@@ -825,6 +1174,22 @@ app.get('/api/test/agendamento-table', (req, res) => {
         });
     });
 });
+
+// Função auxiliar para validar dias de funcionamento
+function isValidDayForWorkshop(selectedDate, workshop) {
+    if (!selectedDate || !workshop || !workshop.dias_funcionamento) {
+        return true; // Por segurança, assume que funciona
+    }
+    
+    const dayOfWeek = selectedDate.getDay(); // 0 = Domingo, 1 = Segunda, etc.
+    const dayNames = ['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'];
+    const diaSemana = dayNames[dayOfWeek];
+    
+    return workshop.dias_funcionamento.toLowerCase().includes(diaSemana);
+}
+
+// Exportar a função para uso em outras partes do código
+app.isValidDayForWorkshop = isValidDayForWorkshop;
 
 // ========== INICIAR SERVIDOR ==========
 
