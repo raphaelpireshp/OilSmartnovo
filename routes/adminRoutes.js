@@ -223,20 +223,27 @@ router.put('/agendamentos/:id/protocolo', checkOficinaAdmin, (req, res) => {
 });
 
 // Registrar divergência
+// CORRIGIR a rota de divergência - garantir que o status seja 'divergencia'
 router.put('/agendamentos/:id/divergencia', checkOficinaAdmin, (req, res) => {
     const { id } = req.params;
-    const { divergencia, status } = req.body;
+    const { divergencia } = req.body; // Remover status do body, sempre usar 'divergencia'
     const oficina_id = req.session.admin.oficina_id;
 
+    console.log('📝 Registrando divergência para agendamento:', id);
+    console.log('📝 Divergência:', divergencia);
+
+    // SEMPRE definir status como 'divergencia'
     const query = `
         UPDATE agendamento_simples 
-        SET divergencia = ?, status = ?
+        SET divergencia = ?, 
+            status = 'divergencia',
+            data_divergencia = NOW()
         WHERE id = ? AND oficina_id = ?
     `;
 
-    db.query(query, [divergencia, status, id, oficina_id], (err, result) => {
+    db.query(query, [divergencia, id, oficina_id], (err, result) => {
         if (err) {
-            console.error('Erro ao registrar divergência:', err);
+            console.error('❌ Erro ao registrar divergência:', err);
             return res.status(500).json({ 
                 success: false, 
                 message: 'Erro ao registrar divergência' 
@@ -250,6 +257,8 @@ router.put('/agendamentos/:id/divergencia', checkOficinaAdmin, (req, res) => {
             });
         }
 
+        console.log('✅ Divergência registrada com sucesso para agendamento:', id);
+        
         res.json({ 
             success: true, 
             message: 'Divergência registrada com sucesso!' 

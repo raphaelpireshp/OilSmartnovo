@@ -644,5 +644,179 @@ router.post("/admin", (req, res) => {
         });
     });
 });
+
+
+
+// Função para verificar disponibilidade da oficina
+function verificarDisponibilidadeOficina(oficina_id, data_hora, callback) {
+    const query = `
+        SELECT 
+            horario_abertura,
+            horario_fechamento,
+            dias_funcionamento
+        FROM oficina 
+        WHERE id = ?
+    `;
+    
+    db.query(query, [oficina_id], (err, results) => {
+        if (err) return callback(err);
+        
+        if (results.length === 0) {
+            return callback(new Error('Oficina não encontrada'));
+        }
+        
+        const oficina = results[0];
+        const dataAgendamento = new Date(data_hora);
+        const dayOfWeek = dataAgendamento.getDay();
+        const dayNames = ['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'];
+        const diaSemana = dayNames[dayOfWeek];
+        
+        // Verificar se a oficina funciona nesse dia
+        if (oficina.dias_funcionamento && !oficina.dias_funcionamento.toLowerCase().includes(diaSemana)) {
+            return callback(new Error('Oficina não funciona neste dia da semana'));
+        }
+        
+        // Verificar horário de funcionamento
+        const horarioAgendamento = dataAgendamento.toTimeString().slice(0, 5);
+        if (horarioAgendamento < oficina.horario_abertura || horarioAgendamento > oficina.horario_fechamento) {
+            return callback(new Error('Horário fora do funcionamento da oficina'));
+        }
+        
+        callback(null, true);
+    });
+}
+
+// Modifique a rota POST principal para incluir a validação
+router.post("/", (req, res) => {
+    console.log('=== DADOS RECEBIDOS NO BACKEND (CLIENTE) ===');
+    console.log('Body completo:', JSON.stringify(req.body, null, 2));
+
+    const {
+        protocolo,
+        data_hora,
+        oficina_nome,
+        oficina_endereco,
+        oficina_telefone,
+        oficina_id,
+        veiculo,
+        servicos,
+        total_servico,
+        cliente_nome,
+        cliente_cpf,
+        cliente_telefone,
+        cliente_email,
+        usuario_id
+    } = req.body;
+
+    // VALIDAÇÃO ATUALIZADA
+    if (!cliente_nome || !cliente_telefone || !data_hora || !usuario_id || !oficina_id) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Campos obrigatórios: nome, telefone, data/hora, usuario_id e oficina_id'
+        });
+    }
+
+    // Verificar disponibilidade da oficina
+    verificarDisponibilidadeOficina(oficina_id, data_hora, (err, disponivel) => {
+        if (err) {
+            return res.status(400).json({
+                success: false,
+                message: err.message
+            });
+        }
+
+        const protocoloFinal = protocolo || gerarCodigoConfirmacao();
+        const servicosLimpos = limparServicos(servicos);
+
+        const values = [
+            protocoloFinal,
+            data_hora || null,
+            oficina_nome || 'Oficina não especificada',
+            oficina_endereco || 'Endereço não informado',
+            oficina_telefone || 'Telefone não informado',
+            veiculo ? (typeof veiculo === 'string' ? veiculo : JSON.stringify(veiculo)) : 'Veículo não informado',
+            servicosLimpos,
+            parseFloat(total_servico) || 0.00,
+            cliente_nome,
+            cliente_cpf ? cliente_cpf.replace(/\D/g, '') : 'CPF não informado',
+            cliente_telefone,
+            cliente_email || 'email@naoinformado.com',
+            usuario_id,
+            oficina_id
+        ];
+
+        const query = `
+            INSERT INTO agendamento_simples (
+                protocolo, data_hora, oficina_nome, oficina_endereco, oficina_telefone,
+                veiculo, servicos, total_servico, cliente_nome, 
+                cliente_cpf, cliente_telefone, cliente_email, usuario_id, oficina_id
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `;
+
+        db.query(query, values, (err, result) => {
+            if (err) {
+                console.error('❌ Erro MySQL ao salvar agendamento CLIENTE:', err);
+                return res.status(500).json({ 
+                    success: false, 
+                    message: 'Erro ao salvar agendamento no banco de dados',
+                    error: err.sqlMessage || err.message
+                });
+            }
+
+            console.log('✅ Agendamento CLIENTE salvo com sucesso. ID:', result.insertId);
+            
+            res.status(201).json({ 
+                success: true, 
+                agendamento_id: result.insertId,
+                codigo_confirmacao: protocoloFinal,
+                message: 'Agendamento salvo com sucesso!'
+            });
+        });
+    });
+});
+
+
+// Rota para buscar agendamentos por oficina e data
+router.get('/oficina/:oficina_id/data/:data', (req, res) => {
+    const { oficina_id, data } = req.params;
+
+    // Validar parâmetros
+    if (!oficina_id || !data) {
+        return res.status(400).json({
+            success: false,
+            message: 'Parâmetros oficina_id e data são obrigatórios'
+        });
+    }
+
+    // A data deve estar no formato YYYY-MM-DD
+    const query = `
+        SELECT data_hora 
+        FROM agendamento_simples 
+        WHERE oficina_id = ? 
+        AND DATE(data_hora) = ?
+        AND status NOT IN ('cancelado', 'fora_prazo')
+    `;
+
+    db.query(query, [oficina_id, data], (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar agendamentos:', err);
+            return res.status(500).json({
+                success: false,
+                message: 'Erro ao buscar agendamentos'
+            });
+        }
+
+        // Extrai os horários (HH:MM) dos agendamentos
+        const horariosAgendados = results.map(agendamento => {
+            const dataHora = new Date(agendamento.data_hora);
+            return dataHora.toTimeString().slice(0, 5); // Formato HH:MM
+        });
+
+        res.json({
+            success: true,
+            data: horariosAgendados
+        });
+    });
+});
 module.exports = router;
 

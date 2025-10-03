@@ -39,6 +39,12 @@ function requireAdminAuth(req, res, next) {
     next();
 }
 
+// Middleware de log para debug
+app.use('/api/admin/*', (req, res, next) => {
+    console.log(`📝 Rota ADMIN acessada: ${req.method} ${req.originalUrl}`);
+    next();
+});
+
 // Rotas de autenticação administrativa
 app.post('/api/admin/login', async (req, res) => {
     const { email, senha } = req.body;
@@ -140,7 +146,150 @@ app.get('/api/admin/check-auth', (req, res) => {
     }
 });
 
-// Rotas administrativas
+// ========== ROTAS ESPECÍFICAS (DEVEM VIR ANTES DAS ROTAS COM :id) ==========
+
+// Rota para concluir agendamento pelo protocolo "OILxxxx" - CORRIGIDA
+app.put('/api/admin/agendamentos/concluir-por-protocolo', requireAdminAuth, (req, res) => {
+    const { protocolo } = req.body;
+    const oficinaId = req.session.admin.oficina_id;
+
+    console.log('🔍 Buscando protocolo:', protocolo, 'para oficina:', oficinaId);
+
+    if (!protocolo || protocolo.trim() === '') {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Protocolo é obrigatório' 
+        });
+    }
+
+    const protocoloTrim = protocolo.toString().trim();
+
+    const query = `
+        UPDATE agendamento_simples 
+        SET status = 'concluido', 
+            data_conclusao = NOW()
+        WHERE protocolo = ? 
+        AND oficina_id = ?
+        AND status IN ('pendente', 'confirmado')
+    `;
+
+    db.query(query, [protocoloTrim, oficinaId], (err, result) => {
+        if (err) {
+            console.error('❌ Erro ao concluir por protocolo:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro interno do servidor' 
+            });
+        }
+
+        console.log('📊 Resultado da atualização:', result.affectedRows, 'linhas afetadas');
+
+        if (result.affectedRows === 0) {
+            // Buscar informações para debug
+            const debugQuery = `
+                SELECT id, protocolo, status, oficina_id 
+                FROM agendamento_simples 
+                WHERE protocolo = ? 
+            `;
+            
+            db.query(debugQuery, [protocoloTrim], (debugErr, debugResults) => {
+                if (debugErr) {
+                    console.error('Erro no debug:', debugErr);
+                }
+                
+                console.log('🔍 Debug - Agendamentos encontrados com este protocolo:', debugResults);
+                
+                return res.status(404).json({ 
+                    success: false, 
+                    message: 'Protocolo não encontrado ou agendamento já concluído/cancelado',
+                    debug: {
+                        protocolo_buscado: protocoloTrim,
+                        encontrados: debugResults,
+                        oficina_sessao: oficinaId
+                    }
+                });
+            });
+            return;
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'Agendamento concluído com sucesso!',
+            protocolo: protocoloTrim
+        });
+    });
+});
+
+// Rota para concluir agendamento específico por ID
+app.put('/api/admin/agendamentos/:id/concluir', requireAdminAuth, (req, res) => {
+    const { id } = req.params;
+    const oficinaId = req.session.admin.oficina_id;
+
+    const query = `
+        UPDATE agendamento_simples 
+        SET status = 'concluido', 
+            data_conclusao = NOW()
+        WHERE id = ? 
+        AND oficina_id = ?
+    `;
+
+    db.query(query, [id, oficinaId], (err, result) => {
+        if (err) {
+            console.error('Erro ao concluir agendamento:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro interno do servidor' 
+            });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Agendamento não encontrado' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'Agendamento concluído com sucesso!' 
+        });
+    });
+});
+
+// Rota alternativa para conclusão por protocolo
+app.put('/api/admin/concluir-protocolo', requireAdminAuth, (req, res) => {
+    const { protocolo } = req.body;
+    const oficinaId = req.session.admin.oficina_id;
+
+    console.log('🎯 Rota alternativa chamada com protocolo:', protocolo);
+
+    if (!protocolo) {
+        return res.status(400).json({ success: false, message: 'Protocolo é obrigatório' });
+    }
+
+    const query = `
+        UPDATE agendamento_simples 
+        SET status = 'concluido', data_conclusao = NOW()
+        WHERE protocolo = ? AND oficina_id = ?
+    `;
+
+    db.query(query, [protocolo.trim(), oficinaId], (err, result) => {
+        if (err) {
+            console.error('Erro:', err);
+            return res.status(500).json({ success: false, message: 'Erro no servidor' });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: 'Protocolo não encontrado' });
+        }
+
+        res.json({ success: true, message: 'Agendamento concluído!' });
+    });
+});
+
+// ========== ROTAS ADMINISTRATIVAS PRINCIPAIS ==========
+
+// Dashboard
 app.get('/api/admin/dashboard', requireAdminAuth, (req, res) => {
     const oficinaId = req.session.admin.oficina_id;
     
@@ -211,6 +360,7 @@ app.get('/api/admin/dashboard', requireAdminAuth, (req, res) => {
     });
 });
 
+// Listar agendamentos
 app.get('/api/admin/agendamentos', requireAdminAuth, (req, res) => {
     const oficinaId = req.session.admin.oficina_id;
     const status = req.query.status;
@@ -247,6 +397,7 @@ app.get('/api/admin/agendamentos', requireAdminAuth, (req, res) => {
     });
 });
 
+// Buscar agendamento específico
 app.get('/api/admin/agendamentos/:id', requireAdminAuth, (req, res) => {
     const { id } = req.params;
     const oficinaId = req.session.admin.oficina_id;
@@ -281,6 +432,7 @@ app.get('/api/admin/agendamentos/:id', requireAdminAuth, (req, res) => {
     });
 });
 
+// Atualizar agendamento
 app.put('/api/admin/agendamentos/:id', requireAdminAuth, (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
@@ -331,124 +483,149 @@ app.put('/api/admin/agendamentos/:id', requireAdminAuth, (req, res) => {
         });
     });
 });
-// Concluir agendamento pelo protocolo "OILxxxx"
-app.put('/api/admin/agendamentos/concluir', requireAdminAuth, (req, res) => {
-    const { protocolo } = req.body;
+
+// Adicionar protocolo ao agendamento
+app.put('/api/admin/agendamentos/:id/protocolo', requireAdminAuth, (req, res) => {
+    const { id } = req.params;
+    const { protocolo, status } = req.body;
     const oficinaId = req.session.admin.oficina_id;
 
-    if (!protocolo) {
-        return res.status(400).json({ success: false, message: 'Protocolo é obrigatório' });
-    }
-
     const query = `
-        UPDATE agendamento_simples
-        SET status = 'concluido', data_conclusao = NOW()
-        WHERE protocolo = ? AND oficina_id = ?
+        UPDATE agendamento_simples 
+        SET protocolo = ?, 
+            status = ?
+        WHERE id = ? AND oficina_id = ?
     `;
 
-    db.query(query, [protocolo, oficinaId], (err, result) => {
+    db.query(query, [protocolo, status, id, oficinaId], (err, result) => {
         if (err) {
-            console.error('Erro ao concluir agendamento:', err);
-            return res.status(500).json({ success: false, message: 'Erro no servidor' });
+            console.error('Erro ao adicionar protocolo:', err);
+            return res.status(500).json({
+                success: false,
+                message: 'Erro ao adicionar protocolo'
+            });
         }
 
         if (result.affectedRows === 0) {
-            return res.status(404).json({ success: false, message: 'Protocolo não encontrado para sua oficina' });
-        }
-
-        res.json({ success: true, message: 'Agendamento concluído com sucesso!' });
-    });
-});
-
-// Importar rotas existentes
-const authRoutes = require('./routes/auth');
-const agendamentoSimplesRoutes = require('./routes/agendamentoSimples');
-const oficinaRoutes = require('./routes/oficina');
-const veiculoRoutes = require('./routes/veiculo');
-const marcaRoutes = require('./routes/marca');
-const modeloRoutes = require('./routes/modelo');
-const modeloAnoRoutes = require('./routes/modeloAno');
-const recomendacaoRoutes = require('./routes/recomendacao');
-const geocodeRoutes = require('./routes/geocode');
-const lembreteTrocaOleoRoutes = require('./routes/lembreteTrocaOleo');
-
-// Usar rotas
-app.use('/api/auth', authRoutes);
-app.use('/api/oficina', oficinaRoutes);
-app.use('/api/veiculos', veiculoRoutes);
-app.use('/api/marcas', marcaRoutes);
-app.use('/api/modelos', modeloRoutes);
-app.use('/api/modelo_anos', modeloAnoRoutes);
-app.use('/api/recomendacoes', recomendacaoRoutes);
-app.use('/api/geocode', geocodeRoutes);
-app.use('/api/contact', require('./routes/contact'));
-app.use('/api/agendamento_simples', agendamentoSimplesRoutes);
-app.use('/api/lembretes_troca_oleo', lembreteTrocaOleoRoutes);
-
-// Rotas de produtos
-app.get('/api/produtos/oleo/:id', (req, res) => {
-    const { id } = req.params;
-    db.query('SELECT * FROM produto_oleo WHERE id = ?', [id], (err, results) => {
-        if (err) {
-            console.error('Erro ao buscar óleo:', err);
-            return res.status(500).json({ error: 'Erro interno do servidor' });
-        }
-        res.json(results[0] || null);
-    });
-});
-
-app.get('/api/produtos/filtro/:id', (req, res) => {
-    const { id } = req.params;
-    db.query('SELECT * FROM produto_filtro WHERE id = ?', [id], (err, results) => {
-        if (err) {
-            console.error('Erro ao buscar filtro:', err);
-            return res.status(500).json({ error: 'Erro interno do servidor' });
-        }
-        res.json(results[0] || null);
-    });
-});
-
-// Rotas gerais
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/html/index.html'));
-});
-
-app.get('/login-adm.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/html/login-adm.html'));
-});
-
-app.get('/admindex.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/html/admindex.html'));
-});
-
-app.get('/api/test', (req, res) => {
-    res.json({ message: 'Servidor funcionando!', timestamp: new Date() });
-});
-
-// Rota de teste para verificar a tabela agendamento_simples
-app.get('/api/test/agendamento-table', (req, res) => {
-    db.query('SELECT COUNT(*) as total FROM agendamento_simples', (err, results) => {
-        if (err) {
-            return res.status(500).json({ 
-                success: false, 
-                error: err.message 
+            return res.status(404).json({
+                success: false,
+                message: 'Agendamento não encontrado'
             });
         }
-        res.json({ 
-            success: true, 
-            total_registros: results[0].total,
-            mensagem: 'Tabela agendamento_simples está acessível'
+
+        res.json({
+            success: true,
+            message: 'Protocolo adicionado com sucesso'
         });
     });
 });
 
-// Iniciar servidor
-app.listen(PORT, () => {
-    console.log(`✅ Servidor rodando em http://localhost:${PORT}`);
+
+// No server.js - CORRIGIR a rota de divergência
+app.put('/api/admin/agendamentos/:id/divergencia', requireAdminAuth, (req, res) => {
+    const { id } = req.params;
+    const { divergencia, status } = req.body;
+    const oficinaId = req.session.admin.oficina_id;
+
+    console.log('🎯 Registrar divergência - Agendamento:', id);
+    console.log('🎯 Divergência:', divergencia);
+
+    const query = `
+        UPDATE agendamento_simples 
+        SET divergencia = ?,
+            status = ?
+        WHERE id = ? AND oficina_id = ?
+    `;
+
+    db.query(query, [divergencia, status, id, oficinaId], (err, result) => {
+        if (err) {
+            console.error('❌ Erro ao registrar divergência:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro interno do servidor' 
+            });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Agendamento não encontrado' 
+            });
+        }
+
+        console.log('✅ Divergência registrada com sucesso!');
+        
+        res.json({
+            success: true,
+            message: 'Divergência registrada com sucesso!'
+        });
+    });
+});
+// Cancelar agendamento
+app.put('/api/admin/agendamentos/:id/cancelar', requireAdminAuth, (req, res) => {
+    const { id } = req.params;
+    const { status, motivo_cancelamento, cancelado_por } = req.body;
+    const oficinaId = req.session.admin.oficina_id;
+
+    const query = `
+        UPDATE agendamento_simples 
+        SET status = ?,
+            motivo_cancelamento = ?,
+            cancelado_por = ?,
+            data_cancelamento = NOW()
+        WHERE id = ? AND oficina_id = ?
+    `;
+
+    db.query(query, [status, motivo_cancelamento, cancelado_por, id, oficinaId], (err, result) => {
+        if (err) {
+            console.error('Erro ao cancelar agendamento:', err);
+            return res.status(500).json({
+                success: false,
+                message: 'Erro ao cancelar agendamento'
+            });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'Agendamento não encontrado'
+            });
+        }
+
+        res.json({
+            success: true,
+            message: 'Agendamento cancelado com sucesso'
+        });
+    });
 });
 
-module.exports = app;
-// Rota para estoque
+// Endpoint de debug para protocolos
+app.get('/api/admin/debug/protocolos', requireAdminAuth, (req, res) => {
+    const oficinaId = req.session.admin.oficina_id;
+    
+    const query = `
+        SELECT id, protocolo, status, cliente_nome, data_hora
+        FROM agendamento_simples 
+        WHERE oficina_id = ?
+        ORDER BY data_hora DESC
+        LIMIT 10
+    `;
+    
+    db.query(query, [oficinaId], (err, results) => {
+        if (err) {
+            console.error('Erro no debug:', err);
+            return res.status(500).json({ success: false, error: err.message });
+        }
+        
+        res.json({
+            success: true,
+            protocolos: results,
+            oficina_id: oficinaId
+        });
+    });
+});
+
+// Estoque
 app.get('/api/admin/estoque', requireAdminAuth, (req, res) => {
     const oficinaId = req.session.admin.oficina_id;
     
@@ -489,7 +666,7 @@ app.get('/api/admin/estoque', requireAdminAuth, (req, res) => {
     });
 });
 
-// Rota para atualizar estoque
+// Atualizar estoque
 app.put('/api/admin/estoque/:id', requireAdminAuth, (req, res) => {
     const { id } = req.params;
     const { quantidade } = req.body;
@@ -524,7 +701,7 @@ app.put('/api/admin/estoque/:id', requireAdminAuth, (req, res) => {
     });
 });
 
-// Rota para relatórios
+// Relatórios
 app.get('/api/admin/relatorios/agendamentos', requireAdminAuth, (req, res) => {
     const oficinaId = req.session.admin.oficina_id;
     const { data_inicio, data_fim } = req.query;
@@ -563,38 +740,98 @@ app.get('/api/admin/relatorios/agendamentos', requireAdminAuth, (req, res) => {
     });
 });
 
-// Adicionar protocolo ao agendamento
-app.put('/api/admin/agendamentos/:id/protocolo', async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { protocolo, status } = req.body;
+// ========== IMPORTAR E USAR OUTRAS ROTAS ==========
 
-        const query = `
-            UPDATE agendamento_simples 
-            SET protocolo = ?, 
-                status = ?
-            WHERE id = ?
-        `;
+// Importar rotas existentes
+const authRoutes = require('./routes/auth');
+const agendamentoSimplesRoutes = require('./routes/agendamentoSimples');
+const oficinaRoutes = require('./routes/oficina');
+const veiculoRoutes = require('./routes/veiculo');
+const marcaRoutes = require('./routes/marca');
+const modeloRoutes = require('./routes/modelo');
+const modeloAnoRoutes = require('./routes/modeloAno');
+const recomendacaoRoutes = require('./routes/recomendacao');
+const geocodeRoutes = require('./routes/geocode');
+const lembreteTrocaOleoRoutes = require('./routes/lembreteTrocaOleo');
 
-        db.query(query, [protocolo, status, id], (err, result) => {
-            if (err) {
-                console.error('Erro ao adicionar protocolo:', err);
-                return res.status(500).json({
-                    success: false,
-                    message: 'Erro ao adicionar protocolo'
-                });
-            }
+// Usar rotas
+app.use('/api/auth', authRoutes);
+app.use('/api/oficina', oficinaRoutes);
+app.use('/api/veiculos', veiculoRoutes);
+app.use('/api/marcas', marcaRoutes);
+app.use('/api/modelos', modeloRoutes);
+app.use('/api/modelo_anos', modeloAnoRoutes);
+app.use('/api/recomendacoes', recomendacaoRoutes);
+app.use('/api/geocode', geocodeRoutes);
+app.use('/api/contact', require('./routes/contact'));
+app.use('/api/agendamento_simples', agendamentoSimplesRoutes);
+app.use('/api/lembretes_troca_oleo', lembreteTrocaOleoRoutes);
 
-            res.json({
-                success: true,
-                message: 'Protocolo adicionado com sucesso'
-            });
-        });
-    } catch (error) {
-        console.error('Erro:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Erro interno do servidor'
-        });
-    }
+// ========== ROTAS DE PRODUTOS ==========
+
+app.get('/api/produtos/oleo/:id', (req, res) => {
+    const { id } = req.params;
+    db.query('SELECT * FROM produto_oleo WHERE id = ?', [id], (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar óleo:', err);
+            return res.status(500).json({ error: 'Erro interno do servidor' });
+        }
+        res.json(results[0] || null);
+    });
 });
+
+app.get('/api/produtos/filtro/:id', (req, res) => {
+    const { id } = req.params;
+    db.query('SELECT * FROM produto_filtro WHERE id = ?', [id], (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar filtro:', err);
+            return res.status(500).json({ error: 'Erro interno do servidor' });
+        }
+        res.json(results[0] || null);
+    });
+});
+
+// ========== ROTAS GERAIS ==========
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/html/index.html'));
+});
+
+app.get('/login-adm.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/html/login-adm.html'));
+});
+
+app.get('/admindex.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/html/admindex.html'));
+});
+
+app.get('/api/test', (req, res) => {
+    res.json({ message: 'Servidor funcionando!', timestamp: new Date() });
+});
+
+// Rota de teste para verificar a tabela agendamento_simples
+app.get('/api/test/agendamento-table', (req, res) => {
+    db.query('SELECT COUNT(*) as total FROM agendamento_simples', (err, results) => {
+        if (err) {
+            return res.status(500).json({ 
+                success: false, 
+                error: err.message 
+            });
+        }
+        res.json({ 
+            success: true, 
+            total_registros: results[0].total,
+            mensagem: 'Tabela agendamento_simples está acessível'
+        });
+    });
+});
+
+// ========== INICIAR SERVIDOR ==========
+
+app.listen(PORT, () => {
+    console.log(`✅ Servidor rodando em http://localhost:${PORT}`);
+    console.log(`📊 Painel administrativo: http://localhost:${PORT}/admindex.html`);
+    console.log(`👤 Painel do cliente: http://localhost:${PORT}/html/agenda.html`);
+});
+
+module.exports = app;

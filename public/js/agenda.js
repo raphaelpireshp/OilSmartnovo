@@ -133,6 +133,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // agenda.js - Substitua a função loadLembreteAutomatico por esta versão melhorada
 
 // Buscar lembrete inteligente baseado no status dos agendamentos
+// Substituir a função loadLembreteInteligente no agenda.js
 async function loadLembreteInteligente() {
     try {
         const userData = localStorage.getItem('user');
@@ -151,23 +152,24 @@ async function loadLembreteInteligente() {
             
             if (result.success && result.data && result.data.length > 0) {
                 const agendamentos = result.data;
-                
-                // Verificar se existe agendamento futuro
                 const agora = new Date();
-                const agendamentoFuturo = agendamentos.find(ag => {
+                
+                // Buscar PRÓXIMO agendamento futuro (não concluído, não cancelado)
+                const proximoAgendamento = agendamentos.find(ag => {
                     const dataAgendamento = new Date(ag.data_hora);
                     return dataAgendamento > agora && 
                            ag.status !== 'cancelado' && 
-                           ag.status !== 'fora_prazo';
+                           ag.status !== 'fora_prazo' &&
+                           ag.status !== 'concluido'; // ← ADICIONAR ESTA CONDIÇÃO
                 });
 
-                if (agendamentoFuturo) {
+                if (proximoAgendamento) {
                     // Se tem agendamento futuro, mostrar informações dele
-                    displayProximoAgendamento(agendamentoFuturo);
+                    displayProximoAgendamento(proximoAgendamento);
                 } else {
                     // Se não tem agendamento futuro, mostrar lembrete baseado no último serviço
                     const ultimoConcluido = agendamentos
-                        .filter(ag => ag.status === 'concluido' || new Date(ag.data_hora) < agora)
+                        .filter(ag => ag.status === 'concluido')
                         .sort((a, b) => new Date(b.data_hora) - new Date(a.data_hora))[0];
                     
                     if (ultimoConcluido) {
@@ -187,6 +189,16 @@ async function loadLembreteInteligente() {
         displayLembretePadrao();
     }
 }
+
+// Adicionar esta função para recarregar o lembrete quando necessário
+function recarregarLembrete() {
+    if (typeof loadLembreteInteligente === 'function') {
+        loadLembreteInteligente();
+    }
+}
+
+// Chamar esta função quando um agendamento for concluído
+window.recarregarLembrete = recarregarLembrete;
 
 // Exibir informações do próximo agendamento
 function displayProximoAgendamento(agendamento) {
@@ -232,9 +244,6 @@ function displayProximoAgendamento(agendamento) {
                 ${diffDays > 1 ? `
 
                 ` : ''}
-                <button class="btn btn-primary" onclick="reagendarServico(${agendamento.id})">
-                    <i class="fas fa-copy"></i> Repetir Este Serviço
-                </button>
             </div>
         </div>
     `;
@@ -281,7 +290,7 @@ function displayLembreteAutomatico(ultimoServico) {
                     <h3>${ultimoServico.servicos || 'Troca de Óleo e Filtro'}</h3>
                     <p><strong>Veículo:</strong> ${ultimoServico.veiculo || 'Seu veículo'}</p>
                     <p><strong>Último serviço:</strong> ${dataServico.toLocaleDateString('pt-BR')}</p>
-                    <p><strong>Próxima troca recomendada:</strong> ${proximaTrocaData.toLocaleDateString('pt-BR')}</p>
+                    <p><strong>Recomendamos que sua próxima troca deve ser feita no dia:</strong> ${proximaTrocaData.toLocaleDateString('pt-BR')}</p>
                     <p><strong>Status:</strong> ${statusText}</p>
                     ${estaAtrasado ? 
                         '<p style="color: #dc3545; font-weight: bold;">⚠️ Sua troca de óleo está atrasada!</p>' : 
@@ -293,9 +302,7 @@ function displayLembreteAutomatico(ultimoServico) {
                 <a href="/html/servicos.html" class="btn btn-primary">
                     <i class="fas fa-calendar-plus"></i> Agendar Nova Troca
                 </a>
-                <button class="btn btn-outline" onclick="reagendarUltimoServico(${ultimoServico.id})">
-                    <i class="fas fa-redo"></i> Repetir Último Serviço
-                </button>
+
             </div>
         </div>
     `;
@@ -506,9 +513,7 @@ function displayAppointments(appointments) {
                 </div>
                 <div class="appointment-footer">
                     ${statusClass !== 'cancelled' && statusClass !== 'expired' ? `
-                        <button class="btn btn-outline" onclick="repeatAppointment(${appointment.id})">
-                            <i class="fas fa-redo"></i> Repetir Agendamento
-                        </button>
+
 
                         ${isFutureAppointment(appointment) ? `
                         <button class="btn btn-outline btn-cancel" onclick="cancelAppointment(${appointment.id})">
@@ -531,40 +536,47 @@ function displayAppointments(appointments) {
     }).join('');
 }
 
-    // Funções auxiliares
-    function getStatusClass(appointment) {
-        const appointmentDate = new Date(appointment.data_hora);
-        const now = new Date();
-        
-        if (appointment.status === 'cancelado') {
-            return 'cancelled';
-        } else if (appointment.status === 'fora_prazo') {
-            return 'expired';
-        } else if (appointmentDate > now) {
-            return 'pending';
-        } else if (appointment.status === 'concluido') {
-            return 'completed';
-        } else {
-            return 'expired';
-        }
+// ATUALIZAR função getStatusClass no agenda.js
+function getStatusClass(appointment) {
+    const appointmentDate = new Date(appointment.data_hora);
+    const now = new Date();
+    
+    // Primeiro verifica o status do banco
+    if (appointment.status === 'cancelado') {
+        return 'cancelled';
+    } else if (appointment.status === 'fora_prazo') {
+        return 'expired';
+    } else if (appointment.status === 'concluido') {
+        return 'completed';
+    } else if (appointment.status === 'divergencia') { // ← ADICIONAR ESTE CASO
+        return 'divergence';
+    } else if (appointmentDate > now) {
+        return 'pending';
+    } else {
+        return 'expired';
     }
+}
 
-    function getStatusText(appointment) {
-        const appointmentDate = new Date(appointment.data_hora);
-        const now = new Date();
-        
-        if (appointment.status === 'cancelado') {
-            return 'Cancelado';
-        } else if (appointment.status === 'fora_prazo') {
-            return 'Fora do Prazo';
-        } else if (appointmentDate > now) {
-            return 'Agendado';
-        } else if (appointment.status === 'concluido') {
-            return 'Concluído';
-        } else {
-            return 'Fora do Prazo';
-        }
+// ATUALIZAR função getStatusText no agenda.js
+function getStatusText(appointment) {
+    const appointmentDate = new Date(appointment.data_hora);
+    const now = new Date();
+    
+    // Primeiro verifica o status do banco
+    if (appointment.status === 'cancelado') {
+        return 'Cancelado';
+    } else if (appointment.status === 'fora_prazo') {
+        return 'Fora do Prazo';
+    } else if (appointment.status === 'concluido') {
+        return 'Concluído';
+    } else if (appointment.status === 'divergencia') { 
+        return 'Com Divergência';
+    } else if (appointmentDate > now) {
+        return 'Agendado';
+    } else {
+        return 'Fora do Prazo';
     }
+}
 
     function isFutureAppointment(appointment) {
         const appointmentDate = new Date(appointment.data_hora);
@@ -1264,21 +1276,14 @@ function updateAppointmentFooter(cardElement, appointment) {
         `;
     } else if (isFutureAppointment(appointment)) {
         footer.innerHTML = `
-            <button class="btn btn-outline" onclick="repeatAppointment(${appointment.id})">
-                <i class="fas fa-redo"></i> Repetir Agendamento
-            </button>
-            <button class="btn btn-outline" onclick="downloadInvoice(${appointment.id})">
-                <i class="fas fa-file-invoice"></i> Comprovante
-            </button>
+
             <button class="btn btn-outline btn-cancel" onclick="cancelAppointment(${appointment.id})">
                 <i class="fas fa-times"></i> Cancelar
             </button>
         `;
     } else {
         footer.innerHTML = `
-            <button class="btn btn-outline" onclick="repeatAppointment(${appointment.id})">
-                <i class="fas fa-redo"></i> Repetir Agendamento
-            </button>
+
             <button class="btn btn-outline" onclick="downloadInvoice(${appointment.id})">
                 <i class="fas fa-file-invoice"></i> Comprovante
             </button>
@@ -1517,6 +1522,33 @@ const additionalCSS = `
     pointer-events: none;
 }
 
+// ADICIONAR ao CSS adicional no agenda.js
+.status.divergence {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+    font-weight: bold;
+}
+
+.appointment-card.divergence {
+    border-left: 4px solid #ffc107;
+}
+
+.appointment-card.divergence::before {
+    content: "DIVERGÊNCIA";
+    position: absolute;
+    top: 10px;
+    right: -30px;
+    background: #ffc107;
+    color: #212529;
+    padding: 5px 40px;
+    font-size: 12px;
+    font-weight: bold;
+    transform: rotate(45deg);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    z-index: 10;
+}
+
 .appointment-card.cancelled .btn:hover,
 .appointment-card.expired .btn:hover {
     transform: none;
@@ -1528,4 +1560,6 @@ const additionalCSS = `
 const style = document.createElement('style');
 style.textContent = additionalCSS;
 document.head.appendChild(style);
+
+
 

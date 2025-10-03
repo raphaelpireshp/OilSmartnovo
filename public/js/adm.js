@@ -234,11 +234,15 @@ async function enviarProtocolo(id, protocolo) {
 }
 
 // Registrar divergência
+// CORRIGIR a função registrarDivergencia no adm.js
 async function registrarDivergencia(id) {
     const divergencia = prompt('Descreva a divergência encontrada (ex: Cliente não compareceu, Veículo diferente do agendado, etc.):');
     
     if (divergencia && divergencia.trim() !== '') {
         try {
+            console.log('🎯 Registrando divergência para agendamento:', id);
+            console.log('📝 Divergência:', divergencia);
+            
             const response = await apiCall(`/api/admin/agendamentos/${id}/divergencia`, {
                 method: 'PUT',
                 body: JSON.stringify({ 
@@ -247,14 +251,24 @@ async function registrarDivergencia(id) {
                 })
             });
 
-            if (response.ok) {
-                showNotification('Divergência registrada com sucesso!', 'warning');
-                loadAgendamentos();
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                showNotification('✅ Divergência registrada com sucesso! O cliente será notificado.', 'warning');
+                
+                // Recarregar a lista de agendamentos
+                setTimeout(() => {
+                    loadAgendamentos();
+                }, 1000);
+            } else {
+                throw new Error(data.message || 'Erro ao registrar divergência');
             }
         } catch (error) {
-            console.error('Erro ao registrar divergência:', error);
-            showNotification('Erro ao registrar divergência', 'error');
+            console.error('❌ Erro ao registrar divergência:', error);
+            showNotification('❌ Erro ao registrar divergência: ' + error.message, 'error');
         }
+    } else if (divergencia !== null) {
+        showNotification('❌ É necessário informar a divergência', 'warning');
     }
 }
 
@@ -832,35 +846,137 @@ if (document.getElementById('btnConcluir')) {
     document.getElementById('btnConcluir').addEventListener('click', concluirPorProtocolo);
 }
 
+// Função corrigida para concluir por protocolo
 async function concluirPorProtocolo() {
     const input = document.getElementById('protocoloInput');
     const msgEl = document.getElementById('msgConcluir');
-    if (!input) return;
-
-    const protocolo = input.value.trim();
-    if (!protocolo) {
-        if (msgEl) { msgEl.innerText = 'Digite um protocolo válido.'; msgEl.style.color = 'red'; }
+    
+    if (!input) {
+        console.error('❌ Input de protocolo não encontrado');
         return;
     }
 
-    if (!confirm(`Concluir agendamento com protocolo ${protocolo}? Esta ação marcará como CONCLUÍDO.`)) return;
+    const protocolo = input.value.trim();
+    
+    if (!protocolo) {
+        if (msgEl) { 
+            msgEl.innerText = 'Digite um protocolo válido.'; 
+            msgEl.style.color = 'red'; 
+        }
+        return;
+    }
+
+    console.log('🎯 Tentando concluir agendamento com protocolo:', protocolo);
+
+    if (!confirm(`Concluir agendamento com protocolo ${protocolo}? Esta ação marcará como CONCLUÍDO.`)) {
+        return;
+    }
 
     try {
-        const response = await apiCall('/api/admin/agendamentos/concluir-por-protocolo', {
+        // Mostrar loading
+        if (msgEl) { 
+            msgEl.innerText = 'Processando...'; 
+            msgEl.style.color = 'blue'; 
+        }
+
+        // Tenta a rota principal primeiro
+        let response = await fetch('/api/admin/agendamentos/concluir-por-protocolo', {
             method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
             body: JSON.stringify({ protocolo })
         });
 
-        if (response.ok) {
-            if (msgEl) { msgEl.innerText = 'Agendamento concluído com sucesso!'; msgEl.style.color = 'green'; }
-            // Atualiza lista de agendamentos (reaproveita sua função existente)
-            if (typeof loadAgendamentos === 'function') loadAgendamentos();
+        // Se der 404, tenta a rota alternativa
+        if (response.status === 404) {
+            console.log('🔄 Tentando rota alternativa...');
+            response = await fetch('/api/admin/concluir-protocolo', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({ protocolo })
+            });
+        }
+
+        // Log da resposta para debug
+        console.log('📨 Status da resposta:', response.status);
+        
+        const data = await response.json();
+        console.log('📨 Dados da resposta:', data);
+
+        if (response.ok && data.success) {
+            if (msgEl) { 
+                msgEl.innerText = '✅ Agendamento concluído com sucesso!'; 
+                msgEl.style.color = 'green'; 
+            }
+            
+            // Limpar input
+            input.value = '';
+            
+            // Atualizar lista de agendamentos
+            setTimeout(() => {
+                if (typeof loadAgendamentos === 'function') {
+                    loadAgendamentos();
+                }
+                if (typeof loadDashboard === 'function') {
+                    loadDashboard();
+                }
+            }, 1000);
+            
         } else {
-            const data = await response.json();
-            if (msgEl) { msgEl.innerText = data.message || 'Erro ao concluir'; msgEl.style.color = 'red'; }
+            let errorMsg = data.message || 'Erro ao concluir agendamento';
+            
+            if (msgEl) { 
+                msgEl.innerText = `❌ ${errorMsg}`; 
+                msgEl.style.color = 'red'; 
+            }
         }
     } catch (err) {
-        console.error('Erro concluirPorProtocolo:', err);
-        if (msgEl) { msgEl.innerText = 'Erro ao concluir agendamento'; msgEl.style.color = 'red'; }
+        console.error('❌ Erro concluirPorProtocolo:', err);
+        if (msgEl) { 
+            msgEl.innerText = '❌ Erro de conexão. Tente novamente.'; 
+            msgEl.style.color = 'red'; 
+        }
     }
 }
+
+// Atualizar o event listener
+if (document.getElementById('btnConcluir')) {
+    document.getElementById('btnConcluir').addEventListener('click', concluirPorProtocolo);
+}
+
+// Função de debug para verificar protocolos no banco
+async function debugProtocolos() {
+    try {
+        const response = await fetch('/api/admin/debug/protocolos', {
+            credentials: 'include'
+        });
+        const data = await response.json();
+        
+        if (data.success && data.protocolos) {
+            console.log('🔍 Todos os agendamentos e protocolos:');
+            data.protocolos.forEach(ag => {
+                console.log(`ID: ${ag.id}, Protocolo: "${ag.protocolo}", Status: ${ag.status}`);
+            });
+            
+            // Mostrar também na interface
+            const msgEl = document.getElementById('msgConcluir');
+            if (msgEl) {
+                msgEl.innerHTML = `Protocolos encontrados: ${data.protocolos.map(p => p.protocolo).join(', ')}`;
+                msgEl.style.color = 'blue';
+            }
+        }
+    } catch (error) {
+        console.error('Erro no debug:', error);
+    }
+}
+
+// Chamar esta função no console do navegador para debug
+window.debugProtocolos = debugProtocolos;
+
+// Chamar esta função no console do navegador para debug
+window.debugProtocolos = debugProtocolos;

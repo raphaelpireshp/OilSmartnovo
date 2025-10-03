@@ -865,6 +865,12 @@ function displayWorkshops(workshops) {
             ? `${(workshop.distancia * 1000).toFixed(0)} m` 
             : `${workshop.distancia.toFixed(1)} km`;
 
+        // Formata dias de funcionamento
+        const diasFormatados = formatDiasFuncionamento(workshop.dias_funcionamento);
+        
+        // Formata horário para exibição
+        const horarioFormatado = formatHorarioFuncionamento(workshop.horario_abertura, workshop.horario_fechamento);
+
         // Marcador no mapa
         const marker = L.marker([lat, lng], { icon: workshopIcon })
             .addTo(map)
@@ -873,6 +879,8 @@ function displayWorkshops(workshops) {
                     <h4>${workshop.nome}</h4>
                     <p><i class="fas fa-map-marker-alt"></i> ${workshop.endereco}, ${workshop.cidade}/${workshop.estado}</p>
                     <p><i class="fas fa-phone"></i> ${workshop.telefone || 'Não informado'}</p>
+                    <p><i class="fas fa-clock"></i> ${horarioFormatado}</p>
+                    <p><i class="fas fa-calendar"></i> ${diasFormatados}</p>
                     <p><i class="fas fa-route"></i> ${distanciaFormatada}</p>
                     <button onclick="selectWorkshop(${workshop.id})" class="select-workshop-btn">
                         Selecionar
@@ -892,7 +900,8 @@ function displayWorkshops(workshops) {
                 <p class="distance"><i class="fas fa-route"></i> ${distanciaFormatada}</p>
                 <p class="address"><i class="fas fa-map-marker-alt"></i> ${workshop.endereco}, ${workshop.cidade}/${workshop.estado}</p>
                 <p class="phone"><i class="fas fa-phone"></i> ${workshop.telefone || 'Não informado'}</p>
-                <p class="hours"><i class="fas fa-clock"></i> ${workshop.horario_abertura} - ${workshop.horario_fechamento}</p>
+                <p class="hours"><i class="fas fa-clock"></i> ${horarioFormatado}</p>
+                <p class="days"><i class="fas fa-calendar"></i> ${diasFormatados}</p>
             </div>
             <button class="btn select-btn" onclick="selectWorkshop(${workshop.id})">Selecionar</button>
         `;
@@ -906,13 +915,62 @@ function displayWorkshops(workshops) {
     }
 }
 
+// Função para formatar dias de funcionamento
+function formatDiasFuncionamento(dias) {
+    if (!dias) return 'Segunda a Sábado';
+    
+    const diasMap = {
+        'segunda': 'Seg',
+        'terca': 'Ter',
+        'quarta': 'Qua',
+        'quinta': 'Qui',
+        'sexta': 'Sex',
+        'sabado': 'Sáb',
+        'domingo': 'Dom'
+    };
+    
+    const diasArray = dias.split(',').map(dia => dia.trim().toLowerCase());
+    
+    // Se tiver todos os dias úteis, simplifica
+    if (diasArray.includes('segunda') && diasArray.includes('terca') && 
+        diasArray.includes('quarta') && diasArray.includes('quinta') && 
+        diasArray.includes('sexta') && !diasArray.includes('sabado') && !diasArray.includes('domingo')) {
+        return 'Segunda a Sexta';
+    }
+    
+    // Se tiver de segunda a sábado
+    if (diasArray.includes('segunda') && diasArray.includes('terca') && 
+        diasArray.includes('quarta') && diasArray.includes('quinta') && 
+        diasArray.includes('sexta') && diasArray.includes('sabado') && !diasArray.includes('domingo')) {
+        return 'Segunda a Sábado';
+    }
+    
+    // Se for todos os dias
+    if (diasArray.includes('segunda') && diasArray.includes('terca') && 
+        diasArray.includes('quarta') && diasArray.includes('quinta') && 
+        diasArray.includes('sexta') && diasArray.includes('sabado') && diasArray.includes('domingo')) {
+        return 'Todos os dias';
+    }
+    
+    // Caso contrário, lista os dias específicos
+    return diasArray.map(dia => diasMap[dia] || dia.charAt(0).toUpperCase() + dia.slice(1)).join(', ');
+}
+
+// Função para formatar horário de funcionamento
+function formatHorarioFuncionamento(abertura, fechamento) {
+    if (!abertura || !fechamento) return '08:00 - 18:00';
+    
+    // Remove segundos se existirem
+    const horaAbertura = abertura.split(':').slice(0, 2).join(':');
+    const horaFechamento = fechamento.split(':').slice(0, 2).join(':');
+    
+    return `${horaAbertura} - ${horaFechamento}`;
+}
     // ==================== FUNÇÕES DE OFICINAS ====================
 
-// Seleciona uma oficina
 window.selectWorkshop = async function(workshopId) {
     showLoading(true);
     try {
-        // Busca os detalhes completos da oficina
         const response = await fetch(`/api/oficina/${workshopId}`);
         if (!response.ok) throw new Error("Erro ao carregar oficina");
         
@@ -923,22 +981,23 @@ window.selectWorkshop = async function(workshopId) {
         if (selectedWorkshop.lat) selectedWorkshop.lat = parseFloat(selectedWorkshop.lat);
         if (selectedWorkshop.lng) selectedWorkshop.lng = parseFloat(selectedWorkshop.lng);
 
-        // Destaca a oficina selecionada
+        // Destacar oficina selecionada
         document.querySelectorAll(".workshop-item").forEach(item => {
             item.classList.remove("selected");
             if (parseInt(item.dataset.id) === parseInt(workshopId)) {
                 item.classList.add("selected");
-                item.style.animation = "pulse 0.5s ease";
-                setTimeout(() => {
-                    item.style.animation = "";
-                }, 500);
             }
         });
 
-        // Centraliza o mapa na oficina selecionada
-        if (selectedWorkshop.lat && selectedWorkshop.lng) {
-            map.setView([selectedWorkshop.lat, selectedWorkshop.lng], 15);
-        }
+        // Atualizar informações da oficina selecionada
+        showSelectedWorkshop(workshopData);
+        
+        // Reconfigurar datas mínimas/máximas baseadas nos dias de funcionamento
+        setMinScheduleDate();
+        
+        // Limpar seleções anteriores de data/horário
+        document.getElementById("schedule-date").value = "";
+        document.getElementById("schedule-time").innerHTML = '<option value="" disabled selected>Selecione um horário</option>';
 
         showToast(`Oficina "${workshopData.nome}" selecionada!`);
         return true;
@@ -952,6 +1011,7 @@ window.selectWorkshop = async function(workshopId) {
 };
 
 // Mostra detalhes da oficina selecionada (versão responsiva)
+// FUNÇÃO ATUALIZADA - Mostrar detalhes da oficina selecionada
 function showSelectedWorkshop(workshop) {
     selectedWorkshopDiv.innerHTML = `
         <div class="selected-workshop-card">
@@ -959,34 +1019,88 @@ function showSelectedWorkshop(workshop) {
             <p><i class="fas fa-map-marker-alt"></i> ${workshop.endereco}, ${workshop.cidade}/${workshop.estado}</p>
             <p><i class="fas fa-phone"></i> ${workshop.telefone || 'Não informado'}</p>
             <p><i class="fas fa-clock"></i> ${workshop.horario_abertura} - ${workshop.horario_fechamento}</p>
-            <p>${workshop.dias_funcionamento}</p>
+            <p><i class="fas fa-calendar"></i> Segunda a Sexta</p>
+            <p><small style="color: #e63946;"><i class="fas fa-info-circle"></i> Não funciona aos sábados e domingos</small></p>
         </div>
     `;
 
-    updateAvailableTimeSlots(workshop);
+    // Atualizar horários disponíveis
+    const dateInput = document.getElementById("schedule-date");
+    if (dateInput.value) {
+        const selectedDate = new Date(dateInput.value);
+        generateAvailableTimeSlots(workshop, selectedDate);
+    }
 }
 
-// Atualiza os horários disponíveis para agendamento
-function updateAvailableTimeSlots(workshop) {
+
+
+// Função para gerar horários disponíveis baseado no horário da oficina
+function generateAvailableTimeSlots(workshop, selectedDate) {
     const timeSelect = document.getElementById("schedule-time");
     timeSelect.innerHTML = '<option value="" disabled selected>Selecione um horário</option>';
 
-    // Gera horários disponíveis (simulação)
-    const slots = generateTimeSlots(
-        workshop.horario_abertura || "08:00", 
-        workshop.horario_fechamento || "18:00", 
-        30
-    );
+    // Verificar se é um dia válido
+    if (!isValidDayForWorkshop(selectedDate, workshop)) {
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = "Oficina não funciona neste dia";
+        option.disabled = true;
+        timeSelect.appendChild(option);
+        
+        // Desabilitar o botão de continuar
+        const continueButton = document.querySelector('button[onclick="goToStep(4)"]');
+        if (continueButton) {
+            continueButton.disabled = true;
+        }
+        return;
+    }
 
+    const startTime = workshop.horario_abertura || "08:00";
+    const endTime = workshop.horario_fechamento || "18:00";
+    const interval = 30; // minutos
+
+    const slots = generateTimeSlots(startTime, endTime, interval);
+    
+    // Filtrar horários passados se for o dia atual
+    const now = new Date();
+    const isToday = selectedDate.toDateString() === now.toDateString();
+    
+    let availableSlots = 0;
+    
     slots.forEach(time => {
+        if (isToday) {
+            const [hours, minutes] = time.split(':').map(Number);
+            const slotTime = new Date();
+            slotTime.setHours(hours, minutes, 0, 0);
+            
+            if (slotTime <= now) {
+                return; // Pular horários passados
+            }
+        }
+
         const option = document.createElement("option");
         option.value = time;
         option.textContent = time;
         timeSelect.appendChild(option);
+        availableSlots++;
     });
+
+    if (availableSlots === 0) {
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = "Nenhum horário disponível";
+        option.disabled = true;
+        timeSelect.appendChild(option);
+    }
+    
+    // Re-habilitar o botão de continuar se há horários disponíveis
+    const continueButton = document.querySelector('button[onclick="goToStep(4)"]');
+    if (continueButton && availableSlots > 0) {
+        continueButton.disabled = false;
+    }
 }
 
-// Gera intervalos de tempo entre abertura e fechamento
+// FUNÇÃO AUXILIAR - Gerar slots de tempo
 function generateTimeSlots(start, end, interval) {
     const slots = [];
     const [startHour, startMinute] = start.split(":").map(Number);
@@ -1296,7 +1410,6 @@ function showConfirmationDetails() {
     confirmationDetails.innerHTML = html;
 }
 
-// Função para validar o passo 3 (atualizada)
 async function validateStep3() {
     const scheduleDateValue = document.getElementById("schedule-date").value;
     const scheduleTime = document.getElementById("schedule-time").value;
@@ -1305,36 +1418,231 @@ async function validateStep3() {
     const customerPhone = document.getElementById("customer-phone").value.trim();
     const customerEmail = document.getElementById("customer-email").value.trim();
 
+    console.log('🔍 Validando passo 3...', {
+        scheduleDateValue,
+        scheduleTime,
+        customerName,
+        customerCpf,
+        customerPhone,
+        customerEmail,
+        selectedWorkshop: selectedWorkshop
+    });
+
+    // Validação básica dos campos obrigatórios
     if (!scheduleDateValue || !scheduleTime || !customerName || !customerCpf || !customerPhone || !customerEmail) {
         showToast("Preencha todos os campos obrigatórios", "error");
+        
+        // Destacar campos vazios
+        highlightEmptyFields();
         return false;
     }
 
+    // Validar se a oficina foi selecionada
+    if (!selectedWorkshop) {
+        showToast("Selecione uma oficina antes de continuar", "error");
+        return false;
+    }
+
+    // Validar dados da oficina
+    if (selectedWorkshop) {
+        const selectedDate = new Date(scheduleDateValue);
+        
+        // Verificar dia de funcionamento
+        if (!isValidDayForWorkshop(selectedDate, selectedWorkshop)) {
+            const dayNames = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+            const dayOfWeek = dayNames[selectedDate.getDay()];
+            showToast(`A oficina "${selectedWorkshop.nome}" não funciona aos ${dayOfWeek}s`, "error");
+            return false;
+        }
+
+        // Verificar horário de funcionamento
+        const [selectedHours, selectedMinutes] = scheduleTime.split(':').map(Number);
+        const openTimeStr = selectedWorkshop.horario_abertura || "08:00";
+        const closeTimeStr = selectedWorkshop.horario_fechamento || "18:00";
+        
+        const [openHours, openMinutes] = openTimeStr.split(':').map(Number);
+        const [closeHours, closeMinutes] = closeTimeStr.split(':').map(Number);
+
+        const selectedTime = selectedHours * 60 + selectedMinutes;
+        const openTime = openHours * 60 + openMinutes;
+        const closeTime = closeHours * 60 + closeMinutes;
+
+        if (selectedTime < openTime || selectedTime >= closeTime) {
+            showToast(`O horário selecionado está fora do horário de funcionamento (${openTimeStr} - ${closeTimeStr})`, "error");
+            return false;
+        }
+
+        // Verificar se a data/hora não é no passado
+        const selectedDateTime = new Date(scheduleDateValue + 'T' + scheduleTime);
+        const now = new Date();
+        
+        if (selectedDateTime <= now) {
+            showToast("Selecione uma data e horário futuros", "error");
+            return false;
+        }
+
+        // Verificar se não é muito longe no futuro (máximo 3 meses)
+        const maxDate = new Date();
+        maxDate.setMonth(maxDate.getMonth() + 3);
+        if (selectedDateTime > maxDate) {
+            showToast("O agendamento não pode ser feito com mais de 3 meses de antecedência", "error");
+            return false;
+        }
+    }
+
+    // Validação de CPF
     if (!validateCPF(customerCpf)) {
         showToast("CPF inválido", "error");
+        document.getElementById("customer-cpf").focus();
         return false;
     }
 
+    // Validação de e-mail
     if (!validateEmail(customerEmail)) {
         showToast("E-mail inválido", "error");
+        document.getElementById("customer-email").focus();
         return false;
     }
 
-    if (!selectedWorkshop) {
-        showToast("Selecione uma oficina", "error");
+    // Validação de telefone
+    if (!validatePhone(customerPhone)) {
+        showToast("Telefone inválido", "error");
+        document.getElementById("customer-phone").focus();
         return false;
     }
 
-    // Verificar se a data é válida (não pode ser no passado)
-    const selectedDate = new Date(scheduleDateValue + 'T' + scheduleTime);
-    const now = new Date();
-    if (selectedDate < now) {
-        showToast("Selecione uma data e horário futuros", "error");
+    // Validação de nome
+    if (customerName.length < 2) {
+        showToast("Nome deve ter pelo menos 2 caracteres", "error");
+        document.getElementById("customer-name").focus();
         return false;
     }
 
+    // Verificar se o horário selecionado não está esgotado (opcional - futura implementação)
+    const isTimeSlotAvailable = await checkTimeSlotAvailability(
+        selectedWorkshop.id, 
+        scheduleDateValue, 
+        scheduleTime
+    );
+    
+    if (!isTimeSlotAvailable) {
+        showToast("Este horário não está mais disponível. Por favor, selecione outro horário.", "error");
+        return false;
+    }
+
+    // SALVAR DADOS DO CLIENTE ANTES DE AVANÇAR
+    const customerData = {
+        name: customerName,
+        cpf: customerCpf,
+        phone: customerPhone,
+        email: customerEmail
+    };
+    
+    sessionStorage.setItem('customerData', JSON.stringify(customerData));
+    
+    // Salvar dados do agendamento
+    const schedulingData = {
+        date: scheduleDateValue,
+        time: scheduleTime,
+        workshop: selectedWorkshop
+    };
+    
+    sessionStorage.setItem('schedulingData', JSON.stringify(schedulingData));
+    
+    console.log('✅ Validação do passo 3 concluída com sucesso');
     return true;
 }
+
+// Função para destacar campos vazios
+function highlightEmptyFields() {
+    const fields = [
+        { id: 'schedule-date', value: document.getElementById("schedule-date").value },
+        { id: 'schedule-time', value: document.getElementById("schedule-time").value },
+        { id: 'customer-name', value: document.getElementById("customer-name").value.trim() },
+        { id: 'customer-cpf', value: document.getElementById("customer-cpf").value.trim() },
+        { id: 'customer-phone', value: document.getElementById("customer-phone").value.trim() },
+        { id: 'customer-email', value: document.getElementById("customer-email").value.trim() }
+    ];
+
+    fields.forEach(field => {
+        const element = document.getElementById(field.id);
+        if (!field.value) {
+            element.style.borderColor = '#e63946';
+            element.style.backgroundColor = '#fff5f5';
+            
+            // Remover o destaque após 3 segundos
+            setTimeout(() => {
+                element.style.borderColor = '';
+                element.style.backgroundColor = '';
+            }, 3000);
+        }
+    });
+}
+
+// Função para validar telefone
+function validatePhone(phone) {
+    const phoneClean = phone.replace(/\D/g, '');
+    return phoneClean.length >= 10 && phoneClean.length <= 11;
+}
+
+// Função para verificar disponibilidade do horário (simulação - futuramente integrar com backend)
+async function checkTimeSlotAvailability(workshopId, date, time) {
+    try {
+        // Por enquanto retorna true, mas futuramente pode fazer uma requisição para o backend
+        // para verificar se já não há muitos agendamentos nesse horário
+        const response = await fetch(`/api/agendamento_simples/disponibilidade?oficina_id=${workshopId}&data=${date}&hora=${time}`);
+        
+        if (response.ok) {
+            const result = await response.json();
+            return result.disponivel;
+        }
+        
+        // Se a API não estiver implementada, assume que está disponível
+        return true;
+    } catch (error) {
+        console.warn('Erro ao verificar disponibilidade, assumindo como disponível:', error);
+        return true;
+    }
+}
+
+
+
+// Função para validar CPF
+function validateCPF(cpf) {
+    cpf = cpf.replace(/\D/g, '');
+    
+    if (cpf.length !== 11) return false;
+    
+    // Verificar se é uma sequência de números iguais
+    if (/^(\d)\1+$/.test(cpf)) return false;
+    
+    // Validar primeiro dígito verificador
+    let sum = 0;
+    for (let i = 0; i < 9; i++) {
+        sum += parseInt(cpf.charAt(i)) * (10 - i);
+    }
+    let remainder = 11 - (sum % 11);
+    let digit = remainder >= 10 ? 0 : remainder;
+    if (digit !== parseInt(cpf.charAt(9))) return false;
+    
+    // Validar segundo dígito verificador
+    sum = 0;
+    for (let i = 0; i < 10; i++) {
+        sum += parseInt(cpf.charAt(i)) * (11 - i);
+    }
+    remainder = 11 - (sum % 11);
+    digit = remainder >= 10 ? 0 : remainder;
+    if (digit !== parseInt(cpf.charAt(10))) return false;
+    
+    return true;
+}
+
+// Função para validar e-mail
+function validateEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+}
+
 // Mostra detalhes do agendamento confirmado
 function showConfirmationDetails() {
     const codigoConfirmacao = sessionStorage.getItem('codigoConfirmacao') || `OS${Date.now().toString().slice(-8)}`;
@@ -1744,14 +2052,45 @@ function showToast(message, type = "success") {
 }
 
     // Configura data mínima para agendamento
-    function setMinScheduleDate() {
-        const today = new Date();
-        const tomorrow = new Date(today);
-        tomorrow.setDate(today.getDate() + 1);
-        
-        scheduleDate.min = tomorrow.toISOString().split("T")[0];
-        scheduleDate.max = new Date(today.setMonth(today.getMonth() + 3)).toISOString().split("T")[0];
+// Configura data mínima para agendamento considerando dias de funcionamento
+// Configura data mínima para agendamento considerando dias de funcionamento
+// FUNÇÃO CORRIGIDA - Configurar data mínima para agendamento
+function setMinScheduleDate() {
+    const today = new Date();
+    const scheduleDate = document.getElementById("schedule-date");
+    
+    // Data mínima é amanhã (próximo dia útil)
+    let nextValidDate = new Date(today);
+    nextValidDate.setDate(nextValidDate.getDate() + 1);
+    
+    // Se for sábado ou domingo, pular para segunda
+    const dayOfWeek = nextValidDate.getDay();
+    if (dayOfWeek === 0) { // Domingo
+        nextValidDate.setDate(nextValidDate.getDate() + 1);
+    } else if (dayOfWeek === 6) { // Sábado
+        nextValidDate.setDate(nextValidDate.getDate() + 2);
     }
+    
+    // Data máxima: 3 meses a partir de hoje
+    const maxDate = new Date(today);
+    maxDate.setMonth(maxDate.getMonth() + 3);
+    
+    scheduleDate.min = nextValidDate.toISOString().split("T")[0];
+    scheduleDate.max = maxDate.toISOString().split("T")[0];
+    
+    console.log('📅 Datas configuradas:', {
+        minima: scheduleDate.min,
+        maxima: scheduleDate.max
+    });
+    
+    // Adicionar validação em tempo real
+    scheduleDate.addEventListener('change', async function() {
+        if (this.value && selectedWorkshop) {
+            const selectedDate = new Date(this.value);
+            await generateAvailableTimeSlots(selectedWorkshop, selectedDate);
+        }
+    });
+}
 
     // ==================== EVENT LISTENERS ====================
 
@@ -2279,3 +2618,200 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('resize', handleMobileMenu);
 });
 
+
+// Função para validar se a oficina funciona no dia selecionado
+// FUNÇÃO CORRIGIDA - Validação de dias de funcionamento
+function isValidDayForWorkshop(selectedDate, workshop) {
+    if (!selectedDate || !workshop) {
+        console.error('❌ Dados inválidos para validação:', { selectedDate, workshop });
+        return true; // Por segurança, assume que funciona
+    }
+    
+    const dayOfWeek = selectedDate.getDay(); // 0 = Domingo, 1 = Segunda, etc.
+    
+    console.log('🔍 Validando dia da oficina:', {
+        dataSelecionada: selectedDate.toLocaleDateString('pt-BR'),
+        diaDaSemana: dayOfWeek,
+        nomeDia: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'][dayOfWeek],
+        oficina: workshop.nome
+    });
+    
+    // SÓ NÃO FUNCIONA AOS SÁBADOS (6) E DOMINGOS (0)
+    // Segunda a Sexta (1-5) FUNCIONAM NORMALMENTE
+    const isValid = dayOfWeek !== 0 && dayOfWeek !== 6;
+    
+    console.log('✅ Oficina funciona neste dia?', isValid);
+    
+    return isValid;
+}
+
+// Função para gerar horários disponíveis baseado no horário da oficina
+function generateAvailableTimeSlots(workshop, selectedDate) {
+    const timeSelect = document.getElementById("schedule-time");
+    timeSelect.innerHTML = '<option value="" disabled selected>Selecione um horário</option>';
+
+    // Verificar se é um dia válido
+    if (!isValidDayForWorkshop(selectedDate, workshop)) {
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = "Oficina não funciona neste dia";
+        option.disabled = true;
+        timeSelect.appendChild(option);
+        return;
+    }
+
+    const startTime = workshop.horario_abertura || "08:00";
+    const endTime = workshop.horario_fechamento || "18:00";
+    const interval = 30; // minutos
+
+    const slots = generateTimeSlots(startTime, endTime, interval);
+    
+    // Filtrar horários passados se for o dia atual
+    const now = new Date();
+    const isToday = selectedDate.toDateString() === now.toDateString();
+    
+    slots.forEach(time => {
+        if (isToday) {
+            const [hours, minutes] = time.split(':').map(Number);
+            const slotTime = new Date();
+            slotTime.setHours(hours, minutes, 0, 0);
+            
+            if (slotTime <= now) {
+                return; // Pular horários passados
+            }
+        }
+
+        const option = document.createElement("option");
+        option.value = time;
+        option.textContent = time;
+        timeSelect.appendChild(option);
+    });
+
+    if (slots.length === 0) {
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = "Nenhum horário disponível";
+        option.disabled = true;
+        timeSelect.appendChild(option);
+    }
+}
+
+// Atualizar a função updateAvailableTimeSlots
+function updateAvailableTimeSlots(workshop) {
+    const dateInput = document.getElementById("schedule-date");
+    
+    // Gerar slots quando a data mudar
+    dateInput.addEventListener('change', function() {
+        if (this.value && workshop) {
+            const selectedDate = new Date(this.value);
+            generateAvailableTimeSlots(workshop, selectedDate);
+        }
+    });
+    
+    // Gerar slots iniciais se já houver uma data selecionada
+    if (dateInput.value && workshop) {
+        const selectedDate = new Date(dateInput.value);
+        generateAvailableTimeSlots(workshop, selectedDate);
+    }
+}
+
+/// FUNÇÃO SIMPLIFICADA - Geração de horários disponíveis
+async function generateAvailableTimeSlots(workshop, selectedDate) {
+    const timeSelect = document.getElementById("schedule-time");
+    
+    // Verificar se é um dia válido (não sábado ou domingo)
+    if (!isValidDayForWorkshop(selectedDate, workshop)) {
+        const dayNames = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+        const dayOfWeek = dayNames[selectedDate.getDay()];
+        
+        timeSelect.innerHTML = '';
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = `Oficina não funciona aos ${dayOfWeek}s`;
+        option.disabled = true;
+        timeSelect.appendChild(option);
+        
+        // Desabilitar botão de continuar
+        const continueButton = document.querySelector('button[onclick="goToStep(4)"]');
+        if (continueButton) continueButton.disabled = true;
+        
+        return;
+    }
+
+    // Se chegou aqui, é um dia útil - mostrar "Carregando..."
+    timeSelect.innerHTML = '<option value="" disabled selected>Carregando horários...</option>';
+
+    try {
+        const startTime = workshop.horario_abertura || "08:00";
+        const endTime = workshop.horario_fechamento || "18:00";
+        const interval = 30;
+
+        // Buscar horários ocupados
+        const dataFormatada = selectedDate.toISOString().split('T')[0];
+        const horariosOcupados = await getHorariosOcupados(workshop.id, dataFormatada);
+        
+        console.log('📅 Horários ocupados encontrados:', horariosOcupados);
+
+        const slots = generateTimeSlots(startTime, endTime, interval);
+        const now = new Date();
+        const isToday = selectedDate.toDateString() === now.toDateString();
+        
+        let availableSlots = 0;
+        timeSelect.innerHTML = '';
+
+        // Adicionar opção padrão
+        const defaultOption = document.createElement("option");
+        defaultOption.value = "";
+        defaultOption.textContent = "Selecione um horário";
+        defaultOption.disabled = true;
+        defaultOption.selected = true;
+        timeSelect.appendChild(defaultOption);
+
+        slots.forEach(time => {
+            // Verificar se é horário passado (se for hoje)
+            if (isToday) {
+                const [hours, minutes] = time.split(':').map(Number);
+                const slotTime = new Date();
+                slotTime.setHours(hours, minutes, 0, 0);
+                if (slotTime <= now) return;
+            }
+
+            // Verificar se está ocupado
+            const isOcupado = horariosOcupados.includes(time);
+
+            const option = document.createElement("option");
+            option.value = time;
+            
+            if (isOcupado) {
+                option.textContent = `${time} (Reservado)`;
+                option.disabled = true;
+                option.style.color = '#e63946';
+            } else {
+                option.textContent = time;
+                availableSlots++;
+            }
+            
+            timeSelect.appendChild(option);
+        });
+
+        // Se não há horários disponíveis
+        if (availableSlots === 0) {
+            timeSelect.innerHTML = '';
+            const noSlotsOption = document.createElement("option");
+            noSlotsOption.value = "";
+            noSlotsOption.textContent = "Nenhum horário disponível";
+            noSlotsOption.disabled = true;
+            timeSelect.appendChild(noSlotsOption);
+        }
+        
+        // Atualizar botão de continuar
+        const continueButton = document.querySelector('button[onclick="goToStep(4)"]');
+        if (continueButton) {
+            continueButton.disabled = availableSlots === 0;
+        }
+
+    } catch (error) {
+        console.error('❌ Erro ao carregar horários:', error);
+        timeSelect.innerHTML = '<option value="" disabled selected>Erro ao carregar horários</option>';
+    }
+}
