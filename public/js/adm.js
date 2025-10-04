@@ -420,49 +420,65 @@ async function removeProduct(id) {
 }
 
 // Mostrar modal para adicionar produto
+// adm.js - ATUALIZAÇÕES PARA ESTOQUE POR VEÍCULO
+
+// ==================== FUNÇÕES PARA MODAIS ====================
+
+// Modal para adicionar produto simples (óleo ou filtro)
 function showAddProductModal() {
     const modal = document.createElement('div');
     modal.className = 'modal active';
     modal.innerHTML = `
         <div class="modal-content" style="max-width: 500px;">
             <div class="modal-header">
-                <h3>Adicionar Produto</h3>
+                <h3>Adicionar Produto Simples</h3>
                 <button class="close-modal" onclick="closeModal(this)">&times;</button>
             </div>
             <div class="modal-body">
                 <form id="addProductForm">
                     <div class="form-group">
+                        <label for="productType">Tipo de Produto</label>
+                        <select id="productType" required onchange="toggleProductFields()">
+                            <option value="">Selecione o tipo</option>
+                            <option value="oleo">Óleo</option>
+                            <option value="filtro">Filtro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label for="productName">Nome do Produto</label>
                         <input type="text" id="productName" required>
                     </div>
                     <div class="form-group">
-                        <label for="productBrand">Marca</label>
+                        <label for="productBrand">Marca do Produto</label>
                         <input type="text" id="productBrand" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="productType">Tipo</label>
-                        <select id="productType" required>
-                            <option value="">Selecione o tipo</option>
-                            <option value="Óleo">Óleo</option>
-                            <option value="Filtro">Filtro</option>
-                            <option value="Peça">Peça</option>
-                            <option value="Acessório">Acessório</option>
-                            <option value="Outro">Outro</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="productQuantity">Quantidade</label>
-                        <input type="number" id="productQuantity" min="0" value="0" required>
                     </div>
                     <div class="form-group">
                         <label for="productPrice">Preço (R$)</label>
                         <input type="number" id="productPrice" min="0" step="0.01" required>
                     </div>
+                    <!-- Campos específicos para óleo -->
+                    <div id="oilFields" style="display: none;">
+                        <div class="form-group">
+                            <label for="oilViscosity">Viscosidade</label>
+                            <input type="text" id="oilViscosity" placeholder="Ex: 5W-30">
+                        </div>
+                        <div class="form-group">
+                            <label for="oilSpecification">Especificação</label>
+                            <input type="text" id="oilSpecification" placeholder="Ex: API SN/CF">
+                        </div>
+                    </div>
+                    <!-- Campos específicos para filtro -->
+                    <div id="filterFields" style="display: none;">
+                        <div class="form-group">
+                            <label for="filterCompatibility">Compatibilidade</label>
+                            <input type="text" id="filterCompatibility" placeholder="Ex: Compatível com Honda Civic">
+                        </div>
+                    </div>
                 </form>
             </div>
             <div class="modal-actions">
                 <button class="btn btn-secondary" onclick="closeModal(this)">Cancelar</button>
-                <button class="btn btn-primary" onclick="addProduct()">Adicionar</button>
+                <button class="btn btn-primary" onclick="addProductSimple()">Adicionar</button>
             </div>
         </div>
     `;
@@ -470,43 +486,150 @@ function showAddProductModal() {
     document.body.appendChild(modal);
 }
 
-// Fechar modal
-function closeModal(button) {
-    const modal = button.closest('.modal');
-    if (modal) {
-        modal.remove();
-    }
+// Alternar campos específicos do produto
+function toggleProductFields() {
+    const productType = document.getElementById('productType').value;
+    const oilFields = document.getElementById('oilFields');
+    const filterFields = document.getElementById('filterFields');
+    
+    if (oilFields) oilFields.style.display = productType === 'oleo' ? 'block' : 'none';
+    if (filterFields) filterFields.style.display = productType === 'filtro' ? 'block' : 'none';
 }
 
-// Adicionar produto
-async function addProduct() {
+// Modal para adicionar produto por veículo
+function showVehicleProductModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal active';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3>Adicionar Produto por Veículo</h3>
+                <button class="close-modal" onclick="closeModal(this)">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="vehicleProductForm">
+                    <!-- Seleção de Veículo -->
+                    <div class="form-section">
+                        <h4>Selecionar Veículo</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="vehicleBrand">Marca</label>
+                                <select id="vehicleBrand" required onchange="loadVehicleModels(this.value)">
+                                    <option value="">Selecione a marca</option>
+                                </select>
+                                <button type="button" class="btn btn-sm btn-outline" onclick="showAddBrandModal()" style="margin-top: 5px;">
+                                    <i class="fas fa-plus"></i> Nova Marca
+                                </button>
+                            </div>
+                            <div class="form-group">
+                                <label for="vehicleModel">Modelo</label>
+                                <select id="vehicleModel" required onchange="loadVehicleYears(this.value)" disabled>
+                                    <option value="">Selecione o modelo</option>
+                                </select>
+                                <button type="button" class="btn btn-sm btn-outline" onclick="showAddModelModal()" style="margin-top: 5px;">
+                                    <i class="fas fa-plus"></i> Novo Modelo
+                                </button>
+                            </div>
+                            <div class="form-group">
+                                <label for="vehicleYear">Ano</label>
+                                <select id="vehicleYear" required disabled>
+                                    <option value="">Selecione o ano</option>
+                                </select>
+                                <button type="button" class="btn btn-sm btn-outline" onclick="showAddYearModal()" style="margin-top: 5px;">
+                                    <i class="fas fa-plus"></i> Novo Ano
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Seleção de Produto -->
+                    <div class="form-section">
+                        <h4>Selecionar Produto</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="productTypeVehicle">Tipo</label>
+                                <select id="productTypeVehicle" required onchange="loadVehicleProducts()">
+                                    <option value="">Selecione o tipo</option>
+                                    <option value="oleo">Óleo</option>
+                                    <option value="filtro">Filtro</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="vehicleProduct">Produto</label>
+                                <select id="vehicleProduct" required disabled>
+                                    <option value="">Selecione o produto</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Preço -->
+                    <div class="form-section">
+                        <h4>Preço</h4>
+                        <div class="form-group">
+                            <label for="vehiclePrice">Preço (R$)</label>
+                            <input type="number" id="vehiclePrice" min="0" step="0.01" required>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal(this)">Cancelar</button>
+                <button class="btn btn-primary" onclick="addVehicleProduct()">Adicionar ao Estoque</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    loadVehicleBrands();
+}
+
+// ==================== FUNÇÕES PARA ADICIONAR DADOS ====================
+
+// Adicionar produto simples
+async function addProductSimple() {
+    const productType = document.getElementById('productType').value;
     const productName = document.getElementById('productName').value;
     const productBrand = document.getElementById('productBrand').value;
-    const productType = document.getElementById('productType').value;
-    const productQuantity = document.getElementById('productQuantity').value;
     const productPrice = document.getElementById('productPrice').value;
 
-    if (!productName || !productBrand || !productType) {
+    if (!productType || !productName || !productBrand || !productPrice) {
         showNotification('Preencha todos os campos obrigatórios', 'error');
         return;
     }
 
+    const productData = {
+        nome: productName,
+        tipo: productType,
+        marca: productBrand,
+        preco: parseFloat(productPrice)
+    };
+
+    // Adicionar campos específicos
+    if (productType === 'oleo') {
+        productData.viscosidade = document.getElementById('oilViscosity').value;
+        productData.especificacao = document.getElementById('oilSpecification').value;
+    } else if (productType === 'filtro') {
+        productData.compatibilidade_modelo = document.getElementById('filterCompatibility').value;
+    }
+
     try {
-        const response = await apiCall('/api/admin/estoque', {
+        const response = await apiCall('/api/admin/estoque/produto-simples', {
             method: 'POST',
-            body: JSON.stringify({
-                nome_produto: productName,
-                marca: productBrand,
-                tipo_produto: productType,
-                quantidade: parseInt(productQuantity),
-                preco: parseFloat(productPrice)
-            })
+            body: JSON.stringify(productData)
         });
 
-        if (response.ok) {
+        const data = await response.json();
+
+        if (data.success) {
             showNotification('Produto adicionado com sucesso!', 'success');
             closeModal(document.querySelector('#addProductForm'));
-            loadEstoque();
+            // Recarregar lista de produtos se estiver no modal de veículo
+            if (document.getElementById('productTypeVehicle')) {
+                loadVehicleProducts();
+            }
+        } else {
+            showNotification(data.message || 'Erro ao adicionar produto', 'error');
         }
     } catch (error) {
         console.error('Erro ao adicionar produto:', error);
@@ -514,6 +637,406 @@ async function addProduct() {
     }
 }
 
+// Adicionar produto por veículo
+async function addVehicleProduct() {
+    const brandId = document.getElementById('vehicleBrand').value;
+    const modelId = document.getElementById('vehicleModel').value;
+    const yearId = document.getElementById('vehicleYear').value;
+    const productType = document.getElementById('productTypeVehicle').value;
+    const productId = document.getElementById('vehicleProduct').value;
+    const price = document.getElementById('vehiclePrice').value;
+    
+    // Validações
+    if (!brandId || !modelId || !yearId || !productType || !productId || !price) {
+        showNotification('Preencha todos os campos obrigatórios', 'error');
+        return;
+    }
+    
+    try {
+        const productData = {
+            produto_id: productId,
+            tipo_produto: productType,
+            modelo_ano_id: yearId,
+            preco: parseFloat(price)
+        };
+        
+        const response = await apiCall('/api/admin/estoque/produto-veiculo', {
+            method: 'POST',
+            body: JSON.stringify(productData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showNotification('Produto adicionado ao estoque com sucesso!', 'success');
+            closeModal(document.querySelector('#vehicleProductForm'));
+            loadEstoqueCompleto();
+        } else {
+            showNotification(data.message || 'Erro ao adicionar produto', 'error');
+        }
+    } catch (error) {
+        console.error('Erro ao adicionar produto por veículo:', error);
+        showNotification('Erro ao adicionar produto', 'error');
+    }
+}
+
+// ==================== FUNÇÕES PARA CARREGAR DADOS ====================
+
+// Carregar estoque completo
+async function loadEstoqueCompleto() {
+    try {
+        showLoading('estoqueTable');
+        const response = await apiCall('/api/admin/estoque/completo');
+        const data = await response.json();
+
+        renderEstoqueCompleto(data.estoque);
+    } catch (error) {
+        console.error('Erro ao carregar estoque:', error);
+        showNotification('Erro ao carregar estoque', 'error');
+    } finally {
+        hideLoading('estoqueTable');
+    }
+}
+
+// Renderizar estoque completo
+function renderEstoqueCompleto(estoque) {
+    const tbody = document.getElementById('estoqueTable');
+    if (!tbody) return;
+
+    if (estoque.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" class="text-center">
+                    <div class="empty-state">
+                        <i class="fas fa-box-open"></i>
+                        <h4>Nenhum produto em estoque</h4>
+                        <p>Adicione produtos ao estoque para começar</p>
+                        <button class="btn btn-primary mt-2" onclick="showAddProductModal()">
+                            <i class="fas fa-plus"></i> Adicionar Produto
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    tbody.innerHTML = estoque.map(item => `
+        <tr class="${item.ativo === 0 ? 'inactive-item' : ''}">
+            <td>
+                <div class="product-info">
+                    <strong>${item.nome_produto}</strong>
+                    <small class="product-type">${item.tipo_produto === 'oleo' ? 'Óleo' : 'Filtro'}</small>
+                </div>
+            </td>
+            <td>${item.marca_produto || '-'}</td>
+            <td>${item.veiculo_completo || 'Produto Geral'}</td>
+            <td>R$ ${parseFloat(item.preco || 0).toFixed(2)}</td>
+            <td>
+                <span class="status-badge status-${item.ativo ? 'ativo' : 'inativo'}">
+                    ${item.ativo ? 'Ativo' : 'Inativo'}
+                </span>
+            </td>
+            <td>${formatDate(item.data_cadastro)}</td>
+            <td>
+                <div class="action-buttons">
+                    ${item.ativo ? `
+                        <button class="btn btn-sm btn-warning" onclick="toggleProductStatus(${item.id}, false)" title="Desativar">
+                            <i class="fas fa-pause"></i>
+                        </button>
+                    ` : `
+                        <button class="btn btn-sm btn-success" onclick="toggleProductStatus(${item.id}, true)" title="Ativar">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    `}
+                    
+                    <button class="btn btn-sm btn-danger" onclick="removeProduct(${item.id})" title="Remover">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// ==================== FUNÇÕES PARA GESTÃO DE VEÍCULOS ====================
+
+// Modal para adicionar marca
+function showAddBrandModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal active';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3>Nova Marca</h3>
+                <button class="close-modal" onclick="closeModal(this)">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addBrandForm">
+                    <div class="form-group">
+                        <label for="brandName">Nome da Marca</label>
+                        <input type="text" id="brandName" required placeholder="Ex: Toyota, Honda, etc.">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal(this)">Cancelar</button>
+                <button class="btn btn-primary" onclick="addBrand()">Adicionar</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+// Modal para adicionar modelo
+function showAddModelModal() {
+    const brandSelect = document.getElementById('vehicleBrand');
+    const currentBrandId = brandSelect.value;
+    
+    if (!currentBrandId) {
+        showNotification('Selecione uma marca primeiro', 'warning');
+        return;
+    }
+
+    const modal = document.createElement('div');
+    modal.className = 'modal active';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3>Novo Modelo</h3>
+                <button class="close-modal" onclick="closeModal(this)">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addModelForm">
+                    <div class="form-group">
+                        <label for="modelName">Nome do Modelo</label>
+                        <input type="text" id="modelName" required placeholder="Ex: Civic, Corolla, etc.">
+                    </div>
+                    <div class="form-group">
+                        <label for="modelType">Tipo de Veículo</label>
+                        <select id="modelType" required>
+                            <option value="carro">Carro</option>
+                            <option value="moto">Moto</option>
+                        </select>
+                    </div>
+                    <input type="hidden" id="modelBrandId" value="${currentBrandId}">
+                </form>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal(this)">Cancelar</button>
+                <button class="btn btn-primary" onclick="addModel()">Adicionar</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+// Modal para adicionar ano
+function showAddYearModal() {
+    const modelSelect = document.getElementById('vehicleModel');
+    const currentModelId = modelSelect.value;
+    
+    if (!currentModelId) {
+        showNotification('Selecione um modelo primeiro', 'warning');
+        return;
+    }
+
+    const modal = document.createElement('div');
+    modal.className = 'modal active';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3>Novo Ano</h3>
+                <button class="close-modal" onclick="closeModal(this)">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addYearForm">
+                    <div class="form-group">
+                        <label for="yearValue">Ano</label>
+                        <input type="number" id="yearValue" min="1900" max="2030" required placeholder="Ex: 2023">
+                    </div>
+                    <input type="hidden" id="yearModelId" value="${currentModelId}">
+                </form>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal(this)">Cancelar</button>
+                <button class="btn btn-primary" onclick="addYear()">Adicionar</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+// Adicionar marca
+async function addBrand() {
+    const brandName = document.getElementById('brandName').value.trim();
+    
+    if (!brandName) {
+        showNotification('Digite o nome da marca', 'error');
+        return;
+    }
+    
+    try {
+        const response = await apiCall('/api/admin/marcas', {
+            method: 'POST',
+            body: JSON.stringify({ nome: brandName })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showNotification('Marca adicionada com sucesso!', 'success');
+            closeModal(document.querySelector('#addBrandForm'));
+            // Recarregar a lista de marcas
+            loadVehicleBrands();
+        } else {
+            showNotification(data.message || 'Erro ao adicionar marca', 'error');
+        }
+    } catch (error) {
+        console.error('Erro ao adicionar marca:', error);
+        showNotification('Erro ao adicionar marca', 'error');
+    }
+}
+
+// Adicionar modelo
+async function addModel() {
+    const modelName = document.getElementById('modelName').value.trim();
+    const modelType = document.getElementById('modelType').value;
+    const brandId = document.getElementById('modelBrandId').value;
+    
+    if (!modelName) {
+        showNotification('Digite o nome do modelo', 'error');
+        return;
+    }
+    
+    try {
+        const response = await apiCall('/api/admin/modelos', {
+            method: 'POST',
+            body: JSON.stringify({ 
+                nome: modelName, 
+                marca_id: brandId,
+                tipo: modelType 
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showNotification('Modelo adicionado com sucesso!', 'success');
+            closeModal(document.querySelector('#addModelForm'));
+            // Recarregar a lista de modelos
+            loadVehicleModels(brandId);
+        } else {
+            showNotification(data.message || 'Erro ao adicionar modelo', 'error');
+        }
+    } catch (error) {
+        console.error('Erro ao adicionar modelo:', error);
+        showNotification('Erro ao adicionar modelo', 'error');
+    }
+}
+
+// Adicionar ano
+async function addYear() {
+    const yearValue = document.getElementById('yearValue').value;
+    const modelId = document.getElementById('yearModelId').value;
+    
+    if (!yearValue) {
+        showNotification('Digite o ano', 'error');
+        return;
+    }
+    
+    try {
+        const response = await apiCall('/api/admin/modelo_anos', {
+            method: 'POST',
+            body: JSON.stringify({ 
+                modelo_id: modelId, 
+                ano: parseInt(yearValue)
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showNotification('Ano adicionado com sucesso!', 'success');
+            closeModal(document.querySelector('#addYearForm'));
+            // Recarregar a lista de anos
+            loadVehicleYears(modelId);
+        } else {
+            showNotification(data.message || 'Erro ao adicionar ano', 'error');
+        }
+    } catch (error) {
+        console.error('Erro ao adicionar ano:', error);
+        showNotification('Erro ao adicionar ano', 'error');
+    }
+}
+
+// ==================== FUNÇÕES AUXILIARES ====================
+
+// Alternar status do produto
+async function toggleProductStatus(productId, activate) {
+    try {
+        const response = await apiCall(`/api/admin/estoque/${productId}/status`, {
+            method: 'PUT',
+            body: JSON.stringify({ ativo: activate })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showNotification(data.message, 'success');
+            loadEstoqueCompleto();
+        } else {
+            showNotification(data.message || 'Erro ao atualizar status', 'error');
+        }
+    } catch (error) {
+        console.error('Erro ao alternar status:', error);
+        showNotification('Erro ao atualizar status', 'error');
+    }
+}
+
+// Remover produto
+async function removeProduct(productId) {
+    if (!confirm('Tem certeza que deseja remover este produto do estoque?')) {
+        return;
+    }
+    
+    try {
+        const response = await apiCall(`/api/admin/estoque/${productId}`, {
+            method: 'DELETE'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showNotification('Produto removido com sucesso!', 'success');
+            loadEstoqueCompleto();
+        } else {
+            showNotification(data.message || 'Erro ao remover produto', 'error');
+        }
+    } catch (error) {
+        console.error('Erro ao remover produto:', error);
+        showNotification('Erro ao remover produto', 'error');
+    }
+}
+
+// Fechar modal
+function closeModal(element) {
+    const modal = element.closest('.modal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+// Inicializar quando a página carregar
+document.addEventListener('DOMContentLoaded', function() {
+    // Carregar estoque se estiver na página de estoque
+    if (document.getElementById('estoqueTable')) {
+        loadEstoqueCompleto();
+    }
+});
 // Visualizar detalhes do agendamento - VERSÃO ATUALIZADA
 async function viewAgendamento(id) {
     try {
@@ -1146,3 +1669,874 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 });
+
+// ==================== GESTÃO DE ESTOQUE AVANÇADA ====================
+
+// Carregar estoque com filtros
+async function loadEstoque(filters = {}) {
+    try {
+        showLoading('estoqueTable');
+        
+        let url = '/api/admin/estoque';
+        const params = new URLSearchParams();
+        
+        if (filters.tipo && filters.tipo !== 'todos') {
+            params.append('tipo', filters.tipo);
+        }
+        if (filters.marca && filters.marca !== 'todos') {
+            params.append('marca_veiculo', filters.marca);
+        }
+        if (filters.status && filters.status !== 'todos') {
+            params.append('status', filters.status);
+        }
+        
+        if (params.toString()) {
+            url += '?' + params.toString();
+        }
+
+        const response = await apiCall(url);
+        const data = await response.json();
+
+        renderEstoque(data.estoque);
+        populateMarcaFilter(data.marcas);
+    } catch (error) {
+        console.error('Erro ao carregar estoque:', error);
+        showNotification('Erro ao carregar estoque', 'error');
+    } finally {
+        hideLoading('estoqueTable');
+    }
+}
+
+// Popular filtro de marcas
+function populateMarcaFilter(marcas) {
+    const marcaFilter = document.getElementById('estoqueMarcaFilter');
+    if (!marcaFilter || !marcas) return;
+    
+    // Manter opção atual selecionada
+    const currentValue = marcaFilter.value;
+    
+    marcaFilter.innerHTML = '<option value="todos">Todas</option>';
+    
+    marcas.forEach(marca => {
+        const option = document.createElement('option');
+        option.value = marca.id;
+        option.textContent = marca.nome;
+        marcaFilter.appendChild(option);
+    });
+    
+    // Restaurar seleção anterior se ainda existir
+    if (currentValue && currentValue !== 'todos') {
+        marcaFilter.value = currentValue;
+    }
+}
+
+// Filtrar estoque
+function filterEstoque() {
+    const filters = {
+        tipo: document.getElementById('estoqueTipoFilter').value,
+        marca: document.getElementById('estoqueMarcaFilter').value,
+        status: document.getElementById('estoqueStatusFilter').value
+    };
+    
+    loadEstoque(filters);
+}
+
+// Renderizar estoque com opções avançadas
+function renderEstoque(estoque) {
+    const tbody = document.getElementById('estoqueTable');
+    if (!tbody) return;
+
+    if (estoque.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="8" class="text-center">
+                    <div class="empty-state">
+                        <i class="fas fa-box-open"></i>
+                        <h4>Nenhum produto em estoque</h4>
+                        <p>Adicione produtos ao estoque para começar</p>
+                        <button class="btn btn-primary mt-2" onclick="showAddProductModal()">
+                            <i class="fas fa-plus"></i> Adicionar Produto
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    tbody.innerHTML = estoque.map(item => `
+        <tr class="${item.ativo === 0 ? 'inactive-item' : ''}">
+            <td>
+                <div class="product-info">
+                    <strong>${item.nome_produto}</strong>
+                    ${item.compatibilidade_veiculo ? `
+                        <small class="vehicle-compatibility">
+                            <i class="fas fa-car"></i> ${item.compatibilidade_veiculo}
+                        </small>
+                    ` : ''}
+                </div>
+            </td>
+            <td>${item.marca || '-'}</td>
+            <td>
+                <span class="product-type-badge ${item.tipo_produto}">
+                    ${item.tipo_produto === 'oleo' ? 'Óleo' : 'Filtro'}
+                </span>
+            </td>
+            <td>
+                <div class="quantity-controls">
+                    <input type="number" 
+                           value="${item.quantidade}" 
+                           min="0" 
+                           onchange="updateEstoque(${item.id}, this.value)"
+                           class="quantity-input"
+                           ${item.ativo === 0 ? 'disabled' : ''}>
+                    ${item.quantidade_minima && item.quantidade <= item.quantidade_minima ? `
+                        <span class="low-stock-warning" title="Estoque baixo">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </span>
+                    ` : ''}
+                </div>
+            </td>
+            <td>R$ ${parseFloat(item.preco || 0).toFixed(2)}</td>
+            <td>
+                <span class="status-badge status-${item.ativo ? 'ativo' : 'inativo'}">
+                    ${item.ativo ? 'Ativo' : 'Inativo'}
+                </span>
+            </td>
+            <td>${formatDate(item.data_cadastro)}</td>
+            <td>
+                <div class="action-buttons">
+                    <button class="btn btn-sm btn-outline" onclick="viewProductDetails(${item.id})" title="Detalhes">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    
+                    ${item.ativo ? `
+                        <button class="btn btn-sm btn-warning" onclick="toggleProductStatus(${item.id}, false)" title="Desativar">
+                            <i class="fas fa-pause"></i>
+                        </button>
+                    ` : `
+                        <button class="btn btn-sm btn-success" onclick="toggleProductStatus(${item.id}, true)" title="Ativar">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    `}
+                    
+                    <button class="btn btn-sm btn-danger" onclick="removeProduct(${item.id})" title="Remover">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// Modal para adicionar produto por veículo
+function showVehicleProductModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal active';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3>Adicionar Produto por Veículo</h3>
+                <button class="close-modal" onclick="closeModal(this)">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="vehicleProductForm">
+                    <!-- Seleção de Veículo -->
+                    <div class="form-section">
+                        <h4>Selecionar Veículo</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="vehicleBrand">Marca</label>
+                                <select id="vehicleBrand" required onchange="loadVehicleModels(this.value)">
+                                    <option value="">Selecione a marca</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="vehicleModel">Modelo</label>
+                                <select id="vehicleModel" required onchange="loadVehicleYears(this.value)" disabled>
+                                    <option value="">Selecione o modelo</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="vehicleYear">Ano</label>
+                                <select id="vehicleYear" required disabled>
+                                    <option value="">Selecione o ano</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Seleção de Produto -->
+                    <div class="form-section">
+                        <h4>Selecionar Produto</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="productTypeVehicle">Tipo</label>
+                                <select id="productTypeVehicle" required onchange="loadVehicleProducts()">
+                                    <option value="">Selecione o tipo</option>
+                                    <option value="oleo">Óleo</option>
+                                    <option value="filtro">Filtro</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="vehicleProduct">Produto</label>
+                                <select id="vehicleProduct" required disabled>
+                                    <option value="">Selecione o produto</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Informações do Estoque -->
+                    <div class="form-section">
+                        <h4>Informações do Estoque</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="vehicleQuantity">Quantidade</label>
+                                <input type="number" id="vehicleQuantity" min="0" value="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="vehicleMinQuantity">Quantidade Mínima</label>
+                                <input type="number" id="vehicleMinQuantity" min="0" value="5">
+                            </div>
+                            <div class="form-group">
+                                <label for="vehiclePrice">Preço (R$)</label>
+                                <input type="number" id="vehiclePrice" min="0" step="0.01" required>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal(this)">Cancelar</button>
+                <button class="btn btn-primary" onclick="addVehicleProduct()">Adicionar ao Estoque</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    loadVehicleBrands();
+}
+
+// Modal para gerenciar veículos
+function showManageVehiclesModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal active';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3>Gerenciar Veículos</h3>
+                <button class="close-modal" onclick="closeModal(this)">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="vehicle-management-tabs">
+                    <div class="tab-buttons">
+                        <button class="tab-btn active" onclick="switchVehicleTab('marcas')">Marcas</button>
+                        <button class="tab-btn" onclick="switchVehicleTab('modelos')">Modelos</button>
+                        <button class="tab-btn" onclick="switchVehicleTab('anos')">Anos</button>
+                    </div>
+                    
+                    <div id="marcasTab" class="tab-content active">
+                        <div class="tab-header">
+                            <h4>Gerenciar Marcas</h4>
+                            <button class="btn btn-sm btn-success" onclick="showAddBrandModal()">
+                                <i class="fas fa-plus"></i> Nova Marca
+                            </button>
+                        </div>
+                        <div class="vehicle-list" id="brandsList">
+                            Carregando marcas...
+                        </div>
+                    </div>
+                    
+                    <div id="modelosTab" class="tab-content">
+                        <div class="tab-header">
+                            <h4>Gerenciar Modelos</h4>
+                            <button class="btn btn-sm btn-success" onclick="showAddModelModal()">
+                                <i class="fas fa-plus"></i> Novo Modelo
+                            </button>
+                        </div>
+                        <div class="vehicle-list" id="modelsList">
+                            Selecione a aba "Marcas" primeiro
+                        </div>
+                    </div>
+                    
+                    <div id="anosTab" class="tab-content">
+                        <div class="tab-header">
+                            <h4>Gerenciar Anos</h4>
+                            <button class="btn btn-sm btn-success" onclick="showAddYearModal()">
+                                <i class="fas fa-plus"></i> Novo Ano
+                            </button>
+                        </div>
+                        <div class="vehicle-list" id="yearsList">
+                            Selecione a aba "Modelos" primeiro
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal(this)">Fechar</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    loadVehicleManagementData();
+}
+
+// Carregar dados para gestão de veículos
+async function loadVehicleManagementData() {
+    await loadBrandsList();
+}
+
+// Alternar entre abas de gestão de veículos
+function switchVehicleTab(tabName) {
+    // Esconder todas as abas
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Mostrar aba selecionada
+    document.getElementById(tabName + 'Tab').classList.add('active');
+    document.querySelector(`[onclick="switchVehicleTab('${tabName}')"]`).classList.add('active');
+    
+    // Carregar dados específicos da aba
+    switch(tabName) {
+        case 'marcas':
+            loadBrandsList();
+            break;
+        case 'modelos':
+            loadModelsList();
+            break;
+        case 'anos':
+            loadYearsList();
+            break;
+    }
+}
+
+// ==================== FUNÇÕES PARA CARREGAR DADOS DE VEÍCULOS ====================
+
+// Carregar marcas para o modal
+async function loadVehicleBrands() {
+    try {
+        const response = await apiCall('/api/admin/marcas');
+        const data = await response.json();
+        
+        const brandSelect = document.getElementById('vehicleBrand');
+        if (brandSelect && data.marcas) {
+            brandSelect.innerHTML = '<option value="">Selecione a marca</option>';
+            data.marcas.forEach(marca => {
+                const option = document.createElement('option');
+                option.value = marca.id;
+                option.textContent = marca.nome;
+                brandSelect.appendChild(option);
+            });
+        }
+    } catch (error) {
+        console.error('Erro ao carregar marcas:', error);
+    }
+}
+
+// Carregar modelos baseado na marca
+async function loadVehicleModels(brandId) {
+    const modelSelect = document.getElementById('vehicleModel');
+    const yearSelect = document.getElementById('vehicleYear');
+    
+    if (!brandId) {
+        modelSelect.disabled = true;
+        modelSelect.innerHTML = '<option value="">Selecione o modelo</option>';
+        yearSelect.disabled = true;
+        yearSelect.innerHTML = '<option value="">Selecione o ano</option>';
+        return;
+    }
+    
+    try {
+        const response = await apiCall(`/api/admin/modelos?marca_id=${brandId}`);
+        const data = await response.json();
+        
+        modelSelect.innerHTML = '<option value="">Selecione o modelo</option>';
+        if (data.modelos) {
+            data.modelos.forEach(model => {
+                const option = document.createElement('option');
+                option.value = model.id;
+                option.textContent = model.nome;
+                modelSelect.appendChild(option);
+            });
+        }
+        modelSelect.disabled = false;
+        
+        // Resetar anos
+        yearSelect.disabled = true;
+        yearSelect.innerHTML = '<option value="">Selecione o ano</option>';
+        
+    } catch (error) {
+        console.error('Erro ao carregar modelos:', error);
+    }
+}
+
+// Carregar anos baseado no modelo
+async function loadVehicleYears(modelId) {
+    const yearSelect = document.getElementById('vehicleYear');
+    
+    if (!modelId) {
+        yearSelect.disabled = true;
+        yearSelect.innerHTML = '<option value="">Selecione o ano</option>';
+        return;
+    }
+    
+    try {
+        const response = await apiCall(`/api/admin/modelo_anos?modelo_id=${modelId}`);
+        const data = await response.json();
+        
+        yearSelect.innerHTML = '<option value="">Selecione o ano</option>';
+        if (data.anos) {
+            data.anos.forEach(ano => {
+                const option = document.createElement('option');
+                option.value = ano.id;
+                option.textContent = ano.ano;
+                yearSelect.appendChild(option);
+            });
+        }
+        yearSelect.disabled = false;
+        
+    } catch (error) {
+        console.error('Erro ao carregar anos:', error);
+    }
+}
+
+// Carregar produtos baseado no tipo
+async function loadVehicleProducts() {
+    const typeSelect = document.getElementById('productTypeVehicle');
+    const productSelect = document.getElementById('vehicleProduct');
+    
+    if (!typeSelect.value) {
+        productSelect.disabled = true;
+        productSelect.innerHTML = '<option value="">Selecione o produto</option>';
+        return;
+    }
+    
+    try {
+        const endpoint = typeSelect.value === 'oleo' ? '/api/admin/produtos/oleos' : '/api/admin/produtos/filtros';
+        const response = await apiCall(endpoint);
+        const data = await response.json();
+        
+        productSelect.innerHTML = '<option value="">Selecione o produto</option>';
+        if (data.produtos) {
+            data.produtos.forEach(produto => {
+                const option = document.createElement('option');
+                option.value = produto.id;
+                option.textContent = `${produto.nome} - R$ ${parseFloat(produto.preco || 0).toFixed(2)}`;
+                option.dataset.preco = produto.preco || 0;
+                productSelect.appendChild(option);
+            });
+        }
+        productSelect.disabled = false;
+        
+    } catch (error) {
+        console.error('Erro ao carregar produtos:', error);
+    }
+}
+
+// ==================== FUNÇÕES PARA GESTÃO DE VEÍCULOS ====================
+
+// Carregar lista de marcas
+async function loadBrandsList() {
+    try {
+        const response = await apiCall('/api/admin/marcas');
+        const data = await response.json();
+        
+        const brandsList = document.getElementById('brandsList');
+        if (brandsList && data.marcas) {
+            if (data.marcas.length === 0) {
+                brandsList.innerHTML = '<p class="no-data">Nenhuma marca cadastrada</p>';
+                return;
+            }
+            
+            brandsList.innerHTML = data.marcas.map(marca => `
+                <div class="vehicle-item">
+                    <div class="vehicle-info">
+                        <strong>${marca.nome}</strong>
+                        <span class="vehicle-count">${marca.total_modelos || 0} modelos</span>
+                    </div>
+                    <div class="vehicle-actions">
+                        <button class="btn btn-sm btn-outline" onclick="editBrand(${marca.id})" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteBrand(${marca.id})" title="Excluir">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+    } catch (error) {
+        console.error('Erro ao carregar lista de marcas:', error);
+    }
+}
+
+// Carregar lista de modelos
+async function loadModelsList() {
+    try {
+        const response = await apiCall('/api/admin/modelos-completos');
+        const data = await response.json();
+        
+        const modelsList = document.getElementById('modelsList');
+        if (modelsList && data.modelos) {
+            if (data.modelos.length === 0) {
+                modelsList.innerHTML = '<p class="no-data">Nenhum modelo cadastrado</p>';
+                return;
+            }
+            
+            modelsList.innerHTML = data.modelos.map(modelo => `
+                <div class="vehicle-item">
+                    <div class="vehicle-info">
+                        <strong>${modelo.nome}</strong>
+                        <div class="vehicle-details">
+                            <span class="brand-name">${modelo.marca_nome}</span>
+                            <span class="vehicle-type ${modelo.tipo}">${modelo.tipo === 'carro' ? 'Carro' : 'Moto'}</span>
+                            <span class="vehicle-count">${modelo.total_anos || 0} anos</span>
+                        </div>
+                    </div>
+                    <div class="vehicle-actions">
+                        <button class="btn btn-sm btn-outline" onclick="editModel(${modelo.id})" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteModel(${modelo.id})" title="Excluir">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+    } catch (error) {
+        console.error('Erro ao carregar lista de modelos:', error);
+    }
+}
+
+// Carregar lista de anos
+async function loadYearsList() {
+    try {
+        const response = await apiCall('/api/admin/modelo_anos-completos');
+        const data = await response.json();
+        
+        const yearsList = document.getElementById('yearsList');
+        if (yearsList && data.anos) {
+            if (data.anos.length === 0) {
+                yearsList.innerHTML = '<p class="no-data">Nenhum ano cadastrado</p>';
+                return;
+            }
+            
+            yearsList.innerHTML = data.anos.map(ano => `
+                <div class="vehicle-item">
+                    <div class="vehicle-info">
+                        <strong>${ano.ano}</strong>
+                        <div class="vehicle-details">
+                            <span class="model-name">${ano.modelo_nome}</span>
+                            <span class="brand-name">${ano.marca_nome}</span>
+                        </div>
+                    </div>
+                    <div class="vehicle-actions">
+                        <button class="btn btn-sm btn-outline" onclick="editYear(${ano.id})" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteYear(${ano.id})" title="Excluir">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+    } catch (error) {
+        console.error('Erro ao carregar lista de anos:', error);
+    }
+}
+
+// ==================== FUNÇÕES PARA ADICIONAR/EDITAR VEÍCULOS ====================
+
+// Modal para adicionar marca
+function showAddBrandModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal active';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3>Nova Marca</h3>
+                <button class="close-modal" onclick="closeModal(this)">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addBrandForm">
+                    <div class="form-group">
+                        <label for="brandName">Nome da Marca</label>
+                        <input type="text" id="brandName" required placeholder="Ex: Toyota, Honda, etc.">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal(this)">Cancelar</button>
+                <button class="btn btn-primary" onclick="addBrand()">Adicionar Marca</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+// Adicionar nova marca
+async function addBrand() {
+    const brandName = document.getElementById('brandName').value.trim();
+    
+    if (!brandName) {
+        showNotification('Digite o nome da marca', 'error');
+        return;
+    }
+    
+    try {
+        const response = await apiCall('/api/admin/marcas', {
+            method: 'POST',
+            body: JSON.stringify({ nome: brandName })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showNotification('Marca adicionada com sucesso!', 'success');
+            closeModal(document.querySelector('#addBrandForm'));
+            loadBrandsList();
+        } else {
+            showNotification(data.message || 'Erro ao adicionar marca', 'error');
+        }
+    } catch (error) {
+        console.error('Erro ao adicionar marca:', error);
+        showNotification('Erro ao adicionar marca', 'error');
+    }
+}
+
+// Adicionar produto por veículo
+async function addVehicleProduct() {
+    const brandId = document.getElementById('vehicleBrand').value;
+    const modelId = document.getElementById('vehicleModel').value;
+    const yearId = document.getElementById('vehicleYear').value;
+    const productType = document.getElementById('productTypeVehicle').value;
+    const productId = document.getElementById('vehicleProduct').value;
+    const quantity = document.getElementById('vehicleQuantity').value;
+    const minQuantity = document.getElementById('vehicleMinQuantity').value;
+    const price = document.getElementById('vehiclePrice').value;
+    
+    // Validações
+    if (!brandId || !modelId || !yearId || !productType || !productId || !quantity || !price) {
+        showNotification('Preencha todos os campos obrigatórios', 'error');
+        return;
+    }
+    
+    try {
+        const productData = {
+            produto_id: productId,
+            tipo_produto: productType,
+            quantidade: parseInt(quantity),
+            quantidade_minima: parseInt(minQuantity) || 5,
+            preco: parseFloat(price),
+            modelo_ano_id: yearId
+        };
+        
+        const response = await apiCall('/api/admin/estoque/veiculo', {
+            method: 'POST',
+            body: JSON.stringify(productData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showNotification('Produto adicionado ao estoque com sucesso!', 'success');
+            closeModal(document.querySelector('#vehicleProductForm'));
+            loadEstoque();
+        } else {
+            showNotification(data.message || 'Erro ao adicionar produto', 'error');
+        }
+    } catch (error) {
+        console.error('Erro ao adicionar produto por veículo:', error);
+        showNotification('Erro ao adicionar produto', 'error');
+    }
+}
+
+// ==================== FUNÇÕES DE CONTROLE DE ESTOQUE ====================
+
+// Alternar status do produto (ativo/inativo)
+async function toggleProductStatus(productId, activate) {
+    const action = activate ? 'ativar' : 'desativar';
+    
+    if (!confirm(`Tem certeza que deseja ${action} este produto?`)) {
+        return;
+    }
+    
+    try {
+        const response = await apiCall(`/api/admin/estoque/${productId}/status`, {
+            method: 'PUT',
+            body: JSON.stringify({ ativo: activate })
+        });
+        
+        if (response.ok) {
+            showNotification(`Produto ${activate ? 'ativado' : 'desativado'} com sucesso!`, 'success');
+            loadEstoque();
+        } else {
+            const data = await response.json();
+            showNotification(data.message || `Erro ao ${action} produto`, 'error');
+        }
+    } catch (error) {
+        console.error(`Erro ao ${action} produto:`, error);
+        showNotification(`Erro ao ${action} produto`, 'error');
+    }
+}
+
+// Ver detalhes do produto
+async function viewProductDetails(productId) {
+    try {
+        const response = await apiCall(`/api/admin/estoque/${productId}/detalhes`);
+        const data = await response.json();
+        
+        if (data.success) {
+            showProductDetailsModal(data.produto);
+        } else {
+            showNotification(data.message || 'Erro ao carregar detalhes', 'error');
+        }
+    } catch (error) {
+        console.error('Erro ao carregar detalhes do produto:', error);
+        showNotification('Erro ao carregar detalhes', 'error');
+    }
+}
+
+// Modal de detalhes do produto
+function showProductDetailsModal(produto) {
+    const modal = document.createElement('div');
+    modal.className = 'modal active';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3>Detalhes do Produto</h3>
+                <button class="close-modal" onclick="closeModal(this)">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="product-details">
+                    <div class="detail-section">
+                        <h4>Informações Básicas</h4>
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <label>Nome:</label>
+                                <span>${produto.nome_produto}</span>
+                            </div>
+                            <div class="detail-item">
+                                <label>Tipo:</label>
+                                <span class="product-type-badge ${produto.tipo_produto}">
+                                    ${produto.tipo_produto === 'oleo' ? 'Óleo' : 'Filtro'}
+                                </span>
+                            </div>
+                            <div class="detail-item">
+                                <label>Marca:</label>
+                                <span>${produto.marca || '-'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <label>Status:</label>
+                                <span class="status-badge status-${produto.ativo ? 'ativo' : 'inativo'}">
+                                    ${produto.ativo ? 'Ativo' : 'Inativo'}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h4>Estoque</h4>
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <label>Quantidade:</label>
+                                <span>${produto.quantidade}</span>
+                            </div>
+                            <div class="detail-item">
+                                <label>Quantidade Mínima:</label>
+                                <span>${produto.quantidade_minima || 'Não definida'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <label>Preço:</label>
+                                <span>R$ ${parseFloat(produto.preco || 0).toFixed(2)}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    ${produto.compatibilidade_veiculo ? `
+                    <div class="detail-section">
+                        <h4>Compatibilidade</h4>
+                        <p>${produto.compatibilidade_veiculo}</p>
+                    </div>
+                    ` : ''}
+                    
+                    <div class="detail-section">
+                        <h4>Datas</h4>
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <label>Cadastrado em:</label>
+                                <span>${formatDate(produto.data_cadastro)}</span>
+                            </div>
+                            ${produto.data_atualizacao ? `
+                            <div class="detail-item">
+                                <label>Atualizado em:</label>
+                                <span>${formatDate(produto.data_atualizacao)}</span>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal(this)">Fechar</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+// Atualizar função existente de atualização de estoque
+async function updateEstoque(id, quantidade) {
+    try {
+        const response = await apiCall(`/api/admin/estoque/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify({ 
+                quantidade: parseInt(quantidade),
+                atualizado_por: 'admin'
+            })
+        });
+
+        if (response.ok) {
+            showNotification('Estoque atualizado com sucesso!', 'success');
+            loadEstoque();
+        } else {
+            const data = await response.json();
+            showNotification(data.message || 'Erro ao atualizar estoque', 'error');
+        }
+    } catch (error) {
+        console.error('Erro ao atualizar estoque:', error);
+        showNotification('Erro ao atualizar estoque', 'error');
+    }
+}
+
+// Atualizar função de remoção de produto
+async function removeProduct(id) {
+    if (confirm('Tem certeza que deseja remover este produto do estoque?\n\nEsta ação não pode ser desfeita.')) {
+        try {
+            const response = await apiCall(`/api/admin/estoque/${id}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                showNotification('Produto removido com sucesso!', 'success');
+                loadEstoque();
+            } else {
+                const data = await response.json();
+                showNotification(data.message || 'Erro ao remover produto', 'error');
+            }
+        } catch (error) {
+            console.error('Erro ao remover produto:', error);
+            showNotification('Erro ao remover produto', 'error');
+        }
+    }
+}

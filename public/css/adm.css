@@ -1963,3 +1963,715 @@ body {
     }
 }
 
+
+/* ===== CONFIGURAÇÕES - DESIGN ATUALIZADO ===== */
+.configuracoes-container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.config-card {
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(180, 148, 52, 0.1);
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.config-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.config-header {
+    padding: 25px 30px;
+    background: linear-gradient(135deg, rgba(180, 148, 52, 0.08), rgba(212, 177, 95, 0.12));
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
+}
+
+.config-header::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 4px;
+    background: linear-gradient(to bottom, var(--secondary-color), var(--accent-color));
+}
+
+.config-header h3 {
+    color: var(--primary-color);
+    font-size: 1.3rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+}
+
+.config-header h3 i {
+    color: var(--secondary-color);
+    font-size: 1.2rem;
+    width: 24px;
+    text-align: center;
+}
+
+.config-body {
+    padding: 30px;
+}
+
+/* Grid de Dias da Semana */
+.dias-semana-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+}
+
+.dia-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: var(--transition);
+    background: var(--light-color);
+    position: relative;
+    overflow: hidden;
+}
+
+.dia-checkbox::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 0;
+    background: linear-gradient(135deg, rgba(180, 148, 52, 0.1), rgba(212, 177, 95, 0.15));
+    transition: var(--transition);
+}
+
+.dia-checkbox:hover {
+    border-color: var(--secondary-color);
+    transform: translateY(-2px);
+}
+
+.dia-checkbox:hover::before {
+    width: 100%;
+}
+
+.dia-checkbox input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--secondary-color);
+    position: relative;
+    z-index: 2;
+}
+
+.dia-checkbox input[type="checkbox"]:checked {
+    accent-color: var(--success-color);
+}
+
+.dia-label {
+    font-weight: 500;
+    color: var(--text-color);
+    position: relative;
+    z-index: 2;
+    transition: var(--transition);
+}
+
+.dia-checkbox input[type="checkbox"]:checked + .dia-label {
+    color: var(--success-color);
+    font-weight: 600;
+}
+
+.dia-checkbox input[type="checkbox"]:checked ~ .dia-label::after {
+    content: ' ✓';
+    font-weight: bold;
+}
+
+/* Preview do Horário */
+.preview-horario {
+    background: linear-gradient(135deg, var(--light-color), rgba(180, 148, 52, 0.03));
+    padding: 25px;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+}
+
+.horario-preview-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.horario-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border-color);
+    transition: var(--transition);
+}
+
+.horario-item:hover {
+    background: rgba(180, 148, 52, 0.05);
+    margin: 0 -10px;
+    padding: 14px 10px;
+    border-radius: 8px;
+}
+
+.horario-item:last-child {
+    border-bottom: none;
+}
+
+.dia-semana {
+    font-weight: 600;
+    color: var(--primary-color);
+    font-size: 0.95rem;
+}
+
+.horario-funcionamento {
+    color: var(--success-color);
+    font-weight: 500;
+    background: rgba(40, 167, 69, 0.1);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+.horario-fechado {
+    color: var(--danger-color);
+    font-style: italic;
+    background: rgba(220, 53, 69, 0.1);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+/* Inputs de Tempo */
+.time-input-group {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.time-input {
+    padding: 14px 16px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background: var(--card-bg);
+    color: var(--text-color);
+    font-size: 1rem;
+    font-weight: 500;
+    transition: var(--transition);
+    flex: 1;
+}
+
+.time-input:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 3px rgba(180, 148, 52, 0.2);
+    transform: translateY(-1px);
+}
+
+.time-separator {
+    color: var(--text-light);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* Informações da Oficina */
+.info-oficina-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-group label i {
+    color: var(--secondary-color);
+    font-size: 0.9rem;
+}
+
+.form-input {
+    padding: 14px 16px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background: var(--card-bg);
+    color: var(--text-color);
+    font-size: 1rem;
+    transition: var(--transition);
+    font-family: inherit;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 3px rgba(180, 148, 52, 0.2);
+    transform: translateY(-1px);
+}
+
+.form-textarea {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background: var(--card-bg);
+    color: var(--text-color);
+    font-size: 1rem;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 100px;
+    transition: var(--transition);
+    line-height: 1.5;
+}
+
+.form-textarea:focus {
+    outline: none;
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 3px rgba(180, 148, 52, 0.2);
+    transform: translateY(-1px);
+}
+
+/* Badge de Status */
+.config-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: rgba(40, 167, 69, 0.1);
+    color: var(--success-color);
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-left: 15px;
+}
+
+/* Botões de Ação na Configuração */
+.config-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .configuracoes-container {
+        gap: 20px;
+    }
+    
+    .config-body {
+        padding: 20px;
+    }
+    
+    .config-header {
+        padding: 20px 25px;
+    }
+    
+    .dias-semana-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .info-oficina-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .time-input-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .time-separator {
+        transform: rotate(90deg);
+    }
+    
+    .horario-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        text-align: left;
+    }
+    
+    .horario-item:hover {
+        margin: 0;
+        padding: 14px 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .config-body {
+        padding: 15px;
+    }
+    
+    .config-header {
+        padding: 15px 20px;
+    }
+    
+    .config-header h3 {
+        font-size: 1.1rem;
+    }
+    
+    .dia-checkbox {
+        padding: 12px 15px;
+    }
+    
+    .preview-horario {
+        padding: 15px;
+    }
+    
+    .form-input,
+    .form-textarea,
+    .time-input {
+        padding: 12px 14px;
+        font-size: 0.95rem;
+    }
+}
+
+/* Animações */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.config-card {
+    animation: slideInUp 0.4s ease-out;
+}
+
+.config-card:nth-child(1) { animation-delay: 0.1s; }
+.config-card:nth-child(2) { animation-delay: 0.2s; }
+.config-card:nth-child(3) { animation-delay: 0.3s; }
+.config-card:nth-child(4) { animation-delay: 0.4s; }
+
+/* Estados de Validação */
+.form-input:valid,
+.form-textarea:valid,
+.time-input:valid {
+    border-color: rgba(40, 167, 69, 0.3);
+}
+
+.form-input:invalid:not(:focus):not(:placeholder-shown),
+.form-textarea:invalid:not(:focus):not(:placeholder-shown) {
+    border-color: rgba(220, 53, 69, 0.3);
+}
+
+/* Placeholder estilizado */
+.form-input::placeholder,
+.form-textarea::placeholder,
+.time-input::placeholder {
+    color: var(--text-light);
+    opacity: 0.7;
+}
+
+/* Dark mode específico para configurações */
+@media (prefers-color-scheme: dark) {
+    .dia-checkbox {
+        background: rgba(255, 255, 255, 0.05);
+    }
+    
+    .preview-horario {
+        background: rgba(255, 255, 255, 0.03);
+    }
+    
+    .horario-funcionamento {
+        background: rgba(40, 167, 69, 0.15);
+    }
+    
+    .horario-fechado {
+        background: rgba(220, 53, 69, 0.15);
+    }
+    
+    .config-header {
+        background: linear-gradient(135deg, rgba(180, 148, 52, 0.05), rgba(212, 177, 95, 0.08));
+    }
+}
+
+/* ===== RESPONSIVE IMPROVEMENTS ===== */
+
+/* Sidebar Toggle para mobile */
+.sidebar-toggle {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .sidebar-toggle {
+        display: flex;
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+        color: var(--primary-color);
+        cursor: pointer;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        align-items: center;
+        justify-content: center;
+        transition: var(--transition);
+        z-index: 1001;
+    }
+
+    .sidebar-toggle:hover {
+        background-color: rgba(180, 148, 52, 0.1);
+    }
+
+    /* Sidebar mobile */
+    .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        width: 280px;
+        z-index: 1000;
+    }
+
+    .sidebar.mobile-open {
+        transform: translateX(0);
+    }
+
+    /* Overlay para mobile */
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+    }
+
+    .sidebar-overlay.active {
+        display: block;
+    }
+
+    /* Main content ajustado para mobile */
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    /* Header melhorado para mobile */
+    .main-header {
+        padding: 12px 20px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    .header-right {
+        gap: 12px;
+    }
+
+    /* Search box mobile */
+    .search-box {
+        display: none;
+    }
+
+    .search-box.mobile-visible {
+        display: block;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--card-bg);
+        padding: 15px;
+        box-shadow: var(--box-shadow);
+        border-top: 1px solid var(--border-color);
+    }
+
+    .search-box.mobile-visible input {
+        width: 100%;
+    }
+
+    /* Content area mobile */
+    .content-area {
+        padding: 20px 15px;
+    }
+
+    /* Table responsive */
+    .table-container {
+        overflow-x: auto;
+    }
+
+    .data-table {
+        min-width: 800px;
+    }
+
+    /* Metrics grid mobile */
+    .metrics-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .metric-card {
+        padding: 20px;
+    }
+
+    /* Activities section mobile */
+    .activities-section {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    /* Filters bar mobile */
+    .filters-bar {
+        flex-direction: column;
+        gap: 15px;
+        padding: 15px;
+    }
+
+    /* Section header mobile */
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    /* Configurações mobile */
+    .dias-semana-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .info-oficina-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Protocolo section mobile */
+    .protocolo-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .protocolo-input-group {
+        min-width: auto;
+    }
+
+    .btn-concluir-protocolo {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Ajustes para telas muito pequenas */
+    .content-area {
+        padding: 15px 10px;
+    }
+
+    .main-header {
+        padding: 10px 15px;
+    }
+
+    .page-title {
+        font-size: 1.3rem;
+    }
+
+    .metric-card {
+        padding: 15px;
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .metric-icon {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    .activities-card {
+        padding: 15px;
+    }
+
+    .modal-content {
+        width: calc(100% - 20px);
+        margin: 10px;
+        border-radius: 10px;
+    }
+
+    .modal-header,
+    .modal-body,
+    .modal-actions {
+        padding: 15px;
+    }
+
+    /* Botões em mobile */
+    .header-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .header-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Melhorias na tabela para mobile */
+@media (max-width: 768px) {
+    .data-table td {
+        padding: 10px 8px;
+        font-size: 0.85rem;
+    }
+
+    .data-table th {
+        padding: 12px 8px;
+        font-size: 0.85rem;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .action-buttons .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Scroll suave */
+.content-area {
+    scroll-behavior: smooth;
+}
+
+/* Loading states melhorados */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid var(--secondary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+

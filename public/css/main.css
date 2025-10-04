@@ -5912,3 +5912,506 @@ input:invalid {
     border-left: 4px solid #e63946;
     background-color: #f8f9fa;
 }
+/* Estilos para distância colorida */
+.workshop-info .distance {
+    font-weight: 600;
+    font-size: 16px;
+    margin: 8px 0;
+}
+
+.workshop-info .distance i {
+    margin-right: 8px;
+}
+
+/* Estilos para dias da semana */
+.workshop-info .days {
+    color: #6c757d;
+    font-size: 14px;
+    margin: 5px 0;
+}
+
+.workshop-info .days i {
+    color: #2a9d8f;
+    margin-right: 8px;
+    width: 16px;
+    text-align: center;
+}
+
+/* Cores para diferentes distâncias */
+.distance-very-close { color: #2a9d8f; } /* Verde - menos de 2km */
+.distance-close { color: #3a86ff; }      /* Azul - 2-5km */
+.distance-medium { color: #f4a261; }     /* Laranja - 5-10km */
+.distance-far { color: #e63946; }        /* Vermelho - mais de 10km */
+
+/* Adicione ao main.css - Estilos para o ícone de distância colorido */
+.workshop-info .distance i {
+    transition: color 0.3s ease;
+}
+
+.distance-very-close i { color: #2a9d8f; } /* Verde */
+.distance-close i { color: #3a86ff; }      /* Azul */
+.distance-medium i { color: #f4a261; }     /* Laranja */
+.distance-far i { color: #e63946; }        /* Vermelho */
+
+/* Adicione ao main.css - Estilos para o input de data com cor amarela */
+input[type="date"] {
+    border-color: var(--secondary-color) !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23b49434' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
+}
+
+input[type="date"]:focus {
+    border-color: var(--accent-color) !important;
+    box-shadow: 0 0 0 4px rgba(180, 148, 52, 0.15) !important;
+}
+
+/* Para o select de horários também */
+.time-select-container select {
+    border-color: var(--secondary-color) !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23b49434' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'%3E%3C/path%3E%3C/svg%3E");
+}
+
+.time-select-container select:focus {
+    border-color: var(--accent-color) !important;
+    box-shadow: 0 0 0 4px rgba(180, 148, 52, 0.15) !important;
+}
+
+
+
+
+
+.workshop-item p .fa-route,
+.workshop-item p .fa-clock {
+    color: var(--secondary-color);
+}
+
+
+
+.workshop-item p .fa-route,
+.workshop-item p .fa-clock,
+.workshop-item p .fa-calendar {
+    color: var(--secondary-color);
+}
+
+
+
+.workshop-item .distance i,
+.workshop-item .hours i,
+.workshop-item .days i {
+    color: var(--secondary-color);
+}
+
+
+
+.workshop-item p .fa-route,
+.workshop-item p .fa-clock,
+.workshop-item p .fa-calendar {
+    color: var(--secondary-color);
+}
+
+.distance-near {
+    color: #28a745 !important; /* verde */
+}
+.distance-medium {
+    color: #ffc107 !important; /* amarelo/laranja */
+}
+.distance-far {
+    color: #dc3545 !important; /* vermelho */
+}
+/* ==================== ESTILOS PARA GESTÃO DE ESTOQUE AVANÇADA ==================== */
+
+/* Ações de Estoque */
+.estoque-actions {
+    margin-bottom: 20px;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* Barra de Filtros */
+.filters-bar {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 150px;
+}
+
+.filter-group label {
+    font-weight: 600;
+    font-size: 12px;
+    color: #6c757d;
+    text-transform: uppercase;
+}
+
+.filter-group select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+/* Controles de Quantidade */
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.quantity-input {
+    width: 80px;
+    padding: 6px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.low-stock-warning {
+    color: #e63946;
+    font-size: 14px;
+}
+
+/* Badges de Tipo de Produto */
+.product-type-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.product-type-badge.oleo {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.product-type-badge.filtro {
+    background: #f3e5f5;
+    color: #7b1fa2;
+}
+
+/* Itens Inativos */
+.inactive-item {
+    opacity: 0.6;
+    background-color: #f8f9fa !important;
+}
+
+.inactive-item:hover {
+    opacity: 0.8;
+}
+
+/* Informações do Produto */
+.product-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.vehicle-compatibility {
+    color: #6c757d;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* ==================== MODAIS DE GESTÃO DE VEÍCULOS ==================== */
+
+/* Seções do Formulário */
+.form-section {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    background: #f8f9fa;
+}
+
+.form-section h4 {
+    margin: 0 0 15px 0;
+    color: #495057;
+    font-size: 16px;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 8px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+/* Abas de Gestão de Veículos */
+.vehicle-management-tabs {
+    margin-top: 10px;
+}
+
+.tab-buttons {
+    display: flex;
+    border-bottom: 1px solid #dee2e6;
+    margin-bottom: 20px;
+}
+
+.tab-btn {
+    padding: 12px 24px;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    font-weight: 600;
+    color: #6c757d;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tab-btn.active {
+    color: #2a9d8f;
+    border-bottom-color: #2a9d8f;
+}
+
+.tab-btn:hover:not(.active) {
+    color: #495057;
+    background: #f8f9fa;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.tab-header h4 {
+    margin: 0;
+    color: #495057;
+}
+
+/* Lista de Veículos */
+.vehicle-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.vehicle-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    background: white;
+    transition: all 0.3s ease;
+}
+
+.vehicle-item:hover {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.vehicle-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.vehicle-info strong {
+    color: #495057;
+    font-size: 14px;
+}
+
+.vehicle-details {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.brand-name, .model-name {
+    font-size: 12px;
+    color: #6c757d;
+    background: #e9ecef;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.vehicle-type {
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.vehicle-type.carro {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.vehicle-type.moto {
+    background: #fff3e0;
+    color: #f57c00;
+}
+
+.vehicle-count {
+    font-size: 11px;
+    color: #6c757d;
+    background: #f8f9fa;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+.vehicle-actions {
+    display: flex;
+    gap: 5px;
+}
+
+/* Detalhes do Produto */
+.product-details {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.detail-section {
+    padding: 15px;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    background: #f8f9fa;
+}
+
+.detail-section h4 {
+    margin: 0 0 15px 0;
+    color: #495057;
+    font-size: 16px;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 8px;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.detail-item label {
+    font-weight: 600;
+    color: #6c757d;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.detail-item span {
+    color: #495057;
+    font-size: 14px;
+}
+
+/* Estados Vazios */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 48px;
+    margin-bottom: 15px;
+    color: #dee2e6;
+}
+
+.empty-state h4 {
+    margin: 0 0 8px 0;
+    color: #6c757d;
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 14px;
+}
+
+.no-data {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .filters-bar {
+        flex-direction: column;
+    }
+    
+    .filter-group {
+        min-width: 100%;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .tab-buttons {
+        flex-direction: column;
+    }
+    
+    .tab-btn {
+        text-align: left;
+        border-bottom: none;
+        border-left: 3px solid transparent;
+    }
+    
+    .tab-btn.active {
+        border-left-color: #2a9d8f;
+        border-bottom-color: transparent;
+    }
+    
+    .vehicle-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .vehicle-actions {
+        align-self: flex-end;
+    }
+    
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Animações */
+@keyframes highlight {
+    0% { background-color: #e8f5e8; }
+    100% { background-color: transparent; }
+}
+
+.highlight {
+    animation: highlight 2s ease;
+}

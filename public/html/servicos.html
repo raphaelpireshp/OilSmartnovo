@@ -747,6 +747,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         });
+
+        // FUNÇÃO PARA GARANTIR QUE O ELEMENTO EXISTA
+function ensureSelectedWorkshopDiv() {
+    if (!selectedWorkshopDiv) {
+        console.log('⚠️ Elemento selected-workshop não encontrado, criando dinamicamente...');
+        
+        // Verificar se existe o container onde deve estar
+        const workshopSummary = document.querySelector('.workshop-summary');
+        if (workshopSummary) {
+            const newDiv = document.createElement('div');
+            newDiv.id = 'selected-workshop';
+            workshopSummary.appendChild(newDiv);
+            return newDiv;
+        } else {
+            console.error('❌ Container workshop-summary também não encontrado!');
+            return null;
+        }
+    }
+    return selectedWorkshopDiv;
+}
     </script>
 
 

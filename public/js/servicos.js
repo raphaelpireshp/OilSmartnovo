@@ -815,7 +815,7 @@ function deg2rad(deg) {
     return deg * (Math.PI/180);
 }
 
-// Exibe oficinas no mapa e na lista (versão responsiva)
+// Exibe oficinas no mapa e na lista - VERSÃO COM DIAS E CORES
 function displayWorkshops(workshops) {
     const mapContainer = document.querySelector(".map-container");
     
@@ -829,7 +829,7 @@ function displayWorkshops(workshops) {
     
     listContainer.innerHTML = "";
 
-    // Limpa marcadores antigos (exceto o do usuário)
+    // Limpa marcadores antigos
     markers.filter(m => m.options.icon?.options?.className !== "user-marker")
            .forEach(m => map.removeLayer(m));
     
@@ -854,7 +854,6 @@ function displayWorkshops(workshops) {
         const lat = parseFloat(workshop.lat);
         const lng = parseFloat(workshop.lng);
         
-        // Verifica se as coordenadas são válidas
         if (isNaN(lat) || isNaN(lng)) {
             console.warn('Coordenadas inválidas para oficina:', workshop);
             return;
@@ -865,13 +864,19 @@ function displayWorkshops(workshops) {
             ? `${(workshop.distancia * 1000).toFixed(0)} m` 
             : `${workshop.distancia.toFixed(1)} km`;
 
+        // COR DA DISTÂNCIA baseada na proximidade
+        const distanciaColor = getDistanceColor(workshop.distancia);
+
         // Formata dias de funcionamento
         const diasFormatados = formatDiasFuncionamento(workshop.dias_funcionamento);
         
         // Formata horário para exibição
-        const horarioFormatado = formatHorarioFuncionamento(workshop.horario_abertura, workshop.horario_fechamento);
+        const horarioFormatado = formatHorarioFuncionamento(
+            workshop.horario_abertura, 
+            workshop.horario_fechamento
+        );
 
-        // Marcador no mapa
+        // Marcador no mapa - COM DIAS
         const marker = L.marker([lat, lng], { icon: workshopIcon })
             .addTo(map)
             .bindPopup(`
@@ -880,7 +885,7 @@ function displayWorkshops(workshops) {
                     <p><i class="fas fa-map-marker-alt"></i> ${workshop.endereco}, ${workshop.cidade}/${workshop.estado}</p>
                     <p><i class="fas fa-phone"></i> ${workshop.telefone || 'Não informado'}</p>
                     <p><i class="fas fa-clock"></i> ${horarioFormatado}</p>
-                    <p><i class="fas fa-calendar"></i> ${diasFormatados}</p>
+                    <p><i class="fas fa-calendar"></i> ${diasFormatados}</p> <!-- DIAS AQUI -->
                     <p><i class="fas fa-route"></i> ${distanciaFormatada}</p>
                     <button onclick="selectWorkshop(${workshop.id})" class="select-workshop-btn">
                         Selecionar
@@ -890,17 +895,20 @@ function displayWorkshops(workshops) {
 
         markers.push(marker);
 
-        // Item na lista
+        // Item na lista - COM DIAS E COR DA DISTÂNCIA
         const workshopItem = document.createElement("div");
         workshopItem.className = "workshop-item";
         workshopItem.dataset.id = workshop.id;
         workshopItem.innerHTML = `
             <div class="workshop-info">
                 <h4>${workshop.nome}</h4>
-                <p class="distance"><i class="fas fa-route"></i> ${distanciaFormatada}</p>
+                <p class="distance">
+                    <i class="fas fa-route"></i> ${distanciaFormatada}
+                </p>
                 <p class="address"><i class="fas fa-map-marker-alt"></i> ${workshop.endereco}, ${workshop.cidade}/${workshop.estado}</p>
                 <p class="phone"><i class="fas fa-phone"></i> ${workshop.telefone || 'Não informado'}</p>
                 <p class="hours"><i class="fas fa-clock"></i> ${horarioFormatado}</p>
+                <p class="days"><i class="fas fa-calendar"></i> ${diasFormatados}</p> <!-- DIAS AQUI -->
             </div>
             <button class="btn select-btn" onclick="selectWorkshop(${workshop.id})">Selecionar</button>
         `;
@@ -1009,9 +1017,7 @@ window.selectWorkshop = async function(workshopId) {
     }
 };
 
-// Mostra detalhes da oficina selecionada (versão responsiva)
-// FUNÇÃO ATUALIZADA - Mostrar detalhes da oficina selecionada
-// Mostrar detalhes da oficina selecionada - VERSÃO ATUALIZADA
+// Mostrar detalhes da oficina selecionada - VERSÃO ATUALIZADA COM DIAS DA SEMANA
 async function showSelectedWorkshop(workshop) {
     try {
         // Buscar dados atualizados da oficina
@@ -1058,6 +1064,7 @@ async function showSelectedWorkshop(workshop) {
                 <h3>${workshop.nome}</h3>
                 <p><i class="fas fa-map-marker-alt"></i> ${workshop.endereco}, ${workshop.cidade}/${workshop.estado}</p>
                 <p><i class="fas fa-phone"></i> ${workshop.telefone || 'Não informado'}</p>
+                <p><i class="fas fa-calendar"></i> ${formatDiasFuncionamento(workshop.dias_funcionamento)}</p>
                 <p style="color: #e63946;"><i class="fas fa-exclamation-triangle"></i> Horários podem estar desatualizados</p>
             </div>
         `;
@@ -2369,20 +2376,19 @@ function updateProgressBar(step) {
 
 
 // Na função displayWorkshops, você pode adicionar cores diferentes baseadas na distância:
+// Função para determinar cor baseada na distância
 function getDistanceColor(distancia) {
-    if (distancia < 0.5) return '#2a9d8f';     // Super perto
-    if (distancia < 1) return '#3a86ff';       // Muito perto
-    if (distancia < 3) return '#f4a261';       // Perto
-    if (distancia < 8) return '#ff9f1c';       // Moderado
-    if (distancia < 15) return '#ff6b6b';      // Um pouco longe
-    return '#e63946';                          // Muito longe
+    if (distancia < 2) return '#2a9d8f';     // Muito perto - VERDE
+    if (distancia < 5) return '#3a86ff';     // Perto - AZUL
+    if (distancia < 10) return '#f4a261';    // Moderado - LARANJA
+    return '#e63946';                        // Longe - VERMELHO
 }
 
 // E modifique o item da lista para usar cores diferentes:
 workshopItem.innerHTML = `
     <div class="workshop-info">
         <h4>${workshop.nome}</h4>
-        <p class="distance" style="color: ${getDistanceColor(workshop.distancia)};">
+        <p class="distance">
             <i class="fas fa-route"></i> ${distanciaFormatada}
         </p>
         <p class="address"><i class="fas fa-map-marker-alt"></i> ${workshop.endereco}, ${workshop.cidade}/${workshop.estado}</p>
@@ -2391,7 +2397,21 @@ workshopItem.innerHTML = `
     </div>
     <button class="btn select-btn" onclick="selectWorkshop(${workshop.id})">Selecionar</button>
 `;
+// Função para retornar a classe CSS baseada na distância
+function getDistanceColorClass(distancia) {
+    if (distancia < 2) return 'distance-very-close';
+    if (distancia < 5) return 'distance-close';
+    if (distancia < 10) return 'distance-medium';
+    return 'distance-far';
+}
 
+// E também atualize a função getDistanceColor para consistência:
+function getDistanceColor(distancia) {
+    if (distancia < 2) return '#00ff0dff';
+    if (distancia < 5) return '#3a86ff';
+    if (distancia < 10) return '#f4a261';
+    return '#e63946';
+}
 
 
 // Atualiza o resumo da seleção
@@ -2650,7 +2670,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-// Função corrigida para validar dias de funcionamento
 // FUNÇÃO CORRIGIDA - Validação de dias de funcionamento
 function isValidDayForWorkshop(selectedDate, workshop) {
     if (!selectedDate || !workshop) {
@@ -2659,7 +2678,7 @@ function isValidDayForWorkshop(selectedDate, workshop) {
     }
     
     const dayOfWeek = selectedDate.getDay(); // 0 = Domingo, 1 = Segunda, etc.
-    const dayNames = ['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'];
+    const dayNames = [ 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado','domingo'];
     const diaSemana = dayNames[dayOfWeek];
     
     console.log('🔍 Validando dia da oficina:', {
@@ -2682,6 +2701,7 @@ function isValidDayForWorkshop(selectedDate, workshop) {
         .map(dia => dia.trim())
         .filter(dia => dia.length > 0);
     
+    // Verifica se o dia atual está na lista
     const isValid = diasArray.includes(diaSemana);
     
     console.log('✅ Resultado da validação:', {

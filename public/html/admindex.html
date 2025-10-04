@@ -74,28 +74,28 @@
         <!-- Main Content -->
         <div class="main-content">
             <!-- Header -->
-            <header class="main-header">
-                <div class="header-left">
-                    <button class="sidebar-toggle" id="sidebarToggle">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <h1 class="page-title" id="pageTitle">Dashboard</h1>
-                </div>
-                <div class="header-right">
-                    <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" placeholder="Pesquisar..." id="searchInput">
-                    </div>
-                    <button class="notification-btn">
-                        <i class="fas fa-bell"></i>
-                        <span class="notification-badge">3</span>
-                    </button>
-                    <div class="date-time">
-                        <span id="currentDate">Carregando...</span>
-                        <span id="currentTime">--:--:--</span>
-                    </div>
-                </div>
-            </header>
+<header class="main-header">
+    <div class="header-left">
+        <button class="sidebar-toggle" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <h1 class="page-title" id="pageTitle">Dashboard</h1>
+    </div>
+    <div class="header-right">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Pesquisar..." id="searchInput">
+        </div>
+        <button class="notification-btn">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge">3</span>
+        </button>
+        <div class="date-time">
+            <span id="currentDate">Carregando...</span>
+            <span id="currentTime">--:--:--</span>
+        </div>
+    </div>
+</header>
 
             <!-- Content Area -->
             <div class="content-area">
@@ -341,44 +341,142 @@
                 </section>
 
                 <!-- Estoque Section -->
-                <section id="estoque" class="content-section">
-                    <div class="section-header">
-                        <h2>Gerenciar Estoque</h2>
-                        <div class="header-actions">
-                            <button class="btn btn-primary" onclick="loadEstoque()">
-                                <i class="fas fa-sync-alt"></i>
-                                Atualizar
-                            </button>
-                            <button class="btn btn-success" onclick="showAddProductModal()">
-                                <i class="fas fa-plus"></i>
-                                Adicionar Produto
-                            </button>
-                        </div>
-                    </div>
+                <!-- Estoque Section -->
+<section id="estoque" class="content-section">
+    <div class="section-header">
+        <h2>Gerenciar Estoque</h2>
+        <div class="header-actions">
+            <button class="btn btn-primary" onclick="loadEstoque()">
+                <i class="fas fa-sync-alt"></i>
+                Atualizar
+            </button>
+            <button class="btn btn-success" onclick="showAddProductModal()">
+                <i class="fas fa-plus"></i>
+                Adicionar Produto
+            </button>
+        </div>
+    </div>
 
-                    <!-- Estoque Table -->
-                    <div class="table-container">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Produto</th>
-                                    <th>Marca</th>
-                                    <th>Tipo</th>
-                                    <th>Quantidade</th>
-                                    <th>Preço</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="estoqueTable">
-                                <tr>
-                                    <td colspan="6" class="text-center">
-                                        <div class="loading"></div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
+    <!-- Ações de Estoque -->
+    <div class="estoque-actions">
+        <div class="action-buttons">
+            <button class="btn btn-primary" onclick="showAddProductModal()">
+                <i class="fas fa-plus"></i>
+                Adicionar Produto Simples
+            </button>
+            <button class="btn btn-info" onclick="showVehicleProductModal()">
+                <i class="fas fa-car"></i>
+                Adicionar por Veículo
+            </button>
+            <button class="btn btn-warning" onclick="showManageVehiclesModal()">
+                <i class="fas fa-cog"></i>
+                Gerenciar Veículos
+            </button>
+            <button class="btn btn-secondary" onclick="exportEstoque()">
+                <i class="fas fa-download"></i>
+                Exportar Estoque
+            </button>
+        </div>
+        
+        <!-- Resumo Rápido -->
+        <div class="estoque-summary" style="margin-top: 15px; padding: 15px; background: #e8f5e8; border-radius: 6px; display: none;" id="estoqueSummary">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h4 style="margin: 0 0 5px 0; color: #2d5016;">Resumo do Estoque</h4>
+                    <p style="margin: 0; color: #4a7c20; font-size: 14px;">
+                        <span id="totalProdutos">0</span> produtos • 
+                        <span id="produtosAtivos">0</span> ativos • 
+                        <span id="produtosBaixoEstoque" style="color: #e63946;">0</span> com estoque baixo
+                    </p>
+                </div>
+                <button class="btn btn-sm btn-outline" onclick="hideEstoqueSummary()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros de Estoque -->
+    <div class="filters-bar">
+        <div class="filter-group">
+            <label for="estoqueTipoFilter">Tipo de Produto</label>
+            <select id="estoqueTipoFilter" onchange="filterEstoque()">
+                <option value="todos">Todos os tipos</option>
+                <option value="oleo">Óleos</option>
+                <option value="filtro">Filtros</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label for="estoqueMarcaFilter">Marca do Veículo</label>
+            <select id="estoqueMarcaFilter" onchange="filterEstoque()">
+                <option value="todos">Todas as marcas</option>
+                <!-- Marcas serão carregadas via JavaScript -->
+            </select>
+        </div>
+        <div class="filter-group">
+            <label for="estoqueStatusFilter">Status</label>
+            <select id="estoqueStatusFilter" onchange="filterEstoque()">
+                <option value="todos">Todos os status</option>
+                <option value="ativo">Ativos</option>
+                <option value="inativo">Inativos</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label for="estoqueEstoqueFilter">Nível de Estoque</label>
+            <select id="estoqueEstoqueFilter" onchange="filterEstoque()">
+                <option value="todos">Todos</option>
+                <option value="baixo">Estoque Baixo</option>
+                <option value="normal">Estoque Normal</option>
+                <option value="zerado">Estoque Zerado</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label for="estoqueSearch">Pesquisar</label>
+            <input type="text" id="estoqueSearch" placeholder="Nome do produto..." onkeyup="searchEstoque()">
+        </div>
+    </div>
+
+    <!-- Estoque Table -->
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th>Marca</th>
+                    <th>Tipo</th>
+                    <th>Quantidade</th>
+                    <th>Preço</th>
+                    <th>Status</th>
+                    <th>Cadastrado em</th>
+                    <th width="120">Ações</th>
+                </tr>
+            </thead>
+            <tbody id="estoqueTable">
+                <tr>
+                    <td colspan="8" class="text-center">
+                        <div class="loading"></div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Paginação -->
+    <div class="pagination-container" style="display: none;" id="estoquePagination">
+        <div class="pagination-info">
+            Mostrando <span id="estoqueStart">1</span>-<span id="estoqueEnd">10</span> de <span id="estoqueTotal">0</span> produtos
+        </div>
+        <div class="pagination-buttons">
+            <button class="btn btn-sm btn-outline" onclick="changeEstoquePage('prev')" id="estoquePrevBtn" disabled>
+                <i class="fas fa-chevron-left"></i> Anterior
+            </button>
+            <span class="pagination-page" id="estoqueCurrentPage">1</span>
+            <button class="btn btn-sm btn-outline" onclick="changeEstoquePage('next')" id="estoqueNextBtn" disabled>
+                Próxima <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+</section>
 
                 <!-- Relatórios Section -->
                 <section id="relatorios" class="content-section">
@@ -426,110 +524,163 @@
                 </section>
 
                 <!-- Configurações Section -->
-                <section id="configuracoes" class="content-section">
-                    <div class="section-header">
-                        <h2>Configurações da Oficina</h2>
-                        <div class="header-actions">
-                            <button class="btn btn-primary" onclick="salvarConfiguracoes()">
-                                <i class="fas fa-save"></i>
-                                Salvar Configurações
-                            </button>
+<section id="configuracoes" class="content-section">
+    <div class="section-header">
+        <h2>Configurações da Oficina</h2>
+        <div class="header-actions">
+            <button class="btn btn-primary" onclick="salvarConfiguracoes()">
+                <i class="fas fa-save"></i>
+                Salvar Configurações
+            </button>
+        </div>
+    </div>
+
+    <div class="configuracoes-container">
+        <!-- Horário de Funcionamento -->
+        <div class="config-card">
+            <div class="config-header">
+                <h3><i class="fas fa-clock"></i> Horário de Funcionamento</h3>
+                <span class="config-status">
+                    <i class="fas fa-check-circle"></i>
+                    Configurado
+                </span>
+            </div>
+            <div class="config-body">
+                <div class="time-input-group">
+                    <input type="time" id="horarioAbertura" class="time-input" value="08:00">
+                    <span class="time-separator">às</span>
+                    <input type="time" id="horarioFechamento" class="time-input" value="18:00">
+                </div>
+                <div style="margin-top: 15px; font-size: 0.9rem; color: var(--text-light);">
+                    <i class="fas fa-info-circle"></i>
+                    Defina o horário comercial da sua oficina
+                </div>
+            </div>
+        </div>
+
+        <!-- Dias de Funcionamento -->
+        <div class="config-card">
+            <div class="config-header">
+                <h3><i class="fas fa-calendar-alt"></i> Dias de Funcionamento</h3>
+            </div>
+            <div class="config-body">
+                <div class="dias-semana-grid">
+                    <label class="dia-checkbox">
+                        <input type="checkbox" id="segunda" value="segunda" checked>
+                        <span class="dia-label">Segunda-feira</span>
+                    </label>
+                    <label class="dia-checkbox">
+                        <input type="checkbox" id="terca" value="terca" checked>
+                        <span class="dia-label">Terça-feira</span>
+                    </label>
+                    <label class="dia-checkbox">
+                        <input type="checkbox" id="quarta" value="quarta" checked>
+                        <span class="dia-label">Quarta-feira</span>
+                    </label>
+                    <label class="dia-checkbox">
+                        <input type="checkbox" id="quinta" value="quinta" checked>
+                        <span class="dia-label">Quinta-feira</span>
+                    </label>
+                    <label class="dia-checkbox">
+                        <input type="checkbox" id="sexta" value="sexta" checked>
+                        <span class="dia-label">Sexta-feira</span>
+                    </label>
+                    <label class="dia-checkbox">
+                        <input type="checkbox" id="sabado" value="sabado" checked>
+                        <span class="dia-label">Sábado</span>
+                    </label>
+                    <label class="dia-checkbox">
+                        <input type="checkbox" id="domingo" value="domingo">
+                        <span class="dia-label">Domingo</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Informações da Oficina -->
+        <div class="config-card">
+            <div class="config-header">
+                <h3><i class="fas fa-info-circle"></i> Informações da Oficina</h3>
+            </div>
+            <div class="config-body">
+                <div class="info-oficina-grid">
+                    <div class="form-group">
+                        <label for="oficinaNome">
+                            <i class="fas fa-store"></i>
+                            Nome da Oficina
+                        </label>
+                        <input type="text" id="oficinaNome" class="form-input" 
+                               placeholder="Ex: Kwil Oloma Brasilândia"
+                               value="Kwil Oloma Brasilândia">
+                    </div>
+                    <div class="form-group">
+                        <label for="oficinaTelefone">
+                            <i class="fas fa-phone"></i>
+                            Telefone
+                        </label>
+                        <input type="text" id="oficinaTelefone" class="form-input" 
+                               placeholder="(11) 99999-9999"
+                               value="(11) 2020-0010">
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label for="oficinaEndereco">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Endereço Completo
+                        </label>
+                        <textarea id="oficinaEndereco" class="form-textarea" 
+                                  placeholder="Endereço completo da oficina" 
+                                  rows="3">Av. Brasilândia, 321 - São Paulo, SP</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Preview do Horário -->
+        <div class="config-card">
+            <div class="config-header">
+                <h3><i class="fas fa-eye"></i> Preview do Horário</h3>
+            </div>
+            <div class="config-body">
+                <div id="previewHorario" class="preview-horario">
+                    <div class="horario-preview-list">
+                        <div class="horario-item">
+                            <span class="dia-semana">Segunda-feira</span>
+                            <span class="horario-funcionamento">08:00 - 18:00</span>
+                        </div>
+                        <div class="horario-item">
+                            <span class="dia-semana">Terça-feira</span>
+                            <span class="horario-funcionamento">08:00 - 18:00</span>
+                        </div>
+                        <div class="horario-item">
+                            <span class="dia-semana">Quarta-feira</span>
+                            <span class="horario-funcionamento">08:00 - 18:00</span>
+                        </div>
+                        <div class="horario-item">
+                            <span class="dia-semana">Quinta-feira</span>
+                            <span class="horario-funcionamento">08:00 - 18:00</span>
+                        </div>
+                        <div class="horario-item">
+                            <span class="dia-semana">Sexta-feira</span>
+                            <span class="horario-funcionamento">08:00 - 18:00</span>
+                        </div>
+                        <div class="horario-item">
+                            <span class="dia-semana">Sábado</span>
+                            <span class="horario-funcionamento">08:00 - 18:00</span>
+                        </div>
+                        <div class="horario-item">
+                            <span class="dia-semana">Domingo</span>
+                            <span class="horario-fechado">Fechado</span>
                         </div>
                     </div>
-
-                    <div class="configuracoes-container">
-                        <!-- Horário de Funcionamento -->
-                        <div class="config-card">
-                            <div class="config-header">
-                                <h3><i class="fas fa-clock"></i> Horário de Funcionamento</h3>
-                            </div>
-                            <div class="config-body">
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="horarioAbertura">Horário de Abertura</label>
-                                        <input type="time" id="horarioAbertura" class="time-input">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="horarioFechamento">Horário de Fechamento</label>
-                                        <input type="time" id="horarioFechamento" class="time-input">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Dias de Funcionamento -->
-                        <div class="config-card">
-                            <div class="config-header">
-                                <h3><i class="fas fa-calendar-alt"></i> Dias de Funcionamento</h3>
-                            </div>
-                            <div class="config-body">
-                                <div class="dias-semana-grid">
-                                    <label class="dia-checkbox">
-                                        <input type="checkbox" id="segunda" value="segunda">
-                                        <span class="dia-label">Segunda-feira</span>
-                                    </label>
-                                    <label class="dia-checkbox">
-                                        <input type="checkbox" id="terca" value="terca">
-                                        <span class="dia-label">Terça-feira</span>
-                                    </label>
-                                    <label class="dia-checkbox">
-                                        <input type="checkbox" id="quarta" value="quarta">
-                                        <span class="dia-label">Quarta-feira</span>
-                                    </label>
-                                    <label class="dia-checkbox">
-                                        <input type="checkbox" id="quinta" value="quinta">
-                                        <span class="dia-label">Quinta-feira</span>
-                                    </label>
-                                    <label class="dia-checkbox">
-                                        <input type="checkbox" id="sexta" value="sexta">
-                                        <span class="dia-label">Sexta-feira</span>
-                                    </label>
-                                    <label class="dia-checkbox">
-                                        <input type="checkbox" id="sabado" value="sabado">
-                                        <span class="dia-label">Sábado</span>
-                                    </label>
-                                    <label class="dia-checkbox">
-                                        <input type="checkbox" id="domingo" value="domingo">
-                                        <span class="dia-label">Domingo</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Informações da Oficina -->
-                        <div class="config-card">
-                            <div class="config-header">
-                                <h3><i class="fas fa-info-circle"></i> Informações da Oficina</h3>
-                            </div>
-                            <div class="config-body">
-                                <div class="form-group">
-                                    <label for="oficinaNome">Nome da Oficina</label>
-                                    <input type="text" id="oficinaNome" class="form-input" placeholder="Nome da sua oficina">
-                                </div>
-                                <div class="form-group">
-                                    <label for="oficinaTelefone">Telefone</label>
-                                    <input type="text" id="oficinaTelefone" class="form-input" placeholder="(11) 99999-9999">
-                                </div>
-                                <div class="form-group">
-                                    <label for="oficinaEndereco">Endereço Completo</label>
-                                    <textarea id="oficinaEndereco" class="form-textarea" placeholder="Endereço completo da oficina" rows="3"></textarea>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Preview do Horário -->
-                        <div class="config-card">
-                            <div class="config-header">
-                                <h3><i class="fas fa-eye"></i> Preview do Horário</h3>
-                            </div>
-                            <div class="config-body">
-                                <div id="previewHorario" class="preview-horario">
-                                    <p>Seu horário de funcionamento será exibido aqui</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+                </div>
+                <div style="margin-top: 15px; font-size: 0.9rem; color: var(--text-light); text-align: center;">
+                    <i class="fas fa-sync-alt"></i>
+                    O preview é atualizado automaticamente quando você altera as configurações
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
             </div>
         </div>
     </div>
@@ -612,6 +763,74 @@
     </div>
 
     <script src="/js/adm.js"></script>
+    <script>
+    // Mobile menu functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.querySelector('.sidebar');
+        
+        // Criar overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'sidebar-overlay';
+        document.body.appendChild(overlay);
+        
+        // Toggle sidebar
+        function toggleSidebar() {
+            sidebar.classList.toggle('mobile-open');
+            overlay.classList.toggle('active');
+            document.body.style.overflow = sidebar.classList.contains('mobile-open') ? 'hidden' : '';
+        }
+        
+        // Fechar sidebar
+        function closeSidebar() {
+            sidebar.classList.remove('mobile-open');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        // Event listeners
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', toggleSidebar);
+        }
+        
+        overlay.addEventListener('click', closeSidebar);
+        
+        // Fechar ao clicar em um link
+        const navLinks = document.querySelectorAll('.nav-link');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 768) {
+                    closeSidebar();
+                }
+            });
+        });
+        
+        // Fechar ao redimensionar para desktop
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                closeSidebar();
+            }
+        });
+        
+        // Search functionality para mobile
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('focus', function() {
+                if (window.innerWidth <= 768) {
+                    this.parentElement.classList.add('mobile-visible');
+                }
+            });
+            
+            searchInput.addEventListener('blur', function() {
+                setTimeout(() => {
+                    if (window.innerWidth <= 768) {
+                        this.parentElement.classList.remove('mobile-visible');
+                    }
+                }, 200);
+            });
+        }
+    });
+</script>
     <script>
         // Atualizar data e hora em tempo real
         function updateDateTime() {
