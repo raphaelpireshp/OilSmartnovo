@@ -265,39 +265,95 @@ router.put('/agendamentos/:id/divergencia', checkOficinaAdmin, (req, res) => {
         });
     });
 });
-// CONCLUIR POR PROTOCOLO (OILxxxx) — permite que o admin conclua usando o protocolo mostrado na agenda do cliente
+// Rota para concluir agendamento por protocolo - CORRIGIDA
 router.put('/agendamentos/concluir-por-protocolo', checkOficinaAdmin, (req, res) => {
     try {
         const { protocolo } = req.body;
         const oficina_id = req.session.admin.oficina_id;
 
+        console.log('🎯 Concluindo agendamento por protocolo:', protocolo, 'Oficina:', oficina_id);
+
         if (!protocolo || !protocolo.toString().trim()) {
-            return res.status(400).json({ success: false, message: 'Protocolo é obrigatório' });
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Protocolo é obrigatório' 
+            });
         }
 
         const protocoloTrim = protocolo.toString().trim();
 
+        // CORREÇÃO: Usar protocolo_cliente que é o nome correto da coluna
         const query = `
-            UPDATE agendamento_simples
-            SET status = 'concluido', data_conclusao = NOW()
-            WHERE protocolo = ? AND oficina_id = ?
+            UPDATE agendamento_simples 
+            SET status = 'concluido', 
+                data_conclusao = NOW(),
+                atualizado_em = NOW()
+            WHERE protocolo_cliente = ? 
+            AND oficina_id = ?
+            AND status IN ('pendente', 'confirmado')
         `;
 
         db.query(query, [protocoloTrim, oficina_id], (err, result) => {
             if (err) {
-                console.error('Erro ao concluir por protocolo:', err);
-                return res.status(500).json({ success: false, message: 'Erro ao concluir agendamento' });
+                console.error('❌ Erro ao concluir por protocolo:', err);
+                return res.status(500).json({ 
+                    success: false, 
+                    message: 'Erro ao concluir agendamento' 
+                });
             }
+
+            console.log('📊 Resultado da atualização:', result.affectedRows, 'linhas afetadas');
 
             if (result.affectedRows === 0) {
-                return res.status(404).json({ success: false, message: 'Protocolo não encontrado para sua oficina' });
-            }
+                // Verificar se o protocolo existe mas já está concluído
+                const checkQuery = `
+                    SELECT id, status, protocolo_cliente 
+                    FROM agendamento_simples 
+                    WHERE protocolo_cliente = ? AND oficina_id = ?
+                `;
+                
+                db.query(checkQuery, [protocoloTrim, oficina_id], (err, checkResults) => {
+                    if (err) {
+                        console.error('Erro ao verificar protocolo:', err);
+                        return res.status(500).json({ 
+                            success: false, 
+                            message: 'Erro ao verificar protocolo' 
+                        });
+                    }
 
-            return res.json({ success: true, message: 'Agendamento concluído com sucesso!' });
+                    if (checkResults.length > 0) {
+                        const agendamento = checkResults[0];
+                        if (agendamento.status === 'concluido') {
+                            return res.status(400).json({ 
+                                success: false, 
+                                message: 'Este agendamento já foi concluído anteriormente' 
+                            });
+                        } else {
+                            return res.status(400).json({ 
+                                success: false, 
+                                message: `Agendamento encontrado mas com status: ${agendamento.status}. Não pode ser concluído.` 
+                            });
+                        }
+                    } else {
+                        return res.status(404).json({ 
+                            success: false, 
+                            message: 'Protocolo não encontrado para sua oficina' 
+                        });
+                    }
+                });
+            } else {
+                return res.json({ 
+                    success: true, 
+                    message: 'Agendamento concluído com sucesso!' 
+                });
+            }
         });
     } catch (error) {
-        console.error('Erro na rota concluir-por-protocolo:', error);
-        res.status(500).json({ success: false, message: 'Erro interno' });
+        console.error('❌ Erro na rota concluir-por-protocolo:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Erro interno do servidor' 
+        });
     }
 });
 
@@ -774,7 +830,63 @@ router.delete('/horarios-excecoes/:id', checkOficinaAdmin, (req, res) => {
         });
     });
 });
+// Rota para obter configuração do intervalo
+router.get('/configuracoes/intervalo', checkOficinaAdmin, (req, res) => {
+    const oficina_id = req.session.admin.oficina_id;
 
+    const query = `
+        SELECT intervalo_agendamento 
+        FROM oficina_config 
+        WHERE oficina_id = ?
+    `;
+
+    db.query(query, [oficina_id], (err, results) => {
+        if (err) {
+            console.error('Erro ao carregar intervalo:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao carregar configuração de intervalo' 
+            });
+        }
+
+        // Se não existir, retorna valor padrão
+        const intervalo = results.length > 0 ? results[0].intervalo_agendamento : 45;
+        
+        res.json({ 
+            success: true, 
+            intervalo: intervalo 
+        });
+    });
+});
+
+// Rota para salvar configuração do intervalo
+router.put('/configuracoes/intervalo', checkOficinaAdmin, (req, res) => {
+    const oficina_id = req.session.admin.oficina_id;
+    const { intervalo } = req.body;
+
+    const query = `
+        INSERT INTO oficina_config (oficina_id, intervalo_agendamento, updated_at)
+        VALUES (?, ?, NOW())
+        ON DUPLICATE KEY UPDATE 
+        intervalo_agendamento = VALUES(intervalo_agendamento),
+        updated_at = NOW()
+    `;
+
+    db.query(query, [oficina_id, intervalo], (err, result) => {
+        if (err) {
+            console.error('Erro ao salvar intervalo:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao salvar configuração de intervalo' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'Intervalo entre agendamentos salvo com sucesso!' 
+        });
+    });
+});
 // Buscar horário válido para uma data específica
 router.get('/horario-data/:data', checkOficinaAdmin, (req, res) => {
     const oficina_id = req.session.admin.oficina_id;
@@ -2036,5 +2148,69 @@ router.post('/horarios-especiais', checkOficinaAdmin, (req, res) => {
         res.json({ success:true, message:"Horário especial salvo com sucesso!" });
     });
 });
+// adminRoutes.js - ADICIONAR ESTAS ROTAS PÚBLICAS
 
+// ROTA PÚBLICA 1: Busca o horário de funcionamento para uma data (considerando especiais)
+router.get('/horario-oficina/:oficina_id/:data', (req, res) => {
+    const { oficina_id, data } = req.params;
+
+    // 1. Verifica se há um horário especial para esta data
+    const queryEspecial = `SELECT * FROM horarios_especiais WHERE oficina_id = ? AND data_especial = ?`;
+    
+    db.query(queryEspecial, [oficina_id, data], (err, especiais) => {
+        if (err) {
+            console.error('Erro ao buscar horário especial:', err);
+            return res.status(500).json({ success: false, message: 'Erro ao buscar horário' });
+        }
+
+        // Se encontrou um horário especial, retorna ele com prioridade
+        if (especiais.length > 0) {
+            return res.json({ success: true, horario: especiais[0], tipo: 'especial' });
+        }
+
+        // 2. Se não houver, busca o horário padrão da oficina
+        const queryOficina = `SELECT horario_abertura, horario_fechamento, dias_funcionamento FROM oficina WHERE id = ?`;
+        
+        db.query(queryOficina, [oficina_id], (err, oficina) => {
+            if (err) {
+                console.error('Erro ao buscar horário da oficina:', err);
+                return res.status(500).json({ success: false, message: 'Erro ao buscar horário' });
+            }
+
+            if (oficina.length === 0) {
+                return res.status(404).json({ success: false, message: 'Oficina não encontrada' });
+            }
+
+            res.json({ success: true, horario: oficina[0], tipo: 'padrao' });
+        });
+    });
+});
+
+// ROTA PÚBLICA 2: Busca horários já ocupados para uma data
+router.get('/oficina/:oficina_id/horarios-ocupados', (req, res) => {
+    const { oficina_id } = req.params;
+    const { data } = req.query; // data no formato 'YYYY-MM-DD'
+
+    if (!data) {
+        return res.status(400).json({ success: false, message: 'Data é obrigatória' });
+    }
+
+    const query = `
+        SELECT TIME(data_hora) as horario 
+        FROM agendamento_simples 
+        WHERE oficina_id = ? 
+        AND DATE(data_hora) = ?
+        AND status IN ('pendente', 'confirmado')
+    `;
+
+    db.query(query, [oficina_id, data], (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar horários ocupados:', err);
+            return res.status(500).json({ success: false, message: 'Erro interno do servidor' });
+        }
+
+        const horarios = results.map(r => r.horario);
+        res.json({ success: true, horarios: horarios });
+    });
+});
 

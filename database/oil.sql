@@ -1305,3 +1305,46 @@ CREATE TABLE horarios_excecoes (
     FOREIGN KEY (oficina_id) REFERENCES oficina(id) ON DELETE CASCADE
 );
 
+
+
+-- Ajustar tabela de estoque (remover quantidade e adicionar status e preço)
+DROP TABLE IF EXISTS estoque;
+CREATE TABLE estoque (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    oficina_id INT NOT NULL,
+    produto_id INT NOT NULL,
+    tipo_produto ENUM('oleo', 'filtro') NOT NULL,
+    preco DECIMAL(10,2) DEFAULT 0,
+    status ENUM('ativo', 'inativo') DEFAULT 'ativo',
+    modelo_ano_id INT NULL, -- opcional, se o produto for vinculado a carro/moto
+    FOREIGN KEY (oficina_id) REFERENCES oficina(id) ON DELETE CASCADE,
+    FOREIGN KEY (modelo_ano_id) REFERENCES modelo_ano(id) ON DELETE SET NULL
+);
+
+-- Horários Especiais (feriados, saídas mais cedo etc.)
+CREATE TABLE horario_especial (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    oficina_id INT NOT NULL,
+    data_especial DATE NOT NULL,
+    horario_abertura TIME NULL,
+    horario_fechamento TIME NULL,
+    motivo VARCHAR(255),
+    FOREIGN KEY (oficina_id) REFERENCES oficina(id) ON DELETE CASCADE
+);
+
+ALTER TABLE estoque
+ADD COLUMN data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ADD COLUMN data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ADD COLUMN ativo BOOLEAN DEFAULT TRUE,
+ADD COLUMN quantidade_minima INT DEFAULT 5;
+
+
+CREATE TABLE IF NOT EXISTS oficina_config (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    oficina_id INT NOT NULL,
+    intervalo_agendamento INT DEFAULT 45 COMMENT 'Intervalo em minutos entre agendamentos',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_oficina (oficina_id),
+    FOREIGN KEY (oficina_id) REFERENCES oficina(id) ON DELETE CASCADE
+);

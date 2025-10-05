@@ -238,9 +238,31 @@ const hamburger = document.getElementById("hamburger-menu");
                     <h2><span class="step-number">3</span> Agendamento</h2>
                     <div class="scheduling-container">
                         <div class="workshop-summary">
+                            <!-- Dentro da seção 3 Agendamento, após workshop-summary -->
+<div class="special-hours-alert" id="specialHoursAlert" style="display: none;">
+    <div class="alert alert-warning">
+        <i class="fas fa-info-circle"></i>
+        <div class="alert-content">
+            <strong>Horário Especial</strong>
+            <span id="specialHoursMessage"></span>
+        </div>
+    </div>
+</div>
+
+<div class="closed-day-alert" id="closedDayAlert" style="display: none;">
+    <div class="alert alert-danger">
+        <i class="fas fa-calendar-times"></i>
+        <div class="alert-content">
+            <strong>Dia Fechado</strong>
+            <span id="closedDayMessage">A oficina não funciona nesta data. Por favor, selecione outra data.</span>
+        </div>
+    </div>
+</div>
                             <h3>Oficina Selecionada</h3>
                             <div id="selected-workshop"></div>
                         </div>
+                        <!-- Dentro da seção 3 Agendamento -->
+<div id="schedule-message" class="alert" style="display: none; margin-top: 10px; padding: 10px; border-radius: 5px;"></div>
                         <div class="schedule-form">
                             <div class="form-row">
                                 <div class="form-group">

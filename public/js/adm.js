@@ -763,7 +763,102 @@ async function loadExceptions() {
         `;
     }
 }
+// Funções para intervalo entre agendamentos
+function calcularCapacidadeAtendimento() {
+    const intervaloSelecionado = document.querySelector('input[name="intervaloAgendamento"]:checked').value;
+    const intervaloNum = parseInt(intervaloSelecionado);
+    
+    // Calcular horas de trabalho (considerando 8 horas por padrão)
+    const horasTrabalho = 8; // 08:00 às 18:00 = 10 horas, mas considerando 8 horas líquidas
+    const minutosTrabalho = horasTrabalho * 60;
+    
+    // Calcular número máximo de atendimentos
+    const maxAtendimentos = Math.floor(minutosTrabalho / intervaloNum);
+    
+    // Atualizar display
+    document.getElementById('intervaloSelecionado').textContent = 
+        intervaloNum === 30 ? '30 minutos' : 
+        intervaloNum === 45 ? '45 minutos' : 
+        intervaloNum === 60 ? '1 hora' : 
+        intervaloNum === 90 ? '1 hora e 30 minutos' : '2 horas';
+    
+    document.getElementById('totalAtendimentos').textContent = maxAtendimentos;
+    
+    console.log(`Intervalo: ${intervaloNum}min - Capacidade: ${maxAtendimentos} atendimentos`);
+}
 
+// Carregar configuração do intervalo
+async function loadIntervaloConfig() {
+    try {
+        const response = await apiCall('/api/admin/configuracoes/intervalo');
+        const data = await response.json();
+        
+        if (data.success && data.intervalo) {
+            const radio = document.querySelector(`input[name="intervaloAgendamento"][value="${data.intervalo}"]`);
+            if (radio) {
+                radio.checked = true;
+            }
+        }
+    } catch (error) {
+        console.error('Erro ao carregar configuração de intervalo:', error);
+        // Usar valor padrão de 45 minutos
+        const radio = document.querySelector('input[name="intervaloAgendamento"][value="45"]');
+        if (radio) radio.checked = true;
+    }
+    
+    calcularCapacidadeAtendimento();
+}
+
+// Salvar configuração do intervalo
+async function salvarIntervaloConfig() {
+    const intervalo = document.querySelector('input[name="intervaloAgendamento"]:checked').value;
+    
+    try {
+        const response = await apiCall('/api/admin/configuracoes/intervalo', {
+            method: 'PUT',
+            body: JSON.stringify({ intervalo: parseInt(intervalo) })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showNotification('Intervalo entre agendamentos salvo com sucesso!', 'success');
+            calcularCapacidadeAtendimento();
+        } else {
+            showNotification(data.message || 'Erro ao salvar intervalo', 'error');
+        }
+    } catch (error) {
+        console.error('Erro ao salvar intervalo:', error);
+        showNotification('Erro ao salvar intervalo entre agendamentos', 'error');
+    }
+}
+
+// Event listeners para intervalo
+document.addEventListener('DOMContentLoaded', function() {
+    const intervaloRadios = document.querySelectorAll('input[name="intervaloAgendamento"]');
+    intervaloRadios.forEach(radio => {
+        radio.addEventListener('change', calcularCapacidadeAtendimento);
+    });
+    
+    // Atualizar função salvarConfiguracoes para incluir o intervalo
+    const originalSalvarConfiguracoes = window.salvarConfiguracoes;
+    window.salvarConfiguracoes = async function() {
+        await originalSalvarConfiguracoes();
+        await salvarIntervaloConfig();
+    };
+    
+    // Carregar configuração quando a seção for aberta
+    const originalShowSection = window.showSection;
+    window.showSection = function(sectionId) {
+        originalShowSection(sectionId);
+        
+        if (sectionId === 'configuracoes') {
+            setTimeout(() => {
+                loadIntervaloConfig();
+            }, 100);
+        }
+    };
+});
 // ==================== FUNÇÕES PARA GESTÃO DE VEÍCULOS ====================
 
 // Modal para adicionar marca
@@ -2626,7 +2721,7 @@ async function loadExceptions() {
     }
 }
 
-// Renderizar horários especiais
+// Renderizar horários especiais - VERSÃO CORRIGIDA
 function renderSpecialHours(horarios) {
     const container = document.getElementById('specialHoursList');
     if (!container) {
@@ -2648,7 +2743,30 @@ function renderSpecialHours(horarios) {
     }
 
     container.innerHTML = horarios.map(horario => {
-        const dataFormatada = new Date(horario.data_especial + 'T00:00:00').toLocaleDateString('pt-BR');
+        // CORREÇÃO: Formatar a data corretamente
+        let dataFormatada;
+        try {
+            // Tenta diferentes formatos de data
+            const dataObj = new Date(horario.data_especial);
+            
+            // Verifica se a data é válida
+            if (isNaN(dataObj.getTime())) {
+                // Se não for válida, tenta formatar manualmente
+                const partes = horario.data_especial.split('-');
+                if (partes.length === 3) {
+                    dataFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`;
+                } else {
+                    dataFormatada = 'Data inválida';
+                }
+            } else {
+                // Data válida, formata normalmente
+                dataFormatada = dataObj.toLocaleDateString('pt-BR');
+            }
+        } catch (error) {
+            console.error('Erro ao formatar data:', error, horario.data_especial);
+            dataFormatada = 'Data inválida';
+        }
+
         return `
         <div class="special-hour-item ${horario.fechado ? 'closed' : ''}">
             <div class="special-hour-info">
