@@ -76,7 +76,46 @@ async function loadDashboard() {
         showNotification('Erro ao carregar dashboard', 'error');
     }
 }
+// Renderizar estoque na tabela
+function renderEstoqueCompleto(estoque) {
+    const tbody = document.getElementById('estoqueTable');
+    if (!tbody) return;
 
+    if (estoque.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="8" class="text-center">Nenhum produto encontrado</td>
+            </tr>
+        `;
+        return;
+    }
+
+    tbody.innerHTML = estoque.map(item => `
+        <tr>
+            <td>${item.produto_nome || 'N/A'}</td>
+            <td>${item.marca || 'Geral'}</td>
+            <td>${item.tipo_produto}</td>
+            <td>${item.quantidade}</td>
+            <td>R$ ${parseFloat(item.preco || 0).toFixed(2)}</td>
+            <td>
+                <span class="status-badge status-${item.status || 'ativo'}">
+                    ${item.status ? item.status.charAt(0).toUpperCase() + item.status.slice(1) : 'Ativo'}
+                </span>
+            </td>
+            <td>${formatDate(item.cadastrado_em) || 'N/A'}</td>
+            <td>
+                <div class="action-buttons">
+                    <button class="btn btn-sm btn-outline" onclick="editProduto(${item.id})" title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteProduto(${item.id})" title="Excluir">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+}
 // Carregar agendamentos da oficina logada
 async function loadAgendamentos(status = 'todos') {
     try {
@@ -100,8 +139,7 @@ async function loadAgendamentos(status = 'todos') {
 }
 
 // Renderizar agendamentos na tabela 
-// Renderizar agendamentos na tabela - VERSÃO ATUALIZADA
-// Renderizar agendamentos na tabela - VERSÃO CORRIGIDA
+
 function renderAgendamentos(agendamentos) {
     const tbody = document.getElementById('agendamentosTable');
     if (!tbody) return;
@@ -324,100 +362,7 @@ async function cancelarAgendamento(id) {
         showNotification('É necessário informar o motivo do cancelamento', 'warning');
     }
 }
-// Carregar estoque
-async function loadEstoque() {
-    try {
-        showLoading('estoqueTable');
-        const response = await apiCall('/api/admin/estoque');
-        const data = await response.json();
 
-        renderEstoque(data.estoque);
-    } catch (error) {
-        console.error('Erro ao carregar estoque:', error);
-        showNotification('Erro ao carregar estoque', 'error');
-    } finally {
-        hideLoading('estoqueTable');
-    }
-}
-
-// Renderizar estoque
-function renderEstoque(estoque) {
-    const tbody = document.getElementById('estoqueTable');
-    if (!tbody) return;
-
-    if (estoque.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="6" class="text-center">
-                    Nenhum item em estoque
-                    <br>
-                    <button class="btn btn-primary mt-2" onclick="showAddProductModal()">
-                        <i class="fas fa-plus"></i> Adicionar Produto
-                    </button>
-                </td>
-            </tr>
-        `;
-        return;
-    }
-
-    tbody.innerHTML = estoque.map(item => `
-        <tr>
-            <td>${item.nome_produto}</td>
-            <td>${item.marca}</td>
-            <td>${item.tipo_produto}</td>
-            <td>
-                <input type="number"
-                    value="${item.quantidade}"
-                    min="0"
-                    onchange="updateEstoque(${item.id}, this.value)"
-                    class="quantity-input">
-            </td>
-            <td>R$ ${parseFloat(item.preco || 0).toFixed(2)}</td>
-            <td>
-                <button class="btn btn-sm btn-danger" onclick="removeProduct(${item.id})" title="Remover">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </td>
-        </tr>
-    `).join('');
-}
-
-// Atualizar estoque
-async function updateEstoque(id, quantidade) {
-    try {
-        const response = await apiCall(`/api/admin/estoque/${id}`, {
-            method: 'PUT',
-            body: JSON.stringify({ quantidade: parseInt(quantidade) })
-        });
-
-        if (response.ok) {
-            showNotification('Estoque atualizado com sucesso!', 'success');
-            loadEstoque();
-        }
-    } catch (error) {
-        console.error('Erro ao atualizar estoque:', error);
-        showNotification('Erro ao atualizar estoque', 'error');
-    }
-}
-
-// Remover produto
-async function removeProduct(id) {
-    if (confirm('Tem certeza que deseja remover este produto do estoque?')) {
-        try {
-            const response = await apiCall(`/api/admin/estoque/${id}`, {
-                method: 'DELETE'
-            });
-
-            if (response.ok) {
-                showNotification('Produto removido com sucesso!', 'success');
-                loadEstoque();
-            }
-        } catch (error) {
-            console.error('Erro ao remover produto:', error);
-            showNotification('Erro ao remover produto', 'error');
-        }
-    }
-}
 
 // Mostrar modal para adicionar produto
 // adm.js - ATUALIZAÇÕES PARA ESTOQUE POR VEÍCULO
@@ -682,81 +627,141 @@ async function addVehicleProduct() {
 
 // ==================== FUNÇÕES PARA CARREGAR DADOS ====================
 
-// Carregar estoque completo
+// ==================== FUNÇÕES CORRIGIDAS PARA ESTOQUE ====================
+
 async function loadEstoqueCompleto() {
     try {
         showLoading('estoqueTable');
-        const response = await apiCall('/api/admin/estoque/completo');
+        
+        // Tenta a rota completa primeiro, depois a simples
+        let response = await apiCall('/api/admin/estoque');
+        
+        // Se der 404, tenta a rota simples
+        if (response.status === 404) {
+            console.log('Rota completa não encontrada, tentando rota simples...');
+            response = await apiCall('/api/admin/estoque');
+        }
+        
         const data = await response.json();
 
-        renderEstoqueCompleto(data.estoque);
+        if (data.success) {
+            if (data.estoque) {
+                renderEstoqueCompleto(data.estoque);
+            } else {
+                // Se não tiver dados, mostra estado vazio
+                renderEstoqueCompleto([]);
+            }
+        } else {
+            showNotification('Erro ao carregar estoque: ' + (data.message || 'Erro desconhecido'), 'error');
+            renderEstoqueCompleto([]);
+        }
     } catch (error) {
         console.error('Erro ao carregar estoque:', error);
-        showNotification('Erro ao carregar estoque', 'error');
+        showNotification('Erro ao carregar estoque. Verifique o console.', 'error');
+        renderEstoqueCompleto([]);
     } finally {
         hideLoading('estoqueTable');
     }
 }
 
-// Renderizar estoque completo
-function renderEstoqueCompleto(estoque) {
-    const tbody = document.getElementById('estoqueTable');
-    if (!tbody) return;
+// ==================== FUNÇÕES CORRIGIDAS PARA HORÁRIOS ESPECIAIS ====================
 
-    if (estoque.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="7" class="text-center">
-                    <div class="empty-state">
-                        <i class="fas fa-box-open"></i>
-                        <h4>Nenhum produto em estoque</h4>
-                        <p>Adicione produtos ao estoque para começar</p>
-                        <button class="btn btn-primary mt-2" onclick="showAddProductModal()">
-                            <i class="fas fa-plus"></i> Adicionar Produto
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        `;
-        return;
-    }
-
-    tbody.innerHTML = estoque.map(item => `
-        <tr class="${item.ativo === 0 ? 'inactive-item' : ''}">
-            <td>
-                <div class="product-info">
-                    <strong>${item.nome_produto}</strong>
-                    <small class="product-type">${item.tipo_produto === 'oleo' ? 'Óleo' : 'Filtro'}</small>
+async function loadSpecialHours() {
+    try {
+        console.log('Carregando horários especiais...');
+        let response = await apiCall('/api/admin/horarios-especiais');
+        
+        // Se der 404, tenta criar a tabela primeiro
+        if (response.status === 404) {
+            console.log('Tabela de horários especiais não existe ainda');
+            document.getElementById('specialHoursList').innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-tools"></i>
+                    <p>Sistema de horários especiais não configurado</p>
+                    <p class="small">As tabelas necessárias ainda não foram criadas</p>
                 </div>
-            </td>
-            <td>${item.marca_produto || '-'}</td>
-            <td>${item.veiculo_completo || 'Produto Geral'}</td>
-            <td>R$ ${parseFloat(item.preco || 0).toFixed(2)}</td>
-            <td>
-                <span class="status-badge status-${item.ativo ? 'ativo' : 'inativo'}">
-                    ${item.ativo ? 'Ativo' : 'Inativo'}
-                </span>
-            </td>
-            <td>${formatDate(item.data_cadastro)}</td>
-            <td>
-                <div class="action-buttons">
-                    ${item.ativo ? `
-                        <button class="btn btn-sm btn-warning" onclick="toggleProductStatus(${item.id}, false)" title="Desativar">
-                            <i class="fas fa-pause"></i>
-                        </button>
-                    ` : `
-                        <button class="btn btn-sm btn-success" onclick="toggleProductStatus(${item.id}, true)" title="Ativar">
-                            <i class="fas fa-play"></i>
-                        </button>
-                    `}
-                    
-                    <button class="btn btn-sm btn-danger" onclick="removeProduct(${item.id})" title="Remover">
-                        <i class="fas fa-trash"></i>
+            `;
+            return;
+        }
+        
+        const data = await response.json();
+        console.log('Dados recebidos:', data);
+
+        if (data.success && data.horarios_especiais) {
+            renderSpecialHours(data.horarios_especiais);
+        } else {
+            document.getElementById('specialHoursList').innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-calendar-times"></i>
+                    <p>Nenhum horário especial configurado</p>
+                    <button class="btn btn-primary mt-2" onclick="showAddSpecialHourModal()">
+                        <i class="fas fa-plus"></i> Adicionar Primeiro Horário
                     </button>
                 </div>
-            </td>
-        </tr>
-    `).join('');
+            `;
+        }
+    } catch (error) {
+        console.error('Erro ao carregar horários especiais:', error);
+        document.getElementById('specialHoursList').innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>Erro ao carregar horários especiais</p>
+                <p class="small">${error.message}</p>
+                <button class="btn btn-secondary mt-2" onclick="loadSpecialHours()">
+                    <i class="fas fa-redo"></i> Tentar Novamente
+                </button>
+            </div>
+        `;
+    }
+}
+
+async function loadExceptions() {
+    try {
+        console.log('Carregando exceções...');
+        let response = await apiCall('/api/admin/horarios-excecoes');
+        
+        // Se der 404, tenta criar a tabela primeiro
+        if (response.status === 404) {
+            console.log('Tabela de exceções não existe ainda');
+            document.getElementById('exceptionsList').innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-tools"></i>
+                    <p>Sistema de exceções não configurado</p>
+                    <p class="small">As tabelas necessárias ainda não foram criadas</p>
+                </div>
+            `;
+            return;
+        }
+        
+        const data = await response.json();
+        console.log('Exceções recebidas:', data);
+
+        if (data.success && data.excecoes) {
+            renderExceptions(data.excecoes);
+        } else {
+            document.getElementById('exceptionsList').innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-calendar-alt"></i>
+                    <p>Nenhuma exceção configurada</p>
+                    <button class="btn btn-primary mt-2" onclick="showAddExceptionModal()">
+                        <i class="fas fa-plus"></i> Adicionar Primeira Exceção
+                    </button>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Erro ao carregar exceções:', error);
+        document.getElementById('exceptionsList').innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>Erro ao carregar exceções</p>
+                <p class="small">${error.message}</p>
+                <button class="btn btn-secondary mt-2" onclick="loadExceptions()">
+                    <i class="fas fa-redo"></i> Tentar Novamente
+                </button>
+            </div>
+        `;
+    }
 }
 
 // ==================== FUNÇÕES PARA GESTÃO DE VEÍCULOS ====================
@@ -1202,7 +1207,7 @@ function hideModal(modalId) {
     }
 }
 
-// Navegação entre seções
+// ATUALIZE a função showSection para incluir horários especiais:
 function showSection(sectionId) {
     // Esconder todas as seções
     document.querySelectorAll('.content-section').forEach(section => {
@@ -1232,7 +1237,9 @@ function showSection(sectionId) {
             'dashboard': 'Dashboard',
             'agendamentos': 'Agendamentos',
             'estoque': 'Estoque',
-            'relatorios': 'Relatórios'
+            'horarios-especiais': 'Horários Especiais', // ADICIONE ESTE
+            'relatorios': 'Relatórios',
+            'configuracoes': 'Configurações'
         };
         pageTitle.textContent = sectionTitles[sectionId] || 'Dashboard';
     }
@@ -1246,10 +1253,16 @@ function showSection(sectionId) {
             loadAgendamentos();
             break;
         case 'estoque':
-            loadEstoque();
+            loadEstoqueCompleto(); // MUDE PARA loadEstoqueCompleto
+            break;
+        case 'horarios-especiais': // ADICIONE ESTE CASO
+            initHorariosEspeciais();
             break;
         case 'relatorios':
             loadRelatorios();
+            break;
+        case 'configuracoes':
+            loadConfiguracoes();
             break;
     }
 }
@@ -2539,4 +2552,456 @@ async function removeProduct(id) {
             showNotification('Erro ao remover produto', 'error');
         }
     }
+}
+
+// ==================== HORÁRIOS ESPECIAIS - FUNÇÕES CORRIGIDAS ====================
+
+// Função para carregar horários especiais
+async function loadSpecialHours() {
+    try {
+        console.log('Carregando horários especiais...');
+        const response = await apiCall('/api/admin/horarios-especiais');
+        const data = await response.json();
+        console.log('Dados recebidos:', data);
+
+        if (data.success && data.horarios_especiais) {
+            renderSpecialHours(data.horarios_especiais);
+        } else {
+            document.getElementById('specialHoursList').innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-calendar-times"></i>
+                    <p>Nenhum horário especial configurado</p>
+                    <button class="btn btn-primary mt-2" onclick="showAddSpecialHourModal()">
+                        <i class="fas fa-plus"></i> Adicionar Primeiro Horário
+                    </button>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Erro ao carregar horários especiais:', error);
+        document.getElementById('specialHoursList').innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>Erro ao carregar horários especiais</p>
+                <button class="btn btn-secondary mt-2" onclick="loadSpecialHours()">
+                    <i class="fas fa-redo"></i> Tentar Novamente
+                </button>
+            </div>
+        `;
+    }
+}
+
+// Função para carregar exceções
+async function loadExceptions() {
+    try {
+        console.log('Carregando exceções...');
+        const response = await apiCall('/api/admin/horarios-excecoes');
+        const data = await response.json();
+        console.log('Exceções recebidas:', data);
+
+        if (data.success && data.excecoes) {
+            renderExceptions(data.excecoes);
+        } else {
+            document.getElementById('exceptionsList').innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-calendar-alt"></i>
+                    <p>Nenhuma exceção configurada</p>
+                    <button class="btn btn-primary mt-2" onclick="showAddExceptionModal()">
+                        <i class="fas fa-plus"></i> Adicionar Primeira Exceção
+                    </button>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Erro ao carregar exceções:', error);
+        document.getElementById('exceptionsList').innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>Erro ao carregar exceções</p>
+                <button class="btn btn-secondary mt-2" onclick="loadExceptions()">
+                    <i class="fas fa-redo"></i> Tentar Novamente
+                </button>
+            </div>
+        `;
+    }
+}
+
+// Renderizar horários especiais
+function renderSpecialHours(horarios) {
+    const container = document.getElementById('specialHoursList');
+    if (!container) {
+        console.error('Container specialHoursList não encontrado!');
+        return;
+    }
+
+    if (!horarios || horarios.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-calendar-times"></i>
+                <p>Nenhum horário especial configurado</p>
+                <button class="btn btn-primary mt-2" onclick="showAddSpecialHourModal()">
+                    <i class="fas fa-plus"></i> Adicionar Primeiro Horário
+                </button>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = horarios.map(horario => {
+        const dataFormatada = new Date(horario.data_especial + 'T00:00:00').toLocaleDateString('pt-BR');
+        return `
+        <div class="special-hour-item ${horario.fechado ? 'closed' : ''}">
+            <div class="special-hour-info">
+                <div class="special-hour-date">
+                    <strong>${dataFormatada}</strong>
+                    ${horario.motivo ? `<span class="special-hour-reason"> - ${horario.motivo}</span>` : ''}
+                </div>
+                <div class="special-hour-time">
+                    ${horario.fechado ? 
+                        '<span class="closed-badge">FECHADO</span>' : 
+                        `${horario.horario_abertura || '--:--'} - ${horario.horario_fechamento || '--:--'}`
+                    }
+                </div>
+            </div>
+            <div class="special-hour-actions">
+                <button class="btn btn-sm btn-danger" onclick="deleteSpecialHour(${horario.id})" title="Excluir">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+        `;
+    }).join('');
+}
+
+// Renderizar exceções
+function renderExceptions(excecoes) {
+    const container = document.getElementById('exceptionsList');
+    if (!container) {
+        console.error('Container exceptionsList não encontrado!');
+        return;
+    }
+
+    if (!excecoes || excecoes.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-calendar-alt"></i>
+                <p>Nenhuma exceção configurada</p>
+                <button class="btn btn-primary mt-2" onclick="showAddExceptionModal()">
+                    <i class="fas fa-plus"></i> Adicionar Primeira Exceção
+                </button>
+            </div>
+        `;
+        return;
+    }
+
+    const diasMap = {
+        'segunda': 'Segunda-feira',
+        'terca': 'Terça-feira',
+        'quarta': 'Quarta-feira',
+        'quinta': 'Quinta-feira',
+        'sexta': 'Sexta-feira',
+        'sabado': 'Sábado',
+        'domingo': 'Domingo'
+    };
+
+    container.innerHTML = excecoes.map(excecao => `
+        <div class="exception-item">
+            <div class="exception-info">
+                <div class="exception-day">
+                    <strong>${diasMap[excecao.dia_semana] || excecao.dia_semana}</strong>
+                    ${excecao.motivo ? `<span class="exception-reason"> - ${excecao.motivo}</span>` : ''}
+                </div>
+                <div class="exception-time">
+                    ${excecao.horario_abertura || '--:--'} - ${excecao.horario_fechamento || '--:--'}
+                </div>
+                ${excecao.data_inicio || excecao.data_fim ? `
+                <div class="exception-period">
+                    <small>
+                        ${excecao.data_inicio ? `De ${new Date(excecao.data_inicio + 'T00:00:00').toLocaleDateString('pt-BR')}` : ''}
+                        ${excecao.data_fim ? ` até ${new Date(excecao.data_fim + 'T00:00:00').toLocaleDateString('pt-BR')}` : ''}
+                    </small>
+                </div>
+                ` : ''}
+            </div>
+            <div class="exception-actions">
+                <button class="btn btn-sm btn-danger" onclick="deleteException(${excecao.id})" title="Excluir">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Modal para adicionar horário especial
+function showAddSpecialHourModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal active';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3>Adicionar Horário Especial</h3>
+                <button class="close-modal" onclick="closeModal(this)">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addSpecialHourForm">
+                    <div class="form-group">
+                        <label for="specialDate">Data</label>
+                        <input type="date" id="specialDate" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="specialReason">Motivo (opcional)</label>
+                        <input type="text" id="specialReason" placeholder="Ex: Feriado, Evento especial, etc.">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="specialClosed" onchange="toggleSpecialHourFields()">
+                            <span class="checkmark"></span>
+                            Oficina fechada neste dia
+                        </label>
+                    </div>
+                    
+                    <div id="specialHourFields">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="specialOpen">Horário de Abertura</label>
+                                <input type="time" id="specialOpen">
+                            </div>
+                            <div class="form-group">
+                                <label for="specialClose">Horário de Fechamento</label>
+                                <input type="time" id="specialClose">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal(this)">Cancelar</button>
+                <button class="btn btn-primary" onclick="addSpecialHour()">Salvar Horário</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Definir data mínima como hoje
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('specialDate').min = today;
+    document.getElementById('specialDate').value = today;
+    
+    toggleSpecialHourFields();
+}
+
+// Modal para adicionar exceção
+function showAddExceptionModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal active';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3>Adicionar Exceção de Dia da Semana</h3>
+                <button class="close-modal" onclick="closeModal(this)">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addExceptionForm">
+                    <div class="form-group">
+                        <label for="exceptionDay">Dia da Semana</label>
+                        <select id="exceptionDay" required>
+                            <option value="">Selecione o dia</option>
+                            <option value="segunda">Segunda-feira</option>
+                            <option value="terca">Terça-feira</option>
+                            <option value="quarta">Quarta-feira</option>
+                            <option value="quinta">Quinta-feira</option>
+                            <option value="sexta">Sexta-feira</option>
+                            <option value="sabado">Sábado</option>
+                            <option value="domingo">Domingo</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="exceptionReason">Motivo (opcional)</label>
+                        <input type="text" id="exceptionReason" placeholder="Ex: Horário de verão, Manutenção, etc.">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="exceptionOpen">Horário de Abertura</label>
+                            <input type="time" id="exceptionOpen" required value="08:00">
+                        </div>
+                        <div class="form-group">
+                            <label for="exceptionClose">Horário de Fechamento</label>
+                            <input type="time" id="exceptionClose" required value="18:00">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal(this)">Cancelar</button>
+                <button class="btn btn-primary" onclick="addException()">Salvar Exceção</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+// Alternar campos de horário
+function toggleSpecialHourFields() {
+    const closed = document.getElementById('specialClosed');
+    const hourFields = document.getElementById('specialHourFields');
+    
+    if (closed && hourFields) {
+        hourFields.style.display = closed.checked ? 'none' : 'block';
+    }
+}
+
+// Adicionar horário especial
+async function addSpecialHour() {
+    const data = document.getElementById('specialDate').value;
+    const motivo = document.getElementById('specialReason').value;
+    const fechado = document.getElementById('specialClosed').checked;
+    const horarioAbertura = document.getElementById('specialOpen').value;
+    const horarioFechamento = document.getElementById('specialClose').value;
+
+    if (!data) {
+        showNotification('Data é obrigatória', 'error');
+        return;
+    }
+
+    const payload = {
+        data_especial: data,
+        motivo: motivo,
+        fechado: fechado
+    };
+
+    if (!fechado) {
+        if (!horarioAbertura || !horarioFechamento) {
+            showNotification('Horários são obrigatórios quando a oficina não está fechada', 'error');
+            return;
+        }
+        payload.horario_abertura = horarioAbertura;
+        payload.horario_fechamento = horarioFechamento;
+    }
+
+    try {
+        const response = await apiCall('/api/admin/horarios-especiais', {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showNotification('Horário especial adicionado com sucesso!', 'success');
+            closeModal(document.querySelector('#addSpecialHourForm'));
+            loadSpecialHours();
+        } else {
+            showNotification(data.message || 'Erro ao adicionar horário especial', 'error');
+        }
+    } catch (error) {
+        console.error('Erro ao adicionar horário especial:', error);
+        showNotification('Erro ao adicionar horário especial', 'error');
+    }
+}
+
+// Adicionar exceção
+async function addException() {
+    const diaSemana = document.getElementById('exceptionDay').value;
+    const motivo = document.getElementById('exceptionReason').value;
+    const horarioAbertura = document.getElementById('exceptionOpen').value;
+    const horarioFechamento = document.getElementById('exceptionClose').value;
+
+    if (!diaSemana || !horarioAbertura || !horarioFechamento) {
+        showNotification('Dia da semana e horários são obrigatórios', 'error');
+        return;
+    }
+
+    const payload = {
+        dia_semana: diaSemana,
+        motivo: motivo,
+        horario_abertura: horarioAbertura,
+        horario_fechamento: horarioFechamento
+    };
+
+    try {
+        const response = await apiCall('/api/admin/horarios-excecoes', {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showNotification('Exceção adicionada com sucesso!', 'success');
+            closeModal(document.querySelector('#addExceptionForm'));
+            loadExceptions();
+        } else {
+            showNotification(data.message || 'Erro ao adicionar exceção', 'error');
+        }
+    } catch (error) {
+        console.error('Erro ao adicionar exceção:', error);
+        showNotification('Erro ao adicionar exceção', 'error');
+    }
+}
+
+// Excluir horário especial
+async function deleteSpecialHour(id) {
+    if (confirm('Tem certeza que deseja excluir este horário especial?')) {
+        try {
+            const response = await apiCall(`/api/admin/horarios-especiais/${id}`, {
+                method: 'DELETE'
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showNotification('Horário especial excluído com sucesso!', 'success');
+                loadSpecialHours();
+            } else {
+                showNotification(data.message || 'Erro ao excluir horário especial', 'error');
+            }
+        } catch (error) {
+            console.error('Erro ao excluir horário especial:', error);
+            showNotification('Erro ao excluir horário especial', 'error');
+        }
+    }
+}
+
+// Excluir exceção
+async function deleteException(id) {
+    if (confirm('Tem certeza que deseja excluir esta exceção?')) {
+        try {
+            const response = await apiCall(`/api/admin/horarios-excecoes/${id}`, {
+                method: 'DELETE'
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showNotification('Exceção excluída com sucesso!', 'success');
+                loadExceptions();
+            } else {
+                showNotification(data.message || 'Erro ao excluir exceção', 'error');
+            }
+        } catch (error) {
+            console.error('Erro ao excluir exceção:', error);
+            showNotification('Erro ao excluir exceção', 'error');
+        }
+    }
+}
+
+// Fechar modal
+function closeModal(element) {
+    const modal = element.closest('.modal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+// Inicializar horários especiais quando a seção for carregada
+function initHorariosEspeciais() {
+    console.log('Inicializando horários especiais...');
+    loadSpecialHours();
+    loadExceptions();
 }

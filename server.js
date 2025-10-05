@@ -1191,6 +1191,106 @@ function isValidDayForWorkshop(selectedDate, workshop) {
 // Exportar a função para uso em outras partes do código
 app.isValidDayForWorkshop = isValidDayForWorkshop;
 
+// Importar e montar rotas admin
+const adminRoutes = require('./routes/adminRoutes');
+app.use('/api/admin', adminRoutes);
+
+// Manipulador de 404 para API (retorna JSON em vez de HTML)
+app.use((req, res, next) => {
+    if (req.path.startsWith('/api')) {
+        return res.status(404).json({ success: false, message: 'Rota não encontrada' });
+    }
+    next();
+});
+
+// Rota para clientes verificarem horários especiais
+app.get('/api/oficina/:id/horario-especial/:data', (req, res) => {
+    const { id, data } = req.params;
+    
+    // Primeiro verifica se há horário especial para esta data
+    const queryEspecial = `
+        SELECT * FROM horarios_especiais 
+        WHERE oficina_id = ? AND data_especial = ?
+    `;
+
+    db.query(queryEspecial, [id, data], (err, especiais) => {
+        if (err) {
+            console.error('Erro ao buscar horário especial:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao buscar horário' 
+            });
+        }
+
+        // Se encontrou horário especial, retorna ele
+        if (especiais.length > 0) {
+            return res.json({ 
+                success: true, 
+                horario_especial: especiais[0],
+                tipo: 'especial'
+            });
+        }
+
+        // Se não especial, checa exceção para o dia da semana
+        const dateObj = new Date(data);
+        const dayNames = ['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'];
+        const diaSemana = dayNames[dateObj.getDay()];
+
+        const queryExcecao = `
+            SELECT * FROM horarios_excecoes 
+            WHERE oficina_id = ? AND dia_semana = ?
+        `;
+
+        db.query(queryExcecao, [id, diaSemana], (err, excecoes) => {
+            if (err) {
+                console.error('Erro ao buscar exceção:', err);
+                return res.status(500).json({ 
+                    success: false, 
+                    message: 'Erro ao buscar horário' 
+                });
+            }
+
+            if (excecoes.length > 0) {
+                return res.json({ 
+                    success: true, 
+                    horario_especial: excecoes[0],
+                    tipo: 'excecao'
+                });
+            }
+
+            // Se nada, busca o horário padrão da oficina
+            const queryOficina = `
+                SELECT horario_abertura, horario_fechamento, dias_funcionamento 
+                FROM oficina WHERE id = ?
+            `;
+
+            db.query(queryOficina, [id], (err, oficina) => {
+                if (err) {
+                    console.error('Erro ao buscar horário da oficina:', err);
+                    return res.status(500).json({ 
+                        success: false, 
+                        message: 'Erro ao buscar horário' 
+                    });
+                }
+
+                if (oficina.length === 0) {
+                    return res.status(404).json({ 
+                        success: false, 
+                        message: 'Oficina não encontrada' 
+                    });
+                }
+
+                res.json({ 
+                    success: true, 
+                    horario_especial: null,
+                    horario_padrao: oficina[0],
+                    tipo: 'padrao'
+                });
+            });
+        });
+    });
+});
+
 // ========== INICIAR SERVIDOR ==========
 
 app.listen(PORT, () => {
@@ -1198,5 +1298,4 @@ app.listen(PORT, () => {
     console.log(`📊 Painel administrativo: http://localhost:${PORT}/admindex.html`);
     console.log(`👤 Painel do cliente: http://localhost:${PORT}/html/agenda.html`);
 });
-
 module.exports = app;

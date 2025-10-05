@@ -40,6 +40,12 @@
                             <span>Estoque</span>
                         </a>
                     </li>
+                            <li class="nav-item">
+            <a href="#" class="nav-link" onclick="showSection('horarios-especiais')">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Horários Especiais</span>
+            </a>
+        </li>
                     <li class="nav-item">
                         <a href="#" class="nav-link" onclick="showSection('relatorios')">
                             <i class="fas fa-chart-bar"></i>
@@ -477,6 +483,41 @@
         </div>
     </div>
 </section>
+<!-- Seção de Horários Especiais -->
+<div id="horarios-especiais" class="content-section">
+    <div class="section-header">
+        <h2>Horários Especiais</h2>
+        <p>Configure horários diferentes para datas específicas ou dias da semana</p>
+    </div>
+
+    <div class="special-hours-container">
+        <!-- Horários Especiais (Datas Específicas) -->
+        <div class="special-hours-section">
+            <div class="section-header">
+                <h3>Datas Especiais</h3>
+                <button class="btn btn-primary" onclick="showAddSpecialHourModal()">
+                    <i class="fas fa-plus"></i> Adicionar Data Especial
+                </button>
+            </div>
+            <div id="specialHoursList" class="special-hours-list">
+                <!-- Lista de horários especiais será carregada aqui -->
+            </div>
+        </div>
+
+        <!-- Exceções de Dias da Semana -->
+        <div class="exceptions-section">
+            <div class="section-header">
+                <h3>Exceções de Dias da Semana</h3>
+                <button class="btn btn-primary" onclick="showAddExceptionModal()">
+                    <i class="fas fa-plus"></i> Adicionar Exceção
+                </button>
+            </div>
+            <div id="exceptionsList" class="exceptions-list">
+                <!-- Lista de exceções será carregada aqui -->
+            </div>
+        </div>
+    </div>
+</div>
 
                 <!-- Relatórios Section -->
                 <section id="relatorios" class="content-section">
@@ -595,6 +636,7 @@
                     </label>
                 </div>
             </div>
+            
         </div>
 
         <!-- Informações da Oficina -->
@@ -677,10 +719,13 @@
                     <i class="fas fa-sync-alt"></i>
                     O preview é atualizado automaticamente quando você altera as configurações
                 </div>
+                
             </div>
         </div>
     </div>
+
 </section>
+
             </div>
         </div>
     </div>

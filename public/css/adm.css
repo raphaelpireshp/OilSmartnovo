@@ -1,17 +1,19 @@
-:root {
-    --primary-color: #213f57;
-    --secondary-color: #b49434;
-    --accent-color: #d4b15f;
-    --text-color: #333;
-    --text-light: #777;
-    --border-color: #e0e0e0;
-    --success-color: #28a745;
-    --warning-color: #ffc107;
-    --danger-color: #dc3545;
-    --transition: all 0.3s ease;
-    --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    --border-radius: 10px;
-    --card-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+/* ATUALIZAR estas variáveis no :root */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --primary-color: #2d4f7c;
+        --secondary-color: #d4b15f;
+        --accent-color: #e8c97d;
+        --text-color: #e0e0e0;
+        --text-light: #a0a0a0;
+        --border-color: #444;
+        --bg-color: #1a1a1a;
+        --light-color: #2a2a2a;
+        --dark-color: #f8f9fa;
+        --card-bg: #2a2a2a;
+        --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+        --card-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
 }
 
 /* Dark mode variables */
@@ -180,6 +182,67 @@ body {
 .user-details {
     display: flex;
     flex-direction: column;
+}
+/* CORREÇÕES GERAIS - ADICIONAR */
+.data-table {
+    color: inherit;
+}
+
+.metric-card {
+    color: inherit;
+}
+
+.activities-card {
+    color: inherit;
+}
+
+/* Garantir que textos em cards sejam legíveis */
+.card-header,
+.metric-content,
+.activity-content {
+    color: inherit;
+}
+
+/* Corrigir textos em modais */
+.modal-body,
+.detail-value {
+    color: var(--text-color) !important;
+}
+
+/* Corrigir filtros */
+.filters-bar {
+    background-color: var(--card-bg);
+    border-color: rgba(180, 148, 52, 0.2);
+}
+
+/* Corrigir paginação */
+.pagination-container {
+    color: var(--text-color);
+}
+
+.pagination-info {
+    color: var(--text-light);
+}
+
+/* Corrigir estados vazios */
+.text-center {
+    color: var(--text-light);
+}
+
+.empty-state {
+    color: var(--text-light);
+}
+
+.empty-state i {
+    color: var(--text-light);
+}
+
+.empty-state h4 {
+    color: var(--text-color);
+}
+
+.empty-state p {
+    color: var(--text-light);
 }
 
 .user-name {
@@ -2005,7 +2068,7 @@ body {
 }
 
 .config-header h3 {
-    color: var(--primary-color);
+    color: #007bff99;
     font-size: 1.3rem;
     font-weight: 600;
     display: flex;
@@ -2132,7 +2195,7 @@ body {
 
 .dia-semana {
     font-weight: 600;
-    color: var(--primary-color);
+    color: #007bff99;
     font-size: 0.95rem;
 }
 
@@ -2675,3 +2738,477 @@ body {
     100% { transform: rotate(360deg); }
 }
 
+
+
+/* CORREÇÕES DE CORES DE TEXTO - ADICIONAR */
+@media (prefers-color-scheme: dark) {
+    body {
+        color: var(--text-color);
+        background-color: var(--bg-color);
+    }
+    
+    .main-header {
+        background-color: var(--card-bg);
+        color: var(--text-color);
+    }
+    
+    .page-title {
+        color: var(--text-color);
+    }
+    
+    .section-header h2 {
+        color: var(--text-color);
+    }
+    
+    .metric-content h3 {
+        color: var(--text-light);
+    }
+    
+    .metric-value {
+        color: var(--text-color);
+    }
+    
+    .card-header h3 {
+        color: var(--text-color);
+    }
+    
+    .activity-title {
+        color: var(--text-color);
+    }
+    
+    .data-table th {
+        color: var(--text-light);
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+    
+    .data-table td {
+        color: var(--text-color);
+    }
+    
+    .filter-group label {
+        color: var(--text-color);
+    }
+    
+    /* Corrigir inputs no modo escuro */
+    input, select, textarea {
+        background-color: var(--card-bg) !important;
+        color: var(--text-color) !important;
+        border-color: var(--border-color) !important;
+    }
+    
+    input::placeholder, 
+    select::placeholder, 
+    textarea::placeholder {
+        color: var(--text-light) !important;
+        opacity: 0.7;
+    }
+    
+    /* Corrigir cards */
+    .metric-card,
+    .activities-card,
+    .config-card,
+    .table-container,
+    .filters-bar {
+        background-color: var(--card-bg);
+        color: var(--text-color);
+    }
+    
+    /* Corrigir estados hover */
+    .data-table tr:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+    
+    /* Corrigir botões outline */
+    .btn-outline {
+        border-color: var(--secondary-color);
+        color: var(--secondary-color);
+    }
+    
+    .btn-outline:hover {
+        background-color: var(--secondary-color);
+        color: var(--dark-color);
+    }
+    
+    /* Corrigir search box */
+    .search-box input {
+        background-color: var(--light-color) !important;
+        color: var(--text-color) !important;
+    }
+    
+    .search-box i {
+        color: var(--text-light);
+    }
+    
+    /* Corrigir notificação */
+    .notification-btn {
+        color: var(--text-light);
+    }
+    
+    .notification-btn:hover {
+        color: var(--secondary-color);
+    }
+    
+    /* Corrigir modal */
+    .modal-content {
+        background-color: var(--card-bg);
+        color: var(--text-color);
+    }
+    
+    .modal-header h3 {
+        color: var(--text-color);
+    }
+    
+    .close-modal {
+        color: var(--text-light);
+    }
+    
+    .close-modal:hover {
+        color: var(--text-color);
+    }
+    
+    /* Corrigir seção de protocolo */
+    .concluir-agendamento {
+        background: linear-gradient(135deg, #2a2a2a 0%, #333 100%);
+        border-color: var(--border-color);
+        color: var(--text-color);
+    }
+    
+    .concluir-agendamento h2 {
+        color: var(--text-color);
+    }
+    
+    .protocolo-input-group label {
+        color: var(--text-color);
+    }
+    
+    .protocolo-input {
+        background: var(--light-color) !important;
+        color: var(--text-color) !important;
+        border-color: var(--border-color);
+    }
+    
+    .protocolo-input:focus {
+        border-color: var(--secondary-color);
+    }
+}
+
+
+/* Estilos para horários especiais */
+.special-hour-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    margin-bottom: 8px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border-left: 4px solid #2a9d8f;
+}
+
+.special-hour-item.closed {
+    border-left-color: #e63946;
+    background: #fff5f5;
+}
+
+.special-hour-info {
+    flex: 1;
+}
+
+.special-hour-date {
+    margin-bottom: 4px;
+}
+
+.special-hour-reason {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-left: 8px;
+}
+
+.special-hour-time {
+    font-weight: 500;
+}
+
+.closed-badge {
+    background: #e63946;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.special-hour-actions {
+    display: flex;
+    gap: 8px;
+}
+
+/* Estilos para exceções */
+.exception-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    margin-bottom: 8px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border-left: 4px solid #3a86ff;
+}
+
+.exception-info {
+    flex: 1;
+}
+
+.exception-day {
+    margin-bottom: 4px;
+}
+
+.exception-reason {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-left: 8px;
+}
+
+.exception-time {
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.exception-period {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+.exception-actions {
+    display: flex;
+    gap: 8px;
+}
+
+/* Estados vazios */
+.empty-state {
+    text-align: center;
+    padding: 20px;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    color: #adb5bd;
+}
+
+/* Horários Especiais */
+.special-hours-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.special-hours-section,
+.exceptions-section {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.special-hour-item,
+.exception-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+}
+
+.special-hour-item.closed {
+    background-color: #fff5f5;
+    border-color: #feb2b2;
+}
+
+.special-hour-info,
+.exception-info {
+    flex: 1;
+}
+
+.special-hour-date,
+.exception-day {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.special-hour-time,
+.exception-time {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.special-hour-reason,
+.exception-reason {
+    color: #6c757d;
+    font-size: 0.85rem;
+    font-style: italic;
+}
+
+.exception-period {
+    margin-top: 0.25rem;
+}
+
+.closed-badge {
+    background: #e53e3e;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.special-hour-actions,
+.exception-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #adb5bd;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .special-hours-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .special-hour-item,
+    .exception-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .special-hour-actions,
+    .exception-actions {
+        align-self: flex-end;
+    }
+}
+
+/* ===== HORÁRIOS ESPECIAIS ===== */
+.special-hours-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.special-hours-section,
+.exceptions-section {
+    background: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--border-color);
+}
+
+.special-hour-item,
+.exception-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+    background: var(--light-color);
+}
+
+.special-hour-item.closed {
+    background-color: rgba(230, 57, 70, 0.1);
+    border-color: rgba(230, 57, 70, 0.3);
+}
+
+.special-hour-info,
+.exception-info {
+    flex: 1;
+}
+
+.special-hour-date,
+.exception-day {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: var(--text-color);
+}
+
+.special-hour-time,
+.exception-time {
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+.special-hour-reason,
+.exception-reason {
+    color: var(--text-light);
+    font-size: 0.85rem;
+    font-style: italic;
+}
+
+.exception-period {
+    margin-top: 0.25rem;
+    font-size: 0.8rem;
+    color: var(--text-light);
+}
+
+.closed-badge {
+    background: #e53e3e;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.special-hour-actions,
+.exception-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-light);
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: var(--text-light);
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .special-hours-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .special-hour-item,
+    .exception-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .special-hour-actions,
+    .exception-actions {
+        align-self: flex-end;
+    }
+}

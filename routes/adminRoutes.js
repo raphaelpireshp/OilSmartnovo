@@ -575,7 +575,265 @@ router.get('/relatorios/agendamentos', checkOficinaAdmin, (req, res) => {
         });
     });
 });
+// ==================== ROTAS PARA HORÁRIOS ESPECIAIS ====================
 
+// Buscar horários especiais da oficina
+router.get('/horarios-especiais', checkOficinaAdmin, (req, res) => {
+    const oficina_id = req.session.admin.oficina_id;
+
+    const query = `
+        SELECT * FROM horarios_especiais 
+        WHERE oficina_id = ? 
+        ORDER BY data_especial DESC
+    `;
+
+    db.query(query, [oficina_id], (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar horários especiais:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao buscar horários especiais' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            horarios_especiais: results 
+        });
+    });
+});
+
+// Buscar exceções de dias da semana
+router.get('/horarios-excecoes', checkOficinaAdmin, (req, res) => {
+    const oficina_id = req.session.admin.oficina_id;
+
+    const query = `
+        SELECT * FROM horarios_excecoes 
+        WHERE oficina_id = ? AND ativo = TRUE
+        ORDER BY dia_semana
+    `;
+
+    db.query(query, [oficina_id], (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar exceções:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao buscar exceções de horário' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            excecoes: results 
+        });
+    });
+});
+
+// Adicionar horário especial
+router.post('/horarios-especiais', checkOficinaAdmin, (req, res) => {
+    const oficina_id = req.session.admin.oficina_id;
+    const { data_especial, horario_abertura, horario_fechamento, motivo, fechado } = req.body;
+
+    if (!data_especial) {
+        return res.status(400).json({
+            success: false,
+            message: 'Data é obrigatória'
+        });
+    }
+
+    const query = `
+        INSERT INTO horarios_especiais 
+        (oficina_id, data_especial, horario_abertura, horario_fechamento, motivo, fechado)
+        VALUES (?, ?, ?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE
+        horario_abertura = VALUES(horario_abertura),
+        horario_fechamento = VALUES(horario_fechamento),
+        motivo = VALUES(motivo),
+        fechado = VALUES(fechado),
+        updated_at = CURRENT_TIMESTAMP
+    `;
+
+    db.query(query, [
+        oficina_id, data_especial, horario_abertura, horario_fechamento, motivo, fechado || false
+    ], (err, result) => {
+        if (err) {
+            console.error('Erro ao adicionar horário especial:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao adicionar horário especial' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'Horário especial adicionado com sucesso!',
+            horario_id: result.insertId
+        });
+    });
+});
+
+// Adicionar exceção de dia da semana
+router.post('/horarios-excecoes', checkOficinaAdmin, (req, res) => {
+    const oficina_id = req.session.admin.oficina_id;
+    const { dia_semana, horario_abertura, horario_fechamento, motivo, data_inicio, data_fim } = req.body;
+
+    if (!dia_semana) {
+        return res.status(400).json({
+            success: false,
+            message: 'Dia da semana é obrigatório'
+        });
+    }
+
+    const query = `
+        INSERT INTO horarios_excecoes 
+        (oficina_id, dia_semana, horario_abertura, horario_fechamento, motivo, data_inicio, data_fim)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    db.query(query, [
+        oficina_id, dia_semana, horario_abertura, horario_fechamento, motivo, data_inicio, data_fim
+    ], (err, result) => {
+        if (err) {
+            console.error('Erro ao adicionar exceção:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao adicionar exceção de horário' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'Exceção de horário adicionada com sucesso!',
+            excecao_id: result.insertId
+        });
+    });
+});
+
+// Remover horário especial
+router.delete('/horarios-especiais/:id', checkOficinaAdmin, (req, res) => {
+    const { id } = req.params;
+    const oficina_id = req.session.admin.oficina_id;
+
+    const query = `
+        DELETE FROM horarios_especiais 
+        WHERE id = ? AND oficina_id = ?
+    `;
+
+    db.query(query, [id, oficina_id], (err, result) => {
+        if (err) {
+            console.error('Erro ao remover horário especial:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao remover horário especial' 
+            });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Horário especial não encontrado' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'Horário especial removido com sucesso!' 
+        });
+    });
+});
+
+// Remover exceção
+router.delete('/horarios-excecoes/:id', checkOficinaAdmin, (req, res) => {
+    const { id } = req.params;
+    const oficina_id = req.session.admin.oficina_id;
+
+    const query = `
+        DELETE FROM horarios_excecoes 
+        WHERE id = ? AND oficina_id = ?
+    `;
+
+    db.query(query, [id, oficina_id], (err, result) => {
+        if (err) {
+            console.error('Erro ao remover exceção:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao remover exceção' 
+            });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Exceção não encontrada' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'Exceção removida com sucesso!' 
+        });
+    });
+});
+
+// Buscar horário válido para uma data específica
+router.get('/horario-data/:data', checkOficinaAdmin, (req, res) => {
+    const oficina_id = req.session.admin.oficina_id;
+    const { data } = req.params;
+
+    // Primeiro verifica se há horário especial para esta data
+    const queryEspecial = `
+        SELECT * FROM horarios_especiais 
+        WHERE oficina_id = ? AND data_especial = ?
+    `;
+
+    db.query(queryEspecial, [oficina_id, data], (err, especiais) => {
+        if (err) {
+            console.error('Erro ao buscar horário especial:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao buscar horário' 
+            });
+        }
+
+        // Se encontrou horário especial, retorna ele
+        if (especiais.length > 0) {
+            return res.json({ 
+                success: true, 
+                horario: especiais[0],
+                tipo: 'especial'
+            });
+        }
+
+        // Se não, busca o horário padrão da oficina
+        const queryOficina = `
+            SELECT horario_abertura, horario_fechamento, dias_funcionamento 
+            FROM oficina WHERE id = ?
+        `;
+
+        db.query(queryOficina, [oficina_id], (err, oficina) => {
+            if (err) {
+                console.error('Erro ao buscar horário da oficina:', err);
+                return res.status(500).json({ 
+                    success: false, 
+                    message: 'Erro ao buscar horário' 
+                });
+            }
+
+            if (oficina.length === 0) {
+                return res.status(404).json({ 
+                    success: false, 
+                    message: 'Oficina não encontrada' 
+                });
+            }
+
+            res.json({ 
+                success: true, 
+                horario: oficina[0],
+                tipo: 'padrao'
+            });
+        });
+    });
+});
 module.exports = router;
 
 
@@ -1401,30 +1659,34 @@ router.get('/produtos/:tipo', checkOficinaAdmin, (req, res) => {
     }
 });
 
-// Buscar estoque da oficina com informações completas
+// ==================== ROTAS CORRIGIDAS PARA ESTOQUE ====================
+
+// Rota para estoque completo (corrigida)
 router.get('/estoque/completo', checkOficinaAdmin, (req, res) => {
     const oficina_id = req.session.admin.oficina_id;
 
     const query = `
         SELECT 
-            e.id,
-            e.produto_id,
-            e.tipo_produto,
-            e.preco,
-            e.ativo,
-            e.data_cadastro,
+            e.*,
             CASE 
                 WHEN e.tipo_produto = 'oleo' THEN po.nome
                 WHEN e.tipo_produto = 'filtro' THEN pf.nome
+                ELSE 'Produto Desconhecido'
             END as nome_produto,
             CASE 
                 WHEN e.tipo_produto = 'oleo' THEN po.marca
                 WHEN e.tipo_produto = 'filtro' THEN pf.marca
+                ELSE '-'
             END as marca_produto,
             m.nome as marca_veiculo,
             mo.nome as modelo_veiculo,
             ma.ano as ano_veiculo,
-            CONCAT(m.nome, ' ', mo.nome, ' ', ma.ano) as veiculo_completo
+            CONCAT(m.nome, ' ', mo.nome, ' ', ma.ano) as veiculo_completo,
+            CASE 
+                WHEN e.quantidade <= 0 THEN 'zerado'
+                WHEN e.quantidade <= 5 THEN 'baixo'
+                ELSE 'normal'
+            END as nivel_estoque
         FROM estoque e
         LEFT JOIN produto_oleo po ON e.tipo_produto = 'oleo' AND e.produto_id = po.id
         LEFT JOIN produto_filtro pf ON e.tipo_produto = 'filtro' AND e.produto_id = pf.id
@@ -1447,6 +1709,200 @@ router.get('/estoque/completo', checkOficinaAdmin, (req, res) => {
         res.json({
             success: true,
             estoque: results
+        });
+    });
+});
+
+// ==================== ROTAS CORRIGIDAS PARA HORÁRIOS ESPECIAIS ====================
+
+// Rota para horários especiais (corrigida)
+router.get('/horarios-especiais', checkOficinaAdmin, (req, res) => {
+    const oficina_id = req.session.admin.oficina_id;
+
+    const query = `
+        SELECT * FROM horarios_especiais 
+        WHERE oficina_id = ? 
+        ORDER BY data_especial DESC
+    `;
+
+    db.query(query, [oficina_id], (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar horários especiais:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao buscar horários especiais' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            horarios_especiais: results 
+        });
+    });
+});
+
+// Rota para exceções (corrigida)
+router.get('/horarios-excecoes', checkOficinaAdmin, (req, res) => {
+    const oficina_id = req.session.admin.oficina_id;
+
+    const query = `
+        SELECT * FROM horarios_excecoes 
+        WHERE oficina_id = ? AND ativo = TRUE
+        ORDER BY dia_semana
+    `;
+
+    db.query(query, [oficina_id], (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar exceções:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao buscar exceções de horário' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            excecoes: results 
+        });
+    });
+});
+
+// Rota para adicionar horário especial (corrigida)
+router.post('/horarios-especiais', checkOficinaAdmin, (req, res) => {
+    const oficina_id = req.session.admin.oficina_id;
+    const { data_especial, horario_abertura, horario_fechamento, motivo, fechado } = req.body;
+
+    if (!data_especial) {
+        return res.status(400).json({
+            success: false,
+            message: 'Data é obrigatória'
+        });
+    }
+
+    const query = `
+        INSERT INTO horarios_especiais 
+        (oficina_id, data_especial, horario_abertura, horario_fechamento, motivo, fechado)
+        VALUES (?, ?, ?, ?, ?, ?)
+    `;
+
+    db.query(query, [
+        oficina_id, data_especial, horario_abertura, horario_fechamento, motivo, fechado || false
+    ], (err, result) => {
+        if (err) {
+            console.error('Erro ao adicionar horário especial:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao adicionar horário especial' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'Horário especial adicionado com sucesso!',
+            horario_id: result.insertId
+        });
+    });
+});
+
+// Rota para adicionar exceção (corrigida)
+router.post('/horarios-excecoes', checkOficinaAdmin, (req, res) => {
+    const oficina_id = req.session.admin.oficina_id;
+    const { dia_semana, horario_abertura, horario_fechamento, motivo } = req.body;
+
+    if (!dia_semana) {
+        return res.status(400).json({
+            success: false,
+            message: 'Dia da semana é obrigatório'
+        });
+    }
+
+    const query = `
+        INSERT INTO horarios_excecoes 
+        (oficina_id, dia_semana, horario_abertura, horario_fechamento, motivo)
+        VALUES (?, ?, ?, ?, ?)
+    `;
+
+    db.query(query, [
+        oficina_id, dia_semana, horario_abertura, horario_fechamento, motivo
+    ], (err, result) => {
+        if (err) {
+            console.error('Erro ao adicionar exceção:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao adicionar exceção de horário' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'Exceção de horário adicionada com sucesso!',
+            excecao_id: result.insertId
+        });
+    });
+});
+
+// Rota para excluir horário especial (corrigida)
+router.delete('/horarios-especiais/:id', checkOficinaAdmin, (req, res) => {
+    const { id } = req.params;
+    const oficina_id = req.session.admin.oficina_id;
+
+    const query = `
+        DELETE FROM horarios_especiais 
+        WHERE id = ? AND oficina_id = ?
+    `;
+
+    db.query(query, [id, oficina_id], (err, result) => {
+        if (err) {
+            console.error('Erro ao remover horário especial:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao remover horário especial' 
+            });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Horário especial não encontrado' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'Horário especial removido com sucesso!' 
+        });
+    });
+});
+
+// Rota para excluir exceção (corrigida)
+router.delete('/horarios-excecoes/:id', checkOficinaAdmin, (req, res) => {
+    const { id } = req.params;
+    const oficina_id = req.session.admin.oficina_id;
+
+    const query = `
+        DELETE FROM horarios_excecoes 
+        WHERE id = ? AND oficina_id = ?
+    `;
+
+    db.query(query, [id, oficina_id], (err, result) => {
+        if (err) {
+            console.error('Erro ao remover exceção:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao remover exceção' 
+            });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Exceção não encontrada' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'Exceção removida com sucesso!' 
         });
     });
 });
@@ -1518,3 +1974,67 @@ router.delete('/estoque/:id', checkOficinaAdmin, (req, res) => {
         });
     });
 });
+
+// ROTAS ESTOQUE
+router.get('/estoque', checkOficinaAdmin, (req, res) => {
+    const oficina_id = req.session.admin.oficina_id;
+    const query = `
+        SELECT e.*, 
+               CASE WHEN e.tipo_produto = 'oleo' THEN o.nome ELSE f.nome END as produto_nome
+        FROM estoque e
+        LEFT JOIN produto_oleo o ON (e.tipo_produto='oleo' AND e.produto_id=o.id)
+        LEFT JOIN produto_filtro f ON (e.tipo_produto='filtro' AND e.produto_id=f.id)
+        WHERE e.oficina_id = ?`;
+    
+    db.query(query, [oficina_id], (err, results) => {
+        if (err) return res.status(500).json({ success:false, message:"Erro ao buscar estoque" });
+        res.json({ success:true, estoque: results });
+    });
+});
+
+router.post('/estoque', checkOficinaAdmin, (req, res) => {
+    const oficina_id = req.session.admin.oficina_id;
+    const { produto_id, tipo_produto, preco, status, modelo_ano_id } = req.body;
+
+    const query = `INSERT INTO estoque (oficina_id, produto_id, tipo_produto, preco, status, modelo_ano_id)
+                   VALUES (?, ?, ?, ?, ?, ?)`;
+    db.query(query, [oficina_id, produto_id, tipo_produto, preco, status, modelo_ano_id || null], (err, result) => {
+        if (err) return res.status(500).json({ success:false, message:"Erro ao adicionar item" });
+        res.json({ success:true, message:"Produto adicionado com sucesso!" });
+    });
+});
+
+router.put('/estoque/:id', checkOficinaAdmin, (req, res) => {
+    const { id } = req.params;
+    const { preco, status } = req.body;
+    const oficina_id = req.session.admin.oficina_id;
+
+    const query = `UPDATE estoque SET preco=?, status=? WHERE id=? AND oficina_id=?`;
+    db.query(query, [preco, status, id, oficina_id], (err, result) => {
+        if (err) return res.status(500).json({ success:false, message:"Erro ao atualizar item" });
+        res.json({ success:true, message:"Produto atualizado com sucesso!" });
+    });
+});
+
+// ROTAS HORÁRIOS ESPECIAIS
+router.get('/horarios-especiais', checkOficinaAdmin, (req, res) => {
+    const oficina_id = req.session.admin.oficina_id;
+    db.query(`SELECT * FROM horario_especial WHERE oficina_id=? ORDER BY data_especial DESC`, 
+        [oficina_id], (err, results) => {
+            if (err) return res.status(500).json({ success:false, message:"Erro ao buscar horários" });
+            res.json({ success:true, horarios: results });
+    });
+});
+
+router.post('/horarios-especiais', checkOficinaAdmin, (req, res) => {
+    const oficina_id = req.session.admin.oficina_id;
+    const { data_especial, horario_abertura, horario_fechamento, motivo } = req.body;
+    const query = `INSERT INTO horario_especial (oficina_id, data_especial, horario_abertura, horario_fechamento, motivo)
+                   VALUES (?, ?, ?, ?, ?)`;
+    db.query(query, [oficina_id, data_especial, horario_abertura, horario_fechamento, motivo], (err, result) => {
+        if (err) return res.status(500).json({ success:false, message:"Erro ao salvar horário especial" });
+        res.json({ success:true, message:"Horário especial salvo com sucesso!" });
+    });
+});
+
+

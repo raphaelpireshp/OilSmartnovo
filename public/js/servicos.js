@@ -2129,6 +2129,79 @@ function setMinScheduleDate() {
         }
     });
 }
+// Função auxiliar para verificar se o dia da semana é válido (baseado em dias_funcionamento da oficina)
+function isValidDayOfWeek(date, diasFuncionamento) {
+    const dayNames = ['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'];
+    const dayIndex = date.getDay();
+    const diaSemana = dayNames[dayIndex];
+    return diasFuncionamento.toLowerCase().includes(diaSemana);
+}
+
+// Função para carregar horários disponíveis (adaptada para checar especial/exceções)
+async function loadAvailableTimes(selectedDate) {
+    if (!selectedWorkshop || !selectedDate) return;
+
+    const dateStr = selectedDate.toISOString().split('T')[0]; // Formato YYYY-MM-DD
+    const horarioSelect = document.getElementById('schedule-time'); // Assuma ID do select de horários
+    horarioSelect.innerHTML = ''; // Limpa opções
+
+    try {
+        // Primeiro, verifica dias de funcionamento padrão
+        if (!isValidDayOfWeek(selectedDate, selectedWorkshop.dias_funcionamento)) {
+            showNotification('Oficina fechada neste dia da semana.', 'error');
+            return;
+        }
+
+        // Chama API para horário especial
+        const response = await fetch(`/api/oficina/${selectedWorkshop.id}/horario-especial/${dateStr}`);
+        const data = await response.json();
+
+        if (!data.success) {
+            showNotification('Erro ao verificar horários.', 'error');
+            return;
+        }
+
+        let abertura = selectedWorkshop.horario_abertura;
+        let fechamento = selectedWorkshop.horario_fechamento;
+        let fechado = false;
+
+        if (data.horario_especial) {
+            if (data.horario_especial.fechado) {
+                fechado = true;
+            } else {
+                abertura = data.horario_especial.horario_abertura;
+                fechamento = data.horario_especial.horario_fechamento;
+            }
+        }
+
+        if (fechado) {
+            showNotification('Oficina fechada nesta data devido a horário especial.', 'error');
+            return;
+        }
+
+        // Gera horários disponíveis (ex: a cada 30min)
+        const startTime = new Date(`1970-01-01T${abertura}:00`);
+        const endTime = new Date(`1970-01-01T${fechamento}:00`);
+        while (startTime < endTime) {
+            const option = document.createElement('option');
+            option.value = startTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            option.text = option.value;
+            horarioSelect.appendChild(option);
+            startTime.setMinutes(startTime.getMinutes() + 30); // Intervalo de 30min
+        }
+
+        // TODO: Chame API para verificar horários já ocupados e remover opções indisponíveis
+    } catch (error) {
+        console.error('Erro ao carregar horários:', error);
+        showNotification('Erro ao carregar horários disponíveis.', 'error');
+    }
+}
+
+// Event listener para mudança de data (adicione ou adapte se não existir)
+scheduleDate.addEventListener('change', () => {
+    const selectedDate = new Date(scheduleDate.value);
+    loadAvailableTimes(selectedDate);
+});
 
     // ==================== EVENT LISTENERS ====================
 
@@ -3049,4 +3122,385 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+});
+_content
+
+
+// Função para verificar horário especial
+async function checkSpecialHours(workshopId, date) {
+    try {
+        const response = await fetch(`/api/oficina/${workshopId}/horario-especial/${date}`);
+        
+        if (response.ok) {
+            const data = await response.json();
+            return data.horario_especial || null;
+        }
+        return null;
+    } catch (error) {
+        console.warn('Erro ao verificar horários especiais:', error);
+        return null;
+    }
+}
+
+// Função atualizada para gerar horários disponíveis
+async function generateAvailableTimeSlots(workshop, selectedDate) {
+    const timeSelect = document.getElementById("schedule-time");
+    timeSelect.innerHTML = '<option value="" disabled selected>Carregando horários...</option>';
+
+    try {
+        const dataFormatada = selectedDate.toISOString().split('T')[0];
+        
+        // Verificar se há horário especial
+        const horarioEspecial = await checkSpecialHours(workshop.id, dataFormatada);
+        
+        let startTime, endTime;
+        
+        if (horarioEspecial && horarioEspecial.fechado) {
+            // Oficina fechada neste dia
+            timeSelect.innerHTML = '<option value="" disabled selected>Oficina fechada neste dia</option>';
+            
+            // Mostrar motivo se existir
+            if (horarioEspecial.motivo) {
+                const motivoOption = document.createElement('option');
+                motivoOption.value = '';
+                motivoOption.disabled = true;
+                motivoOption.textContent = `Motivo: ${horarioEspecial.motivo}`;
+                timeSelect.appendChild(motivoOption);
+            }
+            return;
+        } else if (horarioEspecial) {
+            // Usar horário especial
+            startTime = horarioEspecial.horario_abertura;
+            endTime = horarioEspecial.horario_fechamento;
+            
+            // Adicionar indicador de horário especial
+            const specialOption = document.createElement('option');
+            specialOption.value = '';
+            specialOption.disabled = true;
+            specialOption.textContent = `⚠️ Horário especial: ${startTime} - ${endTime}`;
+            timeSelect.appendChild(specialOption);
+        } else {
+            // Usar horário padrão
+            startTime = workshop.horario_abertura || "08:00";
+            endTime = workshop.horario_fechamento || "18:00";
+        }
+
+        // Resto da função para gerar slots de horário...
+        const slots = generateTimeSlots(startTime, endTime, 30);
+        const horariosOcupados = await getHorariosOcupados(workshop.id, dataFormatada);
+        
+        const now = new Date();
+        const isToday = selectedDate.toDateString() === now.toDateString();
+        
+        let availableSlots = 0;
+        timeSelect.innerHTML = '';
+
+        // Adicionar opção padrão
+        const defaultOption = document.createElement("option");
+        defaultOption.value = "";
+        defaultOption.textContent = "Selecione um horário";
+        defaultOption.disabled = true;
+        defaultOption.selected = true;
+        timeSelect.appendChild(defaultOption);
+
+        slots.forEach(time => {
+            // Verificar se é horário passado (se for hoje)
+            if (isToday) {
+                const [hours, minutes] = time.split(':').map(Number);
+                const slotTime = new Date();
+                slotTime.setHours(hours, minutes, 0, 0);
+                if (slotTime <= now) return;
+            }
+
+            // Verificar se está ocupado
+            const isOcupado = horariosOcupados.includes(time);
+
+            const option = document.createElement("option");
+            option.value = time;
+            
+            if (isOcupado) {
+                option.textContent = `${time} (Reservado)`;
+                option.disabled = true;
+                option.style.color = '#e63946';
+            } else {
+                option.textContent = time;
+                availableSlots++;
+            }
+            
+            timeSelect.appendChild(option);
+        });
+
+        if (availableSlots === 0) {
+            timeSelect.innerHTML = '';
+            const noSlotsOption = document.createElement("option");
+            noSlotsOption.value = "";
+            noSlotsOption.textContent = "Nenhum horário disponível para esta data";
+            noSlotsOption.disabled = true;
+            timeSelect.appendChild(noSlotsOption);
+        }
+        
+    } catch (error) {
+        console.error('Erro ao carregar horários:', error);
+        timeSelect.innerHTML = '<option value="" disabled selected>Erro ao carregar horários disponíveis</option>';
+    }
+}
+
+// ==================== ROTAS PARA HORÁRIOS ESPECIAIS ====================
+
+// Buscar horários especiais da oficina
+router.get('/horarios-especiais', checkOficinaAdmin, (req, res) => {
+    const oficina_id = req.session.admin.oficina_id;
+
+    const query = `
+        SELECT * FROM horarios_especiais 
+        WHERE oficina_id = ? 
+        ORDER BY data_especial DESC
+    `;
+
+    db.query(query, [oficina_id], (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar horários especiais:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao buscar horários especiais' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            horarios_especiais: results 
+        });
+    });
+});
+
+// Buscar exceções de dias da semana
+router.get('/horarios-excecoes', checkOficinaAdmin, (req, res) => {
+    const oficina_id = req.session.admin.oficina_id;
+
+    const query = `
+        SELECT * FROM horarios_excecoes 
+        WHERE oficina_id = ? AND ativo = TRUE
+        ORDER BY dia_semana
+    `;
+
+    db.query(query, [oficina_id], (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar exceções:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao buscar exceções de horário' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            excecoes: results 
+        });
+    });
+});
+
+// Adicionar horário especial
+router.post('/horarios-especiais', checkOficinaAdmin, (req, res) => {
+    const oficina_id = req.session.admin.oficina_id;
+    const { data_especial, horario_abertura, horario_fechamento, motivo, fechado } = req.body;
+
+    if (!data_especial) {
+        return res.status(400).json({
+            success: false,
+            message: 'Data é obrigatória'
+        });
+    }
+
+    const query = `
+        INSERT INTO horarios_especiais 
+        (oficina_id, data_especial, horario_abertura, horario_fechamento, motivo, fechado)
+        VALUES (?, ?, ?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE
+        horario_abertura = VALUES(horario_abertura),
+        horario_fechamento = VALUES(horario_fechamento),
+        motivo = VALUES(motivo),
+        fechado = VALUES(fechado),
+        updated_at = CURRENT_TIMESTAMP
+    `;
+
+    db.query(query, [
+        oficina_id, data_especial, horario_abertura, horario_fechamento, motivo, fechado || false
+    ], (err, result) => {
+        if (err) {
+            console.error('Erro ao adicionar horário especial:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao adicionar horário especial' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'Horário especial adicionado com sucesso!',
+            horario_id: result.insertId
+        });
+    });
+});
+
+// Adicionar exceção de dia da semana
+router.post('/horarios-excecoes', checkOficinaAdmin, (req, res) => {
+    const oficina_id = req.session.admin.oficina_id;
+    const { dia_semana, horario_abertura, horario_fechamento, motivo, data_inicio, data_fim } = req.body;
+
+    if (!dia_semana) {
+        return res.status(400).json({
+            success: false,
+            message: 'Dia da semana é obrigatório'
+        });
+    }
+
+    const query = `
+        INSERT INTO horarios_excecoes 
+        (oficina_id, dia_semana, horario_abertura, horario_fechamento, motivo, data_inicio, data_fim)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    db.query(query, [
+        oficina_id, dia_semana, horario_abertura, horario_fechamento, motivo, data_inicio, data_fim
+    ], (err, result) => {
+        if (err) {
+            console.error('Erro ao adicionar exceção:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao adicionar exceção de horário' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'Exceção de horário adicionada com sucesso!',
+            excecao_id: result.insertId
+        });
+    });
+});
+
+// Remover horário especial
+router.delete('/horarios-especiais/:id', checkOficinaAdmin, (req, res) => {
+    const { id } = req.params;
+    const oficina_id = req.session.admin.oficina_id;
+
+    const query = `
+        DELETE FROM horarios_especiais 
+        WHERE id = ? AND oficina_id = ?
+    `;
+
+    db.query(query, [id, oficina_id], (err, result) => {
+        if (err) {
+            console.error('Erro ao remover horário especial:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao remover horário especial' 
+            });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Horário especial não encontrado' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'Horário especial removido com sucesso!' 
+        });
+    });
+});
+
+// Remover exceção
+router.delete('/horarios-excecoes/:id', checkOficinaAdmin, (req, res) => {
+    const { id } = req.params;
+    const oficina_id = req.session.admin.oficina_id;
+
+    const query = `
+        DELETE FROM horarios_excecoes 
+        WHERE id = ? AND oficina_id = ?
+    `;
+
+    db.query(query, [id, oficina_id], (err, result) => {
+        if (err) {
+            console.error('Erro ao remover exceção:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao remover exceção' 
+            });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Exceção não encontrada' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'Exceção removida com sucesso!' 
+        });
+    });
+});
+
+// Buscar horário válido para uma data específica
+router.get('/horario-data/:data', checkOficinaAdmin, (req, res) => {
+    const oficina_id = req.session.admin.oficina_id;
+    const { data } = req.params;
+
+    // Primeiro verifica se há horário especial para esta data
+    const queryEspecial = `
+        SELECT * FROM horarios_especiais 
+        WHERE oficina_id = ? AND data_especial = ?
+    `;
+
+    db.query(queryEspecial, [oficina_id, data], (err, especiais) => {
+        if (err) {
+            console.error('Erro ao buscar horário especial:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao buscar horário' 
+            });
+        }
+
+        // Se encontrou horário especial, retorna ele
+        if (especiais.length > 0) {
+            return res.json({ 
+                success: true, 
+                horario: especiais[0],
+                tipo: 'especial'
+            });
+        }
+
+        // Se não, busca o horário padrão da oficina
+        const queryOficina = `
+            SELECT horario_abertura, horario_fechamento, dias_funcionamento 
+            FROM oficina WHERE id = ?
+        `;
+
+        db.query(queryOficina, [oficina_id], (err, oficina) => {
+            if (err) {
+                console.error('Erro ao buscar horário da oficina:', err);
+                return res.status(500).json({ 
+                    success: false, 
+                    message: 'Erro ao buscar horário' 
+                });
+            }
+
+            if (oficina.length === 0) {
+                return res.status(404).json({ 
+                    success: false, 
+                    message: 'Oficina não encontrada' 
+                });
+            }
+
+            res.json({ 
+                success: true, 
+                horario: oficina[0],
+                tipo: 'padrao'
+            });
+        });
+    });
 });
