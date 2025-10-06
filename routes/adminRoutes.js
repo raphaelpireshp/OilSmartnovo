@@ -2,7 +2,44 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../database/db');
-
+// Rota para cliente buscar intervalo da oficina
+router.get('/oficina/:id/intervalo', (req, res) => {
+    const { id } = req.params;
+    
+    console.log('📡 Cliente solicitando intervalo da oficina:', id);
+    
+    const query = `
+        SELECT intervalo_agendamento 
+        FROM oficina_config 
+        WHERE oficina_id = ?
+    `;
+    
+    db.query(query, [id], (err, results) => {
+        if (err) {
+            console.error('❌ Erro ao buscar intervalo para cliente:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao buscar intervalo' 
+            });
+        }
+        
+        if (results.length > 0 && results[0].intervalo_agendamento) {
+            const intervalo = results[0].intervalo_agendamento;
+            console.log('✅ Intervalo enviado para cliente:', intervalo);
+            
+            res.json({ 
+                success: true, 
+                intervalo: intervalo 
+            });
+        } else {
+            console.log('ℹ️  Usando intervalo padrão (45min) para oficina:', id);
+            res.json({ 
+                success: true, 
+                intervalo: 45 
+            });
+        }
+    });
+});
 // Middleware para verificar se é admin de oficina
 function checkOficinaAdmin(req, res, next) {
     // Verificar se o usuário está autenticado e é admin
@@ -880,6 +917,42 @@ router.put('/configuracoes/intervalo', checkOficinaAdmin, (req, res) => {
                 message: 'Erro ao salvar configuração de intervalo' 
             });
         }
+
+        res.json({ 
+            success: true, 
+            message: 'Intervalo entre agendamentos salvo com sucesso!' 
+        });
+    });
+});
+// Rota para salvar configuração do intervalo - VERSÃO COM DEBUG
+router.put('/configuracoes/intervalo', checkOficinaAdmin, (req, res) => {
+    const oficina_id = req.session.admin.oficina_id;
+    const { intervalo } = req.body;
+
+    console.log('💾 Salvando intervalo:', {
+        oficina_id: oficina_id,
+        intervalo: intervalo,
+        tipo: typeof intervalo
+    });
+
+    const query = `
+        INSERT INTO oficina_config (oficina_id, intervalo_agendamento, updated_at)
+        VALUES (?, ?, NOW())
+        ON DUPLICATE KEY UPDATE 
+        intervalo_agendamento = VALUES(intervalo_agendamento),
+        updated_at = NOW()
+    `;
+
+    db.query(query, [oficina_id, parseInt(intervalo)], (err, result) => {
+        if (err) {
+            console.error('❌ Erro ao salvar intervalo:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao salvar configuração de intervalo' 
+            });
+        }
+
+        console.log('✅ Intervalo salvo com sucesso! Resultado:', result);
 
         res.json({ 
             success: true, 
@@ -2214,3 +2287,60 @@ router.get('/oficina/:oficina_id/horarios-ocupados', (req, res) => {
     });
 });
 
+// Rota para obter configuração do intervalo
+router.get('/configuracoes/intervalo', checkOficinaAdmin, (req, res) => {
+    const oficina_id = req.session.admin.oficina_id;
+
+    const query = `
+        SELECT intervalo_agendamento 
+        FROM oficina_config 
+        WHERE oficina_id = ?
+    `;
+
+    db.query(query, [oficina_id], (err, results) => {
+        if (err) {
+            console.error('Erro ao carregar intervalo:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao carregar configuração de intervalo' 
+            });
+        }
+
+        // Se não existir, retorna valor padrão
+        const intervalo = results.length > 0 ? results[0].intervalo_agendamento : 45;
+        
+        res.json({ 
+            success: true, 
+            intervalo: intervalo 
+        });
+    });
+});
+
+// Rota para salvar configuração do intervalo
+router.put('/configuracoes/intervalo', checkOficinaAdmin, (req, res) => {
+    const oficina_id = req.session.admin.oficina_id;
+    const { intervalo } = req.body;
+
+    const query = `
+        INSERT INTO oficina_config (oficina_id, intervalo_agendamento, updated_at)
+        VALUES (?, ?, NOW())
+        ON DUPLICATE KEY UPDATE 
+        intervalo_agendamento = VALUES(intervalo_agendamento),
+        updated_at = NOW()
+    `;
+
+    db.query(query, [oficina_id, intervalo], (err, result) => {
+        if (err) {
+            console.error('Erro ao salvar intervalo:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao salvar configuração de intervalo' 
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'Intervalo entre agendamentos salvo com sucesso!' 
+        });
+    });
+});

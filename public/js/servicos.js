@@ -42,6 +42,54 @@ document.addEventListener("DOMContentLoaded", function() {
     let specialHoursCache = {};
 
     // ==================== FUNÇÕES AUXILIARES GERAIS ====================
+// ==================== FUNÇÕES AUXILIARES GERAIS ====================
+// Buscar intervalo configurado da oficina - VERSÃO CORRIGIDA
+async function getWorkshopInterval(workshopId) {
+    try {
+        console.log('🔄 Buscando intervalo para oficina:', workshopId);
+        
+        // CORREÇÃO: Mudar para a rota correta do adminRoutes.js
+        const response = await fetch(`/api/admin/oficina/${workshopId}/intervalo`);
+        
+        if (!response.ok) {
+            console.warn('⚠️ Erro HTTP ao buscar intervalo, usando padrão de 45min');
+            return 45;
+        }
+        
+        const data = await response.json();
+        console.log('📦 Dados recebidos da API de intervalo:', data);
+        
+        if (data.success) {
+            const intervalo = parseInt(data.intervalo || data.intervalo_agendamento);
+            
+            if (!isNaN(intervalo) && intervalo > 0) {
+                console.log('✅ Intervalo encontrado:', intervalo, 'minutos');
+                return intervalo;
+            }
+        }
+        
+        console.warn('⚠️ Intervalo não encontrado ou inválido, usando padrão de 45min');
+        return 45;
+        
+    } catch (error) {
+        console.error('❌ Erro ao buscar intervalo:', error);
+        return 45;
+    }
+}
+
+let intervaloAgendamento = 45; // valor padrão caso não venha nada do servidor
+
+async function carregarConfigOficina(oficinaId) {
+    try {
+        const res = await fetch(`/api/oficina/${oficinaId}/config`);
+        const data = await res.json();
+        intervaloAgendamento = data.intervalo_agendamento || 45;
+        console.log("⏱ Intervalo da oficina:", intervaloAgendamento);
+    } catch (err) {
+        console.error("Erro ao carregar configuração da oficina:", err);
+    }
+}
+
 
     // Mostra/oculta o loading
     function showLoading(show) {
@@ -1052,27 +1100,27 @@ document.addEventListener("DOMContentLoaded", function() {
         return diasArray.includes(diaSemana);
     }
 
-    // Gera slots de tempo
-    function generateTimeSlots(start, end, interval) {
-        const slots = [];
-        const [startHour, startMinute] = start.split(":").map(Number);
-        const [endHour, endMinute] = end.split(":").map(Number);
+// Gera slots de tempo baseado no intervalo configurado
+function generateTimeSlots(start, end, interval) {
+    const slots = [];
+    const [startHour, startMinute] = start.split(":").map(Number);
+    const [endHour, endMinute] = end.split(":").map(Number);
+    
+    let currentHour = startHour;
+    let currentMinute = startMinute;
+    
+    while (currentHour < endHour || (currentHour === endHour && currentMinute < endMinute)) {
+        const time = `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`;
+        slots.push(time);
         
-        let currentHour = startHour;
-        let currentMinute = startMinute;
-        
-        while (currentHour < endHour || (currentHour === endHour && currentMinute < endMinute)) {
-            const time = `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`;
-            slots.push(time);
-            
-            currentMinute += interval;
-            if (currentMinute >= 60) {
-                currentHour += Math.floor(currentMinute / 60);
-                currentMinute = currentMinute % 60;
-            }
+        currentMinute += interval;
+        if (currentMinute >= 60) {
+            currentHour += Math.floor(currentMinute / 60);
+            currentMinute = currentMinute % 60;
         }
-        return slots;
     }
+    return slots;
+}
 
     // Busca horários ocupados do banco
     async function getHorariosOcupados(workshopId, data) {
@@ -1112,109 +1160,129 @@ document.addEventListener("DOMContentLoaded", function() {
         specialHoursCache = {};
     }
 
-    // Gera horários disponíveis (priorizando especiais e ocupados)
-    async function generateAvailableTimeSlots(workshop, selectedDate) {
-        scheduleTimeSelect.innerHTML = '<option value="" disabled selected>Carregando horários...</option>';
-        const continueButton = document.querySelector('button[onclick="goToStep(4)"]');
-        if (continueButton) continueButton.disabled = true;
+// Gera horários disponíveis (com intervalo configurado) - VERSÃO COM DEBUG
+// Gera horários disponíveis (com intervalo configurado) - VERSÃO CORRIGIDA
+async function generateAvailableTimeSlots(workshop, selectedDate) {
+    scheduleTimeSelect.innerHTML = '<option value="" disabled selected>Carregando horários...</option>';
+    const continueButton = document.querySelector('button[onclick="goToStep(4)"]');
+    if (continueButton) continueButton.disabled = true;
 
-        try {
-            const dataFormatada = selectedDate.toISOString().split('T')[0];
+    try {
+        const dataFormatada = selectedDate.toISOString().split('T')[0];
+        console.log('📅 Gerando horários para:', dataFormatada, 'Oficina:', workshop.id);
+        
+        if (!isValidDayForWorkshop(selectedDate, workshop)) {
+            const dayNames = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+            const dayOfWeek = dayNames[selectedDate.getDay()];
             
-            if (!isValidDayForWorkshop(selectedDate, workshop)) {
-                const dayNames = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
-                const dayOfWeek = dayNames[selectedDate.getDay()];
-                
-                scheduleTimeSelect.innerHTML = '';
-                const option = document.createElement("option");
-                option.value = "";
-                option.textContent = `Oficina não funciona aos ${dayOfWeek}s`;
-                option.disabled = true;
-                scheduleTimeSelect.appendChild(option);
-                return;
-            }
-
-            const horarioEspecial = await checkSpecialHours(workshop.id, dataFormatada);
-            let startTime, endTime;
-            let specialMessage = '';
-
-            if (horarioEspecial) {
-                if (horarioEspecial.fechado) {
-                    scheduleTimeSelect.innerHTML = '<option value="" disabled selected>Oficina fechada neste dia</option>';
-                    if (horarioEspecial.motivo) {
-                        const motivoOption = document.createElement('option');
-                        motivoOption.textContent = `Motivo: ${horarioEspecial.motivo}`;
-                        motivoOption.disabled = true;
-                        scheduleTimeSelect.appendChild(motivoOption);
-                    }
-                    return;
-                } else {
-                    startTime = horarioEspecial.horario_abertura;
-                    endTime = horarioEspecial.horario_fechamento;
-                    specialMessage = ` (Horário especial: ${formatHorarioFuncionamento(startTime, endTime)})`;
-                }
-            } else {
-                startTime = workshop.horario_abertura || "08:00";
-                endTime = workshop.horario_fechamento || "18:00";
-            }
-
-            const interval = 30;
-            const slots = generateTimeSlots(startTime, endTime, interval);
-            const horariosOcupados = await getHorariosOcupados(workshop.id, dataFormatada);
-            
-            const now = new Date();
-            const isToday = selectedDate.toDateString() === now.toDateString();
-            
-            let availableSlotsCount = 0;
             scheduleTimeSelect.innerHTML = '';
-
-            const defaultOption = document.createElement("option");
-            defaultOption.value = "";
-            defaultOption.textContent = `Selecione um horário${specialMessage}`;
-            defaultOption.disabled = true;
-            defaultOption.selected = true;
-            scheduleTimeSelect.appendChild(defaultOption);
-
-            slots.forEach(time => {
-                if (isToday) {
-                    const [hours, minutes] = time.split(':').map(Number);
-                    const slotTime = new Date();
-                    slotTime.setHours(hours, minutes, 0, 0);
-                    if (slotTime <= now) return;
-                }
-
-                const isOcupado = horariosOcupados.includes(time);
-
-                const option = document.createElement("option");
-                option.value = time;
-                
-                if (isOcupado) {
-                    option.textContent = `${time} (Reservado)`;
-                    option.disabled = true;
-                    option.style.color = '#e63946';
-                } else {
-                    option.textContent = time;
-                    availableSlotsCount++;
-                }
-                scheduleTimeSelect.appendChild(option);
-            });
-
-            if (availableSlotsCount === 0) {
-                scheduleTimeSelect.innerHTML = '';
-                const noSlotsOption = document.createElement("option");
-                noSlotsOption.value = "";
-                noSlotsOption.textContent = "Nenhum horário disponível para esta data";
-                noSlotsOption.disabled = true;
-                scheduleTimeSelect.appendChild(noSlotsOption);
-            }
-            
-            if (continueButton) continueButton.disabled = availableSlotsCount === 0;
-
-        } catch (error) {
-            console.error('❌ Erro ao carregar horários:', error);
-            scheduleTimeSelect.innerHTML = '<option value="" disabled selected>Erro ao carregar horários disponíveis</option>';
+            const option = document.createElement("option");
+            option.value = "";
+            option.textContent = `Oficina não funciona aos ${dayOfWeek}s`;
+            option.disabled = true;
+            scheduleTimeSelect.appendChild(option);
+            return;
         }
+
+        // BUSCAR INTERVALO CONFIGURADO DA OFICINA - CORREÇÃO AQUI
+        const intervalo = await getWorkshopInterval(workshop.id);
+        console.log(`⏰ Intervalo configurado: ${intervalo} minutos`);
+        console.log(`🏢 ID da Oficina: ${workshop.id}`);
+        console.log(`📋 Nome da Oficina: ${workshop.nome}`);
+
+        const horarioEspecial = await checkSpecialHours(workshop.id, dataFormatada);
+        let startTime, endTime;
+        let specialMessage = '';
+
+        if (horarioEspecial) {
+            if (horarioEspecial.fechado) {
+                scheduleTimeSelect.innerHTML = '<option value="" disabled selected>Oficina fechada neste dia</option>';
+                if (horarioEspecial.motivo) {
+                    const motivoOption = document.createElement('option');
+                    motivoOption.textContent = `Motivo: ${horarioEspecial.motivo}`;
+                    motivoOption.disabled = true;
+                    scheduleTimeSelect.appendChild(motivoOption);
+                }
+                return;
+            } else {
+                startTime = horarioEspecial.horario_abertura;
+                endTime = horarioEspecial.horario_fechamento;
+                specialMessage = ` (Horário especial: ${formatHorarioFuncionamento(startTime, endTime)})`;
+            }
+        } else {
+            startTime = workshop.horario_abertura || "08:00";
+            endTime = workshop.horario_fechamento || "18:00";
+        }
+
+        console.log(`🕒 Horário de funcionamento: ${startTime} - ${endTime}`);
+
+        // USAR INTERVALO CONFIGURADO - GARANTIR QUE ESTÁ SENDO USADO
+        const slots = generateTimeSlots(startTime, endTime, intervalo);
+        console.log(`📋 Slots gerados (${slots.length}) com intervalo de ${intervalo}min:`, slots);
+        
+        const horariosOcupados = await getHorariosOcupados(workshop.id, dataFormatada);
+        console.log(`🚫 Horários ocupados:`, horariosOcupados);
+        
+        const now = new Date();
+        const isToday = selectedDate.toDateString() === now.toDateString();
+        console.log(`📆 É hoje? ${isToday}, Hora atual: ${now.toLocaleTimeString()}`);
+        
+        let availableSlotsCount = 0;
+        scheduleTimeSelect.innerHTML = '';
+
+        const defaultOption = document.createElement("option");
+        defaultOption.value = "";
+        defaultOption.textContent = `Selecione um horário${specialMessage} (Intervalo: ${intervalo}min)`;
+        defaultOption.disabled = true;
+        defaultOption.selected = true;
+        scheduleTimeSelect.appendChild(defaultOption);
+
+        slots.forEach(time => {
+            if (isToday) {
+                const [hours, minutes] = time.split(':').map(Number);
+                const slotTime = new Date();
+                slotTime.setHours(hours, minutes, 0, 0);
+                if (slotTime <= now) {
+                    console.log(`⏩ Pulando horário passado: ${time}`);
+                    return;
+                }
+            }
+
+            const isOcupado = horariosOcupados.includes(time);
+            console.log(`⏱️ ${time} - ${isOcupado ? 'OCUPADO' : 'DISPONÍVEL'}`);
+
+            const option = document.createElement("option");
+            option.value = time;
+            
+            if (isOcupado) {
+                option.textContent = `${time} (Reservado)`;
+                option.disabled = true;
+                option.style.color = '#e63946';
+            } else {
+                option.textContent = time;
+                availableSlotsCount++;
+            }
+            scheduleTimeSelect.appendChild(option);
+        });
+
+        console.log(`✅ Horários disponíveis: ${availableSlotsCount}`);
+
+        if (availableSlotsCount === 0) {
+            scheduleTimeSelect.innerHTML = '';
+            const noSlotsOption = document.createElement("option");
+            noSlotsOption.value = "";
+            noSlotsOption.textContent = "Nenhum horário disponível para esta data";
+            noSlotsOption.disabled = true;
+            scheduleTimeSelect.appendChild(noSlotsOption);
+        }
+        
+        if (continueButton) continueButton.disabled = availableSlotsCount === 0;
+
+    } catch (error) {
+        console.error('❌ Erro ao carregar horários:', error);
+        scheduleTimeSelect.innerHTML = '<option value="" disabled selected>Erro ao carregar horários disponíveis</option>';
     }
+}
 
     // Configura data mínima para agendamento
     function setMinScheduleDate() {

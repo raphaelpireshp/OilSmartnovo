@@ -1348,3 +1348,13 @@ CREATE TABLE IF NOT EXISTS oficina_config (
     UNIQUE KEY unique_oficina (oficina_id),
     FOREIGN KEY (oficina_id) REFERENCES oficina(id) ON DELETE CASCADE
 );
+
+INSERT INTO oficina_config (oficina_id, intervalo_agendamento)
+SELECT id, 45 FROM oficina
+WHERE id NOT IN (SELECT oficina_id FROM oficina_config);
+
+
+SELECT o.id, o.nome, oc.intervalo_agendamento 
+FROM oficina o 
+LEFT JOIN oficina_config oc ON o.id = oc.oficina_id 
+WHERE oc.intervalo_agendamento IS NOT NULL;
