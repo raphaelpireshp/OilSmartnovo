@@ -859,6 +859,91 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 });
+
+// ==================== FUNÇÕES PARA CAPACIDADE SIMULTÂNEA ====================
+
+// Carregar configuração da capacidade
+async function loadCapacidadeConfig() {
+    try {
+        const response = await apiCall('/api/admin/configuracoes/capacidade');
+        const data = await response.json();
+        
+        if (data.success && data.capacidade) {
+            const select = document.getElementById('capacidadeAtendimento');
+            if (select) {
+                select.value = data.capacidade;
+            }
+        }
+    } catch (error) {
+        console.error('Erro ao carregar configuração de capacidade:', error);
+        // Usar valor padrão de 1
+        const select = document.getElementById('capacidadeAtendimento');
+        if (select) select.value = 1;
+    }
+    
+    atualizarPreviewCapacidade();
+}
+
+// Salvar configuração da capacidade
+async function salvarCapacidadeConfig() {
+    const capacidade = document.getElementById('capacidadeAtendimento').value;
+    
+    try {
+        const response = await apiCall('/api/admin/configuracoes/capacidade', {
+            method: 'PUT',
+            body: JSON.stringify({ capacidade: parseInt(capacidade) })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showNotification('Capacidade de atendimento salva com sucesso!', 'success');
+            atualizarPreviewCapacidade();
+        } else {
+            showNotification(data.message || 'Erro ao salvar capacidade', 'error');
+        }
+    } catch (error) {
+        console.error('Erro ao salvar capacidade:', error);
+        showNotification('Erro ao salvar capacidade de atendimento', 'error');
+    }
+}
+
+// Atualizar preview da capacidade
+function atualizarPreviewCapacidade() {
+    const capacidade = document.getElementById('capacidadeAtendimento').value;
+    const preview = document.getElementById('previewCapacidade');
+    
+    if (!preview) return;
+    
+    let descricao = '';
+    if (capacidade == 1) {
+        descricao = 'Atendimento individual (1 cliente por horário)';
+    } else if (capacidade == 2) {
+        descricao = 'Atendimento duplo (2 clientes simultâneos por horário)';
+    } else if (capacidade == 3) {
+        descricao = 'Atendimento triplo (3 clientes simultâneos por horário)';
+    } else {
+        descricao = `Atendimento múltiplo (${capacidade} clientes simultâneos por horário)`;
+    }
+    
+    preview.innerHTML = `
+        <div class="capacidade-preview">
+            <h4 style="margin: 0 0 10px 0; color: var(--primary-color);">
+                <i class="fas fa-users"></i>
+                Capacidade de Atendimento
+            </h4>
+            <p style="margin: 5px 0; font-size: 14px;">
+                <strong>Configurado:</strong> ${capacidade} cliente(s) por horário
+            </p>
+            <p style="margin: 5px 0; font-size: 14px; color: var(--success-color);">
+                ${descricao}
+            </p>
+            <p style="margin: 5px 0; font-size: 12px; color: var(--text-light);">
+                Isso afeta quantos agendamentos podem ser feitos no mesmo horário
+            </p>
+        </div>
+    `;
+}
 // ==================== FUNÇÕES PARA GESTÃO DE VEÍCULOS ====================
 
 // Modal para adicionar marca
@@ -3194,21 +3279,29 @@ async function salvarIntervaloConfig() {
     }
 }
 
-// Event listeners para intervalo
+// Event listeners para intervalo e capacidade
 document.addEventListener('DOMContentLoaded', function() {
+    // Event listeners para intervalo
     const intervaloRadios = document.querySelectorAll('input[name="intervaloAgendamento"]');
     intervaloRadios.forEach(radio => {
         radio.addEventListener('change', calcularCapacidadeAtendimento);
     });
     
-    // Atualizar função salvarConfiguracoes para incluir o intervalo
+    // Event listener para capacidade
+    const capacidadeSelect = document.getElementById('capacidadeAtendimento');
+    if (capacidadeSelect) {
+        capacidadeSelect.addEventListener('change', atualizarPreviewCapacidade);
+    }
+    
+    // Atualizar função salvarConfiguracoes para incluir intervalo e capacidade
     const originalSalvarConfiguracoes = window.salvarConfiguracoes;
     window.salvarConfiguracoes = async function() {
         await originalSalvarConfiguracoes();
         await salvarIntervaloConfig();
+        await salvarCapacidadeConfig();
     };
     
-    // Carregar configuração quando a seção for aberta
+    // Carregar configurações quando a seção for aberta
     const originalShowSection = window.showSection;
     window.showSection = function(sectionId) {
         originalShowSection(sectionId);
@@ -3216,6 +3309,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (sectionId === 'configuracoes') {
             setTimeout(() => {
                 loadIntervaloConfig();
+                loadCapacidadeConfig();
             }, 100);
         }
     };

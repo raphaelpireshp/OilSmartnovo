@@ -1,5 +1,5 @@
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     // ==================== ELEMENTOS DO DOM ====================
     const brandSelect = document.getElementById("vehicle-brand");
     const modelSelect = document.getElementById("vehicle-model");
@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const selectedWorkshopDiv = document.getElementById("selected-workshop");
     const scheduleDateInput = document.getElementById("schedule-date");
     const scheduleTimeSelect = document.getElementById("schedule-time");
-    
+
     // Elementos do modal de login
     const loginBtn = document.getElementById("login-btn");
     const modal = document.getElementById("login-modal");
@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function() {
     let addressSearchTimeout = null;
     let cachedAddresses = {};
     let locationHistory = [];
-    let selectedProducts = { 
+    let selectedProducts = {
         oil: true,
         filter: true
     };
@@ -42,55 +42,102 @@ document.addEventListener("DOMContentLoaded", function() {
     let specialHoursCache = {};
 
     // ==================== FUNÇÕES AUXILIARES GERAIS ====================
-// ==================== FUNÇÕES AUXILIARES GERAIS ====================
-// Buscar intervalo configurado da oficina - VERSÃO CORRIGIDA
-async function getWorkshopInterval(workshopId) {
-    try {
-        console.log('🔄 Buscando intervalo para oficina:', workshopId);
-        
-        // CORREÇÃO: Mudar para a rota correta do adminRoutes.js
-        const response = await fetch(`/api/admin/oficina/${workshopId}/intervalo`);
-        
-        if (!response.ok) {
-            console.warn('⚠️ Erro HTTP ao buscar intervalo, usando padrão de 45min');
+    // ==================== FUNÇÕES AUXILIARES GERAIS ====================
+    // Buscar intervalo configurado da oficina - VERSÃO CORRIGIDA
+    async function getWorkshopInterval(workshopId) {
+        try {
+            console.log('🔄 Buscando intervalo para oficina:', workshopId);
+
+            // CORREÇÃO: Mudar para a rota correta do adminRoutes.js
+            const response = await fetch(`/api/admin/oficina/${workshopId}/intervalo`);
+
+            if (!response.ok) {
+                console.warn('⚠️ Erro HTTP ao buscar intervalo, usando padrão de 45min');
+                return 45;
+            }
+
+            const data = await response.json();
+            console.log('📦 Dados recebidos da API de intervalo:', data);
+
+            if (data.success) {
+                const intervalo = parseInt(data.intervalo || data.intervalo_agendamento);
+
+                if (!isNaN(intervalo) && intervalo > 0) {
+                    console.log('✅ Intervalo encontrado:', intervalo, 'minutos');
+                    return intervalo;
+                }
+            }
+
+            console.warn('⚠️ Intervalo não encontrado ou inválido, usando padrão de 45min');
+            return 45;
+
+        } catch (error) {
+            console.error('❌ Erro ao buscar intervalo:', error);
             return 45;
         }
-        
-        const data = await response.json();
-        console.log('📦 Dados recebidos da API de intervalo:', data);
-        
-        if (data.success) {
-            const intervalo = parseInt(data.intervalo || data.intervalo_agendamento);
-            
-            if (!isNaN(intervalo) && intervalo > 0) {
-                console.log('✅ Intervalo encontrado:', intervalo, 'minutos');
-                return intervalo;
-            }
+    }
+
+    let intervaloAgendamento = 45; // valor padrão caso não venha nada do servidor
+
+    // Função para carregar intervalo e capacidade da oficina
+    let capacidadeSimultanea = 1; // Valor padrão caso não venha nada do servidor
+
+    async function carregarConfigOficina(oficinaId) {
+        try {
+            // Carregar intervalo de agendamento
+            const resIntervalo = await fetch(`/api/oficina/${oficinaId}/intervalo`);
+            const dataIntervalo = await resIntervalo.json();
+            intervaloAgendamento = dataIntervalo.intervalo || 45;
+            console.log("⏱ Intervalo da oficina:", intervaloAgendamento);
+
+            // Carregar capacidade simultânea
+            const resCapacidade = await fetch(`/api/oficina/${oficinaId}/capacidade`);
+            const dataCapacidade = await resCapacidade.json();
+            capacidadeSimultanea = dataCapacidade.capacidade || 1;
+            console.log("🔄 Capacidade simultânea da oficina:", capacidadeSimultanea);
+        } catch (err) {
+            console.error("Erro ao carregar configuração da oficina:", err);
+            // Usar padrões em caso de erro
+            intervaloAgendamento = 45;
+            capacidadeSimultanea = 1;
         }
-        
-        console.warn('⚠️ Intervalo não encontrado ou inválido, usando padrão de 45min');
-        return 45;
-        
-    } catch (error) {
-        console.error('❌ Erro ao buscar intervalo:', error);
-        return 45;
     }
-}
+// Função para atualizar informações de capacidade na interface - VERSÃO MELHORADA
+function atualizarInfoCapacidade(capacidade, horariosOcupados, slotsDisponiveis) {
+    const infoElement = document.getElementById('info-capacidade');
+    const textoElement = document.getElementById('info-capacidade-texto');
 
-let intervaloAgendamento = 45; // valor padrão caso não venha nada do servidor
-
-async function carregarConfigOficina(oficinaId) {
-    try {
-        const res = await fetch(`/api/oficina/${oficinaId}/config`);
-        const data = await res.json();
-        intervaloAgendamento = data.intervalo_agendamento || 45;
-        console.log("⏱ Intervalo da oficina:", intervaloAgendamento);
-    } catch (err) {
-        console.error("Erro ao carregar configuração da oficina:", err);
+    if (!infoElement || !textoElement) {
+        console.log('❌ Elementos de info capacidade não encontrados');
+        return;
     }
+
+    // Calcular estatísticas
+    const totalOcupados = Object.values(horariosOcupados).reduce((sum, count) => sum + count, 0);
+    const totalSlots = Object.keys(horariosOcupados).length;
+    
+    // Texto informativo baseado na capacidade
+    let textoInfo = '';
+    
+    if (capacidade === 1) {
+        textoInfo = `Atendimento individual | ${slotsDisponiveis} horários disponíveis`;
+    } else if (capacidade <= 3) {
+        textoInfo = `Até ${capacidade} atendimentos simultâneos | ${slotsDisponiveis} horários disponíveis`;
+    } else {
+        textoInfo = `Até ${capacidade} atendimentos por horário | ${slotsDisponiveis} horários disponíveis`;
+    }
+
+    // Adicionar informação sobre ocupação se houver agendamentos
+    if (totalOcupados > 0) {
+        textoInfo += ` | ${totalOcupados} agendamentos confirmados`;
+    }
+
+    // Mostrar sempre, mesmo com capacidade 1
+    infoElement.style.display = 'block';
+    textoElement.innerHTML = textoInfo;
+    
+    console.log(`📊 Info capacidade: ${capacidade} simultâneos, ${slotsDisponiveis} disponíveis, ${totalOcupados} ocupados`);
 }
-
-
     // Mostra/oculta o loading
     function showLoading(show) {
         const loadingOverlay = document.getElementById("loading-overlay");
@@ -103,10 +150,10 @@ async function carregarConfigOficina(oficinaId) {
     function showToast(message, type = "success") {
         const toast = document.getElementById("toast");
         if (!toast) return;
-        
+
         toast.textContent = message;
         toast.className = `toast ${type} show`;
-        
+
         if (window.innerWidth <= 768) {
             toast.style.width = "90%";
             toast.style.left = "5%";
@@ -116,7 +163,7 @@ async function carregarConfigOficina(oficinaId) {
             toast.style.left = "50%";
             toast.style.transform = "translateX(-50%)";
         }
-        
+
         setTimeout(() => {
             toast.classList.remove("show");
         }, 3000);
@@ -173,20 +220,20 @@ async function carregarConfigOficina(oficinaId) {
         const R = 6371; // Raio da Terra em km
         const dLat = deg2rad(lat2 - lat1);
         const dLon = deg2rad(lon2 - lon1);
-        
-        const a = 
-            Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
-            Math.sin(dLon/2) * Math.sin(dLon/2);
-        
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         const distancia = R * c; // Distância em km
-        
+
         return distancia;
     }
 
     function deg2rad(deg) {
-        return deg * (Math.PI/180);
+        return deg * (Math.PI / 180);
     }
 
     // Função para determinar cor baseada na distância
@@ -208,7 +255,7 @@ async function carregarConfigOficina(oficinaId) {
     // Formata dias de funcionamento
     function formatDiasFuncionamento(dias) {
         if (!dias) return 'Segunda a Sábado';
-        
+
         const diasMap = {
             'segunda': 'Seg',
             'terca': 'Ter',
@@ -218,15 +265,15 @@ async function carregarConfigOficina(oficinaId) {
             'sabado': 'Sáb',
             'domingo': 'Dom'
         };
-        
+
         const diasArray = dias.split(',').map(dia => dia.trim().toLowerCase());
-        
-        if (diasArray.includes('segunda') && diasArray.includes('terca') && 
-            diasArray.includes('quarta') && diasArray.includes('quinta') && 
+
+        if (diasArray.includes('segunda') && diasArray.includes('terca') &&
+            diasArray.includes('quarta') && diasArray.includes('quinta') &&
             diasArray.includes('sexta') && !diasArray.includes('sabado') && !diasArray.includes('domingo')) {
             return 'Segunda a Sexta';
         }
-        
+
         return diasArray.map(dia => diasMap[dia] || dia).join(', ');
     }
 
@@ -249,7 +296,7 @@ async function carregarConfigOficina(oficinaId) {
     function checkUserLoggedIn() {
         const token = localStorage.getItem('token');
         const userData = localStorage.getItem('user');
-        
+
         if (!token || !userData) {
             // showToast("Você precisa fazer login para agendar um serviço", "error");
             // setTimeout(() => {
@@ -277,14 +324,14 @@ async function carregarConfigOficina(oficinaId) {
 
     // Salva uma nova localização no histórico
     function saveToLocationHistory(locationData) {
-        const exists = locationHistory.some(item => 
+        const exists = locationHistory.some(item =>
             item.display_name === locationData.display_name
         );
-        
+
         if (!exists) {
             locationHistory.unshift(locationData);
             locationHistory = locationHistory.slice(0, 5);
-            
+
             try {
                 localStorage.setItem('oilSmartLocationHistory', JSON.stringify(locationHistory));
             } catch (error) {
@@ -297,9 +344,9 @@ async function carregarConfigOficina(oficinaId) {
     function showLocationSuggestions() {
         const suggestionsContainer = document.getElementById("location-suggestions");
         if (!suggestionsContainer || locationHistory.length === 0) return;
-        
+
         suggestionsContainer.innerHTML = '<h4>Localizações recentes:</h4>';
-        
+
         locationHistory.forEach(location => {
             const suggestionItem = document.createElement("div");
             suggestionItem.className = "location-suggestion";
@@ -308,16 +355,16 @@ async function carregarConfigOficina(oficinaId) {
                 <span>${location.display_name.split(',')[0]}</span>
                 <small>${location.display_name.split(',').slice(1, 3).join(',').trim()}</small>
             `;
-            
+
             suggestionItem.addEventListener("click", () => {
                 locationInput.value = location.display_name;
                 suggestionsContainer.style.display = "none";
                 searchByAddress(location);
             });
-            
+
             suggestionsContainer.appendChild(suggestionItem);
         });
-        
+
         suggestionsContainer.style.display = "block";
     }
 
@@ -386,13 +433,13 @@ async function carregarConfigOficina(oficinaId) {
         const mapContainer = document.getElementById("map");
         const mapHeight = window.innerWidth <= 768 ? "300px" : "400px";
         mapContainer.style.height = mapHeight;
-        
+
         map = L.map("map").setView([-23.5505, -46.6333], 13);
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
-        window.addEventListener("resize", function() {
+        window.addEventListener("resize", function () {
             const newHeight = window.innerWidth <= 768 ? "300px" : "400px";
             mapContainer.style.height = newHeight;
             setTimeout(() => map.invalidateSize(), 100);
@@ -404,11 +451,11 @@ async function carregarConfigOficina(oficinaId) {
     async function populateBrands() {
         showLoading(true);
         brandSelect.innerHTML = '<option value="">Selecione a marca</option>';
-        
+
         try {
             const response = await fetch("/api/marcas");
             if (!response.ok) throw new Error("Falha ao carregar marcas");
-            
+
             const brands = await response.json();
             brands.forEach(brand => {
                 const option = document.createElement("option");
@@ -435,7 +482,7 @@ async function carregarConfigOficina(oficinaId) {
             try {
                 const response = await fetch(`/api/modelos?marca_id=${brandId}`);
                 if (!response.ok) throw new Error("Falha ao carregar modelos");
-                
+
                 const models = await response.json();
                 models.forEach(model => {
                     const option = document.createElement("option");
@@ -462,7 +509,7 @@ async function carregarConfigOficina(oficinaId) {
             try {
                 const response = await fetch(`/api/modelo_anos?modelo_id=${modelId}`);
                 if (!response.ok) throw new Error("Falha ao carregar anos");
-                
+
                 const years = await response.json();
                 years.forEach(year => {
                     const option = document.createElement("option");
@@ -492,9 +539,9 @@ async function carregarConfigOficina(oficinaId) {
                 showToast(result.message, "error");
                 return null;
             }
-            
+
             sessionStorage.setItem('oilRecommendation', JSON.stringify(result.data));
-            
+
             return result.data;
 
         } catch (error) {
@@ -527,7 +574,7 @@ async function carregarConfigOficina(oficinaId) {
                     </label>
                 </div>
             `;
-            
+
             filterContainer.innerHTML = `
                 <div class="no-recommendation">
                     <i class="fas fa-exclamation-triangle"></i>
@@ -640,7 +687,7 @@ async function carregarConfigOficina(oficinaId) {
 
         if (oilCheckbox) oilCheckbox.addEventListener("change", updateProductSelection);
         if (filterCheckbox) filterCheckbox.addEventListener("change", updateProductSelection);
-        
+
         updateProductSelection();
     }
 
@@ -649,12 +696,12 @@ async function carregarConfigOficina(oficinaId) {
     function updateProductSelection() {
         const oilCheckbox = document.getElementById("select-oil");
         const filterCheckbox = document.getElementById("select-filter");
-        
+
         selectedProducts.oil = oilCheckbox ? oilCheckbox.checked : false;
         selectedProducts.filter = filterCheckbox ? filterCheckbox.checked : false;
-        
+
         sessionStorage.setItem('selectedProducts', JSON.stringify(selectedProducts));
-        
+
         updateSelectionSummary();
     }
 
@@ -662,14 +709,14 @@ async function carregarConfigOficina(oficinaId) {
         const summaryElement = document.getElementById("selected-items");
         const summaryContainer = document.querySelector(".selection-summary");
         const selections = [];
-        
+
         if (selectedProducts.oil) {
             selections.push("Óleo");
         }
         if (selectedProducts.filter) {
             selections.push("Filtro");
         }
-        
+
         if (selections.length === 0) {
             summaryElement.textContent = "Nenhum produto selecionado";
             summaryElement.style.color = "#e63946";
@@ -680,7 +727,7 @@ async function carregarConfigOficina(oficinaId) {
             summaryElement.style.color = "#2a9d8f";
             if (summaryContainer) summaryContainer.classList.remove("empty");
             if (summaryContainer) summaryContainer.classList.add("highlight");
-            
+
             if (summaryContainer) {
                 setTimeout(() => {
                     summaryContainer.classList.remove("highlight");
@@ -696,12 +743,12 @@ async function carregarConfigOficina(oficinaId) {
             <h4>Resumo da Seleção</h4>
             <p id="selected-items">Carregando...</p>
         `;
-        
+
         const recommendationContainer = document.querySelector(".recommendation-container");
         if (recommendationContainer) {
             recommendationContainer.parentNode.insertBefore(selectionContainer, recommendationContainer.nextSibling);
         }
-        
+
         updateSelectionSummary();
     }
 
@@ -735,9 +782,9 @@ async function carregarConfigOficina(oficinaId) {
 
             addUserMarker(userLocation.lat, userLocation.lng, "Sua localização");
             map.setView([userLocation.lat, userLocation.lng], 14);
-            
+
             await searchNearbyWorkshops(userLocation.lat, userLocation.lng);
-            
+
             showToast("Localização obtida com sucesso!");
         } catch (error) {
             console.error("Erro ao obter localização:", error);
@@ -749,18 +796,18 @@ async function carregarConfigOficina(oficinaId) {
 
     async function searchAddress(query) {
         if (!query || query.length < 3) return [];
-        
+
         if (cachedAddresses[query]) {
             return cachedAddresses[query];
         }
-        
+
         try {
             const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=br&limit=5&addressdetails=1`);
             if (!response.ok) throw new Error("Erro ao buscar endereços");
-            
+
             const data = await response.json();
             cachedAddresses[query] = data;
-            
+
             return data;
         } catch (error) {
             console.error("Erro na busca de endereços:", error);
@@ -771,12 +818,12 @@ async function carregarConfigOficina(oficinaId) {
     function showAddressSuggestions(addresses) {
         const resultsContainer = document.getElementById("autocomplete-results");
         resultsContainer.innerHTML = '';
-        
+
         if (!addresses || addresses.length === 0) {
             resultsContainer.classList.remove("active");
             return;
         }
-        
+
         addresses.forEach(address => {
             const item = document.createElement("div");
             item.className = "autocomplete-item";
@@ -784,16 +831,16 @@ async function carregarConfigOficina(oficinaId) {
                 <div class="main-text">${address.display_name.split(',')[0]}</div>
                 <div class="secondary-text">${address.display_name.split(',').slice(1).join(',').trim()}</div>
             `;
-            
+
             item.addEventListener("click", () => {
                 locationInput.value = address.display_name;
                 resultsContainer.classList.remove("active");
                 searchByAddress(address);
             });
-            
+
             resultsContainer.appendChild(item);
         });
-        
+
         resultsContainer.classList.add("active");
     }
 
@@ -807,14 +854,14 @@ async function carregarConfigOficina(oficinaId) {
         showLoading(true);
         try {
             let finalLocationData = locationData;
-            
+
             if (!finalLocationData) {
                 if (cachedAddresses[address] && cachedAddresses[address].length > 0) {
                     finalLocationData = cachedAddresses[address][0];
                 } else {
                     const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&countrycodes=br&limit=1&addressdetails=1`);
                     if (!response.ok) throw new Error("Erro ao buscar endereço");
-                    
+
                     const data = await response.json();
                     if (!data || data.length === 0) {
                         throw new Error("Endereço não encontrado");
@@ -831,10 +878,10 @@ async function carregarConfigOficina(oficinaId) {
 
             addUserMarker(location.lat, location.lng, finalLocationData.display_name);
             map.setView([location.lat, location.lng], 14);
-            
+
             await searchNearbyWorkshops(location.lat, location.lng);
             saveToLocationHistory(finalLocationData);
-            
+
             showToast(`Oficinas próximas a: ${finalLocationData.display_name}`);
         } catch (error) {
             console.error("Erro na busca por endereço:", error);
@@ -846,7 +893,7 @@ async function carregarConfigOficina(oficinaId) {
 
     function addUserMarker(lat, lng, popupText) {
         markers.filter(m => m.options.icon?.options?.className === "user-marker")
-               .forEach(m => map.removeLayer(m));
+            .forEach(m => map.removeLayer(m));
 
         const userIcon = L.divIcon({
             className: "user-marker",
@@ -867,13 +914,13 @@ async function carregarConfigOficina(oficinaId) {
         showLoading(true);
         try {
             const response = await fetch(`/api/oficina`);
-            
+
             if (!response.ok) {
                 throw new Error(`Erro HTTP: ${response.status}`);
             }
-            
+
             const data = await response.json();
-            
+
             if (!data.success || !data.data || data.data.length === 0) {
                 showToast("Nenhuma oficina encontrada", "info");
                 displayWorkshops([]);
@@ -895,9 +942,9 @@ async function carregarConfigOficina(oficinaId) {
             const oficinasComDistancia = oficinasValidas.map(workshop => {
                 const workshopLat = parseFloat(workshop.lat);
                 const workshopLng = parseFloat(workshop.lng);
-                
+
                 const distancia = calcularDistancia(lat, lng, workshopLat, workshopLng);
-                
+
                 return {
                     ...workshop,
                     distancia: distancia
@@ -906,7 +953,7 @@ async function carregarConfigOficina(oficinaId) {
 
             oficinasComDistancia.sort((a, b) => a.distancia - b.distancia);
             displayWorkshops(oficinasComDistancia);
-            
+
         } catch (error) {
             console.error("Erro ao buscar oficinas:", error);
             showToast("Erro ao carregar oficinas. Tente novamente.", "error");
@@ -923,12 +970,12 @@ async function carregarConfigOficina(oficinaId) {
             listContainer.className = "workshop-list-container";
             mapContainer.parentNode.insertBefore(listContainer, mapContainer.nextSibling);
         }
-        
+
         listContainer.innerHTML = "";
 
         markers.filter(m => m.options.icon?.options?.className !== "user-marker")
-               .forEach(m => map.removeLayer(m));
-        
+            .forEach(m => map.removeLayer(m));
+
         markers = markers.filter(m => m.options.icon?.options?.className === "user-marker");
 
         if (!workshops || workshops.length === 0) {
@@ -947,19 +994,19 @@ async function carregarConfigOficina(oficinaId) {
         workshops.forEach(workshop => {
             const lat = parseFloat(workshop.lat);
             const lng = parseFloat(workshop.lng);
-            
+
             if (isNaN(lat) || isNaN(lng)) {
                 console.warn('Coordenadas inválidas para oficina:', workshop);
                 return;
             }
 
-            const distanciaFormatada = workshop.distancia < 1 
-                ? `${(workshop.distancia * 1000).toFixed(0)} m` 
+            const distanciaFormatada = workshop.distancia < 1
+                ? `${(workshop.distancia * 1000).toFixed(0)} m`
                 : `${workshop.distancia.toFixed(1)} km`;
 
             const diasFormatados = formatDiasFuncionamento(workshop.dias_funcionamento);
             const horarioFormatado = formatHorarioFuncionamento(
-                workshop.horario_abertura, 
+                workshop.horario_abertura,
                 workshop.horario_fechamento
             );
 
@@ -1007,12 +1054,12 @@ async function carregarConfigOficina(oficinaId) {
     }
 
     // Função global para ser chamada pelos botões do mapa
-    window.selectWorkshop = async function(workshopId) {
+    window.selectWorkshop = async function (workshopId) {
         showLoading(true);
         try {
             const response = await fetch(`/api/oficina/${workshopId}`);
             if (!response.ok) throw new Error("Oficina não encontrada");
-            
+
             const workshopData = await response.json();
             selectedWorkshop = workshopData;
             currentWorkshopId = workshopId;
@@ -1039,15 +1086,15 @@ async function carregarConfigOficina(oficinaId) {
         try {
             const response = await fetch(`/api/oficina/${workshop.id}/detalhes`);
             if (!response.ok) throw new Error("Erro ao carregar dados da oficina");
-            
+
             const workshopData = await response.json();
             const updatedWorkshop = workshopData.oficina;
-            
+
             selectedWorkshop = updatedWorkshop;
 
             const diasFormatados = formatDiasFuncionamento(updatedWorkshop.dias_funcionamento);
             const horarioFormatado = formatHorarioFuncionamento(
-                updatedWorkshop.horario_abertura, 
+                updatedWorkshop.horario_abertura,
                 updatedWorkshop.horario_fechamento
             );
 
@@ -1065,7 +1112,7 @@ async function carregarConfigOficina(oficinaId) {
                 const selectedDate = new Date(scheduleDateInput.value);
                 await generateAvailableTimeSlots(updatedWorkshop, selectedDate);
             }
-            
+
         } catch (error) {
             console.error('❌ Erro ao carregar detalhes da oficina:', error);
             selectedWorkshopDiv.innerHTML = `
@@ -1087,63 +1134,118 @@ async function carregarConfigOficina(oficinaId) {
         const dayNames = ['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'];
         const dayIndex = date.getDay();
         const diaSemana = dayNames[dayIndex];
-        
+
         if (!workshop.dias_funcionamento || workshop.dias_funcionamento.trim() === '') {
             return dayOfWeek !== 0; // Assume segunda a sábado se não especificado
         }
-        
+
         const diasArray = workshop.dias_funcionamento.toLowerCase()
             .split(',')
             .map(dia => dia.trim())
             .filter(dia => dia.length > 0);
-        
+
         return diasArray.includes(diaSemana);
     }
 
-// Gera slots de tempo baseado no intervalo configurado
-function generateTimeSlots(start, end, interval) {
-    const slots = [];
-    const [startHour, startMinute] = start.split(":").map(Number);
-    const [endHour, endMinute] = end.split(":").map(Number);
-    
-    let currentHour = startHour;
-    let currentMinute = startMinute;
-    
-    while (currentHour < endHour || (currentHour === endHour && currentMinute < endMinute)) {
-        const time = `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`;
-        slots.push(time);
-        
-        currentMinute += interval;
-        if (currentMinute >= 60) {
-            currentHour += Math.floor(currentMinute / 60);
-            currentMinute = currentMinute % 60;
+    // Gera slots de tempo baseado no intervalo configurado
+    function generateTimeSlots(start, end, interval) {
+        const slots = [];
+        const [startHour, startMinute] = start.split(":").map(Number);
+        const [endHour, endMinute] = end.split(":").map(Number);
+
+        let currentHour = startHour;
+        let currentMinute = startMinute;
+
+        while (currentHour < endHour || (currentHour === endHour && currentMinute < endMinute)) {
+            const time = `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`;
+            slots.push(time);
+
+            currentMinute += interval;
+            if (currentMinute >= 60) {
+                currentHour += Math.floor(currentMinute / 60);
+                currentMinute = currentMinute % 60;
+            }
         }
+        return slots;
     }
-    return slots;
+
+// Buscar horários ocupados considerando a capacidade - VERSÃO MAIS ROBUSTA
+async function getHorariosOcupados(workshopId, data) {
+    try {
+        console.log(`🔍 Buscando ocupação para oficina ${workshopId} na data ${data}`);
+        
+        // BUSCAR CAPACIDADE COM TRATAMENTO DE ERRO MELHORADO
+        let capacidade = await getWorkshopCapacity(workshopId);
+        console.log(`🏢 Capacidade final: ${capacidade}`);
+
+        // Buscar agendamentos
+        const response = await fetch(`/api/oficina/${workshopId}/horarios-ocupados/${data}`);
+        
+        if (!response.ok) {
+            console.warn('⚠️ Erro ao buscar horários ocupados, retornando vazio');
+            return { ocupacao: {}, capacidade: capacidade };
+        }
+
+        const result = await response.json();
+        const horariosOcupados = result.data || [];
+        
+        console.log(`📅 Horários ocupados encontrados:`, horariosOcupados);
+
+        // Agrupa horários por slot
+        const ocupacaoPorHorario = {};
+        horariosOcupados.forEach(horario => {
+            const horaFormatada = horario.substring(0, 5);
+            ocupacaoPorHorario[horaFormatada] = (ocupacaoPorHorario[horaFormatada] || 0) + 1;
+        });
+
+        console.log(`📊 Ocupação por horário:`, ocupacaoPorHorario);
+
+        return {
+            ocupacao: ocupacaoPorHorario,
+            capacidade: capacidade
+        };
+    } catch (error) {
+        console.error('❌ Erro geral ao buscar horários ocupados:', error);
+        return { ocupacao: {}, capacidade: 1 }; // Sempre retorna um fallback
+    }
 }
 
-    // Busca horários ocupados do banco
-    async function getHorariosOcupados(workshopId, data) {
-        try {
-            const response = await fetch(`/api/oficina/${workshopId}/horarios-ocupados/${data}`);
-            
-            if (!response.ok) {
-                throw new Error('Erro ao buscar horários ocupados');
-            }
-            
-            const result = await response.json();
-            return result.data || [];
-        } catch (error) {
-            console.warn('⚠️ Erro ao buscar horários ocupados, retornando vazio:', error);
-            return [];
+
+    // Função para buscar capacidade da oficina
+// Função para buscar capacidade da oficina - VERSÃO CORRIGIDA
+async function getWorkshopCapacity(workshopId) {
+    try {
+        console.log('🔍 Buscando capacidade para oficina:', workshopId);
+        
+        const response = await fetch(`/api/oficina/${workshopId}/capacidade`);
+        
+        if (!response.ok) {
+            console.warn('⚠️ Erro HTTP ao buscar capacidade:', response.status);
+            return 1; // Retorna padrão em caso de erro
         }
+        
+        const data = await response.json();
+        console.log('📦 Dados recebidos da capacidade:', data);
+        
+        if (data.success && data.capacidade !== undefined) {
+            const capacidade = parseInt(data.capacidade);
+            console.log(`✅ Capacidade encontrada: ${capacidade}`);
+            return capacidade;
+        } else {
+            console.warn('⚠️ Resposta da API não contém capacidade válida, usando padrão 1');
+            return 1;
+        }
+    } catch (error) {
+        console.error('❌ Erro ao buscar capacidade:', error);
+        return 1; // Sempre retorna um valor padrão em caso de erro
     }
+}
 
     // Verifica horários especiais
     async function checkSpecialHours(workshopId, date) {
         try {
             const response = await fetch(`/api/oficina/${workshopId}/horario-especial/${date}`);
-            
+
             if (response.ok) {
                 const data = await response.json();
                 return data.horario_especial || null;
@@ -1160,147 +1262,179 @@ function generateTimeSlots(start, end, interval) {
         specialHoursCache = {};
     }
 
-// Gera horários disponíveis (com intervalo configurado) - VERSÃO COM DEBUG
-// Gera horários disponíveis (com intervalo configurado) - VERSÃO CORRIGIDA
-async function generateAvailableTimeSlots(workshop, selectedDate) {
-    scheduleTimeSelect.innerHTML = '<option value="" disabled selected>Carregando horários...</option>';
-    const continueButton = document.querySelector('button[onclick="goToStep(4)"]');
-    if (continueButton) continueButton.disabled = true;
+    // Gera horários disponíveis (com intervalo configurado) - VERSÃO COM DEBUG
+    // Gera horários disponíveis (com intervalo configurado) - VERSÃO CORRIGIDA
+    async function generateAvailableTimeSlots(workshop, selectedDate) {
+        scheduleTimeSelect.innerHTML = '<option value="" disabled selected>Carregando horários...</option>';
+        const continueButton = document.querySelector('button[onclick="goToStep(4)"]');
+        if (continueButton) continueButton.disabled = true;
 
-    try {
-        const dataFormatada = selectedDate.toISOString().split('T')[0];
-        console.log('📅 Gerando horários para:', dataFormatada, 'Oficina:', workshop.id);
-        
-        if (!isValidDayForWorkshop(selectedDate, workshop)) {
-            const dayNames = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
-            const dayOfWeek = dayNames[selectedDate.getDay()];
-            
+        try {
+            const dataFormatada = selectedDate.toISOString().split('T')[0];
+            console.log('📅 Gerando horários para:', dataFormatada, 'Oficina:', workshop.id);
+
+            if (!isValidDayForWorkshop(selectedDate, workshop)) {
+                const dayNames = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+                const dayOfWeek = dayNames[selectedDate.getDay()];
+
+                scheduleTimeSelect.innerHTML = '';
+                const option = document.createElement("option");
+                option.value = "";
+                option.textContent = `Oficina não funciona aos ${dayOfWeek}s`;
+                option.disabled = true;
+                scheduleTimeSelect.appendChild(option);
+                return;
+            }
+
+            // BUSCAR INTERVALO CONFIGURADO DA OFICINA - CORREÇÃO AQUI
+            const intervalo = await getWorkshopInterval(workshop.id);
+            console.log(`⏰ Intervalo configurado: ${intervalo} minutos`);
+            console.log(`🏢 ID da Oficina: ${workshop.id}`);
+            console.log(`📋 Nome da Oficina: ${workshop.nome}`);
+
+            const horarioEspecial = await checkSpecialHours(workshop.id, dataFormatada);
+            let startTime, endTime;
+            let specialMessage = '';
+
+            if (horarioEspecial) {
+                if (horarioEspecial.fechado) {
+                    scheduleTimeSelect.innerHTML = '<option value="" disabled selected>Oficina fechada neste dia</option>';
+                    if (horarioEspecial.motivo) {
+                        const motivoOption = document.createElement('option');
+                        motivoOption.textContent = `Motivo: ${horarioEspecial.motivo}`;
+                        motivoOption.disabled = true;
+                        scheduleTimeSelect.appendChild(motivoOption);
+                    }
+                    return;
+                } else {
+                    startTime = horarioEspecial.horario_abertura;
+                    endTime = horarioEspecial.horario_fechamento;
+                    specialMessage = ` (Horário especial: ${formatHorarioFuncionamento(startTime, endTime)})`;
+                }
+            } else {
+                startTime = workshop.horario_abertura || "08:00";
+                endTime = workshop.horario_fechamento || "18:00";
+            }
+
+            console.log(`🕒 Horário de funcionamento: ${startTime} - ${endTime}`);
+
+            // USAR INTERVALO CONFIGURADO - GARANTIR QUE ESTÁ SENDO USADO
+            const slots = generateTimeSlots(startTime, endTime, intervalo);
+            console.log(`📋 Slots gerados (${slots.length}) com intervalo de ${intervalo}min:`, slots);
+
+            // NOVO (colocar no lugar):
+            const ocupacaoData = await getHorariosOcupados(workshop.id, dataFormatada);
+            const horariosOcupados = ocupacaoData.ocupacao;
+            const capacidade = ocupacaoData.capacidade;
+
+            console.log(`🎯 Capacidade: ${capacidade}, Horários ocupados:`, horariosOcupados);
+
+            const now = new Date();
+            const isToday = selectedDate.toDateString() === now.toDateString();
+            console.log(`📆 É hoje? ${isToday}, Hora atual: ${now.toLocaleTimeString()}`);
+
+            let availableSlotsCount = 0;
             scheduleTimeSelect.innerHTML = '';
-            const option = document.createElement("option");
-            option.value = "";
-            option.textContent = `Oficina não funciona aos ${dayOfWeek}s`;
-            option.disabled = true;
-            scheduleTimeSelect.appendChild(option);
+
+            const defaultOption = document.createElement("option");
+            defaultOption.value = "";
+            defaultOption.textContent = `Selecione um horário${specialMessage} (Intervalo: ${intervalo}min)`;
+            defaultOption.disabled = true;
+            defaultOption.selected = true;
+            scheduleTimeSelect.appendChild(defaultOption);
+
+slots.forEach(time => {
+    if (isToday) {
+        const [hours, minutes] = time.split(':').map(Number);
+        const slotTime = new Date();
+        slotTime.setHours(hours, minutes, 0, 0);
+        if (slotTime <= now) {
+            console.log(`⏩ Pulando horário passado: ${time}`);
             return;
         }
-
-        // BUSCAR INTERVALO CONFIGURADO DA OFICINA - CORREÇÃO AQUI
-        const intervalo = await getWorkshopInterval(workshop.id);
-        console.log(`⏰ Intervalo configurado: ${intervalo} minutos`);
-        console.log(`🏢 ID da Oficina: ${workshop.id}`);
-        console.log(`📋 Nome da Oficina: ${workshop.nome}`);
-
-        const horarioEspecial = await checkSpecialHours(workshop.id, dataFormatada);
-        let startTime, endTime;
-        let specialMessage = '';
-
-        if (horarioEspecial) {
-            if (horarioEspecial.fechado) {
-                scheduleTimeSelect.innerHTML = '<option value="" disabled selected>Oficina fechada neste dia</option>';
-                if (horarioEspecial.motivo) {
-                    const motivoOption = document.createElement('option');
-                    motivoOption.textContent = `Motivo: ${horarioEspecial.motivo}`;
-                    motivoOption.disabled = true;
-                    scheduleTimeSelect.appendChild(motivoOption);
-                }
-                return;
-            } else {
-                startTime = horarioEspecial.horario_abertura;
-                endTime = horarioEspecial.horario_fechamento;
-                specialMessage = ` (Horário especial: ${formatHorarioFuncionamento(startTime, endTime)})`;
-            }
-        } else {
-            startTime = workshop.horario_abertura || "08:00";
-            endTime = workshop.horario_fechamento || "18:00";
-        }
-
-        console.log(`🕒 Horário de funcionamento: ${startTime} - ${endTime}`);
-
-        // USAR INTERVALO CONFIGURADO - GARANTIR QUE ESTÁ SENDO USADO
-        const slots = generateTimeSlots(startTime, endTime, intervalo);
-        console.log(`📋 Slots gerados (${slots.length}) com intervalo de ${intervalo}min:`, slots);
-        
-        const horariosOcupados = await getHorariosOcupados(workshop.id, dataFormatada);
-        console.log(`🚫 Horários ocupados:`, horariosOcupados);
-        
-        const now = new Date();
-        const isToday = selectedDate.toDateString() === now.toDateString();
-        console.log(`📆 É hoje? ${isToday}, Hora atual: ${now.toLocaleTimeString()}`);
-        
-        let availableSlotsCount = 0;
-        scheduleTimeSelect.innerHTML = '';
-
-        const defaultOption = document.createElement("option");
-        defaultOption.value = "";
-        defaultOption.textContent = `Selecione um horário${specialMessage} (Intervalo: ${intervalo}min)`;
-        defaultOption.disabled = true;
-        defaultOption.selected = true;
-        scheduleTimeSelect.appendChild(defaultOption);
-
-        slots.forEach(time => {
-            if (isToday) {
-                const [hours, minutes] = time.split(':').map(Number);
-                const slotTime = new Date();
-                slotTime.setHours(hours, minutes, 0, 0);
-                if (slotTime <= now) {
-                    console.log(`⏩ Pulando horário passado: ${time}`);
-                    return;
-                }
-            }
-
-            const isOcupado = horariosOcupados.includes(time);
-            console.log(`⏱️ ${time} - ${isOcupado ? 'OCUPADO' : 'DISPONÍVEL'}`);
-
-            const option = document.createElement("option");
-            option.value = time;
-            
-            if (isOcupado) {
-                option.textContent = `${time} (Reservado)`;
-                option.disabled = true;
-                option.style.color = '#e63946';
-            } else {
-                option.textContent = time;
-                availableSlotsCount++;
-            }
-            scheduleTimeSelect.appendChild(option);
-        });
-
-        console.log(`✅ Horários disponíveis: ${availableSlotsCount}`);
-
-        if (availableSlotsCount === 0) {
-            scheduleTimeSelect.innerHTML = '';
-            const noSlotsOption = document.createElement("option");
-            noSlotsOption.value = "";
-            noSlotsOption.textContent = "Nenhum horário disponível para esta data";
-            noSlotsOption.disabled = true;
-            scheduleTimeSelect.appendChild(noSlotsOption);
-        }
-        
-        if (continueButton) continueButton.disabled = availableSlotsCount === 0;
-
-    } catch (error) {
-        console.error('❌ Erro ao carregar horários:', error);
-        scheduleTimeSelect.innerHTML = '<option value="" disabled selected>Erro ao carregar horários disponíveis</option>';
     }
-}
+
+    const ocupacaoAtual = horariosOcupados[time] || 0;
+    const vagasDisponiveis = capacidade - ocupacaoAtual;
+    const estaDisponivel = vagasDisponiveis > 0;
+
+    console.log(`⏱️ ${time} - Ocupação: ${ocupacaoAtual}/${capacidade}, Vagas: ${vagasDisponiveis}`);
+
+    const option = document.createElement("option");
+    option.value = time;
+
+    if (!estaDisponivel) {
+        option.textContent = `${time} (Lotado)`;
+        option.disabled = true;
+        option.style.color = '#6c757d'; // Cinza para lotado
+        option.style.fontWeight = 'normal';
+    } else {
+        // SISTEMA DE CORES PARA ATÉ 5 VAGAS
+        let textoVaga = '';
+        
+        if (vagasDisponiveis === 1) {
+            textoVaga = ' (Última vaga!)';
+            option.style.color = '#e63946'; // Vermelho - urgente
+            option.style.fontWeight = 'bold';
+        } else if (vagasDisponiveis === 2) {
+            textoVaga = ` (${vagasDisponiveis} vagas)`;
+            option.style.color = '#f4a261'; // Laranja - atenção
+            option.style.fontWeight = 'bold';
+        } else if (vagasDisponiveis === 3) {
+            textoVaga = ` (${vagasDisponiveis} vagas)`;
+            option.style.color = '#3a86ff'; // Azul - bom
+            option.style.fontWeight = 'normal';
+        } else if (vagasDisponiveis >= 4) {
+            textoVaga = ` (${vagasDisponiveis} vagas)`;
+            option.style.color = '#2a9d8f'; // Verde - ótimo
+            option.style.fontWeight = 'normal';
+        }
+        
+        option.textContent = `${time}${textoVaga}`;
+        availableSlotsCount++;
+    }
+    scheduleTimeSelect.appendChild(option);
+});
+
+            console.log(`✅ Horários disponíveis: ${availableSlotsCount}`);
+
+            if (availableSlotsCount === 0) {
+                scheduleTimeSelect.innerHTML = '';
+                const noSlotsOption = document.createElement("option");
+                noSlotsOption.value = "";
+                noSlotsOption.textContent = "Nenhum horário disponível para esta data";
+                noSlotsOption.disabled = true;
+                scheduleTimeSelect.appendChild(noSlotsOption);
+            }
+
+            if (continueButton) continueButton.disabled = availableSlotsCount === 0;
+
+
+            // Atualizar informações de capacidade na interface
+            atualizarInfoCapacidade(capacidade, horariosOcupados, availableSlotsCount);
+        } catch (error) {
+            console.error('❌ Erro ao carregar horários:', error);
+            scheduleTimeSelect.innerHTML = '<option value="" disabled selected>Erro ao carregar horários disponíveis</option>';
+        }
+    }
 
     // Configura data mínima para agendamento
     function setMinScheduleDate() {
         const today = new Date();
-        
+
         let nextValidDate = new Date(today);
         nextValidDate.setDate(nextValidDate.getDate() + 1);
-        
+
         const dayOfWeek = nextValidDate.getDay();
         if (dayOfWeek === 0) { // Domingo
             nextValidDate.setDate(nextValidDate.getDate() + 1);
         } else if (dayOfWeek === 6) { // Sábado
             nextValidDate.setDate(nextValidDate.getDate() + 2);
         }
-        
+
         const maxDate = new Date(today);
         maxDate.setMonth(maxDate.getMonth() + 3);
-        
+
         scheduleDateInput.min = nextValidDate.toISOString().split("T")[0];
         scheduleDateInput.max = maxDate.toISOString().split("T")[0];
     }
@@ -1316,10 +1450,10 @@ async function generateAvailableTimeSlots(workshop, selectedDate) {
             }, 2000);
             return false;
         }
-        
+
         const user = JSON.parse(userData);
         const usuario_id = user.id;
-        
+
         if (!usuario_id) {
             showToast("Erro: ID do usuário não encontrado", "error");
             return false;
@@ -1359,24 +1493,24 @@ async function generateAvailableTimeSlots(workshop, selectedDate) {
         }
 
         showLoading(true);
-        
+
         try {
             const selectedProducts = getSelectedProducts();
             const oilRecommendation = JSON.parse(sessionStorage.getItem('oilRecommendation') || '{}');
-            
+
             let totalOil = 0;
             let totalFilter = 0;
-            
+
             if (selectedProducts.oil && oilRecommendation.oleo && oilRecommendation.oleo.preco) {
                 totalOil = parseFloat(oilRecommendation.oleo.preco) || 0;
             }
-            
+
             if (selectedProducts.filter && oilRecommendation.filtro && oilRecommendation.filtro.preco) {
                 totalFilter = parseFloat(oilRecommendation.filtro.preco) || 0;
             }
-            
+
             const totalService = totalOil + totalFilter;
-            
+
             const servicosArray = [];
             if (selectedProducts.oil && oilRecommendation.oleo) {
                 servicosArray.push(`Troca de Óleo: ${oilRecommendation.oleo.nome} - R$ ${totalOil.toFixed(2)}`);
@@ -1406,11 +1540,11 @@ async function generateAvailableTimeSlots(workshop, selectedDate) {
             };
 
             const result = await salvarAgendamentoNoBanco(agendamentoData);
-            
+
             if (result.success) {
                 sessionStorage.setItem('codigoConfirmacao', result.codigo_confirmacao || protocolo);
                 sessionStorage.setItem('agendamentoId', result.agendamento_id);
-                
+
                 const customerData = {
                     name: customerName,
                     cpf: customerCpf,
@@ -1418,16 +1552,16 @@ async function generateAvailableTimeSlots(workshop, selectedDate) {
                     email: customerEmail
                 };
                 sessionStorage.setItem('customerData', JSON.stringify(customerData));
-                
+
                 sessionStorage.setItem('selectedWorkshop', JSON.stringify(selectedWorkshop));
-                
+
                 const serviceData = {
                     servicos: servicosArray,
                     total: totalService,
                     data: dataHora
                 };
                 sessionStorage.setItem('serviceData', JSON.stringify(serviceData));
-                
+
                 showToast('Agendamento salvo com sucesso!', 'success');
                 return true;
             } else {
@@ -1451,7 +1585,7 @@ async function generateAvailableTimeSlots(workshop, selectedDate) {
                 },
                 body: JSON.stringify(agendamentoData)
             });
-            
+
             const responseText = await response.text();
             let result;
             try {
@@ -1459,17 +1593,17 @@ async function generateAvailableTimeSlots(workshop, selectedDate) {
             } catch (e) {
                 throw new Error(`Resposta inválida do servidor: ${responseText}`);
             }
-            
+
             if (!response.ok) {
                 throw new Error(result.message || `Erro HTTP ${response.status}`);
             }
-            
+
             if (!result.success) {
                 throw new Error(result.message || 'Erro ao salvar agendamento');
             }
-            
+
             return result;
-            
+
         } catch (error) {
             console.error('❌ Erro ao salvar agendamento no banco:', error);
             throw error;
@@ -1482,15 +1616,15 @@ async function generateAvailableTimeSlots(workshop, selectedDate) {
         const userVehicleData = JSON.parse(sessionStorage.getItem('userVehicle') || '{}');
         const selectedWorkshopData = JSON.parse(sessionStorage.getItem('selectedWorkshop') || '{}');
         const serviceData = JSON.parse(sessionStorage.getItem('serviceData') || '{}');
-        
+
         let dataFormatada = '';
         if (serviceData.data) {
             const data = new Date(serviceData.data);
-            dataFormatada = data.toLocaleDateString('pt-BR') + ' às ' + data.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
+            dataFormatada = data.toLocaleDateString('pt-BR') + ' às ' + data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
         }
-        
+
         const confirmationDetails = document.querySelector(".confirmation-details");
-        
+
         let html = `
             <div class="confirmation-section">
                 <h4>📋 Informações do Agendamento</h4>
@@ -1505,7 +1639,7 @@ async function generateAvailableTimeSlots(workshop, selectedDate) {
                 <p><strong>Telefone:</strong> ${selectedWorkshopData.telefone || 'Não informado'}</p>
             </div>
         `;
-        
+
         if (userVehicleData.marca || userVehicleData.modelo || userVehicleData.ano) {
             html += `
                 <div class="confirmation-section">
@@ -1535,7 +1669,7 @@ async function generateAvailableTimeSlots(workshop, selectedDate) {
                 <p><strong>E-mail:</strong> ${customerData.email || 'Não informado'}</p>
             </div>
         `;
-        
+
         confirmationDetails.innerHTML = html;
     }
 
@@ -1557,7 +1691,7 @@ async function generateAvailableTimeSlots(workshop, selectedDate) {
         });
     }
 
-    window.goToStep = async function(step) {
+    window.goToStep = async function (step) {
         if (step > currentStep) {
             if (step === 2 && !validateStep1()) return;
             if (step === 3 && !await validateStep2()) return;
@@ -1570,7 +1704,7 @@ async function generateAvailableTimeSlots(workshop, selectedDate) {
 
         document.querySelectorAll(".service-step").forEach(s => s.classList.remove("active"));
         document.getElementById(`step${step}`).classList.add("active");
-        
+
         updateProgressBar(step);
         currentStep = step;
 
@@ -1582,7 +1716,7 @@ async function generateAvailableTimeSlots(workshop, selectedDate) {
 
     function validateStep1() {
         const isValid = brandSelect.value && modelSelect.value && yearSelect.value;
-        
+
         if (!isValid) {
             showToast("Selecione marca, modelo e ano do veículo", "error");
             return false;
@@ -1611,7 +1745,7 @@ async function generateAvailableTimeSlots(workshop, selectedDate) {
 
     async function validateStep2() {
         const currentSelectedProducts = getSelectedProducts();
-        
+
         if (!currentSelectedProducts.oil && !currentSelectedProducts.filter) {
             showToast("Selecione pelo menos um produto (óleo ou filtro) para continuar", "error");
             const oilCard = document.getElementById("recommended-oil");
@@ -1620,14 +1754,14 @@ async function generateAvailableTimeSlots(workshop, selectedDate) {
             if (filterCard) { filterCard.style.animation = "shake 0.5s ease"; setTimeout(() => { filterCard.style.animation = ""; }, 500); }
             return false;
         }
-        
+
         if (!selectedWorkshop) {
             showToast("Selecione uma oficina para continuar", "error");
             const workshopList = document.querySelector(".workshop-list-container");
             if (workshopList) { workshopList.style.animation = "shake 0.5s ease"; setTimeout(() => { workshopList.style.animation = ""; }, 500); }
             return false;
         }
-        
+
         try {
             const response = await fetch(`/api/oficina/${selectedWorkshop.id}`);
             if (!response.ok) throw new Error("Oficina não disponível");
@@ -1676,7 +1810,7 @@ async function generateAvailableTimeSlots(workshop, selectedDate) {
             email: customerEmail
         };
         sessionStorage.setItem('customerData', JSON.stringify(customerData));
-        
+
         return true;
     }
 
@@ -1685,7 +1819,7 @@ async function generateAvailableTimeSlots(workshop, selectedDate) {
     brandSelect.addEventListener("change", () => populateModels(brandSelect.value));
     modelSelect.addEventListener("change", () => populateYears(modelSelect.value));
 
-    vehicleForm.addEventListener("submit", async function(e) {
+    vehicleForm.addEventListener("submit", async function (e) {
         e.preventDefault();
         if (validateStep1()) {
             showLoading(true);
@@ -1704,7 +1838,7 @@ async function generateAvailableTimeSlots(workshop, selectedDate) {
         }
     });
 
-    scheduleDateInput.addEventListener('change', async function() {
+    scheduleDateInput.addEventListener('change', async function () {
         if (this.value && selectedWorkshop) {
             const selectedDate = new Date(this.value + 'T00:00:00');
             await generateAvailableTimeSlots(selectedWorkshop, selectedDate);
@@ -1712,26 +1846,26 @@ async function generateAvailableTimeSlots(workshop, selectedDate) {
     });
 
     if (locationInput) {
-        locationInput.addEventListener("input", function(e) {
+        locationInput.addEventListener("input", function (e) {
             const query = e.target.value.trim();
             const resultsContainer = document.getElementById("autocomplete-results");
-            
+
             if (addressSearchTimeout) {
                 clearTimeout(addressSearchTimeout);
             }
-            
+
             if (query.length < 3) {
                 resultsContainer.classList.remove("active");
                 return;
             }
-            
+
             addressSearchTimeout = setTimeout(async () => {
                 const addresses = await searchAddress(query);
                 showAddressSuggestions(addresses);
             }, 300);
         });
 
-        document.addEventListener("click", function(e) {
+        document.addEventListener("click", function (e) {
             if (e.target !== locationInput) {
                 const resultsContainer = document.getElementById("autocomplete-results");
                 if (resultsContainer) resultsContainer.classList.remove("active");
@@ -1748,14 +1882,14 @@ async function generateAvailableTimeSlots(workshop, selectedDate) {
     }
 
     if (hamburgerMenu && mobileNav) {
-        hamburgerMenu.addEventListener("click", function() {
+        hamburgerMenu.addEventListener("click", function () {
             mobileNav.classList.toggle("active");
             document.body.style.overflow = mobileNav.classList.contains("active") ? "hidden" : "auto";
         });
 
         const navLinks = mobileNav.querySelectorAll("a");
         navLinks.forEach(link => {
-            link.addEventListener("click", function() {
+            link.addEventListener("click", function () {
                 if (window.innerWidth <= 992) {
                     mobileNav.classList.remove("active");
                     document.body.style.overflow = "auto";
@@ -1765,7 +1899,7 @@ async function generateAvailableTimeSlots(workshop, selectedDate) {
     }
 
     // Máscaras de input
-    document.getElementById("customer-cpf").addEventListener("input", function(e) {
+    document.getElementById("customer-cpf").addEventListener("input", function (e) {
         let value = e.target.value.replace(/\D/g, "");
         if (value.length > 9) {
             value = value.replace(/^(\d{3})(\d{3})(\d{3})(\d{2}).*/, "$1.$2.$3-$4");
@@ -1777,7 +1911,7 @@ async function generateAvailableTimeSlots(workshop, selectedDate) {
         e.target.value = value;
     });
 
-    document.getElementById("customer-phone").addEventListener("input", function(e) {
+    document.getElementById("customer-phone").addEventListener("input", function (e) {
         let value = e.target.value.replace(/\D/g, "");
         if (value.length > 10) {
             value = value.replace(/^(\d\d)(\d{5})(\d{4}).*/, "($1) $2-$3");
@@ -1793,18 +1927,18 @@ async function generateAvailableTimeSlots(workshop, selectedDate) {
 
     // Modal de login
     if (loginBtn && modal) {
-        loginBtn.addEventListener("click", function(e) {
+        loginBtn.addEventListener("click", function (e) {
             e.preventDefault();
             modal.style.display = "block";
             document.body.style.overflow = "hidden";
         });
 
-        closeModal.addEventListener("click", function() {
+        closeModal.addEventListener("click", function () {
             modal.style.display = "none";
             document.body.style.overflow = "auto";
         });
 
-        window.addEventListener("click", function(e) {
+        window.addEventListener("click", function (e) {
             if (e.target === modal) {
                 modal.style.display = "none";
                 document.body.style.overflow = "auto";
@@ -1824,7 +1958,7 @@ async function generateAvailableTimeSlots(workshop, selectedDate) {
     }
 
     if (togglePassword && passwordInput) {
-        togglePassword.addEventListener("click", function() {
+        togglePassword.addEventListener("click", function () {
             const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
             passwordInput.setAttribute("type", type);
             this.querySelector("i").classList.toggle("fa-eye");
@@ -1833,21 +1967,21 @@ async function generateAvailableTimeSlots(workshop, selectedDate) {
     }
 
     if (loginForm) {
-        loginForm.addEventListener("submit", function(e) {
+        loginForm.addEventListener("submit", function (e) {
             e.preventDefault();
             const email = this.querySelector("#login-email").value.trim();
             const password = this.querySelector("#login-password").value.trim();
-            
+
             if (!email || !password) {
                 showToast("Preencha todos os campos", "error");
                 return;
             }
-            
+
             if (!validateEmail(email)) {
                 showToast("E-mail inválido", "error");
                 return;
             }
-            
+
             showToast("Login realizado com sucesso!", "success");
             modal.style.display = "none";
             document.body.style.overflow = "auto";

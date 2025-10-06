@@ -2,6 +2,8 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../database/db');
+
+
 // Rota para cliente buscar intervalo da oficina
 router.get('/oficina/:id/intervalo', (req, res) => {
     const { id } = req.params;
@@ -38,6 +40,73 @@ router.get('/oficina/:id/intervalo', (req, res) => {
                 intervalo: 45 
             });
         }
+    });
+});
+
+// ==================== ROTAS PARA CAPACIDADE SIMULTÂNEA ====================
+
+// Rota para obter configuração da capacidade
+router.get('/configuracoes/capacidade', checkOficinaAdmin, (req, res) => {
+    const oficina_id = req.session.admin.oficina_id;
+
+    const query = `
+        SELECT capacidade_simultanea 
+        FROM oficina_capacidade 
+        WHERE oficina_id = ?
+    `;
+
+    db.query(query, [oficina_id], (err, results) => {
+        if (err) {
+            console.error('Erro ao carregar capacidade:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao carregar configuração de capacidade' 
+            });
+        }
+
+        const capacidade = results.length > 0 ? results[0].capacidade_simultanea : 1;
+        
+        res.json({ 
+            success: true, 
+            capacidade: capacidade 
+        });
+    });
+});
+
+// Rota para salvar configuração da capacidade
+router.put('/configuracoes/capacidade', checkOficinaAdmin, (req, res) => {
+    const oficina_id = req.session.admin.oficina_id;
+    const { capacidade } = req.body;
+
+    console.log('💾 Salvando capacidade:', {
+        oficina_id: oficina_id,
+        capacidade: capacidade,
+        tipo: typeof capacidade
+    });
+
+    const query = `
+        INSERT INTO oficina_capacidade (oficina_id, capacidade_simultanea, updated_at)
+        VALUES (?, ?, NOW())
+        ON DUPLICATE KEY UPDATE 
+        capacidade_simultanea = VALUES(capacidade_simultanea),
+        updated_at = NOW()
+    `;
+
+    db.query(query, [oficina_id, parseInt(capacidade)], (err, result) => {
+        if (err) {
+            console.error('❌ Erro ao salvar capacidade:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao salvar configuração de capacidade' 
+            });
+        }
+
+        console.log('✅ Capacidade salva com sucesso! Resultado:', result);
+
+        res.json({ 
+            success: true, 
+            message: 'Capacidade de atendimento salva com sucesso!' 
+        });
     });
 });
 // Middleware para verificar se é admin de oficina
@@ -2344,3 +2413,5 @@ router.put('/configuracoes/intervalo', checkOficinaAdmin, (req, res) => {
         });
     });
 });
+
+module.exports = router;

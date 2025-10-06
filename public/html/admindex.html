@@ -667,6 +667,43 @@
                         Baseado no horário comercial de 8 horas (08:00 às 18:00)
                     </p>
                 </div>
+
+            </div>
+            
+        </div>
+        
+    </div>
+</div>
+<!-- Card de Capacidade de Atendimento -->
+<div class="config-card">
+    <div class="config-header">
+        <h3><i class="fas fa-users"></i> Capacidade de Atendimento Simultâneo</h3>
+        <span class="config-status">
+            <i class="fas fa-user-friends"></i>
+            Clientes por Horário
+        </span>
+    </div>
+    <div class="config-body">
+        <div class="capacidade-info">
+            <p style="margin-bottom: 15px; color: var(--text-light);">
+                <i class="fas fa-info-circle"></i>
+                Defina quantos clientes sua oficina pode atender simultaneamente no mesmo horário.
+            </p>
+            
+            <div class="form-group">
+                <label for="capacidadeAtendimento">Clientes por horário:</label>
+                <select id="capacidadeAtendimento" class="form-input">
+                    <option value="1">1 cliente (atendimento individual)</option>
+                    <option value="2">2 clientes (atendimento duplo)</option>
+                    <option value="3">3 clientes (atendimento triplo)</option>
+                    <option value="4">4 clientes</option>
+                    <option value="5">5 clientes</option>
+                </select>
+            </div>
+            
+            <!-- Preview de capacidade -->
+            <div id="previewCapacidade" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                <!-- Preview será gerado via JavaScript -->
             </div>
         </div>
     </div>

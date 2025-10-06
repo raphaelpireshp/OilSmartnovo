@@ -5,6 +5,7 @@ const cors = require('cors');
 const session = require('express-session');
 require('dotenv').config();
 
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -110,6 +111,48 @@ app.post('/api/admin/login', async (req, res) => {
             message: 'Erro interno do servidor' 
         });
     }
+});
+
+
+// ========== ROTA PARA CAPACIDADE DA OFICINA (CLIENTE) - VERSÃO CORRIGIDA ==========
+
+// Rota para cliente buscar capacidade da oficina - CORRIGIDA
+app.get('/api/oficina/:id/capacidade', (req, res) => {
+    const { id } = req.params;
+
+    console.log('📡 Cliente solicitando capacidade da oficina:', id);
+
+    const query = `
+        SELECT capacidade_simultanea 
+        FROM oficina_capacidade 
+        WHERE oficina_id = ?
+    `;
+
+    db.query(query, [id], (err, results) => {
+        if (err) {
+            console.error('❌ Erro ao buscar capacidade para cliente:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao buscar capacidade' 
+            });
+        }
+        
+        if (results.length > 0 && results[0].capacidade_simultanea !== null) {
+            const capacidade = results[0].capacidade_simultanea;
+            console.log('✅ Capacidade encontrada para cliente:', capacidade);
+            
+            res.json({ 
+                success: true, 
+                capacidade: capacidade 
+            });
+        } else {
+            console.log('ℹ️  Nenhuma capacidade configurada, usando padrão (1) para oficina:', id);
+            res.json({ 
+                success: true, 
+                capacidade: 1 
+            });
+        }
+    });
 });
 
 app.post('/api/admin/logout', (req, res) => {
@@ -1212,6 +1255,7 @@ app.get('/api/oficina/:id/horarios-ocupados/:data', (req, res) => {
         });
     }
 
+    // Primeiro busca todos os horários ocupados (sem filtrar por capacidade)
     const query = `
         SELECT TIME(data_hora) as hora
         FROM agendamento_simples 
@@ -1392,64 +1436,8 @@ app.get('/api/oficina/:id/horario-especial/:data', (req, res) => {
 });
 
 
-// ========== ROTA PARA OBTER INTERVALO DA OFICINA ==========
 
-// Rota para obter configuração do intervalo de uma oficina específica
-app.get('/api/oficina/:id/intervalo', (req, res) => {
-    const { id } = req.params;
 
-    const query = `
-        SELECT oc.intervalo_agendamento 
-        FROM oficina_config oc
-        WHERE oc.oficina_id = ?
-        UNION ALL
-        SELECT 45 as intervalo_agendamento
-        LIMIT 1
-    `;
-
-    db.query(query, [id], (err, results) => {
-        if (err) {
-            console.error('Erro ao buscar intervalo da oficina:', err);
-            return res.status(500).json({ 
-                success: false, 
-                message: 'Erro ao buscar configuração de intervalo' 
-            });
-        }
-
-        // Se não existir configuração, usa 45 minutos como padrão
-        const intervalo = results.length > 0 ? results[0].intervalo_agendamento : 45;
-        
-        res.json({ 
-            success: true, 
-            intervalo: intervalo 
-        });
-    });
-});
-
-// Rota de debug para verificar configurações de intervalo
-app.get('/api/debug/intervalo/:oficina_id', (req, res) => {
-    const { oficina_id } = req.params;
-    
-    const query = `
-        SELECT oc.*, o.nome as oficina_nome 
-        FROM oficina_config oc 
-        JOIN oficina o ON oc.oficina_id = o.id 
-        WHERE oc.oficina_id = ?
-    `;
-    
-    db.query(query, [oficina_id], (err, results) => {
-        if (err) {
-            console.error('Erro no debug:', err);
-            return res.status(500).json({ error: err.message });
-        }
-        
-        res.json({
-            oficina_id: oficina_id,
-            configuracao: results[0] || null,
-            mensagem: results.length > 0 ? 'Configuração encontrada' : 'Nenhuma configuração encontrada, usando padrão (45min)'
-        });
-    });
-});
 // ========== INICIAR SERVIDOR ==========
 
 app.listen(PORT, () => {

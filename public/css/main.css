@@ -6555,3 +6555,39 @@ select:disabled {
         gap: 5px;
     }
 }
+
+
+/* Estilos para informações de capacidade */
+.capacidade-info {
+    border-left: 4px solid #3a86ff;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.capacidade-info .fas {
+    font-size: 16px;
+}
+
+/* Destaque para última vaga */
+select option[style*="color: #f4a261"] {
+    font-weight: bold !important;
+}
+
+/* Tooltip para informações de capacidade */
+.capacidade-tooltip {
+    position: relative;
+    cursor: help;
+}
+
+.capacidade-tooltip:hover::after {
+    content: "Número de clientes que podem ser atendidos ao mesmo tempo";
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    background: #333;
+    color: white;
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 1000;
+}
