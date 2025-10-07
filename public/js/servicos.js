@@ -41,9 +41,83 @@ document.addEventListener("DOMContentLoaded", function () {
     let currentWorkshopId = null;
     let specialHoursCache = {};
 
+    // ==================== FUNÇÕES PARA HORÁRIOS ESPECIAIS ====================
+
+    // Verificar se há horário especial para uma data
+    async function verificarHorarioEspecial(oficinaId, data) {
+        try {
+            console.log('🔍 Verificando horário especial para:', data, 'Oficina:', oficinaId);
+
+            const response = await fetch(`/api/oficina/${oficinaId}/horario-especial/${data}`);
+
+            if (!response.ok) {
+                console.log('ℹ️  Nenhum horário especial encontrado, usando horário padrão');
+                return null;
+            }
+
+            const dataResponse = await response.json();
+
+            if (dataResponse.success && dataResponse.horario_especial) {
+                console.log('🎯 Horário especial encontrado:', dataResponse.horario_especial);
+                return dataResponse.horario_especial;
+            }
+
+            return null;
+        } catch (error) {
+            console.error('❌ Erro ao verificar horário especial:', error);
+            return null;
+        }
+    }
+
+    // Aplicar horário especial na interface
+    function aplicarHorarioEspecial(horarioEspecial) {
+        const specialHoursAlert = document.getElementById('specialHoursAlert');
+        const closedDayAlert = document.getElementById('closedDayAlert');
+
+        // Resetar alerts
+        if (specialHoursAlert) specialHoursAlert.style.display = 'none';
+        if (closedDayAlert) closedDayAlert.style.display = 'none';
+
+        if (!horarioEspecial) return;
+
+        // Se a oficina está fechada
+        if (horarioEspecial.fechado) {
+            if (closedDayAlert) {
+                closedDayAlert.style.display = 'block';
+                document.getElementById('closedDayMessage').textContent =
+                    horarioEspecial.motivo ?
+                        `A oficina está fechada: ${horarioEspecial.motivo}` :
+                        'A oficina não funciona nesta data. Por favor, selecione outra data.';
+            }
+            return;
+        }
+
+        // Se tem horário especial
+        if (horarioEspecial.horario_abertura && horarioEspecial.horario_fechamento) {
+            if (specialHoursAlert) {
+                specialHoursAlert.style.display = 'block';
+                const message = horarioEspecial.motivo ?
+                    `Horário especial: ${horarioEspecial.horario_abertura} - ${horarioEspecial.horario_fechamento} (${horarioEspecial.motivo})` :
+                    `Horário especial: ${horarioEspecial.horario_abertura} - ${horarioEspecial.horario_fechamento}`;
+
+                document.getElementById('specialHoursMessage').textContent = message;
+            }
+        }
+    }
+
+    // Verificar e aplicar horários especiais quando a data muda
+    async function verificarHorariosAoMudarData() {
+        const dataInput = document.getElementById('schedule-date');
+        const oficinaId = currentWorkshopId;
+
+        if (!dataInput || !dataInput.value || !oficinaId) return;
+
+        const horarioEspecial = await verificarHorarioEspecial(oficinaId, dataInput.value);
+        aplicarHorarioEspecial(horarioEspecial);
+    }
+
     // ==================== FUNÇÕES AUXILIARES GERAIS ====================
-    // ==================== FUNÇÕES AUXILIARES GERAIS ====================
-    // Buscar intervalo configurado da oficina - VERSÃO CORRIGIDA
+
     async function getWorkshopInterval(workshopId) {
         try {
             console.log('🔄 Buscando intervalo para oficina:', workshopId);
@@ -102,42 +176,42 @@ document.addEventListener("DOMContentLoaded", function () {
             capacidadeSimultanea = 1;
         }
     }
-// Função para atualizar informações de capacidade na interface - VERSÃO MELHORADA
-function atualizarInfoCapacidade(capacidade, horariosOcupados, slotsDisponiveis) {
-    const infoElement = document.getElementById('info-capacidade');
-    const textoElement = document.getElementById('info-capacidade-texto');
+    // Função para atualizar informações de capacidade na interface - VERSÃO MELHORADA
+    function atualizarInfoCapacidade(capacidade, horariosOcupados, slotsDisponiveis) {
+        const infoElement = document.getElementById('info-capacidade');
+        const textoElement = document.getElementById('info-capacidade-texto');
 
-    if (!infoElement || !textoElement) {
-        console.log('❌ Elementos de info capacidade não encontrados');
-        return;
+        if (!infoElement || !textoElement) {
+            console.log('❌ Elementos de info capacidade não encontrados');
+            return;
+        }
+
+        // Calcular estatísticas
+        const totalOcupados = Object.values(horariosOcupados).reduce((sum, count) => sum + count, 0);
+        const totalSlots = Object.keys(horariosOcupados).length;
+
+        // Texto informativo baseado na capacidade
+        let textoInfo = '';
+
+        if (capacidade === 1) {
+            textoInfo = `Atendimento individual | ${slotsDisponiveis} horários disponíveis`;
+        } else if (capacidade <= 3) {
+            textoInfo = `Até ${capacidade} atendimentos simultâneos | ${slotsDisponiveis} horários disponíveis`;
+        } else {
+            textoInfo = `Até ${capacidade} atendimentos por horário | ${slotsDisponiveis} horários disponíveis`;
+        }
+
+        // Adicionar informação sobre ocupação se houver agendamentos
+        if (totalOcupados > 0) {
+            textoInfo += ` | ${totalOcupados} agendamentos confirmados`;
+        }
+
+        // Mostrar sempre, mesmo com capacidade 1
+        infoElement.style.display = 'block';
+        textoElement.innerHTML = textoInfo;
+
+        console.log(`📊 Info capacidade: ${capacidade} simultâneos, ${slotsDisponiveis} disponíveis, ${totalOcupados} ocupados`);
     }
-
-    // Calcular estatísticas
-    const totalOcupados = Object.values(horariosOcupados).reduce((sum, count) => sum + count, 0);
-    const totalSlots = Object.keys(horariosOcupados).length;
-    
-    // Texto informativo baseado na capacidade
-    let textoInfo = '';
-    
-    if (capacidade === 1) {
-        textoInfo = `Atendimento individual | ${slotsDisponiveis} horários disponíveis`;
-    } else if (capacidade <= 3) {
-        textoInfo = `Até ${capacidade} atendimentos simultâneos | ${slotsDisponiveis} horários disponíveis`;
-    } else {
-        textoInfo = `Até ${capacidade} atendimentos por horário | ${slotsDisponiveis} horários disponíveis`;
-    }
-
-    // Adicionar informação sobre ocupação se houver agendamentos
-    if (totalOcupados > 0) {
-        textoInfo += ` | ${totalOcupados} agendamentos confirmados`;
-    }
-
-    // Mostrar sempre, mesmo com capacidade 1
-    infoElement.style.display = 'block';
-    textoElement.innerHTML = textoInfo;
-    
-    console.log(`📊 Info capacidade: ${capacidade} simultâneos, ${slotsDisponiveis} disponíveis, ${totalOcupados} ocupados`);
-}
     // Mostra/oculta o loading
     function showLoading(show) {
         const loadingOverlay = document.getElementById("loading-overlay");
@@ -1169,77 +1243,77 @@ function atualizarInfoCapacidade(capacidade, horariosOcupados, slotsDisponiveis)
         return slots;
     }
 
-// Buscar horários ocupados considerando a capacidade - VERSÃO MAIS ROBUSTA
-async function getHorariosOcupados(workshopId, data) {
-    try {
-        console.log(`🔍 Buscando ocupação para oficina ${workshopId} na data ${data}`);
-        
-        // BUSCAR CAPACIDADE COM TRATAMENTO DE ERRO MELHORADO
-        let capacidade = await getWorkshopCapacity(workshopId);
-        console.log(`🏢 Capacidade final: ${capacidade}`);
+    // Buscar horários ocupados considerando a capacidade - VERSÃO MAIS ROBUSTA
+    async function getHorariosOcupados(workshopId, data) {
+        try {
+            console.log(`🔍 Buscando ocupação para oficina ${workshopId} na data ${data}`);
 
-        // Buscar agendamentos
-        const response = await fetch(`/api/oficina/${workshopId}/horarios-ocupados/${data}`);
-        
-        if (!response.ok) {
-            console.warn('⚠️ Erro ao buscar horários ocupados, retornando vazio');
-            return { ocupacao: {}, capacidade: capacidade };
+            // BUSCAR CAPACIDADE COM TRATAMENTO DE ERRO MELHORADO
+            let capacidade = await getWorkshopCapacity(workshopId);
+            console.log(`🏢 Capacidade final: ${capacidade}`);
+
+            // Buscar agendamentos
+            const response = await fetch(`/api/oficina/${workshopId}/horarios-ocupados/${data}`);
+
+            if (!response.ok) {
+                console.warn('⚠️ Erro ao buscar horários ocupados, retornando vazio');
+                return { ocupacao: {}, capacidade: capacidade };
+            }
+
+            const result = await response.json();
+            const horariosOcupados = result.data || [];
+
+            console.log(`📅 Horários ocupados encontrados:`, horariosOcupados);
+
+            // Agrupa horários por slot
+            const ocupacaoPorHorario = {};
+            horariosOcupados.forEach(horario => {
+                const horaFormatada = horario.substring(0, 5);
+                ocupacaoPorHorario[horaFormatada] = (ocupacaoPorHorario[horaFormatada] || 0) + 1;
+            });
+
+            console.log(`📊 Ocupação por horário:`, ocupacaoPorHorario);
+
+            return {
+                ocupacao: ocupacaoPorHorario,
+                capacidade: capacidade
+            };
+        } catch (error) {
+            console.error('❌ Erro geral ao buscar horários ocupados:', error);
+            return { ocupacao: {}, capacidade: 1 }; // Sempre retorna um fallback
         }
-
-        const result = await response.json();
-        const horariosOcupados = result.data || [];
-        
-        console.log(`📅 Horários ocupados encontrados:`, horariosOcupados);
-
-        // Agrupa horários por slot
-        const ocupacaoPorHorario = {};
-        horariosOcupados.forEach(horario => {
-            const horaFormatada = horario.substring(0, 5);
-            ocupacaoPorHorario[horaFormatada] = (ocupacaoPorHorario[horaFormatada] || 0) + 1;
-        });
-
-        console.log(`📊 Ocupação por horário:`, ocupacaoPorHorario);
-
-        return {
-            ocupacao: ocupacaoPorHorario,
-            capacidade: capacidade
-        };
-    } catch (error) {
-        console.error('❌ Erro geral ao buscar horários ocupados:', error);
-        return { ocupacao: {}, capacidade: 1 }; // Sempre retorna um fallback
     }
-}
 
 
     // Função para buscar capacidade da oficina
-// Função para buscar capacidade da oficina - VERSÃO CORRIGIDA
-async function getWorkshopCapacity(workshopId) {
-    try {
-        console.log('🔍 Buscando capacidade para oficina:', workshopId);
-        
-        const response = await fetch(`/api/oficina/${workshopId}/capacidade`);
-        
-        if (!response.ok) {
-            console.warn('⚠️ Erro HTTP ao buscar capacidade:', response.status);
-            return 1; // Retorna padrão em caso de erro
+    // Função para buscar capacidade da oficina - VERSÃO CORRIGIDA
+    async function getWorkshopCapacity(workshopId) {
+        try {
+            console.log('🔍 Buscando capacidade para oficina:', workshopId);
+
+            const response = await fetch(`/api/oficina/${workshopId}/capacidade`);
+
+            if (!response.ok) {
+                console.warn('⚠️ Erro HTTP ao buscar capacidade:', response.status);
+                return 1; // Retorna padrão em caso de erro
+            }
+
+            const data = await response.json();
+            console.log('📦 Dados recebidos da capacidade:', data);
+
+            if (data.success && data.capacidade !== undefined) {
+                const capacidade = parseInt(data.capacidade);
+                console.log(`✅ Capacidade encontrada: ${capacidade}`);
+                return capacidade;
+            } else {
+                console.warn('⚠️ Resposta da API não contém capacidade válida, usando padrão 1');
+                return 1;
+            }
+        } catch (error) {
+            console.error('❌ Erro ao buscar capacidade:', error);
+            return 1; // Sempre retorna um valor padrão em caso de erro
         }
-        
-        const data = await response.json();
-        console.log('📦 Dados recebidos da capacidade:', data);
-        
-        if (data.success && data.capacidade !== undefined) {
-            const capacidade = parseInt(data.capacidade);
-            console.log(`✅ Capacidade encontrada: ${capacidade}`);
-            return capacidade;
-        } else {
-            console.warn('⚠️ Resposta da API não contém capacidade válida, usando padrão 1');
-            return 1;
-        }
-    } catch (error) {
-        console.error('❌ Erro ao buscar capacidade:', error);
-        return 1; // Sempre retorna um valor padrão em caso de erro
     }
-}
 
     // Verifica horários especiais
     async function checkSpecialHours(workshopId, date) {
@@ -1343,58 +1417,58 @@ async function getWorkshopCapacity(workshopId) {
             defaultOption.selected = true;
             scheduleTimeSelect.appendChild(defaultOption);
 
-slots.forEach(time => {
-    if (isToday) {
-        const [hours, minutes] = time.split(':').map(Number);
-        const slotTime = new Date();
-        slotTime.setHours(hours, minutes, 0, 0);
-        if (slotTime <= now) {
-            console.log(`⏩ Pulando horário passado: ${time}`);
-            return;
-        }
-    }
+            slots.forEach(time => {
+                if (isToday) {
+                    const [hours, minutes] = time.split(':').map(Number);
+                    const slotTime = new Date();
+                    slotTime.setHours(hours, minutes, 0, 0);
+                    if (slotTime <= now) {
+                        console.log(`⏩ Pulando horário passado: ${time}`);
+                        return;
+                    }
+                }
 
-    const ocupacaoAtual = horariosOcupados[time] || 0;
-    const vagasDisponiveis = capacidade - ocupacaoAtual;
-    const estaDisponivel = vagasDisponiveis > 0;
+                const ocupacaoAtual = horariosOcupados[time] || 0;
+                const vagasDisponiveis = capacidade - ocupacaoAtual;
+                const estaDisponivel = vagasDisponiveis > 0;
 
-    console.log(`⏱️ ${time} - Ocupação: ${ocupacaoAtual}/${capacidade}, Vagas: ${vagasDisponiveis}`);
+                console.log(`⏱️ ${time} - Ocupação: ${ocupacaoAtual}/${capacidade}, Vagas: ${vagasDisponiveis}`);
 
-    const option = document.createElement("option");
-    option.value = time;
+                const option = document.createElement("option");
+                option.value = time;
 
-    if (!estaDisponivel) {
-        option.textContent = `${time} (Lotado)`;
-        option.disabled = true;
-        option.style.color = '#6c757d'; // Cinza para lotado
-        option.style.fontWeight = 'normal';
-    } else {
-        // SISTEMA DE CORES PARA ATÉ 5 VAGAS
-        let textoVaga = '';
-        
-        if (vagasDisponiveis === 1) {
-            textoVaga = ' (Última vaga!)';
-            option.style.color = '#e63946'; // Vermelho - urgente
-            option.style.fontWeight = 'bold';
-        } else if (vagasDisponiveis === 2) {
-            textoVaga = ` (${vagasDisponiveis} vagas)`;
-            option.style.color = '#f4a261'; // Laranja - atenção
-            option.style.fontWeight = 'bold';
-        } else if (vagasDisponiveis === 3) {
-            textoVaga = ` (${vagasDisponiveis} vagas)`;
-            option.style.color = '#3a86ff'; // Azul - bom
-            option.style.fontWeight = 'normal';
-        } else if (vagasDisponiveis >= 4) {
-            textoVaga = ` (${vagasDisponiveis} vagas)`;
-            option.style.color = '#2a9d8f'; // Verde - ótimo
-            option.style.fontWeight = 'normal';
-        }
-        
-        option.textContent = `${time}${textoVaga}`;
-        availableSlotsCount++;
-    }
-    scheduleTimeSelect.appendChild(option);
-});
+                if (!estaDisponivel) {
+                    option.textContent = `${time} (Lotado)`;
+                    option.disabled = true;
+                    option.style.color = '#6c757d'; // Cinza para lotado
+                    option.style.fontWeight = 'normal';
+                } else {
+                    // SISTEMA DE CORES PARA ATÉ 5 VAGAS
+                    let textoVaga = '';
+
+                    if (vagasDisponiveis === 1) {
+                        textoVaga = ' (Última vaga!)';
+                        option.style.color = '#e63946'; // Vermelho - urgente
+                        option.style.fontWeight = 'bold';
+                    } else if (vagasDisponiveis === 2) {
+                        textoVaga = ` (${vagasDisponiveis} vagas)`;
+                        option.style.color = '#f4a261'; // Laranja - atenção
+                        option.style.fontWeight = 'bold';
+                    } else if (vagasDisponiveis === 3) {
+                        textoVaga = ` (${vagasDisponiveis} vagas)`;
+                        option.style.color = '#3a86ff'; // Azul - bom
+                        option.style.fontWeight = 'normal';
+                    } else if (vagasDisponiveis >= 4) {
+                        textoVaga = ` (${vagasDisponiveis} vagas)`;
+                        option.style.color = '#2a9d8f'; // Verde - ótimo
+                        option.style.fontWeight = 'normal';
+                    }
+
+                    option.textContent = `${time}${textoVaga}`;
+                    availableSlotsCount++;
+                }
+                scheduleTimeSelect.appendChild(option);
+            });
 
             console.log(`✅ Horários disponíveis: ${availableSlotsCount}`);
 
@@ -1838,12 +1912,17 @@ slots.forEach(time => {
         }
     });
 
-    scheduleDateInput.addEventListener('change', async function () {
-        if (this.value && selectedWorkshop) {
-            const selectedDate = new Date(this.value + 'T00:00:00');
-            await generateAvailableTimeSlots(selectedWorkshop, selectedDate);
-        }
-    });
+scheduleDateInput.addEventListener('change', async function () {
+    if (this.value && selectedWorkshop) {
+        const selectedDate = new Date(this.value + 'T00:00:00');
+        
+        // ✅ Verificar horários especiais
+        await verificarHorariosAoMudarData();
+        
+        // ✅ Gerar horários disponíveis
+        await generateAvailableTimeSlots(selectedWorkshop, selectedDate);
+    }
+});
 
     if (locationInput) {
         locationInput.addEventListener("input", function (e) {
@@ -1986,7 +2065,8 @@ slots.forEach(time => {
             modal.style.display = "none";
             document.body.style.overflow = "auto";
         });
-    }
+        
+    } 
 
     // ==================== INICIALIZAÇÃO ====================
 
@@ -2004,5 +2084,6 @@ slots.forEach(time => {
     }
 
     init();
+    
 });
 

@@ -1437,7 +1437,71 @@ app.get('/api/oficina/:id/horario-especial/:data', (req, res) => {
 
 
 
+// Rota para clientes verificarem horários especiais
+app.get('/api/oficina/:id/horario-especial/:data', (req, res) => {
+    const { id, data } = req.params;
+    
+    console.log('🔍 Cliente verificando horário especial:', { oficina: id, data: data });
+    
+    // Primeiro verifica se há horário especial para esta data
+    const queryEspecial = `
+        SELECT * FROM horarios_especiais 
+        WHERE oficina_id = ? AND data_especial = ?
+    `;
 
+    db.query(queryEspecial, [id, data], (err, especiais) => {
+        if (err) {
+            console.error('❌ Erro ao buscar horário especial:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao buscar horário' 
+            });
+        }
+
+        // Se encontrou horário especial, retorna ele
+        if (especiais.length > 0) {
+            console.log('✅ Horário especial encontrado:', especiais[0]);
+            return res.json({ 
+                success: true, 
+                horario_especial: especiais[0]
+            });
+        }
+
+        // Se não especial, checa exceção para o dia da semana
+        const dateObj = new Date(data);
+        const dayNames = ['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'];
+        const diaSemana = dayNames[dateObj.getDay()];
+
+        const queryExcecao = `
+            SELECT * FROM horarios_excecoes 
+            WHERE oficina_id = ? AND dia_semana = ? AND ativo = TRUE
+        `;
+
+        db.query(queryExcecao, [id, diaSemana], (err, excecoes) => {
+            if (err) {
+                console.error('❌ Erro ao buscar exceção:', err);
+                return res.status(500).json({ 
+                    success: false, 
+                    message: 'Erro ao buscar horário' 
+                });
+            }
+
+            if (excecoes.length > 0) {
+                console.log('✅ Exceção encontrada:', excecoes[0]);
+                return res.json({ 
+                    success: true, 
+                    horario_especial: excecoes[0]
+                });
+            }
+
+            // Se não encontrou nada, retorna null
+            res.json({ 
+                success: true, 
+                horario_especial: null
+            });
+        });
+    });
+});
 // ========== INICIAR SERVIDOR ==========
 
 app.listen(PORT, () => {

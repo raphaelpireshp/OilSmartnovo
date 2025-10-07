@@ -751,7 +751,7 @@ router.get('/horarios-especiais', checkOficinaAdmin, (req, res) => {
 
     db.query(query, [oficina_id], (err, results) => {
         if (err) {
-            console.error('Erro ao buscar horários especiais:', err);
+            console.error('❌ Erro ao buscar horários especiais:', err);
             return res.status(500).json({ 
                 success: false, 
                 message: 'Erro ao buscar horários especiais' 
@@ -777,7 +777,7 @@ router.get('/horarios-excecoes', checkOficinaAdmin, (req, res) => {
 
     db.query(query, [oficina_id], (err, results) => {
         if (err) {
-            console.error('Erro ao buscar exceções:', err);
+            console.error('❌ Erro ao buscar exceções:', err);
             return res.status(500).json({ 
                 success: false, 
                 message: 'Erro ao buscar exceções de horário' 
@@ -807,19 +807,13 @@ router.post('/horarios-especiais', checkOficinaAdmin, (req, res) => {
         INSERT INTO horarios_especiais 
         (oficina_id, data_especial, horario_abertura, horario_fechamento, motivo, fechado)
         VALUES (?, ?, ?, ?, ?, ?)
-        ON DUPLICATE KEY UPDATE
-        horario_abertura = VALUES(horario_abertura),
-        horario_fechamento = VALUES(horario_fechamento),
-        motivo = VALUES(motivo),
-        fechado = VALUES(fechado),
-        updated_at = CURRENT_TIMESTAMP
     `;
 
     db.query(query, [
         oficina_id, data_especial, horario_abertura, horario_fechamento, motivo, fechado || false
     ], (err, result) => {
         if (err) {
-            console.error('Erro ao adicionar horário especial:', err);
+            console.error('❌ Erro ao adicionar horário especial:', err);
             return res.status(500).json({ 
                 success: false, 
                 message: 'Erro ao adicionar horário especial' 
@@ -834,10 +828,10 @@ router.post('/horarios-especiais', checkOficinaAdmin, (req, res) => {
     });
 });
 
-// Adicionar exceção de dia da semana
+// Adicionar exceção
 router.post('/horarios-excecoes', checkOficinaAdmin, (req, res) => {
     const oficina_id = req.session.admin.oficina_id;
-    const { dia_semana, horario_abertura, horario_fechamento, motivo, data_inicio, data_fim } = req.body;
+    const { dia_semana, horario_abertura, horario_fechamento, motivo } = req.body;
 
     if (!dia_semana) {
         return res.status(400).json({
@@ -848,15 +842,15 @@ router.post('/horarios-excecoes', checkOficinaAdmin, (req, res) => {
 
     const query = `
         INSERT INTO horarios_excecoes 
-        (oficina_id, dia_semana, horario_abertura, horario_fechamento, motivo, data_inicio, data_fim)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        (oficina_id, dia_semana, horario_abertura, horario_fechamento, motivo)
+        VALUES (?, ?, ?, ?, ?)
     `;
 
     db.query(query, [
-        oficina_id, dia_semana, horario_abertura, horario_fechamento, motivo, data_inicio, data_fim
+        oficina_id, dia_semana, horario_abertura, horario_fechamento, motivo
     ], (err, result) => {
         if (err) {
-            console.error('Erro ao adicionar exceção:', err);
+            console.error('❌ Erro ao adicionar exceção:', err);
             return res.status(500).json({ 
                 success: false, 
                 message: 'Erro ao adicionar exceção de horário' 
@@ -871,7 +865,7 @@ router.post('/horarios-excecoes', checkOficinaAdmin, (req, res) => {
     });
 });
 
-// Remover horário especial
+// Excluir horário especial
 router.delete('/horarios-especiais/:id', checkOficinaAdmin, (req, res) => {
     const { id } = req.params;
     const oficina_id = req.session.admin.oficina_id;
@@ -883,7 +877,7 @@ router.delete('/horarios-especiais/:id', checkOficinaAdmin, (req, res) => {
 
     db.query(query, [id, oficina_id], (err, result) => {
         if (err) {
-            console.error('Erro ao remover horário especial:', err);
+            console.error('❌ Erro ao remover horário especial:', err);
             return res.status(500).json({ 
                 success: false, 
                 message: 'Erro ao remover horário especial' 
@@ -904,7 +898,7 @@ router.delete('/horarios-especiais/:id', checkOficinaAdmin, (req, res) => {
     });
 });
 
-// Remover exceção
+// Excluir exceção
 router.delete('/horarios-excecoes/:id', checkOficinaAdmin, (req, res) => {
     const { id } = req.params;
     const oficina_id = req.session.admin.oficina_id;
@@ -916,7 +910,7 @@ router.delete('/horarios-excecoes/:id', checkOficinaAdmin, (req, res) => {
 
     db.query(query, [id, oficina_id], (err, result) => {
         if (err) {
-            console.error('Erro ao remover exceção:', err);
+            console.error('❌ Erro ao remover exceção:', err);
             return res.status(500).json({ 
                 success: false, 
                 message: 'Erro ao remover exceção' 
