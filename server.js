@@ -113,7 +113,45 @@ app.post('/api/admin/login', async (req, res) => {
     }
 });
 
+// ==================== ROTA PARA HORÁRIOS ESPECIAIS - CLIENTE ====================
 
+// Rota para cliente verificar horário especial em uma data específica
+app.get('/api/oficina/:id/horario-especial/:data', (req, res) => {
+    const { id, data } = req.params;
+
+    console.log('🔍 Cliente verificando horário especial:', { oficina_id: id, data: data });
+
+    const query = `
+        SELECT * FROM horarios_especiais 
+        WHERE oficina_id = ? AND data_especial = ?
+    `;
+
+    db.query(query, [id, data], (err, results) => {
+        if (err) {
+            console.error('❌ Erro ao buscar horário especial:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao verificar horário especial' 
+            });
+        }
+
+        if (results.length === 0) {
+            console.log('ℹ️ Nenhum horário especial encontrado');
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Nenhum horário especial encontrado para esta data' 
+            });
+        }
+
+        const horarioEspecial = results[0];
+        console.log('✅ Horário especial encontrado:', horarioEspecial);
+        
+        res.json({ 
+            success: true, 
+            horario_especial: horarioEspecial 
+        });
+    });
+});
 // ========== ROTA PARA CAPACIDADE DA OFICINA (CLIENTE) - VERSÃO CORRIGIDA ==========
 
 // Rota para cliente buscar capacidade da oficina - CORRIGIDA
