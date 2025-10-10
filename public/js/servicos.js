@@ -116,6 +116,119 @@ document.addEventListener("DOMContentLoaded", function () {
         aplicarHorarioEspecial(horarioEspecial);
     }
 
+
+    // ==================== FUNÇÕES PARA EXCEÇÕES DE DIAS DA SEMANA - CLIENTE ====================
+
+    // Verificar se há exceção para um dia da semana específico
+    async function verificarExcecaoDiaSemana(oficinaId, diaSemana) {
+        try {
+            console.log('🔍 Verificando exceção para dia:', diaSemana, 'Oficina:', oficinaId);
+
+            const response = await fetch(`/api/admin/oficina/${oficinaId}/excecao-dia/${diaSemana}`);
+
+            if (!response.ok) {
+                console.log('ℹ️ Nenhuma exceção encontrada para', diaSemana);
+                return null;
+            }
+
+            const dataResponse = await response.json();
+
+            if (dataResponse.success && dataResponse.excecao) {
+                console.log('🎯 Exceção encontrada:', dataResponse.excecao);
+                return dataResponse.excecao;
+            }
+
+            return null;
+        } catch (error) {
+            console.error('❌ Erro ao verificar exceção:', error);
+            return null;
+        }
+    }
+
+    // Buscar todas as exceções ativas da oficina
+    async function buscarExcecoesAtivas(oficinaId) {
+        try {
+            console.log('🔍 Buscando exceções ativas para oficina:', oficinaId);
+
+            const response = await fetch(`/api/admin/oficina/${oficinaId}/excecoes-ativas`);
+
+            if (!response.ok) {
+                console.log('ℹ️ Nenhuma exceção ativa encontrada');
+                return [];
+            }
+
+            const dataResponse = await response.json();
+
+            if (dataResponse.success && dataResponse.excecoes) {
+                console.log('✅ Exceções ativas encontradas:', dataResponse.excecoes.length);
+                return dataResponse.excecoes;
+            }
+
+            return [];
+        } catch (error) {
+            console.error('❌ Erro ao buscar exceções ativas:', error);
+            return [];
+        }
+    }
+
+    // Aplicar exceção na interface
+    function aplicarExcecao(excecao, diaSemana) {
+        const excecaoAlert = document.getElementById('excecaoAlert');
+        const diasMap = {
+            'segunda': 'Segunda-feira',
+            'terca': 'Terça-feira',
+            'quarta': 'Quarta-feira',
+            'quinta': 'Quinta-feira',
+            'sexta': 'Sexta-feira',
+            'sabado': 'Sábado',
+            'domingo': 'Domingo'
+        };
+
+        // Resetar alert
+        if (excecaoAlert) excecaoAlert.style.display = 'none';
+
+        if (!excecao) return;
+
+        console.log('🎨 Aplicando exceção na interface:', excecao);
+
+        if (excecaoAlert) {
+            excecaoAlert.style.display = 'block';
+            const message = excecao.motivo ?
+                `Horário especial para ${diasMap[diaSemana]}: ${excecao.horario_abertura} - ${excecao.horario_fechamento} (${excecao.motivo})` :
+                `Horário especial para ${diasMap[diaSemana]}: ${excecao.horario_abertura} - ${excecao.horario_fechamento}`;
+
+            document.getElementById('excecaoMessage').textContent = message;
+        }
+    }
+
+    // Verificar e aplicar exceções quando a data muda
+    async function verificarExcecoesAoMudarData() {
+        const dataInput = document.getElementById('schedule-date');
+        const oficinaId = currentWorkshopId;
+
+        console.log('📅 Verificando exceções para mudança de data:', {
+            data: dataInput?.value,
+            oficinaId: oficinaId
+        });
+
+        if (!dataInput || !dataInput.value || !oficinaId) {
+            console.log('⚠️ Dados insuficientes para verificar exceções');
+            return;
+        }
+
+        // Obter o dia da semana da data selecionada
+        const selectedDate = new Date(dataInput.value + 'T00:00:00');
+        const dayOfWeek = selectedDate.getDay();
+        const dayNames = ['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'];
+        const diaSemana = dayNames[dayOfWeek];
+
+        console.log('📆 Dia da semana detectado:', diaSemana);
+
+        // Verificar se há exceção para este dia
+        const excecao = await verificarExcecaoDiaSemana(oficinaId, diaSemana);
+        aplicarExcecao(excecao, diaSemana);
+    }
+
     // ==================== FUNÇÕES AUXILIARES GERAIS ====================
 
     async function getWorkshopInterval(workshopId) {
@@ -1139,7 +1252,7 @@ document.addEventListener("DOMContentLoaded", function () {
             currentWorkshopId = workshopId;
 
             // ✅ LIMPAR CACHE DE HORÁRIOS ESPECIAIS AO TROCAR DE OFICINA
-clearSpecialHoursCache();
+            clearSpecialHoursCache();
             // ✅ LIMPAR CACHE DE HORÁRIOS ESPECIAIS AO TROCAR DE OFICINA
             specialHoursCache = {};
 
@@ -1451,83 +1564,83 @@ clearSpecialHoursCache();
 
     // ==================== FUNÇÕES PARA HORÁRIOS ESPECIAIS - CLIENTE ====================
 
-// Verificar se há horário especial para uma data
-async function verificarHorarioEspecial(oficinaId, data) {
-    try {
-        console.log('🔍 Verificando horário especial para:', data, 'Oficina:', oficinaId);
+    // Verificar se há horário especial para uma data
+    async function verificarHorarioEspecial(oficinaId, data) {
+        try {
+            console.log('🔍 Verificando horário especial para:', data, 'Oficina:', oficinaId);
 
-        const response = await fetch(`/api/oficina/${oficinaId}/horario-especial/${data}`);
-        
-        if (!response.ok) {
-            console.log('ℹ️ Nenhum horário especial encontrado, usando horário padrão');
+            const response = await fetch(`/api/oficina/${oficinaId}/horario-especial/${data}`);
+
+            if (!response.ok) {
+                console.log('ℹ️ Nenhum horário especial encontrado, usando horário padrão');
+                return null;
+            }
+
+            const dataResponse = await response.json();
+
+            if (dataResponse.success && dataResponse.horario_especial) {
+                console.log('🎯 Horário especial encontrado:', dataResponse.horario_especial);
+                return dataResponse.horario_especial;
+            }
+
+            return null;
+        } catch (error) {
+            console.error('❌ Erro ao verificar horário especial:', error);
             return null;
         }
-
-        const dataResponse = await response.json();
-        
-        if (dataResponse.success && dataResponse.horario_especial) {
-            console.log('🎯 Horário especial encontrado:', dataResponse.horario_especial);
-            return dataResponse.horario_especial;
-        }
-
-        return null;
-    } catch (error) {
-        console.error('❌ Erro ao verificar horário especial:', error);
-        return null;
-    }
-}
-
-// Aplicar horário especial na interface
-function aplicarHorarioEspecial(horarioEspecial) {
-    const specialHoursAlert = document.getElementById('specialHoursAlert');
-    const closedDayAlert = document.getElementById('closedDayAlert');
-
-    // Resetar alerts
-    if (specialHoursAlert) specialHoursAlert.style.display = 'none';
-    if (closedDayAlert) closedDayAlert.style.display = 'none';
-
-    if (!horarioEspecial) return;
-
-    // Se a oficina está fechada
-    if (horarioEspecial.fechado) {
-        if (closedDayAlert) {
-            closedDayAlert.style.display = 'block';
-            document.getElementById('closedDayMessage').textContent = 
-                horarioEspecial.motivo ? 
-                    `A oficina está fechada: ${horarioEspecial.motivo}` : 
-                    'A oficina não funciona nesta data. Por favor, selecione outra data.';
-        }
-        return;
     }
 
-    // Se tem horário especial
-    if (horarioEspecial.horario_abertura && horarioEspecial.horario_fechamento) {
-        if (specialHoursAlert) {
-            specialHoursAlert.style.display = 'block';
-            const message = horarioEspecial.motivo ?
-                `Horário especial: ${horarioEspecial.horario_abertura} - ${horarioEspecial.horario_fechamento} (${horarioEspecial.motivo})` :
-                `Horário especial: ${horarioEspecial.horario_abertura} - ${horarioEspecial.horario_fechamento}`;
-                
-            document.getElementById('specialHoursMessage').textContent = message;
+    // Aplicar horário especial na interface
+    function aplicarHorarioEspecial(horarioEspecial) {
+        const specialHoursAlert = document.getElementById('specialHoursAlert');
+        const closedDayAlert = document.getElementById('closedDayAlert');
+
+        // Resetar alerts
+        if (specialHoursAlert) specialHoursAlert.style.display = 'none';
+        if (closedDayAlert) closedDayAlert.style.display = 'none';
+
+        if (!horarioEspecial) return;
+
+        // Se a oficina está fechada
+        if (horarioEspecial.fechado) {
+            if (closedDayAlert) {
+                closedDayAlert.style.display = 'block';
+                document.getElementById('closedDayMessage').textContent =
+                    horarioEspecial.motivo ?
+                        `A oficina está fechada: ${horarioEspecial.motivo}` :
+                        'A oficina não funciona nesta data. Por favor, selecione outra data.';
+            }
+            return;
+        }
+
+        // Se tem horário especial
+        if (horarioEspecial.horario_abertura && horarioEspecial.horario_fechamento) {
+            if (specialHoursAlert) {
+                specialHoursAlert.style.display = 'block';
+                const message = horarioEspecial.motivo ?
+                    `Horário especial: ${horarioEspecial.horario_abertura} - ${horarioEspecial.horario_fechamento} (${horarioEspecial.motivo})` :
+                    `Horário especial: ${horarioEspecial.horario_abertura} - ${horarioEspecial.horario_fechamento}`;
+
+                document.getElementById('specialHoursMessage').textContent = message;
+            }
         }
     }
-}
 
-// Verificar e aplicar horários especiais quando a data muda
-async function verificarHorariosAoMudarData() {
-    const dataInput = document.getElementById('schedule-date');
-    const oficinaId = currentWorkshopId;
+    // Verificar e aplicar horários especiais quando a data muda
+    async function verificarHorariosAoMudarData() {
+        const dataInput = document.getElementById('schedule-date');
+        const oficinaId = currentWorkshopId;
 
-    if (!dataInput || !dataInput.value || !oficinaId) return;
+        if (!dataInput || !dataInput.value || !oficinaId) return;
 
-    const horarioEspecial = await verificarHorarioEspecial(oficinaId, dataInput.value);
-    aplicarHorarioEspecial(horarioEspecial);
-}
+        const horarioEspecial = await verificarHorarioEspecial(oficinaId, dataInput.value);
+        aplicarHorarioEspecial(horarioEspecial);
+    }
 
-// Função para limpar cache de horários especiais ao trocar de oficina
-function clearSpecialHoursCache() {
-    specialHoursCache = {};
-}
+    // Função para limpar cache de horários especiais ao trocar de oficina
+    function clearSpecialHoursCache() {
+        specialHoursCache = {};
+    }
     // Gera horários disponíveis (com intervalo configurado)
     async function generateAvailableTimeSlots(workshop, selectedDate) {
         scheduleTimeSelect.innerHTML = '<option value="" disabled selected>Carregando horários...</option>';
@@ -1552,48 +1665,76 @@ function clearSpecialHoursCache() {
             }
 
             // BUSCAR INTERVALO CONFIGURADO DA OFICINA - CORREÇÃO AQUI
-const intervalo = await getWorkshopInterval(workshop.id);
-console.log(`⏰ Intervalo configurado: ${intervalo} minutos`);
-console.log(`🏢 ID da Oficina: ${workshop.id}`);
-console.log(`📋 Nome da Oficina: ${workshop.nome}`);
+            const intervalo = await getWorkshopInterval(workshop.id);
+            console.log(`⏰ Intervalo configurado: ${intervalo} minutos`);
+            console.log(`🏢 ID da Oficina: ${workshop.id}`);
+            console.log(`📋 Nome da Oficina: ${workshop.nome}`);
 
-// ✅ VERIFICAR HORÁRIOS ESPECIAIS COMO PRIORIDADE
-const horarioEspecial = await verificarHorarioEspecial(workshop.id, dataFormatada);
-let startTime, endTime;
-let specialMessage = '';
+            // ✅ VERIFICAR HORÁRIOS ESPECIAIS COMO PRIORIDADE
+            const horarioEspecial = await verificarHorarioEspecial(workshop.id, dataFormatada);
+            let startTime, endTime;
+            let specialMessage = '';
 
-// Se tem horário especial, usa ele como PRIORIDADE
-if (horarioEspecial) {
-    console.log('🎯 Aplicando horário especial como prioridade');
+            // Obter o dia da semana para verificar exceções
+            const dayOfWeek = selectedDate.getDay();
+            const dayNames = ['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'];
+            const diaSemana = dayNames[dayOfWeek];
 
-    if (horarioEspecial.fechado) {
-        scheduleTimeSelect.innerHTML = '<option value="" disabled selected>Oficina fechada neste dia</option>';
-        if (horarioEspecial.motivo) {
-            const motivoOption = document.createElement('option');
-            motivoOption.textContent = `Motivo: ${horarioEspecial.motivo}`;
-            motivoOption.disabled = true;
-            scheduleTimeSelect.appendChild(motivoOption);
-        }
+            console.log('📆 Dia da semana detectado:', diaSemana);
 
-        // Aplicar visualmente que está fechado
-        aplicarHorarioEspecial(horarioEspecial);
-        return;
-    } else {
-        startTime = horarioEspecial.horario_abertura;
-        endTime = horarioEspecial.horario_fechamento;
-        specialMessage = ` (Horário especial: ${formatHorarioFuncionamento(startTime, endTime)})`;
+            // Se tem horário especial, usa ele como PRIORIDADE MÁXIMA
+            if (horarioEspecial) {
+                console.log('🎯 Aplicando horário especial como prioridade máxima');
 
-        // Aplicar visualmente o horário especial
-        aplicarHorarioEspecial(horarioEspecial);
-    }
-} else {
-    // Se não tem horário especial, usa o padrão
-    startTime = workshop.horario_abertura || "08:00";
-    endTime = workshop.horario_fechamento || "18:00";
+                if (horarioEspecial.fechado) {
+                    scheduleTimeSelect.innerHTML = '<option value="" disabled selected>Oficina fechada neste dia</option>';
+                    if (horarioEspecial.motivo) {
+                        const motivoOption = document.createElement('option');
+                        motivoOption.textContent = `Motivo: ${horarioEspecial.motivo}`;
+                        motivoOption.disabled = true;
+                        scheduleTimeSelect.appendChild(motuitoOption);
+                    }
 
-    // Esconder alerts de horário especial
-    aplicarHorarioEspecial(null);
-}
+                    // Aplicar visualmente que está fechado
+                    aplicarHorarioEspecial(horarioEspecial);
+                    // Esconder alerta de exceção se houver
+                    aplicarExcecao(null, diaSemana);
+                    return;
+                } else {
+                    startTime = horarioEspecial.horario_abertura;
+                    endTime = horarioEspecial.horario_fechamento;
+                    specialMessage = ` (Horário especial: ${formatHorarioFuncionamento(startTime, endTime)})`;
+
+                    // Aplicar visualmente o horário especial
+                    aplicarHorarioEspecial(horarioEspecial);
+                    // Esconder alerta de exceção se houver
+                    aplicarExcecao(null, diaSemana);
+                }
+            } else {
+                // ✅ VERIFICAR EXCEÇÕES DE DIA DA SEMANA COMO SEGUNDA PRIORIDADE
+                const excecao = await verificarExcecaoDiaSemana(workshop.id, diaSemana);
+
+                if (excecao) {
+                    console.log('🎯 Aplicando exceção de dia da semana:', excecao);
+                    startTime = excecao.horario_abertura;
+                    endTime = excecao.horario_fechamento;
+                    specialMessage = ` (Horário especial para ${diaSemana}: ${formatHorarioFuncionamento(startTime, endTime)})`;
+
+                    // Aplicar visualmente a exceção
+                    aplicarExcecao(excecao, diaSemana);
+                    // Esconder alerta de horário especial
+                    aplicarHorarioEspecial(null);
+                } else {
+                    // Se não tem exceção, usa o horário padrão
+                    startTime = workshop.horario_abertura || "08:00";
+                    endTime = workshop.horario_fechamento || "18:00";
+                    specialMessage = '';
+
+                    // Esconder ambos os alerts
+                    aplicarHorarioEspecial(null);
+                    aplicarExcecao(null, diaSemana);
+                }
+            }
 
             console.log(`🕒 Horário de funcionamento: ${startTime} - ${endTime}`);
 
@@ -2117,18 +2258,18 @@ if (horarioEspecial) {
         }
     });
 
-// ✅ ATUALIZAR este event listener para verificar horários especiais
-scheduleDateInput.addEventListener('change', async function() {
-    if (this.value && selectedWorkshop) {
-        const selectedDate = new Date(this.value + 'T00:00:00');
+    // ✅ ATUALIZAR este event listener para verificar horários especiais
+    scheduleDateInput.addEventListener('change', async function () {
+        if (this.value && selectedWorkshop) {
+            const selectedDate = new Date(this.value + 'T00:00:00');
 
-        // ✅ Verificar horários especiais ANTES de gerar slots
-        await verificarHorariosAoMudarData();
+            // ✅ Verificar horários especiais ANTES de gerar slots
+            await verificarHorariosAoMudarData();
 
-        // ✅ Gerar horários disponíveis (que já usará o horário especial se existir)
-        await generateAvailableTimeSlots(selectedWorkshop, selectedDate);
-    }
-});
+            // ✅ Gerar horários disponíveis (que já usará o horário especial se existir)
+            await generateAvailableTimeSlots(selectedWorkshop, selectedDate);
+        }
+    });
 
     if (locationInput) {
         locationInput.addEventListener("input", function (e) {

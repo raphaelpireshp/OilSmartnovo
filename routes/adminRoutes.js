@@ -1084,6 +1084,83 @@ router.get('/horario-data/:data', checkOficinaAdmin, (req, res) => {
 });
 module.exports = router;
 
+// ==================== ROTAS PÚBLICAS PARA EXCEÇÕES DE DIAS DA SEMANA ====================
+
+// Rota pública para buscar exceções ativas de uma oficina
+router.get('/oficina/:id/excecoes-ativas', (req, res) => {
+    const { id } = req.params;
+
+    console.log('🔍 Cliente solicitando exceções ativas para oficina:', id);
+
+    const query = `
+        SELECT * FROM horarios_excecoes 
+        WHERE oficina_id = ? 
+        AND ativo = TRUE
+        AND (data_inicio IS NULL OR data_inicio <= CURDATE())
+        AND (data_fim IS NULL OR data_fim >= CURDATE())
+        ORDER BY dia_semana
+    `;
+
+    db.query(query, [id], (err, results) => {
+        if (err) {
+            console.error('❌ Erro ao buscar exceções ativas:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao buscar exceções de horário' 
+            });
+        }
+
+        console.log('✅ Exceções ativas encontradas:', results.length);
+        
+        res.json({ 
+            success: true, 
+            excecoes: results 
+        });
+    });
+});
+
+// Rota pública para verificar se há exceção para um dia específico
+router.get('/oficina/:id/excecao-dia/:dia_semana', (req, res) => {
+    const { id, dia_semana } = req.params;
+
+    console.log('🔍 Verificando exceção para:', { oficina_id: id, dia_semana: dia_semana });
+
+    const query = `
+        SELECT * FROM horarios_excecoes 
+        WHERE oficina_id = ? 
+        AND dia_semana = ?
+        AND ativo = TRUE
+        AND (data_inicio IS NULL OR data_inicio <= CURDATE())
+        AND (data_fim IS NULL OR data_fim >= CURDATE())
+        LIMIT 1
+    `;
+
+    db.query(query, [id, dia_semana], (err, results) => {
+        if (err) {
+            console.error('❌ Erro ao verificar exceção do dia:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro ao verificar exceção' 
+            });
+        }
+
+        if (results.length === 0) {
+            console.log('ℹ️ Nenhuma exceção encontrada para este dia');
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Nenhuma exceção encontrada para este dia' 
+            });
+        }
+
+        const excecao = results[0];
+        console.log('✅ Exceção encontrada:', excecao);
+        
+        res.json({ 
+            success: true, 
+            excecao: excecao 
+        });
+    });
+});  
 
 // ==================== ROTAS DE GESTÃO DE ESTOQUE AVANÇADA ====================
 
