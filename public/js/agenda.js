@@ -1,5 +1,5 @@
 // agenda.js - Arquivo completo e funcional
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Elementos do DOM
     const appointmentsList = document.querySelector('.appointments-list');
     const filterPeriod = document.getElementById('filter-period');
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!checkAuthentication()) {
             return;
         }
-        
+
         loadAppointments();
         setupEventListeners();
         verificarStatusPeriodicamente();
@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function checkAuthentication() {
         const token = localStorage.getItem('token');
         const userData = localStorage.getItem('user');
-        
+
         if (!token || !userData) {
             showToast('Você precisa fazer login para ver seus agendamentos', 'error');
             setTimeout(() => {
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function setupEventListeners() {
         // Filtro por período
         if (filterPeriod) {
-            filterPeriod.addEventListener('change', function() {
+            filterPeriod.addEventListener('change', function () {
                 currentFilter = this.value;
                 filterAppointments();
             });
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Filtro por status
         if (filterStatus) {
-            filterStatus.addEventListener('change', function() {
+            filterStatus.addEventListener('change', function () {
                 currentStatusFilter = this.value;
                 filterAppointments();
             });
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Ordenação
         if (filterSort) {
-            filterSort.addEventListener('change', function() {
+            filterSort.addEventListener('change', function () {
                 currentSort = this.value;
                 filterAppointments();
             });
@@ -68,15 +68,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Limpar filtros
         if (clearFiltersBtn) {
-            clearFiltersBtn.addEventListener('click', function() {
+            clearFiltersBtn.addEventListener('click', function () {
                 currentFilter = 'all';
                 currentStatusFilter = 'all';
                 currentSort = 'newest';
-                
+
                 if (filterPeriod) filterPeriod.value = 'all';
                 if (filterStatus) filterStatus.value = 'all';
                 if (filterSort) filterSort.value = 'newest';
-                
+
                 filterAppointments();
             });
         }
@@ -85,41 +85,41 @@ document.addEventListener('DOMContentLoaded', function() {
     // Carregar agendamentos do backend
     async function loadAppointments() {
         showLoading(true);
-        
+
         try {
             // Obter ID do usuário logado
             const userData = localStorage.getItem('user');
             if (!userData) {
                 throw new Error('Usuário não está logado');
             }
-            
+
             const user = JSON.parse(userData);
             const userId = user.id;
-            
+
             if (!userId) {
                 throw new Error('ID do usuário não encontrado');
             }
 
             // Buscar agendamentos específicos do usuário
             const response = await fetch(`/api/agendamento_simples/usuario/${userId}`);
-            
+
             if (!response.ok) {
                 throw new Error(`Erro HTTP: ${response.status}`);
             }
-            
+
             const result = await response.json();
-            
+
             if (result.success) {
                 allAppointments = result.data || [];
                 displayAppointments(allAppointments);
             } else {
                 throw new Error(result.message || 'Erro ao carregar agendamentos');
             }
-            
+
         } catch (error) {
             console.error('Erro ao carregar agendamentos:', error);
             showError('Erro ao carregar agendamentos. Verifique se está logado.');
-            
+
             // Se não estiver logado, redirecionar para login
             if (error.message.includes('não está logado')) {
                 setTimeout(() => {
@@ -130,98 +130,98 @@ document.addEventListener('DOMContentLoaded', function() {
             showLoading(false);
         }
     }
-// agenda.js - Substitua a função loadLembreteAutomatico por esta versão melhorada
+    // agenda.js - Substitua a função loadLembreteAutomatico por esta versão melhorada
 
-// Buscar lembrete inteligente baseado no status dos agendamentos
-// Substituir a função loadLembreteInteligente no agenda.js
-async function loadLembreteInteligente() {
-    try {
-        const userData = localStorage.getItem('user');
-        if (!userData) return;
-        
-        const user = JSON.parse(userData);
-        const userId = user.id;
-        
-        if (!userId) return;
+    // Buscar lembrete inteligente baseado no status dos agendamentos
+    // Substituir a função loadLembreteInteligente no agenda.js
+    async function loadLembreteInteligente() {
+        try {
+            const userData = localStorage.getItem('user');
+            if (!userData) return;
 
-        // Buscar agendamentos do usuário
-        const response = await fetch(`/api/agendamento_simples/usuario/${userId}`);
-        
-        if (response.ok) {
-            const result = await response.json();
-            
-            if (result.success && result.data && result.data.length > 0) {
-                const agendamentos = result.data;
-                const agora = new Date();
-                
-                // Buscar PRÓXIMO agendamento futuro (não concluído, não cancelado)
-                const proximoAgendamento = agendamentos.find(ag => {
-                    const dataAgendamento = new Date(ag.data_hora);
-                    return dataAgendamento > agora && 
-                           ag.status !== 'cancelado' && 
-                           ag.status !== 'fora_prazo' &&
-                           ag.status !== 'concluido'; // ← ADICIONAR ESTA CONDIÇÃO
-                });
+            const user = JSON.parse(userData);
+            const userId = user.id;
 
-                if (proximoAgendamento) {
-                    // Se tem agendamento futuro, mostrar informações dele
-                    displayProximoAgendamento(proximoAgendamento);
-                } else {
-                    // Se não tem agendamento futuro, mostrar lembrete baseado no último serviço
-                    const ultimoConcluido = agendamentos
-                        .filter(ag => ag.status === 'concluido')
-                        .sort((a, b) => new Date(b.data_hora) - new Date(a.data_hora))[0];
-                    
-                    if (ultimoConcluido) {
-                        displayLembreteAutomatico(ultimoConcluido);
+            if (!userId) return;
+
+            // Buscar agendamentos do usuário
+            const response = await fetch(`/api/agendamento_simples/usuario/${userId}`);
+
+            if (response.ok) {
+                const result = await response.json();
+
+                if (result.success && result.data && result.data.length > 0) {
+                    const agendamentos = result.data;
+                    const agora = new Date();
+
+                    // Buscar PRÓXIMO agendamento futuro (não concluído, não cancelado)
+                    const proximoAgendamento = agendamentos.find(ag => {
+                        const dataAgendamento = new Date(ag.data_hora);
+                        return dataAgendamento > agora &&
+                            ag.status !== 'cancelado' &&
+                            ag.status !== 'fora_prazo' &&
+                            ag.status !== 'concluido'; // ← ADICIONAR ESTA CONDIÇÃO
+                    });
+
+                    if (proximoAgendamento) {
+                        // Se tem agendamento futuro, mostrar informações dele
+                        displayProximoAgendamento(proximoAgendamento);
                     } else {
-                        displayLembretePadrao();
+                        // Se não tem agendamento futuro, mostrar lembrete baseado no último serviço
+                        const ultimoConcluido = agendamentos
+                            .filter(ag => ag.status === 'concluido')
+                            .sort((a, b) => new Date(b.data_hora) - new Date(a.data_hora))[0];
+
+                        if (ultimoConcluido) {
+                            displayLembreteAutomatico(ultimoConcluido);
+                        } else {
+                            displayLembretePadrao();
+                        }
                     }
+                } else {
+                    displayLembretePadrao();
                 }
             } else {
                 displayLembretePadrao();
             }
-        } else {
+        } catch (error) {
+            console.error('Erro ao carregar lembrete inteligente:', error);
             displayLembretePadrao();
         }
-    } catch (error) {
-        console.error('Erro ao carregar lembrete inteligente:', error);
-        displayLembretePadrao();
-    }
-}
-
-// Adicionar esta função para recarregar o lembrete quando necessário
-function recarregarLembrete() {
-    if (typeof loadLembreteInteligente === 'function') {
-        loadLembreteInteligente();
-    }
-}
-
-// Chamar esta função quando um agendamento for concluído
-window.recarregarLembrete = recarregarLembrete;
-
-// Exibir informações do próximo agendamento
-function displayProximoAgendamento(agendamento) {
-    const reminderSection = document.querySelector('.reminder-section');
-    if (!reminderSection) return;
-
-    const dataAgendamento = new Date(agendamento.data_hora);
-    const agora = new Date();
-    const diffTime = dataAgendamento - agora;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    let statusText = '';
-    if (diffDays === 0) {
-        statusText = '<span style="color: #28a745;">⚡ É hoje!</span>';
-    } else if (diffDays === 1) {
-        statusText = '<span style="color: #ffc107;">⚠️ Amanhã!</span>';
-    } else if (diffDays <= 7) {
-        statusText = `<span style="color: #fd7e14;">📅 Em ${diffDays} dias</span>`;
-    } else {
-        statusText = `<span style="color: #17a2b8;">📅 Em ${diffDays} dias</span>`;
     }
 
-    reminderSection.innerHTML = `
+    // Adicionar esta função para recarregar o lembrete quando necessário
+    function recarregarLembrete() {
+        if (typeof loadLembreteInteligente === 'function') {
+            loadLembreteInteligente();
+        }
+    }
+
+    // Chamar esta função quando um agendamento for concluído
+    window.recarregarLembrete = recarregarLembrete;
+
+    // Exibir informações do próximo agendamento
+    function displayProximoAgendamento(agendamento) {
+        const reminderSection = document.querySelector('.reminder-section');
+        if (!reminderSection) return;
+
+        const dataAgendamento = new Date(agendamento.data_hora);
+        const agora = new Date();
+        const diffTime = dataAgendamento - agora;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        let statusText = '';
+        if (diffDays === 0) {
+            statusText = '<span style="color: #28a745;">⚡ É hoje!</span>';
+        } else if (diffDays === 1) {
+            statusText = '<span style="color: #ffc107;">⚠️ Amanhã!</span>';
+        } else if (diffDays <= 7) {
+            statusText = `<span style="color: #fd7e14;">📅 Em ${diffDays} dias</span>`;
+        } else {
+            statusText = `<span style="color: #17a2b8;">📅 Em ${diffDays} dias</span>`;
+        }
+
+        reminderSection.innerHTML = `
         <div class="section-header">
             <h2><i class="fas fa-calendar-check"></i> Próximo Agendamento</h2>
         </div>
@@ -247,37 +247,37 @@ function displayProximoAgendamento(agendamento) {
             </div>
         </div>
     `;
-}
-
-// Atualize também a função displayLembreteAutomatico para ficar mais clara:
-function displayLembreteAutomatico(ultimoServico) {
-    const reminderSection = document.querySelector('.reminder-section');
-    if (!reminderSection) return;
-
-    const dataServico = new Date(ultimoServico.data_hora);
-    
-    // Calcular próxima troca (6 meses após o serviço)
-    const proximaTrocaData = new Date(dataServico);
-    proximaTrocaData.setMonth(proximaTrocaData.getMonth() + 6);
-    
-    // Verificar se já passou da data recomendada
-    const hoje = new Date();
-    const estaAtrasado = proximaTrocaData < hoje;
-    
-    // Calcular dias de atraso ou até a próxima troca
-    const diffTime = Math.abs(proximaTrocaData - hoje);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    let statusText = '';
-    if (estaAtrasado) {
-        statusText = `<span style="color: #dc3545;">⏰ Atrasado há ${diffDays} dias</span>`;
-    } else if (diffDays <= 30) {
-        statusText = `<span style="color: #fd7e14;">⚠️ Em ${diffDays} dias</span>`;
-    } else {
-        statusText = `<span style="color: #28a745;">📅 Em ${diffDays} dias</span>`;
     }
 
-    reminderSection.innerHTML = `
+    // Atualize também a função displayLembreteAutomatico para ficar mais clara:
+    function displayLembreteAutomatico(ultimoServico) {
+        const reminderSection = document.querySelector('.reminder-section');
+        if (!reminderSection) return;
+
+        const dataServico = new Date(ultimoServico.data_hora);
+
+        // Calcular próxima troca (6 meses após o serviço)
+        const proximaTrocaData = new Date(dataServico);
+        proximaTrocaData.setMonth(proximaTrocaData.getMonth() + 6);
+
+        // Verificar se já passou da data recomendada
+        const hoje = new Date();
+        const estaAtrasado = proximaTrocaData < hoje;
+
+        // Calcular dias de atraso ou até a próxima troca
+        const diffTime = Math.abs(proximaTrocaData - hoje);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        let statusText = '';
+        if (estaAtrasado) {
+            statusText = `<span style="color: #dc3545;">⏰ Atrasado há ${diffDays} dias</span>`;
+        } else if (diffDays <= 30) {
+            statusText = `<span style="color: #fd7e14;">⚠️ Em ${diffDays} dias</span>`;
+        } else {
+            statusText = `<span style="color: #28a745;">📅 Em ${diffDays} dias</span>`;
+        }
+
+        reminderSection.innerHTML = `
         <div class="section-header">
             <h2><i class="fas fa-bell"></i> Lembrete de Manutenção</h2>
         </div>
@@ -292,10 +292,10 @@ function displayLembreteAutomatico(ultimoServico) {
                     <p><strong>Último serviço:</strong> ${dataServico.toLocaleDateString('pt-BR')}</p>
                     <p><strong>Recomendamos que sua próxima troca deve ser feita no dia:</strong> ${proximaTrocaData.toLocaleDateString('pt-BR')}</p>
                     <p><strong>Status:</strong> ${statusText}</p>
-                    ${estaAtrasado ? 
-                        '<p style="color: #dc3545; font-weight: bold;">⚠️ Sua troca de óleo está atrasada!</p>' : 
-                        '<p style="color: #28a745;">✅ Sua manutenção está em dia</p>'
-                    }
+                    ${estaAtrasado ?
+                '<p style="color: #dc3545; font-weight: bold;">⚠️ Sua troca de óleo está atrasada!</p>' :
+                '<p style="color: #28a745;">✅ Sua manutenção está em dia</p>'
+            }
                 </div>
             </div>
             <div class="reminder-actions">
@@ -306,61 +306,61 @@ function displayLembreteAutomatico(ultimoServico) {
             </div>
         </div>
     `;
-}
-
-// Função para ver detalhes do agendamento
-function verDetalhesAgendamento(agendamentoId) {
-    // Rolar até o card do agendamento
-    const card = document.querySelector(`.appointment-card[data-id="${agendamentoId}"]`);
-    if (card) {
-        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        
-        // Efeito visual de destaque
-        card.style.animation = 'pulse 2s ease-in-out';
-        setTimeout(() => {
-            card.style.animation = '';
-        }, 2000);
     }
-}
 
-// Função para reagendar qualquer serviço
-async function reagendarServico(agendamentoId) {
-    try {
-        const response = await fetch(`/api/agendamento_simples/${agendamentoId}`);
-        const result = await response.json();
-        
-        if (result.success) {
-            const agendamento = result.data;
-            
-            sessionStorage.setItem('ultimoAgendamento', JSON.stringify({
-                veiculo: agendamento.veiculo,
-                servicos: agendamento.servicos,
-                tipo_oleo: agendamento.tipo_oleo,
-                oficina: {
-                    nome: agendamento.oficina_nome,
-                    endereco: agendamento.oficina_endereco
-                }
-            }));
-            
-            window.location.href = '/html/servicos.html';
+    // Função para ver detalhes do agendamento
+    function verDetalhesAgendamento(agendamentoId) {
+        // Rolar até o card do agendamento
+        const card = document.querySelector(`.appointment-card[data-id="${agendamentoId}"]`);
+        if (card) {
+            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            // Efeito visual de destaque
+            card.style.animation = 'pulse 2s ease-in-out';
+            setTimeout(() => {
+                card.style.animation = '';
+            }, 2000);
         }
-    } catch (error) {
-        console.error('Erro ao reagendar:', error);
-        showToast('Erro ao carregar dados do serviço', 'error');
     }
-}
 
-// Na função init(), atualize para:
-function init() {
-    if (!checkAuthentication()) {
-        return;
+    // Função para reagendar qualquer serviço
+    async function reagendarServico(agendamentoId) {
+        try {
+            const response = await fetch(`/api/agendamento_simples/${agendamentoId}`);
+            const result = await response.json();
+
+            if (result.success) {
+                const agendamento = result.data;
+
+                sessionStorage.setItem('ultimoAgendamento', JSON.stringify({
+                    veiculo: agendamento.veiculo,
+                    servicos: agendamento.servicos,
+                    tipo_oleo: agendamento.tipo_oleo,
+                    oficina: {
+                        nome: agendamento.oficina_nome,
+                        endereco: agendamento.oficina_endereco
+                    }
+                }));
+
+                window.location.href = '/html/servicos.html';
+            }
+        } catch (error) {
+            console.error('Erro ao reagendar:', error);
+            showToast('Erro ao carregar dados do serviço', 'error');
+        }
     }
-    
-    loadAppointments();
-    loadLembreteInteligente(); // ← TROQUEI PARA A NOVA FUNÇÃO
-    setupEventListeners();
-    verificarStatusPeriodicamente();
-}
+
+    // Na função init(), atualize para:
+    function init() {
+        if (!checkAuthentication()) {
+            return;
+        }
+
+        loadAppointments();
+        loadLembreteInteligente(); // ← TROQUEI PARA A NOVA FUNÇÃO
+        setupEventListeners();
+        verificarStatusPeriodicamente();
+    }
     // Filtrar e ordenar agendamentos
     function filterAppointments() {
         let filtered = [...allAppointments];
@@ -370,23 +370,23 @@ function init() {
             const now = new Date();
             filtered = filtered.filter(appointment => {
                 const appointmentDate = new Date(appointment.data_hora);
-                
+
                 switch (currentFilter) {
                     case 'today':
                         return isToday(appointmentDate);
-                    
+
                     case 'week':
                         return isThisWeek(appointmentDate);
-                    
+
                     case 'month':
                         return isThisMonth(appointmentDate);
-                    
+
                     case 'last_month':
                         return isLastMonth(appointmentDate);
-                    
+
                     case 'year':
                         return isThisYear(appointmentDate);
-                    
+
                     default:
                         return true;
                 }
@@ -398,23 +398,23 @@ function init() {
             filtered = filtered.filter(appointment => {
                 const appointmentDate = new Date(appointment.data_hora);
                 const now = new Date();
-                
+
                 switch (currentStatusFilter) {
                     case 'pendente':
                         return appointment.status === 'pendente' || (appointmentDate > now && (!appointment.status || appointment.status === 'pendente'));
-                    
+
                     case 'agendado':
                         return appointment.status === 'confirmado' || (appointmentDate > now && appointment.status !== 'cancelado');
-                    
+
                     case 'concluido':
                         return appointment.status === 'concluido';
-                    
+
                     case 'cancelado':
                         return appointment.status === 'cancelado';
-                    
+
                     case 'fora_prazo':
                         return appointment.status === 'fora_prazo' || (appointmentDate < now && appointment.status !== 'concluido' && appointment.status !== 'cancelado');
-                    
+
                     default:
                         return true;
                 }
@@ -425,20 +425,20 @@ function init() {
         filtered.sort((a, b) => {
             const dateA = new Date(a.data_hora);
             const dateB = new Date(b.data_hora);
-            
+
             switch (currentSort) {
                 case 'newest':
                     return dateB - dateA;
-                
+
                 case 'oldest':
                     return dateA - dateB;
-                
+
                 case 'date_asc':
                     return dateA - dateB;
-                
+
                 case 'date_desc':
                     return dateB - dateA;
-                
+
                 default:
                     return dateB - dateA;
             }
@@ -448,7 +448,8 @@ function init() {
     }
 
     // Exibir agendamentos na página
-// Exibir agendamentos na página
+    // Exibir agendamentos na página
+// FUNÇÃO CORRIGIDA - Exibir agendamentos na página
 function displayAppointments(appointments) {
     if (!appointmentsList) return;
 
@@ -512,76 +513,136 @@ function displayAppointments(appointments) {
                     ` : ''}
                 </div>
                 <div class="appointment-footer">
-                    ${statusClass !== 'cancelled' && statusClass !== 'expired' ? `
-
-
-                        ${isFutureAppointment(appointment) ? `
-                        <button class="btn btn-outline btn-cancel" onclick="cancelAppointment(${appointment.id})">
-                            <i class="fas fa-times"></i> Cancelar
-                        </button>
-                        ` : `
-                        <button class="btn btn-outline" onclick="rateService(${appointment.id})">
-                            <i class="fas fa-star"></i> Avaliar Serviço
-                        </button>
-                        `}
-                    ` : `
-                        <button class="btn btn-outline" onclick="repeatAppointment(${appointment.id})">
-                            <i class="fas fa-redo"></i> Novo Agendamento
-                        </button>
-                        <span class="text-muted">Ações indisponíveis</span>
-                    `}
+                    ${getAppointmentActions(appointment)}
                 </div>
             </div>
         `;
     }).join('');
 }
 
-// ATUALIZAR função getStatusClass no agenda.js
-function getStatusClass(appointment) {
-    const appointmentDate = new Date(appointment.data_hora);
-    const now = new Date();
+// NOVA FUNÇÃO - Lógica centralizada para ações dos agendamentos
+function getAppointmentActions(appointment) {
+    const statusClass = getStatusClass(appointment);
+    const isFuture = isFutureAppointment(appointment);
     
-    // Primeiro verifica o status do banco
-    if (appointment.status === 'cancelado') {
-        return 'cancelled';
-    } else if (appointment.status === 'fora_prazo') {
-        return 'expired';
-    } else if (appointment.status === 'concluido') {
-        return 'completed';
-    } else if (appointment.status === 'divergencia') { // ← ADICIONAR ESTE CASO
-        return 'divergence';
-    } else if (appointmentDate > now) {
-        return 'pending';
-    } else {
-        return 'expired';
+    // AGENDAMENTOS CANCELADOS ou EXPIRADOS
+    if (statusClass === 'cancelled' || statusClass === 'expired') {
+        return `
+            <button class="btn btn-outline" onclick="repeatAppointment(${appointment.id})">
+                <i class="fas fa-redo"></i> Novo Agendamento
+            </button>
+
+        `;
     }
+    
+    // AGENDAMENTOS COM DIVERGÊNCIA - APENAS COMPROVANTE
+    if (statusClass === 'divergence') {
+        return `
+
+            <span class="text-muted">Avaliação indisponível</span>
+        `;
+    }
+    
+    // AGENDAMENTOS FUTUROS (PENDENTES/CONFIRMADOS)
+    if (isFuture) {
+        return `
+
+            <button class="btn btn-outline btn-cancel" onclick="cancelAppointment(${appointment.id})">
+                <i class="fas fa-times"></i> Cancelar
+            </button>
+        `;
+    }
+    
+    // AGENDAMENTOS CONCLUÍDOS - PERMITIR AVALIAÇÃO
+    if (statusClass === 'completed') {
+        return `
+            <button class="btn btn-outline" onclick="repeatAppointment(${appointment.id})">
+                <i class="fas fa-redo"></i> Repetir Serviço
+            </button>
+
+        `;
+    }
+    
+    // PADRÃO (fallback)
+    return `
+
+        <span class="text-muted">Ações indisponíveis</span>
+    `;
 }
 
-// ATUALIZAR função getStatusText no agenda.js
-function getStatusText(appointment) {
+// FUNÇÃO ATUALIZADA - Para compatibilidade com outras partes do código
+function updateAppointmentFooter(cardElement, appointment) {
+    const footer = cardElement.querySelector('.appointment-footer');
+    if (!footer) return;
+    
+    footer.innerHTML = getAppointmentActions(appointment);
+}
+
+// FUNÇÃO ATUALIZADA - Verificar se é agendamento futuro
+function isFutureAppointment(appointment) {
     const appointmentDate = new Date(appointment.data_hora);
     const now = new Date();
     
-    // Primeiro verifica o status do banco
-    if (appointment.status === 'cancelado') {
-        return 'Cancelado';
-    } else if (appointment.status === 'fora_prazo') {
-        return 'Fora do Prazo';
-    } else if (appointment.status === 'concluido') {
-        return 'Concluído';
-    } else if (appointment.status === 'divergencia') { 
-        return 'Com Divergência';
-    } else if (appointmentDate > now) {
-        return 'Agendado';
-    } else {
-        return 'Fora do Prazo';
-    }
+    // Só é futuro se: data > agora E não está em estados finais
+    return appointmentDate > now && 
+           appointment.status !== 'cancelado' && 
+           appointment.status !== 'concluido' &&
+           appointment.status !== 'fora_prazo' &&
+           appointment.status !== 'divergencia';
 }
+
+    // ATUALIZAR função getStatusClass no agenda.js
+    function getStatusClass(appointment) {
+        const appointmentDate = new Date(appointment.data_hora);
+        const now = new Date();
+
+        // Primeiro verifica o status do banco
+        if (appointment.status === 'cancelado') {
+            return 'cancelled';
+        } else if (appointment.status === 'fora_prazo') {
+            return 'expired';
+        } else if (appointment.status === 'concluido') {
+            return 'completed';
+        } else if (appointment.status === 'divergencia') { // ← ADICIONAR ESTE CASO
+            return 'divergence';
+        } else if (appointmentDate > now) {
+            return 'pending';
+        } else {
+            return 'expired';
+        }
+    }
+
+    // ATUALIZAR função getStatusText no agenda.js
+    function getStatusText(appointment) {
+        const appointmentDate = new Date(appointment.data_hora);
+        const now = new Date();
+
+        // Primeiro verifica o status do banco
+        if (appointment.status === 'cancelado') {
+            return 'Cancelado';
+        } else if (appointment.status === 'fora_prazo') {
+            return 'Fora do Prazo';
+        } else if (appointment.status === 'concluido') {
+            return 'Concluído';
+        } else if (appointment.status === 'divergencia') {
+            return 'Com Divergência';
+        } else if (appointmentDate > now) {
+            return 'Agendado';
+        } else {
+            return 'Fora do Prazo';
+        }
+    }
 
     function isFutureAppointment(appointment) {
         const appointmentDate = new Date(appointment.data_hora);
         const now = new Date();
-        return appointmentDate > now && appointment.status !== 'cancelado';
+
+        // Só pode cancelar se for futuro E não estiver concluído/cancelado
+        return appointmentDate > now &&
+            appointment.status !== 'cancelado' &&
+            appointment.status !== 'concluido' &&
+            appointment.status !== 'fora_prazo' &&
+            appointment.status !== 'divergencia';
     }
 
     function formatDate(dateString) {
@@ -591,9 +652,9 @@ function getStatusText(appointment) {
 
     function formatTime(dateString) {
         const date = new Date(dateString);
-        return date.toLocaleTimeString('pt-BR', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
+        return date.toLocaleTimeString('pt-BR', {
+            hour: '2-digit',
+            minute: '2-digit'
         });
     }
 
@@ -601,8 +662,8 @@ function getStatusText(appointment) {
     function isToday(date) {
         const today = new Date();
         return date.getDate() === today.getDate() &&
-               date.getMonth() === today.getMonth() &&
-               date.getFullYear() === today.getFullYear();
+            date.getMonth() === today.getMonth() &&
+            date.getFullYear() === today.getFullYear();
     }
 
     function isThisWeek(date) {
@@ -610,25 +671,25 @@ function getStatusText(appointment) {
         const startOfWeek = new Date(today);
         startOfWeek.setDate(today.getDate() - today.getDay());
         startOfWeek.setHours(0, 0, 0, 0);
-        
+
         const endOfWeek = new Date(startOfWeek);
         endOfWeek.setDate(startOfWeek.getDate() + 6);
         endOfWeek.setHours(23, 59, 59, 999);
-        
+
         return date >= startOfWeek && date <= endOfWeek;
     }
 
     function isThisMonth(date) {
         const today = new Date();
         return date.getMonth() === today.getMonth() &&
-               date.getFullYear() === today.getFullYear();
+            date.getFullYear() === today.getFullYear();
     }
 
     function isLastMonth(date) {
         const today = new Date();
         const lastMonth = today.getMonth() === 0 ? 11 : today.getMonth() - 1;
         const year = today.getMonth() === 0 ? today.getFullYear() - 1 : today.getFullYear();
-        
+
         return date.getMonth() === lastMonth && date.getFullYear() === year;
     }
 
@@ -665,7 +726,7 @@ function getStatusText(appointment) {
                 console.error('Erro ao verificar status:', error);
             }
         }, 60 * 60 * 1000); // 1 hora
-        
+
         // Recarregar agendamentos a cada 5 minutos
         setInterval(() => {
             loadAppointments();
@@ -679,10 +740,10 @@ async function repeatAppointment(appointmentId) {
         // Buscar dados do agendamento
         const response = await fetch(`/api/agendamento_simples/${appointmentId}`);
         const result = await response.json();
-        
+
         if (result.success) {
             const appointment = result.data;
-            
+
             // Armazenar dados para usar na página de serviços
             sessionStorage.setItem('lastAppointment', JSON.stringify({
                 veiculo: appointment.veiculo,
@@ -692,7 +753,7 @@ async function repeatAppointment(appointmentId) {
                     endereco: appointment.oficina_endereco
                 }
             }));
-            
+
             // Redirecionar para serviços
             window.location.href = '/html/servicos.html';
         }
@@ -702,163 +763,9 @@ async function repeatAppointment(appointmentId) {
     }
 }
 
-// Função melhorada para download de comprovante
-// Função melhorada para download de comprovante
-async function downloadInvoice(appointmentId) {
-    try {
-        console.log('🎯 Iniciando download do comprovante para agendamento:', appointmentId);
-        
-        // Mostrar estado de carregamento
-        const button = event.target.closest('.btn');
-        const originalText = button.innerHTML;
-        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando...';
-        button.disabled = true;
-        
-        // Buscar dados completos do agendamento
-        const response = await fetch(`/api/agendamento_simples/${appointmentId}`);
-        const result = await response.json();
-        
-        if (result.success) {
-            // Gerar PDF com dados do agendamento
-            await generatePDF(result.data);
-            
-            // Mostrar confirmação
-            showDownloadSuccess();
-        } else {
-            throw new Error(result.message || 'Erro ao buscar dados do agendamento');
-        }
-        
-    } catch (error) {
-        console.error('❌ Erro ao gerar comprovante:', error);
-        showToast('❌ Erro ao gerar comprovante: ' + error.message, 'error');
-    } finally {
-        // Restaurar estado do botão
-        const button = event.target.closest('.btn');
-        button.innerHTML = '<i class="fas fa-file-invoice"></i> Comprovante';
-        button.disabled = false;
-    }
-}
 
-// Função aprimorada para gerar PDF
-async function generatePDF(appointment) {
-    return new Promise((resolve, reject) => {
-        try {
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF();
-            
-            // Configurações do documento
-            pdf.setFont('helvetica');
-            pdf.setFontSize(20);
-            
-            // Cabeçalho
-            pdf.setTextColor(33, 63, 87); // Cor primária
-            pdf.text('OilSmart - Comprovante de Agendamento', 20, 30);
-            
-            // Linha decorativa
-            pdf.setDrawColor(180, 148, 52); // Cor secundária
-            pdf.setLineWidth(1);
-            pdf.line(20, 35, 190, 35);
-            
-            // Informações do protocolo
-            pdf.setFontSize(12);
-            pdf.setTextColor(0, 0, 0);
-            pdf.text(`Protocolo: ${appointment.protocolo || 'N/A'}`, 20, 50);
-            pdf.text(`Data de Emissão: ${new Date().toLocaleDateString('pt-BR')}`, 20, 60);
-            
-            let yPosition = 80;
-            
-            // Dados do agendamento
-            const details = [
-                `Data do Serviço: ${new Date(appointment.data_hora).toLocaleDateString('pt-BR')}`,
-                `Horário: ${new Date(appointment.data_hora).toLocaleTimeString('pt-BR', { 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                })}`,
-                `Oficina: ${appointment.oficina_nome || 'Oficina não informada'}`,
-                `Endereço: ${appointment.oficina_endereco || 'Endereço não informado'}`,
-                `Veículo: ${appointment.veiculo || 'Veículo não informado'}`,
-                `Serviços: ${appointment.servicos || 'Troca de óleo'}`,
-                `Status: ${getStatusText(appointment)}`
-            ];
-            
-            // Adicionar detalhes
-            pdf.setFontSize(11);
-            details.forEach(detail => {
-                pdf.text(detail, 20, yPosition);
-                yPosition += 8;
-            });
-            
-            // Adicionar preço se disponível
-            if (appointment.total_servico) {
-                yPosition += 10;
-                pdf.setFontSize(12);
-                pdf.setFont(undefined, 'bold');
-                pdf.text(`Valor Total: R$ ${parseFloat(appointment.total_servico).toFixed(2)}`, 20, yPosition);
-                pdf.setFont(undefined, 'normal');
-            }
-            
-            // Adicionar motivo do cancelamento se aplicável
-            if (appointment.motivo_cancelamento) {
-                yPosition += 15;
-                pdf.setFontSize(10);
-                pdf.setTextColor(220, 53, 69); // Vermelho
-                pdf.text(`Motivo do Cancelamento: ${appointment.motivo_cancelamento}`, 20, yPosition);
-                pdf.setTextColor(0, 0, 0);
-            }
-            
-            // Informações de contato
-            yPosition += 20;
-            pdf.setFontSize(9);
-            pdf.setTextColor(100, 100, 100);
-            pdf.text('Para dúvidas ou cancelamentos, entre em contato:', 20, yPosition);
-            pdf.text('Telefone: (11) 4002-8922 | Email: contato@oilsmart.com.br', 20, yPosition + 5);
-            
-            // Rodapé
-            yPosition = 270;
-            pdf.setFontSize(8);
-            pdf.setTextColor(128, 128, 128);
-            pdf.text('Este é um comprovante gerado automaticamente pelo sistema OilSmart.', 20, yPosition);
-            pdf.text(`Comprovante gerado em: ${new Date().toLocaleString('pt-BR')}`, 20, yPosition + 5);
-            
-            // Salvar PDF
-            const fileName = `comprovante-${appointment.protocolo || appointment.id}.pdf`;
-            pdf.save(fileName);
-            
-            resolve();
-            
-        } catch (error) {
-            console.error('Erro na geração do PDF:', error);
-            reject(error);
-        }
-    });
-}
 
-// Função para mostrar confirmação de download
-function showDownloadSuccess() {
-    const modal = document.createElement('div');
-    modal.className = 'download-modal show';
-    modal.innerHTML = `
-        <div class="download-modal-content">
-            <div class="download-icon">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            <h3>Download Concluído!</h3>
-            <p>O comprovante foi baixado com sucesso. Verifique sua pasta de downloads.</p>
-            <div class="download-modal-buttons">
-                <button class="btn btn-primary" onclick="closeDownloadModal()">
-                    <i class="fas fa-check"></i> OK
-                </button>
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    // Fechar modal após 5 segundos automaticamente
-    setTimeout(() => {
-        closeDownloadModal();
-    }, 5000);
-}
+
 
 // Função para fechar o modal
 function closeDownloadModal() {
@@ -869,38 +776,14 @@ function closeDownloadModal() {
 }
 
 // Adicionar evento de clique fora do modal para fechar
-document.addEventListener('click', function(event) {
+document.addEventListener('click', function (event) {
     if (event.target.classList.contains('download-modal')) {
         closeDownloadModal();
     }
 });
 
 // Função para mostrar confirmação de download
-function showDownloadSuccess() {
-    const modal = document.createElement('div');
-    modal.className = 'download-modal show';
-    modal.innerHTML = `
-        <div class="download-modal-content">
-            <div class="download-icon">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            <h3>Download Concluído!</h3>
-            <p>O comprovante foi baixado com sucesso. Verifique sua pasta de downloads.</p>
-            <div class="download-modal-buttons">
-                <button class="btn btn-primary" onclick="closeDownloadModal()">
-                    <i class="fas fa-check"></i> OK
-                </button>
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    // Fechar modal após 5 segundos automaticamente
-    setTimeout(() => {
-        closeDownloadModal();
-    }, 5000);
-}
+
 
 // Função para fechar o modal
 function closeDownloadModal() {
@@ -911,7 +794,7 @@ function closeDownloadModal() {
 }
 
 // Adicionar evento de clique fora do modal para fechar
-document.addEventListener('click', function(event) {
+document.addEventListener('click', function (event) {
     if (event.target.classList.contains('download-modal')) {
         closeDownloadModal();
     }
@@ -919,7 +802,7 @@ document.addEventListener('click', function(event) {
 
 async function cancelAppointment(appointmentId) {
     console.log('🎯 Iniciando cancelamento do agendamento:', appointmentId);
-    
+
     // Verificar autenticação
     const token = localStorage.getItem('token');
     if (!token) {
@@ -929,66 +812,77 @@ async function cancelAppointment(appointmentId) {
         }, 2000);
         return;
     }
+    // Verificar se já está concluído
+    if (appointment.status === 'concluido') {
+        showToast('Não é possível cancelar agendamentos já concluídos', 'error');
+        return;
+    }
+
+    // Verificar se está fora do prazo
+    if (appointment.status === 'fora_prazo') {
+        showToast('Não é possível cancelar agendamentos fora do prazo', 'error');
+        return;
+    }
 
     try {
         // Verificar se é um agendamento futuro
         const response = await fetch(`/api/agendamento_simples/${appointmentId}`);
         const result = await response.json();
-        
+
         if (!result.success) {
             throw new Error('Agendamento não encontrado');
         }
-        
+
         const appointment = result.data;
         const appointmentDate = new Date(appointment.data_hora);
         const now = new Date();
-        
+
         // Verificar se já passou da data
         if (appointmentDate <= now) {
             showToast('Não é possível cancelar agendamentos passados', 'error');
             return;
         }
-        
+
         // Verificar se já está cancelado
         if (appointment.status === 'cancelado') {
             showToast('Este agendamento já está cancelado', 'warning');
             return;
         }
-        
+
     } catch (error) {
         console.error('Erro ao verificar agendamento:', error);
         showToast('Erro ao verificar agendamento', 'error');
         return;
     }
-    
+
     // Pedir motivo do cancelamento
     const motivo = await showCancelReasonModal();
-    
+
     if (!motivo) {
         showToast('Cancelamento não realizado', 'info');
         return;
     }
-    
+
     if (!confirm('Tem certeza que deseja cancelar este agendamento?\n\nA oficina será notificada sobre o cancelamento.')) {
         return;
     }
-    
+
     try {
         // Mostrar loading
         showCancelLoading(true);
-        
+
         const response = await fetch(`/api/agendamento_simples/${appointmentId}/cancelar`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ 
+            body: JSON.stringify({
                 motivo: motivo.trim() || 'Cancelado pelo cliente',
                 cancelado_por: 'cliente'
             })
         });
-        
+
         const result = await response.json();
 
         if (result.success) {
@@ -1000,7 +894,7 @@ async function cancelAppointment(appointmentId) {
         } else {
             throw new Error(result.message || 'Erro ao cancelar agendamento');
         }
-        
+
     } catch (error) {
         console.error('❌ Erro ao cancelar agendamento:', error);
         showToast('❌ Erro ao cancelar agendamento: ' + error.message, 'error');
@@ -1025,7 +919,7 @@ function showCancelReasonModal() {
             align-items: center;
             z-index: 10000;
         `;
-        
+
         modal.innerHTML = `
             <div style="background: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 500px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
                 <h3 style="margin-bottom: 15px; color: #333;">Motivo do Cancelamento</h3>
@@ -1041,20 +935,20 @@ function showCancelReasonModal() {
                 </div>
             </div>
         `;
-        
+
         document.body.appendChild(modal);
-        
+
         const input = modal.querySelector('#cancel-reason-input');
         const cancelBtn = modal.querySelector('#cancel-btn');
         const confirmBtn = modal.querySelector('#confirm-btn');
-        
+
         input.focus();
-        
+
         cancelBtn.onclick = () => {
             document.body.removeChild(modal);
             resolve(null);
         };
-        
+
         confirmBtn.onclick = () => {
             const motivo = input.value.trim();
             if (!motivo) {
@@ -1065,7 +959,7 @@ function showCancelReasonModal() {
             document.body.removeChild(modal);
             resolve(motivo);
         };
-        
+
         // Fechar modal ao clicar fora
         modal.onclick = (e) => {
             if (e.target === modal) {
@@ -1073,7 +967,7 @@ function showCancelReasonModal() {
                 resolve(null);
             }
         };
-        
+
         // Enter para confirmar
         input.onkeydown = (e) => {
             if (e.key === 'Enter' && e.ctrlKey) {
@@ -1081,7 +975,7 @@ function showCancelReasonModal() {
             }
         };
     });
-    
+
 }
 function showSuccessModal() {
     const modal = document.createElement('div');
@@ -1097,7 +991,7 @@ function showSuccessModal() {
         align-items: center;
         z-index: 10000;
     `;
-    
+
     modal.innerHTML = `
         <div style="
             background: white; 
@@ -1126,11 +1020,11 @@ function showSuccessModal() {
             </button>
         </div>
     `;
-    
+
     document.body.appendChild(modal);
-    
+
     // Fechar modal ao clicar fora (opcional)
-    modal.onclick = function(e) {
+    modal.onclick = function (e) {
         if (e.target === modal) {
             document.body.removeChild(modal);
         }
@@ -1139,7 +1033,7 @@ function showSuccessModal() {
 // Função para mostrar/ocultar loading
 function showCancelLoading(show) {
     let loadingElement = document.getElementById('cancel-loading');
-    
+
     if (show) {
         if (!loadingElement) {
             loadingElement = document.createElement('div');
@@ -1165,7 +1059,7 @@ function showCancelLoading(show) {
                 </div>
             `;
             document.body.appendChild(loadingElement);
-            
+
             // Adicionar animação do spinner
             const style = document.createElement('style');
             style.textContent = `
@@ -1189,13 +1083,13 @@ async function updateAppointmentUI(appointmentId) {
         // Buscar dados atualizados do agendamento
         const response = await fetch(`/api/agendamento_simples/${appointmentId}`);
         const result = await response.json();
-        
+
         if (result.success) {
             const updatedAppointment = result.data;
-            
+
             // Encontrar o card do agendamento no DOM
             const appointmentCard = document.querySelector(`.appointment-card[data-id="${appointmentId}"]`);
-            
+
             if (appointmentCard) {
                 // Atualizar o card com os novos dados
                 updateAppointmentCard(appointmentCard, updatedAppointment);
@@ -1216,24 +1110,24 @@ async function updateAppointmentUI(appointmentId) {
 function updateAppointmentCard(cardElement, appointment) {
     const statusClass = getStatusClass(appointment);
     const statusText = getStatusText(appointment);
-    
+
     // Atualizar o status no header
     const statusElement = cardElement.querySelector('.status');
     if (statusElement) {
         statusElement.className = `status ${statusClass}`;
         statusElement.textContent = statusText;
     }
-    
+
     // Atualizar a classe principal do card
     cardElement.className = `appointment-card ${statusClass}`;
     cardElement.setAttribute('data-id', appointment.id);
-    
+
     // Atualizar o protocolo se necessário
     const protocolElement = cardElement.querySelector('.protocol');
     if (protocolElement && appointment.protocolo) {
         protocolElement.textContent = `Protocolo: ${appointment.protocolo}`;
     }
-    
+
     // Adicionar/atualizar informações de cancelamento
     let cancelInfo = cardElement.querySelector('.cancel-info');
     if (appointment.motivo_cancelamento) {
@@ -1246,10 +1140,10 @@ function updateAppointmentCard(cardElement, appointment) {
     } else if (cancelInfo) {
         cancelInfo.remove();
     }
-    
+
     // Atualizar os botões do footer
     updateAppointmentFooter(cardElement, appointment);
-    
+
     // Adicionar efeito visual de atualização
     cardElement.style.animation = 'pulse 0.5s ease-in-out';
     setTimeout(() => {
@@ -1257,24 +1151,27 @@ function updateAppointmentCard(cardElement, appointment) {
     }, 500);
 }
 
-// Função para atualizar os botões do footer baseado no status
 function updateAppointmentFooter(cardElement, appointment) {
     const footer = cardElement.querySelector('.appointment-footer');
     if (!footer) return;
-    
+
     const statusClass = getStatusClass(appointment);
-    
+
+    // VERIFICAÇÃO CORRIGIDA - Não mostrar cancelar para concluídos/fora do prazo
+    const canCancel = isFutureAppointment(appointment) &&
+        statusClass !== 'completed' &&
+        statusClass !== 'expired';
+
     if (statusClass === 'cancelled' || statusClass === 'expired') {
         footer.innerHTML = `
             <button class="btn btn-outline" onclick="repeatAppointment(${appointment.id})">
                 <i class="fas fa-redo"></i> Novo Agendamento
             </button>
-            <button class="btn btn-outline" onclick="downloadInvoice(${appointment.id})">
-                <i class="fas fa-file-invoice"></i> Comprovante
-            </button>
+
             <span class="text-muted">Ações indisponíveis</span>
         `;
-    } else if (isFutureAppointment(appointment)) {
+    } else if (canCancel) {
+        // Só mostra cancelar se for futuro E não concluído
         footer.innerHTML = `
 
             <button class="btn btn-outline btn-cancel" onclick="cancelAppointment(${appointment.id})">
@@ -1282,14 +1179,12 @@ function updateAppointmentFooter(cardElement, appointment) {
             </button>
         `;
     } else {
+        // Para agendamentos concluídos ou passados - sem opção de cancelar
         footer.innerHTML = `
+            <button class="btn btn-outline" onclick="repeatAppointment(${appointment.id})">
+                <i class="fas fa-redo"></i> Repetir Serviço
+            </button>
 
-            <button class="btn btn-outline" onclick="downloadInvoice(${appointment.id})">
-                <i class="fas fa-file-invoice"></i> Comprovante
-            </button>
-            <button class="btn btn-outline" onclick="rateService(${appointment.id})">
-                <i class="fas fa-star"></i> Avaliar Serviço
-            </button>
         `;
     }
 }
@@ -1315,7 +1210,7 @@ function showToast(message, type = 'info') {
             max-width: 300px;
             word-wrap: break-word;
         `;
-        
+
         switch (type) {
             case 'success':
                 toast.style.backgroundColor = '#28a745';
@@ -1330,10 +1225,10 @@ function showToast(message, type = 'info') {
             default:
                 toast.style.backgroundColor = '#17a2b8';
         }
-        
+
         toast.textContent = message;
         document.body.appendChild(toast);
-        
+
         setTimeout(() => {
             document.body.removeChild(toast);
         }, 5000);
