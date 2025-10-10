@@ -946,6 +946,8 @@ app.use('/api/recomendacoes', recomendacaoRoutes);
 app.use('/api/geocode', geocodeRoutes);
 app.use('/api/contact', require('./routes/contact'));
 app.use('/api/agendamento_simples', agendamentoSimplesRoutes);
+app.use('/api/email', require('./routes/email'));
+
 app.use('/api/lembretes_troca_oleo', lembreteTrocaOleoRoutes);
 
 // ========== ROTAS DE PRODUTOS ==========

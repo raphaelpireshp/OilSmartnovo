@@ -10,8 +10,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/css/main.css">
 <link rel="icon" href="/img/tentativa4.png" type="image/x-icon"></head>
-<link rel="stylesheet" href="/css/auth.css">
-<script src="/js/auth.js" defer></script>
 </head>
 
 <body>
@@ -211,7 +209,106 @@
 
 
     <script src="/js/main.js"></script>
-
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const contactForm = document.getElementById('contact-form');
+    
+    if (contactForm) {
+        contactForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Coletar dados do formulário
+            const formData = {
+                name: document.getElementById('contact-name').value.trim(),
+                email: document.getElementById('contact-email').value.trim(),
+                phone: document.getElementById('contact-phone').value.trim(),
+                subject: document.getElementById('contact-subject').value,
+                message: document.getElementById('contact-message').value.trim()
+            };
+            
+            // Validação básica
+            if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+                showToast('Preencha todos os campos obrigatórios', 'error');
+                return;
+            }
+            
+            if (!validateEmail(formData.email)) {
+                showToast('Email inválido', 'error');
+                return;
+            }
+            
+            // Desabilitar botão e mostrar loading
+            const submitBtn = contactForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Enviando...';
+            
+            try {
+                const response = await fetch('/api/email/send-contact', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showToast(result.message, 'success');
+                    contactForm.reset(); // Limpar formulário
+                } else {
+                    showToast(result.message, 'error');
+                }
+                
+            } catch (error) {
+                console.error('Erro ao enviar formulário:', error);
+                showToast('Erro ao enviar mensagem. Tente novamente.', 'error');
+            } finally {
+                // Reabilitar botão
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        });
+    }
+    
+    // Função de validação de email (reutilizada do servicos.js)
+    function validateEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    }
+    
+    // Função para mostrar mensagens toast (simplificada)
+    function showToast(message, type = 'success') {
+        // Cria um toast temporário se não existir
+        let toast = document.getElementById('toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'toast';
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                border-radius: 4px;
+                color: white;
+                z-index: 10000;
+                font-weight: 500;
+                transition: all 0.3s ease;
+            `;
+            document.body.appendChild(toast);
+        }
+        
+        toast.textContent = message;
+        toast.style.backgroundColor = type === 'success' ? '#28a745' : '#dc3545';
+        toast.style.display = 'block';
+        
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 5000);
+    }
+});
+</script>
 </body>
 
 </html>
