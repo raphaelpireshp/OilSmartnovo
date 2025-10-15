@@ -829,7 +829,7 @@ document.addEventListener("DOMContentLoaded", function () {
             filterContainer.innerHTML = `
                 <div class="product-card-content">
                     <div class="product-image">
-                        <img src="../img/filter-default.jpg" alt="${filter.nome}" loading="lazy">
+                        <img src="../img/oil-filter.jpg" alt="${filter.nome}" loading="lazy">
                     </div>
                     <div class="product-details">
                         <h4>${filter.nome}</h4>
@@ -892,18 +892,19 @@ document.addEventListener("DOMContentLoaded", function () {
         updateSelectionSummary();
     }
 
-    function updateSelectionSummary() {
-        const summaryElement = document.getElementById("selected-items");
-        const summaryContainer = document.querySelector(".selection-summary");
-        const selections = [];
+function updateSelectionSummary() {
+    const summaryElement = document.getElementById("selected-items");
+    const summaryContainer = document.querySelector(".selection-summary");
+    const selections = [];
 
-        if (selectedProducts.oil) {
-            selections.push("Óleo");
-        }
-        if (selectedProducts.filter) {
-            selections.push("Filtro");
-        }
+    if (selectedProducts.oil) {
+        selections.push("Óleo");
+    }
+    if (selectedProducts.filter) {
+        selections.push("Filtro");
+    }
 
+    if (summaryElement) {
         if (selections.length === 0) {
             summaryElement.textContent = "Nenhum produto selecionado";
             summaryElement.style.color = "#e63946";
@@ -922,22 +923,38 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
     }
+}
 
-    function initSelectionSummary() {
-        const selectionContainer = document.createElement("div");
-        selectionContainer.className = "selection-summary";
-        selectionContainer.innerHTML = `
+function initSelectionSummary() {
+    // Remove qualquer resumo duplicado que possa existir
+    const existingSummaries = document.querySelectorAll('.selection-summary');
+    if (existingSummaries.length > 1) {
+        // Mantém apenas o primeiro e remove os demais
+        for (let i = 1; i < existingSummaries.length; i++) {
+            existingSummaries[i].remove();
+        }
+    }
+    
+    // Verifica se já existe um resumo no HTML
+    let summaryElement = document.querySelector(".selection-summary");
+    
+    // Se não existe, cria um novo
+    if (!summaryElement) {
+        summaryElement = document.createElement("div");
+        summaryElement.className = "selection-summary";
+        summaryElement.innerHTML = `
             <h4>Resumo da Seleção</h4>
             <p id="selected-items">Carregando...</p>
         `;
 
         const recommendationContainer = document.querySelector(".recommendation-container");
         if (recommendationContainer) {
-            recommendationContainer.parentNode.insertBefore(selectionContainer, recommendationContainer.nextSibling);
+            recommendationContainer.parentNode.insertBefore(summaryElement, recommendationContainer.nextSibling);
         }
-
-        updateSelectionSummary();
     }
+
+    updateSelectionSummary();
+}
 
     function getSelectedProducts() {
         const saved = sessionStorage.getItem('selectedProducts');
@@ -1886,15 +1903,15 @@ document.addEventListener("DOMContentLoaded", function () {
         const customerPhone = document.getElementById("customer-phone").value.trim();
         const customerEmail = document.getElementById("customer-email").value.trim();
 
-        if (!scheduleDateValue || !scheduleTime || !customerName || !customerCpf || !customerPhone || !customerEmail) {
+        if (!scheduleDateValue || !scheduleTime || !customerName || !customerPhone || !customerEmail) {
             showToast("Preencha todos os campos obrigatórios", "error");
             return false;
         }
 
-        if (!validateCPF(customerCpf)) {
-            showToast("CPF inválido", "error");
-            return false;
-        }
+        // if (!validateCPF(customerCpf)) {
+        //     showToast("CPF inválido", "error");
+        //     return false;
+        // }
 
         if (!validateEmail(customerEmail)) {
             showToast("E-mail inválido", "error");
@@ -2199,7 +2216,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const scheduleDateValue = scheduleDateInput.value;
         const scheduleTime = scheduleTimeSelect.value;
         const customerName = document.getElementById("customer-name").value.trim();
-        const customerCpf = document.getElementById("customer-cpf").value.trim();
+        // const customerCpf = document.getElementById("customer-cpf").value.trim();
         const customerPhone = document.getElementById("customer-phone").value.trim();
         const customerEmail = document.getElementById("customer-email").value.trim();
 
@@ -2208,10 +2225,10 @@ document.addEventListener("DOMContentLoaded", function () {
             return false;
         }
 
-        if (!validateCPF(customerCpf)) {
-            showToast("CPF inválido", "error");
-            return false;
-        }
+        // if (!validateCPF(customerCpf)) {
+        //     showToast("CPF inválido", "error");
+        //     return false;
+        // }
 
         if (!validateEmail(customerEmail)) {
             showToast("E-mail inválido", "error");
@@ -2414,21 +2431,173 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
     }
+// ==================== FUNÇÕES DE NAVEGAÇÃO CORRIGIDAS ====================
 
+function updateProgressBar(step) {
+    const progressSteps = document.querySelectorAll(".progress-step");
+    
+    progressSteps.forEach((stepElement, index) => {
+        const stepNumber = index + 1;
+        if (stepNumber < step) {
+            stepElement.classList.add('completed');
+            stepElement.classList.remove('active');
+        } else if (stepNumber === step) {
+            stepElement.classList.add('active');
+            stepElement.classList.remove('completed');
+        } else {
+            stepElement.classList.remove('active', 'completed');
+        }
+    });
+}
+
+// Função global para navegação entre steps
+window.goToStep = async function (step) {
+    console.log(`🔄 Indo para passo ${step} (atual: ${currentStep})`);
+    
+    // Validação antes de avançar
+    if (step > currentStep) {
+        if (step === 2 && !validateStep1()) {
+            console.log('❌ Validação do passo 1 falhou');
+            return;
+        }
+        if (step === 3 && !await validateStep2()) {
+            console.log('❌ Validação do passo 2 falhou');
+            return;
+        }
+        if (step === 4) {
+            const success = await processScheduling();
+            if (!success) {
+                console.log('❌ Processamento do agendamento falhou');
+                return;
+            }
+            showConfirmationDetails();
+        }
+    }
+
+    // Esconde todos os steps
+    document.querySelectorAll(".service-step").forEach(s => {
+        s.classList.remove("active");
+    });
+    
+    // Mostra o step atual
+    const currentStepElement = document.getElementById(`step${step}`);
+    if (currentStepElement) {
+        currentStepElement.classList.add("active");
+        console.log(`✅ Step ${step} ativado`);
+    } else {
+        console.error(`❌ Elemento step${step} não encontrado`);
+        return;
+    }
+
+    // Atualiza a barra de progresso
+    updateProgressBar(step);
+    currentStep = step;
+
+    // Scroll suave para o topo do step
+    currentStepElement.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+};
+
+// Validação do Step 1
+function validateStep1() {
+    const brandSelect = document.getElementById("vehicle-brand");
+    const modelSelect = document.getElementById("vehicle-model");
+    const yearSelect = document.getElementById("vehicle-year");
+    const mileageInput = document.getElementById("vehicle-mileage");
+
+    if (!brandSelect || !modelSelect || !yearSelect) {
+        console.error('❌ Elementos do formulário não encontrados');
+        return false;
+    }
+
+    const isValid = brandSelect.value && modelSelect.value && yearSelect.value;
+
+    if (!isValid) {
+        showToast("Selecione marca, modelo e ano do veículo", "error");
+        return false;
+    }
+
+    if (mileageInput.value.trim() !== "") {
+        if (isNaN(mileageInput.value) || mileageInput.value < 0) {
+            showToast("Quilometragem inválida", "error");
+            return false;
+        }
+    }
+
+    // Salva os dados do veículo
+    userVehicle = {
+        marca_id: brandSelect.value,
+        marca: brandSelect.options[brandSelect.selectedIndex].textContent,
+        modelo_id: modelSelect.value,
+        modelo: modelSelect.options[modelSelect.selectedIndex].textContent,
+        modelo_ano_id: yearSelect.value,
+        ano: yearSelect.options[yearSelect.selectedIndex].textContent,
+        quilometragem: mileageInput.value.trim()
+    };
+    sessionStorage.setItem('userVehicle', JSON.stringify(userVehicle));
+
+    console.log('✅ Step 1 validado com sucesso');
+    return true;
+}
+
+// Validação do Step 2
+async function validateStep2() {
+    const currentSelectedProducts = getSelectedProducts();
+
+    if (!currentSelectedProducts.oil && !currentSelectedProducts.filter) {
+        showToast("Selecione pelo menos um produto (óleo ou filtro) para continuar", "error");
+        
+        // Efeito visual nos cards
+        const oilCard = document.getElementById("recommended-oil");
+        const filterCard = document.getElementById("recommended-filter");
+        
+        if (oilCard) { 
+            oilCard.style.animation = "shake 0.5s ease"; 
+            setTimeout(() => { oilCard.style.animation = ""; }, 500); 
+        }
+        if (filterCard) { 
+            filterCard.style.animation = "shake 0.5s ease"; 
+            setTimeout(() => { filterCard.style.animation = ""; }, 500); 
+        }
+        
+        return false;
+    }
+
+    if (!selectedWorkshop) {
+        showToast("Selecione uma oficina para continuar", "error");
+        return false;
+    }
+
+    console.log('✅ Step 2 validado com sucesso');
+    return true;
+}
     // ==================== INICIALIZAÇÃO ====================
 
-    function init() {
-        // if (!checkUserLoggedIn()) {
-        //     return; 
-        // }
-        initMap();
-        populateBrands();
-        setMinScheduleDate();
-        handleResponsiveLayout();
-        loadLocationHistory();
+function init() {
+    console.log('🚀 Inicializando agendamento...');
+    
+    // Inicializa componentes
+    initMap();
+    populateBrands();
+    setMinScheduleDate();
+    handleResponsiveLayout();
+    loadLocationHistory();
+    
+    // Inicializa o resumo de seleção (APENAS UMA VEZ)
+    const existingSummary = document.querySelector('.selection-summary');
+    if (!existingSummary) {
         initSelectionSummary();
-        window.addEventListener("resize", handleResponsiveLayout);
+    } else {
+        // Se já existe, apenas atualiza
+        updateSelectionSummary();
     }
+    
+    window.addEventListener("resize", handleResponsiveLayout);
+    
+    console.log('✅ Agendamento inicializado');
+}
 
     init();
 

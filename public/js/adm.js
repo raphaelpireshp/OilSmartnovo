@@ -3767,3 +3767,98 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 });
+
+// Funções para o módulo de estoque (em desenvolvimento)
+function showDevAlert() {
+    showNotification('🔧 Módulo em desenvolvimento! O sistema de estoque estará disponível em breve.', 'warning');
+}
+
+function showDevDetails() {
+    showNotification(`
+        📋 <strong>Módulo de Estoque - Em Desenvolvimento</strong><br><br>
+        🎯 <strong>Funcionalidades planejadas:</strong><br>
+        • Controle completo de inventário<br>
+        • Alertas de estoque baixo<br>
+        • Gestão de fornecedores<br>
+        • Relatórios de movimentação<br>
+        • Integração com agendamentos<br><br>
+        ⏰ <strong>Previsão de lançamento:</strong> Próxima versão
+    `, 'info');
+}
+
+function loadEstoque() {
+    showDevAlert();
+    
+    // Simular loading
+    setTimeout(() => {
+        showNotification('⚠️ Dados de demonstração carregados. Módulo real em desenvolvimento.', 'info');
+    }, 1000);
+}
+
+function showAddProductModal() {
+    showDevAlert();
+}
+
+function showVehicleProductModal() {
+    showDevAlert();
+}
+
+function showManageVehiclesModal() {
+    showDevAlert();
+}
+
+function exportEstoque() {
+    showDevAlert();
+}
+
+function filterEstoque() {
+    showNotification('🔍 Filtros funcionarão quando o módulo estiver completo.', 'info');
+}
+
+function searchEstoque() {
+    // Não faz nada, apenas para demonstração
+}
+
+// Função auxiliar para mostrar notificações
+function showNotification(message, type = 'info') {
+    // Criar elemento de notificação
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <i class="fas fa-${type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+            <span>${message}</span>
+        </div>
+        <button class="notification-close" onclick="this.parentElement.remove()">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    
+    // Estilos da notificação
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'warning' ? '#fff3cd' : '#d1ecf1'};
+        color: ${type === 'warning' ? '#856404' : '#0c5460'};
+        padding: 15px 20px;
+        border-radius: 8px;
+        border-left: 4px solid ${type === 'warning' ? '#ffc107' : '#17a2b8'};
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10000;
+        max-width: 400px;
+        animation: slideInRight 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto-remover após 5 segundos
+    setTimeout(() => {
+        if (notification.parentElement) {
+            notification.remove();
+        }
+    }, 5000);
+}

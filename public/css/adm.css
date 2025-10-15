@@ -2403,3 +2403,377 @@ body {
         background: #1a1a1a;
     }
 }
+/* Estilos para aviso de desenvolvimento - MODO NOTURNO */
+.dev-alert-container {
+    margin: 20px 0;
+}
+
+.dev-alert {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    color: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    border-left: 6px solid #ff6b7a;
+    animation: pulse-alert 2s infinite;
+}
+
+/* Modo noturno - ajustes específicos */
+@media (prefers-color-scheme: dark) {
+    .dev-alert {
+        background: linear-gradient(135deg, #dc3545, #b02a37);
+        box-shadow: 0 4px 15px rgba(220, 53, 69, 0.6);
+        border-left: 6px solid #ff4757;
+    }
+}
+
+.dev-alert-icon {
+    font-size: 3rem;
+    opacity: 0.9;
+}
+
+.dev-alert-content {
+    flex: 1;
+}
+
+.dev-alert-content h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.dev-alert-content p {
+    margin: 5px 0;
+    opacity: 0.9;
+}
+
+.dev-alert-content strong {
+    color: #ffd700;
+}
+
+.dev-alert-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.dev-placeholder {
+    margin-top: 30px;
+    border: 2px dashed #dc3545;
+    border-radius: 8px;
+    padding: 20px;
+    background: #fff5f5;
+    transition: all 0.3s ease;
+}
+
+/* Modo noturno - placeholder */
+@media (prefers-color-scheme: dark) {
+    .dev-placeholder {
+        background: #2d1b1b;
+        border-color: #ff4757;
+        box-shadow: 0 2px 10px rgba(220, 53, 69, 0.3);
+    }
+}
+
+.placeholder-header {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #dc3545;
+    transition: color 0.3s ease;
+}
+
+/* Modo noturno - header */
+@media (prefers-color-scheme: dark) {
+    .placeholder-header {
+        color: #ff6b7a;
+    }
+}
+
+.placeholder-header i {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.placeholder-header h4 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.dev-row {
+    opacity: 0.7;
+    background: #f8f9fa !important;
+    transition: all 0.3s ease;
+}
+
+/* Modo noturno - linhas da tabela */
+@media (prefers-color-scheme: dark) {
+    .dev-row {
+        background: #2d3748 !important;
+        color: #e2e8f0;
+    }
+    
+    .dev-row:hover {
+        background: #4a5568 !important;
+        color: #ffffff;
+    }
+}
+
+.dev-row:hover {
+    opacity: 1;
+    background: #fff !important;
+}
+
+.quantidade-baixa {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+/* Modo noturno - cores das quantidades */
+@media (prefers-color-scheme: dark) {
+    .quantidade-baixa {
+        color: #ff6b7a;
+    }
+    
+    .quantidade-normal {
+        color: #68d391;
+    }
+    
+    .quantidade-zerada {
+        color: #a0aec0;
+    }
+}
+
+.quantidade-normal {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.quantidade-zerada {
+    color: #6c757d;
+    font-weight: bold;
+    text-decoration: line-through;
+}
+
+.placeholder-note {
+    margin-top: 20px;
+    padding: 15px;
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 6px;
+    color: #856404;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+/* Modo noturno - nota */
+@media (prefers-color-scheme: dark) {
+    .placeholder-note {
+        background: #443b1b;
+        border-color: #d69e2e;
+        color: #ecc94b;
+    }
+}
+
+.placeholder-note i {
+    color: #f39c12;
+    margin-right: 8px;
+    transition: color 0.3s ease;
+}
+
+/* Modo noturno - ícone da nota */
+@media (prefers-color-scheme: dark) {
+    .placeholder-note i {
+        color: #ecc94b;
+    }
+}
+
+/* Animações */
+@keyframes pulse-alert {
+    0% {
+        box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+    }
+    50% {
+        box-shadow: 0 4px 20px rgba(220, 53, 69, 0.5);
+    }
+    100% {
+        box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+    }
+}
+
+/* Modo noturno - animação mais intensa */
+@media (prefers-color-scheme: dark) {
+    @keyframes pulse-alert {
+        0% {
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.5);
+        }
+        50% {
+            box-shadow: 0 4px 25px rgba(220, 53, 69, 0.8);
+        }
+        100% {
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.5);
+        }
+    }
+}
+
+/* Botões desabilitados para desenvolvimento */
+.btn[onclick*="showDevAlert"] {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.btn[onclick*="showDevAlert"]:hover {
+    opacity: 0.7;
+    transform: none !important;
+}
+
+/* Modo noturno - ajustes para a tabela completa */
+@media (prefers-color-scheme: dark) {
+    .data-table {
+        background: #2d3748;
+        color: #e2e8f0;
+    }
+    
+    .data-table thead {
+        background: #4a5568;
+    }
+    
+    .data-table th {
+        color: #ffffff;
+        border-bottom: 2px solid #718096;
+    }
+    
+    .data-table td {
+        border-bottom: 1px solid #4a5568;
+        color: #e2e8f0;
+    }
+    
+    .data-table tr:hover {
+        background: #4a5568;
+    }
+}
+
+/* Estilos para notificações - Modo Noturno */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 10000;
+    max-width: 400px;
+    animation: slideInRight 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.notification-warning {
+    background: #fff3cd;
+    color: #856404;
+    border-left: 4px solid #ffc107;
+}
+
+.notification-info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border-left: 4px solid #17a2b8;
+}
+
+/* Modo noturno - notificações */
+@media (prefers-color-scheme: dark) {
+    .notification-warning {
+        background: #443b1b;
+        color: #ecc94b;
+        border-left: 4px solid #d69e2e;
+    }
+    
+    .notification-info {
+        background: #1a3a40;
+        color: #90e0ef;
+        border-left: 4px solid #00b4d8;
+    }
+}
+
+.notification-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    opacity: 0.7;
+    padding: 5px;
+    transition: opacity 0.3s ease;
+}
+
+.notification-close:hover {
+    opacity: 1;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Ajustes extras para modo noturno - status badges */
+@media (prefers-color-scheme: dark) {
+    .status-badge.status-pendente {
+        background: #fed7d7;
+        color: #c53030;
+    }
+    
+    .status-badge.status-concluido {
+        background: #c6f6d5;
+        color: #276749;
+    }
+    
+    .status-badge.status-cancelado {
+        background: #fed7d7;
+        color: #c53030;
+    }
+}
+
+/* Efeito de brilho para o alerta no modo noturno */
+@media (prefers-color-scheme: dark) {
+    .dev-alert::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(45deg, #ff6b7a, #dc3545, #ff6b7a);
+        border-radius: 14px;
+        z-index: -1;
+        opacity: 0.3;
+        animation: glow 3s ease-in-out infinite alternate;
+    }
+    
+    .dev-alert {
+        position: relative;
+    }
+}
+
+@keyframes glow {
+    from {
+        opacity: 0.3;
+    }
+    to {
+        opacity: 0.6;
+    }
+}

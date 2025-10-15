@@ -340,139 +340,111 @@
                 </section>
 
                 <!-- Estoque Section -->
-                <!-- Estoque Section -->
+<!-- Estoque Section -->
 <section id="estoque" class="content-section">
     <div class="section-header">
         <h2>Gerenciar Estoque</h2>
         <div class="header-actions">
-            <button class="btn btn-primary" onclick="loadEstoque()">
+            <button class="btn btn-primary" onclick="showDevAlert()">
                 <i class="fas fa-sync-alt"></i>
                 Atualizar
             </button>
-            <button class="btn btn-success" onclick="showAddProductModal()">
+            <button class="btn btn-success" onclick="showDevAlert()">
                 <i class="fas fa-plus"></i>
                 Adicionar Produto
             </button>
         </div>
     </div>
 
-    <!-- Ações de Estoque -->
-    <div class="estoque-actions">
-        <div class="action-buttons">
-            <button class="btn btn-primary" onclick="showAddProductModal()">
-                <i class="fas fa-plus"></i>
-                Adicionar Produto Simples
-            </button>
-            <button class="btn btn-info" onclick="showVehicleProductModal()">
-                <i class="fas fa-car"></i>
-                Adicionar por Veículo
-            </button>
-            <button class="btn btn-warning" onclick="showManageVehiclesModal()">
-                <i class="fas fa-cog"></i>
-                Gerenciar Veículos
-            </button>
-            <button class="btn btn-secondary" onclick="exportEstoque()">
-                <i class="fas fa-download"></i>
-                Exportar Estoque
-            </button>
-        </div>
-        
-        <!-- Resumo Rápido -->
-        <div class="estoque-summary" style="margin-top: 15px; padding: 15px; background: #e8f5e8; border-radius: 6px; display: none;" id="estoqueSummary">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <h4 style="margin: 0 0 5px 0; color: #2d5016;">Resumo do Estoque</h4>
-                    <p style="margin: 0; color: #4a7c20; font-size: 14px;">
-                        <span id="totalProdutos">0</span> produtos • 
-                        <span id="produtosAtivos">0</span> ativos • 
-                        <span id="produtosBaixoEstoque" style="color: #e63946;">0</span> com estoque baixo
-                    </p>
-                </div>
-                <button class="btn btn-sm btn-outline" onclick="hideEstoqueSummary()">
-                    <i class="fas fa-times"></i>
+    <!-- AVISO DE DESENVOLVIMENTO -->
+    <div class="dev-alert-container">
+        <div class="dev-alert">
+            <div class="dev-alert-icon">
+                <i class="fas fa-tools"></i>
+            </div>
+            <div class="dev-alert-content">
+                <h3>Módulo em Desenvolvimento</h3>
+                <p>O sistema de gerenciamento de estoque está em desenvolvimento como um projeto à parte.</p>
+                <p><strong>Previsão de lançamento:</strong> Em breve</p>
+            </div>
+            <div class="dev-alert-actions">
+                <button class="btn btn-outline" onclick="showDevDetails()">
+                    <i class="fas fa-info-circle"></i>
+                    Mais Informações
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Filtros de Estoque -->
-    <div class="filters-bar">
-        <div class="filter-group">
-            <label for="estoqueTipoFilter">Tipo de Produto</label>
-            <select id="estoqueTipoFilter" onchange="filterEstoque()">
-                <option value="todos">Todos os tipos</option>
-                <option value="oleo">Óleos</option>
-                <option value="filtro">Filtros</option>
-            </select>
+    <!-- Placeholder para demonstração -->
+    <div class="dev-placeholder">
+        <div class="placeholder-header">
+            <i class="fas fa-boxes"></i>
+            <h4>Visualização do Módulo de Estoque</h4>
         </div>
-        <div class="filter-group">
-            <label for="estoqueMarcaFilter">Marca do Veículo</label>
-            <select id="estoqueMarcaFilter" onchange="filterEstoque()">
-                <option value="todos">Todas as marcas</option>
-                <!-- Marcas serão carregadas via JavaScript -->
-            </select>
-        </div>
-        <div class="filter-group">
-            <label for="estoqueStatusFilter">Status</label>
-            <select id="estoqueStatusFilter" onchange="filterEstoque()">
-                <option value="todos">Todos os status</option>
-                <option value="ativo">Ativos</option>
-                <option value="inativo">Inativos</option>
-            </select>
-        </div>
-        <div class="filter-group">
-            <label for="estoqueEstoqueFilter">Nível de Estoque</label>
-            <select id="estoqueEstoqueFilter" onchange="filterEstoque()">
-                <option value="todos">Todos</option>
-                <option value="baixo">Estoque Baixo</option>
-                <option value="normal">Estoque Normal</option>
-                <option value="zerado">Estoque Zerado</option>
-            </select>
-        </div>
-        <div class="filter-group">
-            <label for="estoqueSearch">Pesquisar</label>
-            <input type="text" id="estoqueSearch" placeholder="Nome do produto..." onkeyup="searchEstoque()">
-        </div>
-    </div>
-
-    <!-- Estoque Table -->
-    <div class="table-container">
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>Produto</th>
-                    <th>Marca</th>
-                    <th>Tipo</th>
-                    <th>Quantidade</th>
-                    <th>Preço</th>
-                    <th>Status</th>
-                    <th>Cadastrado em</th>
-                    <th width="120">Ações</th>
-                </tr>
-            </thead>
-            <tbody id="estoqueTable">
-                <tr>
-                    <td colspan="8" class="text-center">
-                        <div class="loading"></div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Paginação -->
-    <div class="pagination-container" style="display: none;" id="estoquePagination">
-        <div class="pagination-info">
-            Mostrando <span id="estoqueStart">1</span>-<span id="estoqueEnd">10</span> de <span id="estoqueTotal">0</span> produtos
-        </div>
-        <div class="pagination-buttons">
-            <button class="btn btn-sm btn-outline" onclick="changeEstoquePage('prev')" id="estoquePrevBtn" disabled>
-                <i class="fas fa-chevron-left"></i> Anterior
-            </button>
-            <span class="pagination-page" id="estoqueCurrentPage">1</span>
-            <button class="btn btn-sm btn-outline" onclick="changeEstoquePage('next')" id="estoqueNextBtn" disabled>
-                Próxima <i class="fas fa-chevron-right"></i>
-            </button>
+        <div class="placeholder-content">
+            <div class="placeholder-table">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Produto</th>
+                            <th>Marca</th>
+                            <th>Tipo</th>
+                            <th>Quantidade</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="dev-row">
+                            <td>
+                                <i class="fas fa-wrench"></i>
+                                Óleo Sintético 5W-30
+                            </td>
+                            <td>Petrobras</td>
+                            <td>Óleo</td>
+                            <td>
+                                <span class="quantidade-baixa">5 unidades</span>
+                            </td>
+                            <td>
+                                <span class="status-badge status-pendente">Estoque Baixo</span>
+                            </td>
+                        </tr>
+                        <tr class="dev-row">
+                            <td>
+                                <i class="fas fa-filter"></i>
+                                Filtro de Óleo Esportivo
+                            </td>
+                            <td>Fram</td>
+                            <td>Filtro</td>
+                            <td>
+                                <span class="quantidade-normal">25 unidades</span>
+                            </td>
+                            <td>
+                                <span class="status-badge status-concluido">Disponível</span>
+                            </td>
+                        </tr>
+                        <tr class="dev-row">
+                            <td>
+                                <i class="fas fa-oil-can"></i>
+                                Óleo Mineral 20W-50
+                            </td>
+                            <td>Shell</td>
+                            <td>Óleo</td>
+                            <td>
+                                <span class="quantidade-zerada">0 unidades</span>
+                            </td>
+                            <td>
+                                <span class="status-badge status-cancelado">Esgotado</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="placeholder-note">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Nota:</strong> Esta é apenas uma visualização estática para demonstração. 
+                O módulo completo estará disponível em breve.
+            </div>
         </div>
     </div>
 </section>
