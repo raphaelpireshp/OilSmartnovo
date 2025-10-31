@@ -1,0 +1,1590 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gerenciamento - OilSmart</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .tabs {
+            display: flex;
+            background-color: white;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .tab.active {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .tab:hover:not(.active) {
+            background-color: var(--light-color);
+        }
+        
+        .tab-content {
+            display: none;
+            background-color: white;
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            background-color: #fafafa;
+        }
+        
+        .form-section h3 {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--secondary-color);
+            color: var(--dark-color);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn-primary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #219653;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background-color: #e67e22;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: var(--light-color);
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .action-btn {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        
+        .alert {
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .search-container {
+            margin-bottom: 20px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 5px;
+        }
+        
+        .page-btn {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background-color: white;
+            cursor: pointer;
+        }
+        
+        .page-btn.active {
+            background-color: var(--secondary-color);
+            color: white;
+            border-color: var(--secondary-color);
+        }
+        
+        @media (max-width: 768px) {
+            .tabs {
+                flex-wrap: wrap;
+            }
+            
+            .tab {
+                flex: 1;
+                min-width: 120px;
+                text-align: center;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .tab-content {
+                overflow-x: auto;
+            }
+            
+            table {
+                min-width: 800px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <h1>Sistema de Gerenciamento OilSmart</h1>
+                <div id="status-indicator" class="alert alert-warning">Conectando...</div>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" data-tab="products">Produtos</div>
+            <div class="tab" data-tab="workshops">Oficinas</div>
+            <div class="tab" data-tab="brands">Marcas</div>
+            <div class="tab" data-tab="models">Modelos</div>
+            <div class="tab" data-tab="years">Anos</div>
+        </div>
+        
+        <!-- TAB PRODUTOS -->
+        <div class="tab-content active" id="products-tab">
+            <h2>Gerenciar Produtos</h2>
+            
+            <div class="form-section">
+                <h3>Adicionar Óleo</h3>
+                <form id="oil-form">
+                    <div class="form-group">
+                        <label for="oil-name">Nome</label>
+                        <input type="text" id="oil-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="oil-type">Tipo</label>
+                        <select id="oil-type" required>
+                            <option value="carro">Carro</option>
+                            <option value="moto">Moto</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="oil-viscosity">Viscosidade</label>
+                        <input type="text" id="oil-viscosity" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="oil-specification">Especificação</label>
+                        <input type="text" id="oil-specification" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="oil-brand">Marca</label>
+                        <input type="text" id="oil-brand" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="oil-price">Preço</label>
+                        <input type="number" id="oil-price" step="0.01" required>
+                    </div>
+                    <div class="actions">
+                        <button type="submit" class="btn-primary">Adicionar Óleo</button>
+                        <button type="button" class="btn-warning" id="clear-oil-form">Limpar</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="form-section">
+                <h3>Adicionar Filtro</h3>
+                <form id="filter-form">
+                    <div class="form-group">
+                        <label for="filter-name">Nome</label>
+                        <input type="text" id="filter-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="filter-type">Tipo</label>
+                        <select id="filter-type" required>
+                            <option value="carro">Carro</option>
+                            <option value="moto">Moto</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="filter-compatibility">Compatibilidade</label>
+                        <textarea id="filter-compatibility" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="filter-price">Preço</label>
+                        <input type="number" id="filter-price" step="0.01" required>
+                    </div>
+                    <div class="actions">
+                        <button type="submit" class="btn-primary">Adicionar Filtro</button>
+                        <button type="button" class="btn-warning" id="clear-filter-form">Limpar</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="search-container">
+                <input type="text" id="product-search" class="search-input" placeholder="Buscar produtos...">
+            </div>
+            
+            <div id="products-list">
+                <h3>Lista de Produtos</h3>
+                <table id="products-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Tipo</th>
+                            <th>Detalhes</th>
+                            <th>Preço</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="products-table-body">
+                        <!-- Produtos serão carregados aqui -->
+                    </tbody>
+                </table>
+                <div class="pagination" id="products-pagination">
+                    <!-- Paginação será gerada aqui -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- TAB OFICINAS -->
+        <div class="tab-content" id="workshops-tab">
+            <h2>Gerenciar Oficinas</h2>
+            
+            <div class="form-section">
+                <h3>Adicionar Oficina</h3>
+                <form id="workshop-form">
+                    <div class="form-group">
+                        <label for="workshop-name">Nome da Oficina</label>
+                        <input type="text" id="workshop-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="workshop-email">Email</label>
+                        <input type="email" id="workshop-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="workshop-password">Senha</label>
+                        <input type="password" id="workshop-password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="workshop-address">Endereço</label>
+                        <input type="text" id="workshop-address" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="workshop-city">Cidade</label>
+                        <input type="text" id="workshop-city" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="workshop-state">Estado</label>
+                        <input type="text" id="workshop-state" maxlength="2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="workshop-cep">CEP</label>
+                        <input type="text" id="workshop-cep" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="workshop-phone">Telefone</label>
+                        <input type="text" id="workshop-phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="workshop-opening">Horário de Abertura</label>
+                        <input type="time" id="workshop-opening" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="workshop-closing">Horário de Fechamento</label>
+                        <input type="time" id="workshop-closing" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="workshop-days">Dias de Funcionamento</label>
+                        <input type="text" id="workshop-days" placeholder="Seg-Sex" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="workshop-lat">Latitude</label>
+                        <input type="number" id="workshop-lat" step="any">
+                    </div>
+                    <div class="form-group">
+                        <label for="workshop-lng">Longitude</label>
+                        <input type="number" id="workshop-lng" step="any">
+                    </div>
+                    <div class="actions">
+                        <button type="submit" class="btn-primary">Adicionar Oficina</button>
+                        <button type="button" class="btn-warning" id="clear-workshop-form">Limpar</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="search-container">
+                <input type="text" id="workshop-search" class="search-input" placeholder="Buscar oficinas...">
+            </div>
+            
+            <div id="workshops-list">
+                <h3>Lista de Oficinas</h3>
+                <table id="workshops-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Endereço</th>
+                            <th>Cidade/Estado</th>
+                            <th>Telefone</th>
+                            <th>Horário</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="workshops-table-body">
+                        <!-- Oficinas serão carregadas aqui -->
+                    </tbody>
+                </table>
+                <div class="pagination" id="workshops-pagination">
+                    <!-- Paginação será gerada aqui -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- TAB MARCAS -->
+        <div class="tab-content" id="brands-tab">
+            <h2>Gerenciar Marcas</h2>
+            
+            <div class="form-section">
+                <h3>Adicionar Marca</h3>
+                <form id="brand-form">
+                    <div class="form-group">
+                        <label for="brand-name">Nome da Marca</label>
+                        <input type="text" id="brand-name" required>
+                    </div>
+                    <div class="actions">
+                        <button type="submit" class="btn-primary">Adicionar Marca</button>
+                        <button type="button" class="btn-warning" id="clear-brand-form">Limpar</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="search-container">
+                <input type="text" id="brand-search" class="search-input" placeholder="Buscar marcas...">
+            </div>
+            
+            <div id="brands-list">
+                <h3>Lista de Marcas</h3>
+                <table id="brands-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="brands-table-body">
+                        <!-- Marcas serão carregadas aqui -->
+                    </tbody>
+                </table>
+                <div class="pagination" id="brands-pagination">
+                    <!-- Paginação será gerada aqui -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- TAB MODELOS -->
+        <div class="tab-content" id="models-tab">
+            <h2>Gerenciar Modelos</h2>
+            
+            <div class="form-section">
+                <h3>Adicionar Modelo</h3>
+                <form id="model-form">
+                    <div class="form-group">
+                        <label for="model-name">Nome do Modelo</label>
+                        <input type="text" id="model-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="model-brand">Marca</label>
+                        <select id="model-brand" required>
+                            <!-- Marcas serão carregadas aqui -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="model-type">Tipo</label>
+                        <select id="model-type" required>
+                            <option value="carro">Carro</option>
+                            <option value="moto">Moto</option>
+                        </select>
+                    </div>
+                    <div class="actions">
+                        <button type="submit" class="btn-primary">Adicionar Modelo</button>
+                        <button type="button" class="btn-warning" id="clear-model-form">Limpar</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="search-container">
+                <input type="text" id="model-search" class="search-input" placeholder="Buscar modelos...">
+            </div>
+            
+            <div id="models-list">
+                <h3>Lista de Modelos</h3>
+                <table id="models-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Marca</th>
+                            <th>Tipo</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="models-table-body">
+                        <!-- Modelos serão carregados aqui -->
+                    </tbody>
+                </table>
+                <div class="pagination" id="models-pagination">
+                    <!-- Paginação será gerada aqui -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- TAB ANOS DE MODELO -->
+        <div class="tab-content" id="years-tab">
+            <h2>Gerenciar Anos de Modelo</h2>
+            
+            <div class="form-section">
+                <h3>Adicionar Ano de Modelo</h3>
+                <form id="year-form">
+                    <div class="form-group">
+                        <label for="year-model">Modelo</label>
+                        <select id="year-model" required>
+                            <!-- Modelos serão carregados aqui -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="year-value">Ano</label>
+                        <input type="number" id="year-value" min="1900" max="2030" required>
+                    </div>
+                    <div class="actions">
+                        <button type="submit" class="btn-primary">Adicionar Ano</button>
+                        <button type="button" class="btn-warning" id="clear-year-form">Limpar</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="search-container">
+                <input type="text" id="year-search" class="search-input" placeholder="Buscar anos...">
+            </div>
+            
+            <div id="years-list">
+                <h3>Lista de Anos de Modelo</h3>
+                <table id="years-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Modelo</th>
+                            <th>Ano</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="years-table-body">
+                        <!-- Anos serão carregados aqui -->
+                    </tbody>
+                </table>
+                <div class="pagination" id="years-pagination">
+                    <!-- Paginação será gerada aqui -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configurações
+        const API_BASE_URL = 'http://localhost:3000/api';
+        const ITEMS_PER_PAGE = 10;
+        
+        // Estado da aplicação
+        let currentTab = 'products';
+        let currentPage = {
+            products: 1,
+            workshops: 1,
+            brands: 1,
+            models: 1,
+            years: 1
+        };
+        let totalPages = {
+            products: 1,
+            workshops: 1,
+            brands: 1,
+            models: 1,
+            years: 1
+        };
+        let searchTerm = {
+            products: '',
+            workshops: '',
+            brands: '',
+            models: '',
+            years: ''
+        };
+        
+        // Elementos DOM
+        const statusIndicator = document.getElementById('status-indicator');
+        
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeTabs();
+            initializeForms();
+            loadInitialData();
+            setInterval(checkConnection, 30000);
+        });
+        
+        // Inicializar abas
+        function initializeTabs() {
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    switchTab(tabId);
+                });
+            });
+        }
+        
+        // Inicializar formulários
+        function initializeForms() {
+            // Formulário de óleo
+            document.getElementById('oil-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addOil();
+            });
+            
+            // Formulário de filtro
+            document.getElementById('filter-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addFilter();
+            });
+            
+            // Formulário de oficina
+            document.getElementById('workshop-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addWorkshop();
+            });
+            
+            // Formulário de marca
+            document.getElementById('brand-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addBrand();
+            });
+            
+            // Formulário de modelo
+            document.getElementById('model-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addModel();
+            });
+            
+            // Formulário de ano
+            document.getElementById('year-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addYear();
+            });
+            
+            // Botões de limpar formulário
+            document.getElementById('clear-oil-form').addEventListener('click', function() {
+                document.getElementById('oil-form').reset();
+            });
+            
+            document.getElementById('clear-filter-form').addEventListener('click', function() {
+                document.getElementById('filter-form').reset();
+            });
+            
+            document.getElementById('clear-workshop-form').addEventListener('click', function() {
+                document.getElementById('workshop-form').reset();
+            });
+            
+            document.getElementById('clear-brand-form').addEventListener('click', function() {
+                document.getElementById('brand-form').reset();
+            });
+            
+            document.getElementById('clear-model-form').addEventListener('click', function() {
+                document.getElementById('model-form').reset();
+            });
+            
+            document.getElementById('clear-year-form').addEventListener('click', function() {
+                document.getElementById('year-form').reset();
+            });
+            
+            // Campos de busca
+            document.getElementById('product-search').addEventListener('input', function() {
+                searchTerm.products = this.value;
+                currentPage.products = 1;
+                loadProducts();
+            });
+            
+            document.getElementById('workshop-search').addEventListener('input', function() {
+                searchTerm.workshops = this.value;
+                currentPage.workshops = 1;
+                loadWorkshops();
+            });
+            
+            document.getElementById('brand-search').addEventListener('input', function() {
+                searchTerm.brands = this.value;
+                currentPage.brands = 1;
+                loadBrands();
+            });
+            
+            document.getElementById('model-search').addEventListener('input', function() {
+                searchTerm.models = this.value;
+                currentPage.models = 1;
+                loadModels();
+            });
+            
+            document.getElementById('year-search').addEventListener('input', function() {
+                searchTerm.years = this.value;
+                currentPage.years = 1;
+                loadYears();
+            });
+        }
+        
+        // Carregar dados iniciais
+        function loadInitialData() {
+            checkConnection();
+            loadProducts();
+            loadBrands();
+        }
+        
+        // Verificar conexão com a API
+        async function checkConnection() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/test`);
+                if (response.ok) {
+                    statusIndicator.className = 'alert alert-success';
+                    statusIndicator.textContent = 'Conectado';
+                } else {
+                    throw new Error('Resposta não OK');
+                }
+            } catch (error) {
+                statusIndicator.className = 'alert alert-danger';
+                statusIndicator.textContent = 'Desconectado';
+                console.error('Erro de conexão:', error);
+            }
+        }
+        
+        // Alternar entre abas
+        function switchTab(tabId) {
+            // Atualizar aba ativa
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`.tab[data-tab="${tabId}"]`).classList.add('active');
+            
+            // Atualizar conteúdo ativo
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${tabId}-tab`).classList.add('active');
+            
+            // Atualizar estado
+            currentTab = tabId;
+            
+            // Carregar dados específicos da aba
+            switch(tabId) {
+                case 'products':
+                    loadProducts();
+                    break;
+                case 'workshops':
+                    loadWorkshops();
+                    break;
+                case 'brands':
+                    loadBrands();
+                    break;
+                case 'models':
+                    loadModels();
+                    loadBrandsForSelect('model-brand');
+                    break;
+                case 'years':
+                    loadYears();
+                    loadModelsForSelect('year-model');
+                    break;
+            }
+        }
+        
+        // ========== FUNÇÕES PARA PRODUTOS ==========
+        
+        // Adicionar óleo
+        async function addOil() {
+            const oilData = {
+                nome: document.getElementById('oil-name').value,
+                tipo: document.getElementById('oil-type').value,
+                viscosidade: document.getElementById('oil-viscosity').value,
+                especificacao: document.getElementById('oil-specification').value,
+                marca: document.getElementById('oil-brand').value,
+                preco: parseFloat(document.getElementById('oil-price').value)
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/produtos/oleo`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(oilData)
+                });
+                
+                if (response.ok) {
+                    showAlert('Óleo adicionado com sucesso!', 'success');
+                    document.getElementById('oil-form').reset();
+                    loadProducts();
+                } else {
+                    throw new Error('Erro ao adicionar óleo');
+                }
+            } catch (error) {
+                showAlert('Erro ao adicionar óleo: ' + error.message, 'danger');
+                console.error('Erro:', error);
+            }
+        }
+        
+        // Adicionar filtro
+        async function addFilter() {
+            const filterData = {
+                nome: document.getElementById('filter-name').value,
+                tipo: document.getElementById('filter-type').value,
+                compatibilidade_modelo: document.getElementById('filter-compatibility').value,
+                preco: parseFloat(document.getElementById('filter-price').value)
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/produtos/filtro`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(filterData)
+                });
+                
+                if (response.ok) {
+                    showAlert('Filtro adicionado com sucesso!', 'success');
+                    document.getElementById('filter-form').reset();
+                    loadProducts();
+                } else {
+                    throw new Error('Erro ao adicionar filtro');
+                }
+            } catch (error) {
+                showAlert('Erro ao adicionar filtro: ' + error.message, 'danger');
+                console.error('Erro:', error);
+            }
+        }
+        
+        // Carregar produtos
+        async function loadProducts() {
+            try {
+                // Buscar óleos
+                const oilsResponse = await fetch(`${API_BASE_URL}/produtos/oleo`);
+                const oils = await oilsResponse.json();
+                
+                // Buscar filtros
+                const filtersResponse = await fetch(`${API_BASE_URL}/produtos/filtro`);
+                const filters = await filtersResponse.json();
+                
+                // Combinar e filtrar produtos
+                let allProducts = [
+                    ...oils.map(oil => ({...oil, tipo_produto: 'oleo'})),
+                    ...filters.map(filter => ({...filter, tipo_produto: 'filtro'}))
+                ];
+                
+                // Aplicar filtro de busca
+                if (searchTerm.products) {
+                    const term = searchTerm.products.toLowerCase();
+                    allProducts = allProducts.filter(product => 
+                        product.nome.toLowerCase().includes(term) ||
+                        (product.marca && product.marca.toLowerCase().includes(term)) ||
+                        (product.compatibilidade_modelo && product.compatibilidade_modelo.toLowerCase().includes(term))
+                    );
+                }
+                
+                // Calcular paginação
+                totalPages.products = Math.ceil(allProducts.length / ITEMS_PER_PAGE);
+                const startIndex = (currentPage.products - 1) * ITEMS_PER_PAGE;
+                const paginatedProducts = allProducts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+                
+                // Renderizar produtos
+                renderProducts(paginatedProducts);
+                renderPagination('products', totalPages.products, currentPage.products);
+                
+            } catch (error) {
+                console.error('Erro ao carregar produtos:', error);
+                showAlert('Erro ao carregar produtos', 'danger');
+            }
+        }
+        
+        // Renderizar produtos na tabela
+        function renderProducts(products) {
+            const tbody = document.getElementById('products-table-body');
+            tbody.innerHTML = '';
+            
+            if (products.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Nenhum produto encontrado</td></tr>';
+                return;
+            }
+            
+            products.forEach(product => {
+                const row = document.createElement('tr');
+                
+                let details = '';
+                if (product.tipo_produto === 'oleo') {
+                    details = `Viscosidade: ${product.viscosidade}, Especificação: ${product.especificacao}`;
+                } else {
+                    details = `Compatibilidade: ${product.compatibilidade_modelo}`;
+                }
+                
+                // CORREÇÃO: Converter preco para número antes de usar toFixed
+                const preco = parseFloat(product.preco) || 0;
+                
+                row.innerHTML = `
+                    <td>${product.id}</td>
+                    <td>${product.nome}</td>
+                    <td>${product.tipo} (${product.tipo_produto})</td>
+                    <td>${details}</td>
+                    <td>R$ ${preco.toFixed(2)}</td>
+                    <td class="action-buttons">
+                        <button class="btn-warning action-btn" onclick="editProduct(${product.id}, '${product.tipo_produto}')">Editar</button>
+                        <button class="btn-danger action-btn" onclick="deleteProduct(${product.id}, '${product.tipo_produto}')">Excluir</button>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+        
+        // ========== FUNÇÕES PARA OFICINAS ==========
+        
+        // Adicionar oficina
+        async function addWorkshop() {
+            const workshopData = {
+                nome: document.getElementById('workshop-name').value,
+                email: document.getElementById('workshop-email').value,
+                senha: document.getElementById('workshop-password').value,
+                endereco: document.getElementById('workshop-address').value,
+                cidade: document.getElementById('workshop-city').value,
+                estado: document.getElementById('workshop-state').value,
+                cep: document.getElementById('workshop-cep').value,
+                telefone: document.getElementById('workshop-phone').value,
+                horario_abertura: document.getElementById('workshop-opening').value,
+                horario_fechamento: document.getElementById('workshop-closing').value,
+                dias_funcionamento: document.getElementById('workshop-days').value,
+                lat: parseFloat(document.getElementById('workshop-lat').value) || null,
+                lng: parseFloat(document.getElementById('workshop-lng').value) || null
+            };
+            
+            console.log('📤 Dados enviados para API:', workshopData);
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/oficina`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(workshopData)
+                });
+                
+                if (response.ok) {
+                    showAlert('Oficina adicionada com sucesso!', 'success');
+                    document.getElementById('workshop-form').reset();
+                    loadWorkshops();
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Erro ao adicionar oficina');
+                }
+            } catch (error) {
+                showAlert('Erro ao adicionar oficina: ' + error.message, 'danger');
+                console.error('Erro:', error);
+            }
+        }
+        
+        // Carregar oficinas
+        async function loadWorkshops() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/oficinas-completas`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    let workshops = data.data;
+                    
+                    // Aplicar filtro de busca
+                    if (searchTerm.workshops) {
+                        const term = searchTerm.workshops.toLowerCase();
+                        workshops = workshops.filter(workshop => 
+                            workshop.nome.toLowerCase().includes(term) ||
+                            workshop.endereco.toLowerCase().includes(term) ||
+                            workshop.cidade.toLowerCase().includes(term)
+                        );
+                    }
+                    
+                    // Calcular paginação
+                    totalPages.workshops = Math.ceil(workshops.length / ITEMS_PER_PAGE);
+                    const startIndex = (currentPage.workshops - 1) * ITEMS_PER_PAGE;
+                    const paginatedWorkshops = workshops.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+                    
+                    // Renderizar oficinas
+                    renderWorkshops(paginatedWorkshops);
+                    renderPagination('workshops', totalPages.workshops, currentPage.workshops);
+                } else {
+                    throw new Error(data.message || 'Erro ao carregar oficinas');
+                }
+            } catch (error) {
+                console.error('Erro ao carregar oficinas:', error);
+                showAlert('Erro ao carregar oficinas', 'danger');
+            }
+        }
+        
+        // Renderizar oficinas na tabela
+        function renderWorkshops(workshops) {
+            const tbody = document.getElementById('workshops-table-body');
+            tbody.innerHTML = '';
+            
+            if (workshops.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Nenhuma oficina encontrada</td></tr>';
+                return;
+            }
+            
+            workshops.forEach(workshop => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${workshop.id}</td>
+                    <td>${workshop.nome}</td>
+                    <td>${workshop.endereco}</td>
+                    <td>${workshop.cidade}/${workshop.estado}</td>
+                    <td>${workshop.telefone}</td>
+                    <td>${workshop.horario_abertura} - ${workshop.horario_fechamento}</td>
+                    <td class="action-buttons">
+                        <button class="btn-warning action-btn" onclick="editWorkshop(${workshop.id})">Editar</button>
+                        <button class="btn-danger action-btn" onclick="deleteWorkshop(${workshop.id})">Excluir</button>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+        
+        // ========== FUNÇÕES PARA MARCAS ==========
+        
+        // Adicionar marca
+        async function addBrand() {
+            const brandData = {
+                nome: document.getElementById('brand-name').value
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/marca`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(brandData)
+                });
+                
+                if (response.ok) {
+                    showAlert('Marca adicionada com sucesso!', 'success');
+                    document.getElementById('brand-form').reset();
+                    loadBrands();
+                    
+                    // Atualizar selects que usam marcas
+                    if (currentTab === 'models') {
+                        loadBrandsForSelect('model-brand');
+                    }
+                } else {
+                    throw new Error('Erro ao adicionar marca');
+                }
+            } catch (error) {
+                showAlert('Erro ao adicionar marca: ' + error.message, 'danger');
+                console.error('Erro:', error);
+            }
+        }
+        
+        // Carregar marcas
+        async function loadBrands() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/marcas`);
+                const brands = await response.json();
+                
+                // Aplicar filtro de busca
+                let filteredBrands = brands;
+                if (searchTerm.brands) {
+                    const term = searchTerm.brands.toLowerCase();
+                    filteredBrands = brands.filter(brand => 
+                        brand.nome.toLowerCase().includes(term)
+                    );
+                }
+                
+                // Calcular paginação
+                totalPages.brands = Math.ceil(filteredBrands.length / ITEMS_PER_PAGE);
+                const startIndex = (currentPage.brands - 1) * ITEMS_PER_PAGE;
+                const paginatedBrands = filteredBrands.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+                
+                // Renderizar marcas
+                renderBrands(paginatedBrands);
+                renderPagination('brands', totalPages.brands, currentPage.brands);
+                
+            } catch (error) {
+                console.error('Erro ao carregar marcas:', error);
+                showAlert('Erro ao carregar marcas', 'danger');
+            }
+        }
+        
+        // Renderizar marcas na tabela
+        function renderBrands(brands) {
+            const tbody = document.getElementById('brands-table-body');
+            tbody.innerHTML = '';
+            
+            if (brands.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align: center;">Nenhuma marca encontrada</td></tr>';
+                return;
+            }
+            
+            brands.forEach(brand => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${brand.id}</td>
+                    <td>${brand.nome}</td>
+                    <td class="action-buttons">
+                        <button class="btn-warning action-btn" onclick="editBrand(${brand.id})">Editar</button>
+                        <button class="btn-danger action-btn" onclick="deleteBrand(${brand.id})">Excluir</button>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+        
+        // Carregar marcas para select
+        async function loadBrandsForSelect(selectId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/marcas`);
+                const brands = await response.json();
+                
+                const select = document.getElementById(selectId);
+                select.innerHTML = '<option value="">Selecione uma marca</option>';
+                
+                brands.forEach(brand => {
+                    const option = document.createElement('option');
+                    option.value = brand.id;
+                    option.textContent = brand.nome;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Erro ao carregar marcas para select:', error);
+            }
+        }
+        
+        // ========== FUNÇÕES PARA MODELOS ==========
+        
+        // Adicionar modelo
+        async function addModel() {
+            const modelData = {
+                nome: document.getElementById('model-name').value,
+                marca_id: parseInt(document.getElementById('model-brand').value),
+                tipo: document.getElementById('model-type').value
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/modelo`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(modelData)
+                });
+                
+                if (response.ok) {
+                    showAlert('Modelo adicionado com sucesso!', 'success');
+                    document.getElementById('model-form').reset();
+                    loadModels();
+                    
+                    // Atualizar selects que usam modelos
+                    if (currentTab === 'years') {
+                        loadModelsForSelect('year-model');
+                    }
+                } else {
+                    throw new Error('Erro ao adicionar modelo');
+                }
+            } catch (error) {
+                showAlert('Erro ao adicionar modelo: ' + error.message, 'danger');
+                console.error('Erro:', error);
+            }
+        }
+        
+        // Carregar modelos
+        async function loadModels() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/modelos-completos`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    let models = data.data;
+                    
+                    // Aplicar filtro de busca
+                    if (searchTerm.models) {
+                        const term = searchTerm.models.toLowerCase();
+                        models = models.filter(model => 
+                            model.nome_modelo.toLowerCase().includes(term) ||
+                            model.nome_marca.toLowerCase().includes(term)
+                        );
+                    }
+                    
+                    // Calcular paginação
+                    totalPages.models = Math.ceil(models.length / ITEMS_PER_PAGE);
+                    const startIndex = (currentPage.models - 1) * ITEMS_PER_PAGE;
+                    const paginatedModels = models.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+                    
+                    // Renderizar modelos
+                    renderModels(paginatedModels);
+                    renderPagination('models', totalPages.models, currentPage.models);
+                } else {
+                    throw new Error(data.message || 'Erro ao carregar modelos');
+                }
+            } catch (error) {
+                console.error('Erro ao carregar modelos:', error);
+                showAlert('Erro ao carregar modelos', 'danger');
+            }
+        }
+        
+        // Renderizar modelos na tabela
+        function renderModels(models) {
+            const tbody = document.getElementById('models-table-body');
+            tbody.innerHTML = '';
+            
+            if (models.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Nenhum modelo encontrado</td></tr>';
+                return;
+            }
+            
+            models.forEach(model => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${model.id_modelo}</td>
+                    <td>${model.nome_modelo}</td>
+                    <td>${model.nome_marca}</td>
+                    <td>${model.tipo}</td>
+                    <td class="action-buttons">
+                        <button class="btn-warning action-btn" onclick="editModel(${model.id_modelo})">Editar</button>
+                        <button class="btn-danger action-btn" onclick="deleteModel(${model.id_modelo})">Excluir</button>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+        
+        // Carregar modelos para select
+        async function loadModelsForSelect(selectId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/modelos-completos`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const models = data.data;
+                    const select = document.getElementById(selectId);
+                    select.innerHTML = '<option value="">Selecione um modelo</option>';
+                    
+                    models.forEach(model => {
+                        const option = document.createElement('option');
+                        option.value = model.id_modelo;
+                        option.textContent = `${model.nome_marca} - ${model.nome_modelo} (${model.tipo})`;
+                        select.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Erro ao carregar modelos para select:', error);
+            }
+        }
+        
+        // ========== FUNÇÕES PARA ANOS DE MODELO ==========
+        
+        // Adicionar ano
+        async function addYear() {
+            const yearData = {
+                modelo_id: parseInt(document.getElementById('year-model').value),
+                ano: parseInt(document.getElementById('year-value').value)
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/ano-modelo`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(yearData)
+                });
+                
+                if (response.ok) {
+                    showAlert('Ano adicionado com sucesso!', 'success');
+                    document.getElementById('year-form').reset();
+                    loadYears();
+                } else {
+                    throw new Error('Erro ao adicionar ano');
+                }
+            } catch (error) {
+                showAlert('Erro ao adicionar ano: ' + error.message, 'danger');
+                console.error('Erro:', error);
+            }
+        }
+        
+        // Carregar anos
+        async function loadYears() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/anos-completos`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    let years = data.data;
+                    
+                    // Aplicar filtro de busca
+                    if (searchTerm.years) {
+                        const term = searchTerm.years.toLowerCase();
+                        years = years.filter(year => 
+                            year.nome_marca.toLowerCase().includes(term) ||
+                            year.nome_modelo.toLowerCase().includes(term) ||
+                            year.ano.toString().includes(term)
+                        );
+                    }
+                    
+                    // Calcular paginação
+                    totalPages.years = Math.ceil(years.length / ITEMS_PER_PAGE);
+                    const startIndex = (currentPage.years - 1) * ITEMS_PER_PAGE;
+                    const paginatedYears = years.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+                    
+                    // Renderizar anos
+                    renderYears(paginatedYears);
+                    renderPagination('years', totalPages.years, currentPage.years);
+                } else {
+                    throw new Error(data.message || 'Erro ao carregar anos');
+                }
+            } catch (error) {
+                console.error('Erro ao carregar anos:', error);
+                showAlert('Erro ao carregar anos', 'danger');
+            }
+        }
+        
+        // Renderizar anos na tabela
+        function renderYears(years) {
+            const tbody = document.getElementById('years-table-body');
+            tbody.innerHTML = '';
+            
+            if (years.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Nenhum ano encontrado</td></tr>';
+                return;
+            }
+            
+            years.forEach(year => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${year.id_ano}</td>
+                    <td>${year.nome_marca} - ${year.nome_modelo}</td>
+                    <td>${year.ano}</td>
+                    <td class="action-buttons">
+                        <button class="btn-warning action-btn" onclick="editYear(${year.id_ano})">Editar</button>
+                        <button class="btn-danger action-btn" onclick="deleteYear(${year.id_ano})">Excluir</button>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+        
+        // ========== FUNÇÕES AUXILIARES ==========
+        
+        // Mostrar alerta
+        function showAlert(message, type) {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            
+            // Inserir no início do container
+            const container = document.querySelector('.container');
+            container.insertBefore(alert, container.firstChild);
+            
+            // Remover após 5 segundos
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+        
+        // Renderizar paginação
+        function renderPagination(type, totalPages, currentPage) {
+            const paginationContainer = document.getElementById(`${type}-pagination`);
+            paginationContainer.innerHTML = '';
+            
+            if (totalPages <= 1) return;
+            
+            // Botão anterior
+            const prevButton = document.createElement('button');
+            prevButton.className = 'page-btn';
+            prevButton.textContent = '«';
+            prevButton.disabled = currentPage === 1;
+            prevButton.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage[type]--;
+                    loadDataByType(type);
+                }
+            });
+            paginationContainer.appendChild(prevButton);
+            
+            // Páginas
+            for (let i = 1; i <= totalPages; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+                pageButton.textContent = i;
+                pageButton.addEventListener('click', () => {
+                    currentPage[type] = i;
+                    loadDataByType(type);
+                });
+                paginationContainer.appendChild(pageButton);
+            }
+            
+            // Botão próximo
+            const nextButton = document.createElement('button');
+            nextButton.className = 'page-btn';
+            nextButton.textContent = '»';
+            nextButton.disabled = currentPage === totalPages;
+            nextButton.addEventListener('click', () => {
+                if (currentPage < totalPages) {
+                    currentPage[type]++;
+                    loadDataByType(type);
+                }
+            });
+            paginationContainer.appendChild(nextButton);
+        }
+        
+        // Carregar dados por tipo
+        function loadDataByType(type) {
+            switch(type) {
+                case 'products':
+                    loadProducts();
+                    break;
+                case 'workshops':
+                    loadWorkshops();
+                    break;
+                case 'brands':
+                    loadBrands();
+                    break;
+                case 'models':
+                    loadModels();
+                    break;
+                case 'years':
+                    loadYears();
+                    break;
+            }
+        }
+        
+        // Funções de edição (simuladas)
+        function editProduct(id, type) {
+            showAlert(`Editando produto ${id} do tipo ${type}`, 'warning');
+        }
+        
+        function editWorkshop(id) {
+            showAlert(`Editando oficina ${id}`, 'warning');
+        }
+        
+        function editBrand(id) {
+            showAlert(`Editando marca ${id}`, 'warning');
+        }
+        
+        function editModel(id) {
+            showAlert(`Editando modelo ${id}`, 'warning');
+        }
+        
+        function editYear(id) {
+            showAlert(`Editando ano ${id}`, 'warning');
+        }
+        
+        // Funções de exclusão (simuladas)
+        function deleteProduct(id, type) {
+            if (confirm(`Tem certeza que deseja excluir o produto ${id}?`)) {
+                showAlert(`Produto ${id} excluído`, 'success');
+                loadDataByType('products');
+            }
+        }
+        
+        function deleteWorkshop(id) {
+            if (confirm(`Tem certeza que deseja excluir a oficina ${id}?`)) {
+                showAlert(`Oficina ${id} excluída`, 'success');
+                loadDataByType('workshops');
+            }
+        }
+        
+        function deleteBrand(id) {
+            if (confirm(`Tem certeza que deseja excluir a marca ${id}?`)) {
+                showAlert(`Marca ${id} excluída`, 'success');
+                loadDataByType('brands');
+            }
+        }
+        
+        function deleteModel(id) {
+            if (confirm(`Tem certeza que deseja excluir o modelo ${id}?`)) {
+                showAlert(`Modelo ${id} excluído`, 'success');
+                loadDataByType('models');
+            }
+        }
+        
+        function deleteYear(id) {
+            if (confirm(`Tem certeza que deseja excluir o ano ${id}?`)) {
+                showAlert(`Ano ${id} excluído`, 'success');
+                loadDataByType('years');
+            }
+        }
+    </script>
+</body>
+</html>

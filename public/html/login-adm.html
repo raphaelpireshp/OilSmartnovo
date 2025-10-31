@@ -5,108 +5,296 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - OilSmart Admin</title>
     <style>
+        /* ===== VARIÁVEIS GLOBAIS ===== */
+        :root {
+            /* Cores principais - Esquema dourado/azul */
+            --primary-color: #213f57;
+            --primary-dark: #1a3246;
+            --primary-light: #2a4f6d;
+            --secondary-color: #b49434;
+            --secondary-dark: #9a7d2c;
+            --secondary-light: #d4b15f;
+            --accent-color: #ffd700;
+            --accent-gold: #ffd700;
+            
+            /* Cores de texto */
+            --text-color: #2d3748;
+            --text-light: #718096;
+            --text-lighter: #a0aec0;
+            
+            /* Cores de fundo */
+            --bg-color: #ffffff;
+            --bg-light: #f7fafc;
+            --bg-lighter: #edf2f7;
+            
+            /* Cores de borda */
+            --border-color: #e2e8f0;
+            --border-light: #f1f5f9;
+            
+            /* Cores de estado */
+            --success-color: #48bb78;
+            --success-light: #c6f6d5;
+            --warning-color: #ed8936;
+            --warning-light: #fed7d7;
+            --danger-color: #f56565;
+            --danger-light: #fed7d7;
+            --info-color: #4299e1;
+            --info-light: #bee3f8;
+            
+            /* Efeitos e transições */
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-fast: all 0.2s ease;
+            --transition-slow: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            
+            /* Sombras */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --shadow-gold: 0 8px 25px rgba(180, 148, 52, 0.3);
+            
+            /* Bordas */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-full: 50%;
+            
+            /* Espaçamentos */
+            --space-xs: 0.5rem;
+            --space-sm: 1rem;
+            --space-md: 1.5rem;
+            --space-lg: 2rem;
+            --space-xl: 3rem;
+            --space-2xl: 4rem;
+        }
+
+        /* ===== MODO ESCURO ===== */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary-color: #1e2a3a;
+                --primary-dark: #151f2a;
+                --primary-light: #2a3a4d;
+                --secondary-color: #d4af37;
+                --secondary-dark: #b8941f;
+                --secondary-light: #e6c86d;
+                --accent-color: #ffd700;
+                
+                --text-color: #e2e8f0;
+                --text-light: #cbd5e0;
+                --text-lighter: #a0aec0;
+                
+                --bg-color: #0f1419;
+                --bg-light: #1a202c;
+                --bg-lighter: #2d3748;
+                
+                --border-color: #374151;
+                --border-light: #1f2937;
+            }
+        }
+
+        /* ===== RESET E ESTILOS BASE ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
         body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #213f57, #384d5e);
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--text-color);
+            line-height: 1.7;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: var(--space-md);
+            transition: var(--transition-slow);
+            position: relative;
+            overflow-x: hidden;
         }
 
+        /* Efeito de partículas no fundo */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(180, 148, 52, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(33, 63, 87, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(255, 215, 0, 0.05) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        /* ===== CONTAINER DE LOGIN ===== */
         .login-container {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            background: var(--bg-color);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-xl);
             overflow: hidden;
             width: 100%;
-            max-width: 400px;
+            max-width: 440px;
+            position: relative;
+            z-index: 1;
+            transition: var(--transition);
+            border: 1px solid var(--border-color);
+            animation: fadeInUp 0.8s ease-out;
         }
 
+        .login-container:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl), 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        /* ===== HEADER DO LOGIN ===== */
         .login-header {
-            background: #213f57;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
             color: white;
             text-align: center;
-            padding: 30px 20px;
+            padding: var(--space-xl) var(--space-md);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="rgba(255,255,255,0.03)" points="0,1000 1000,0 1000,1000"/></svg>');
+            background-size: cover;
         }
 
         .login-header h1 {
-            font-size: 24px;
-            margin-bottom: 10px;
+            font-size: 1.8rem;
+            margin-bottom: var(--space-xs);
+            position: relative;
+            z-index: 1;
+            animation: fadeInUp 0.8s ease;
         }
 
         .login-header p {
-            opacity: 0.8;
-            font-size: 14px;
+            opacity: 0.9;
+            font-size: 0.95rem;
+            position: relative;
+            z-index: 1;
+            animation: fadeInUp 0.8s ease 0.2s both;
         }
 
+        /* ===== FORMULÁRIO ===== */
         .login-form {
-            padding: 30px;
+            padding: var(--space-xl);
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: var(--space-lg);
+            position: relative;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-            color: #333;
+            margin-bottom: var(--space-xs);
+            font-weight: 600;
+            color: var(--text-color);
+            font-size: 0.95rem;
+            transition: var(--transition-fast);
         }
 
         .form-group input {
             width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: all 0.3s ease;
+            padding: 14px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-family: inherit;
+            background: var(--bg-color);
+            color: var(--text-color);
+            transition: var(--transition);
+            position: relative;
         }
 
         .form-group input:focus {
             outline: none;
-            border-color: #b49434;
-            box-shadow: 0 0 0 3px rgba(180, 148, 52, 0.1);
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(180, 148, 52, 0.15);
+            transform: translateY(-2px);
         }
 
+        .form-group input:valid {
+            border-color: var(--success-color);
+        }
+
+        .form-group input:invalid:not(:focus):not(:placeholder-shown) {
+            border-color: var(--danger-color);
+        }
+
+        /* ===== BOTÃO DE LOGIN ===== */
         .login-btn {
             width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #b49434, #d4b15f);
+            padding: 14px;
+            background: linear-gradient(135deg, var(--secondary-color), var(--accent-gold));
             color: white;
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.5px;
+            box-shadow: var(--shadow-gold);
         }
 
-        .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(180, 148, 52, 0.3);
+        .login-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: var(--transition-slow);
+        }
+
+        .login-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(180, 148, 52, 0.4);
+        }
+
+        .login-btn:hover:not(:disabled)::before {
+            left: 100%;
+        }
+
+        .login-btn:active:not(:disabled) {
+            transform: translateY(-1px);
         }
 
         .login-btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
+            box-shadow: none;
         }
 
+        /* ===== ANIMAÇÃO DE CARREGAMENTO ===== */
         .loading {
             display: inline-block;
             width: 20px;
             height: 20px;
             border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
+            border-radius: var(--radius-full);
             border-top-color: #fff;
             animation: spin 1s ease-in-out infinite;
         }
@@ -115,34 +303,161 @@
             to { transform: rotate(360deg); }
         }
 
+        /* ===== MENSAGEM DE ERRO ===== */
         .error-message {
-            background: #fee;
-            border: 1px solid #fcc;
-            color: #c33;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 15px;
-            font-size: 14px;
+            background: var(--danger-light);
+            border: 1px solid var(--danger-color);
+            color: var(--danger-color);
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-lg);
+            font-size: 0.9rem;
             display: none;
+            animation: shake 0.5s ease;
+            position: relative;
         }
 
+        .error-message::before {
+            content: '⚠️';
+            margin-right: var(--space-xs);
+        }
+
+        /* ===== LINK DE VOLTAR ===== */
         .back-link {
             text-align: center;
-            margin-top: 20px;
+            margin-top: var(--space-lg);
         }
 
         .back-link a {
-            color: #213f57;
+            color: var(--primary-color);
             text-decoration: none;
-            font-size: 14px;
+            font-size: 0.9rem;
+            transition: var(--transition-fast);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-xs);
         }
 
         .back-link a:hover {
-            text-decoration: underline;
+            color: var(--secondary-color);
+            text-decoration: none;
+            transform: translateX(-3px);
+        }
+
+        /* ===== ANIMAÇÕES ===== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* ===== RESPONSIVIDADE ===== */
+        @media (max-width: 768px) {
+            .login-container {
+                max-width: 100%;
+                margin: 0 var(--space-sm);
+            }
+            
+            .login-form {
+                padding: var(--space-lg);
+            }
+            
+            .login-header {
+                padding: var(--space-lg) var(--space-md);
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: var(--space-sm);
+            }
+            
+            .login-form {
+                padding: var(--space-md);
+            }
+            
+            .form-group {
+                margin-bottom: var(--space-md);
+            }
+        }
+
+        /* ===== SCROLLBAR PERSONALIZADA ===== */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-light);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--secondary-color), var(--accent-gold));
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, var(--secondary-dark), var(--accent-gold));
+        }
+
+        /* ===== MELHORIAS DE ACESSIBILIDADE ===== */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Foco visível para teclado */
+        button:focus-visible,
+        a:focus-visible,
+        input:focus-visible {
+            outline: 2px solid var(--accent-gold);
+            outline-offset: 2px;
+        }
+
+        /* ===== PARTÍCULAS ANIMADAS ===== */
+        .particles-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: var(--radius-full);
+            background: rgba(180, 148, 52, 0.3);
+            animation: float 6s infinite ease-in-out;
         }
     </style>
 </head>
 <body>
+    <div class="particles-container" id="particlesContainer"></div>
+    
     <div class="login-container">
         <div class="login-header">
             <h1>OilSmart Admin</h1>
@@ -154,12 +469,12 @@
             
             <div class="form-group">
                 <label for="email">E-mail</label>
-                <input type="email" id="email" placeholder="seu@email.com" required>
+                <input type="email" id="email" placeholder="seu@email.com" required autocomplete="email">
             </div>
             
             <div class="form-group">
                 <label for="senha">Senha</label>
-                <input type="password" id="senha" placeholder="Sua senha" required>
+                <input type="password" id="senha" placeholder="Sua senha" required autocomplete="current-password">
             </div>
             
             <button class="login-btn" onclick="login()" id="loginBtn">
@@ -167,35 +482,81 @@
             </button>
             
             <div class="back-link">
-                <a href="/">← Voltar para o site principal</a>
+                <a href="/">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+                    </svg>
+                    Voltar para o site principal
+                </a>
             </div>
         </div>
     </div>
 
     <script>
+        // Elementos DOM
+        const emailInput = document.getElementById('email');
+        const senhaInput = document.getElementById('senha');
+        const loginBtn = document.getElementById('loginBtn');
+        const errorDiv = document.getElementById('errorMessage');
+        const particlesContainer = document.getElementById('particlesContainer');
+
+        // Função para exibir mensagens de erro
         function showError(message) {
-            const errorDiv = document.getElementById('errorMessage');
             errorDiv.textContent = message;
             errorDiv.style.display = 'block';
+            
+            // Adicionar classe de animação
+            errorDiv.classList.add('shake');
+            setTimeout(() => {
+                errorDiv.classList.remove('shake');
+            }, 500);
         }
 
+        // Função para ocultar mensagens de erro
         function hideError() {
-            document.getElementById('errorMessage').style.display = 'none';
+            errorDiv.style.display = 'none';
         }
 
-        async function login() {
-            const email = document.getElementById('email').value;
-            const senha = document.getElementById('senha').value;
-            const loginBtn = document.getElementById('loginBtn');
-
+        // Função para validar formulário
+        function validateForm(email, senha) {
             if (!email || !senha) {
                 showError('Por favor, preencha todos os campos');
+                return false;
+            }
+            
+            // Validação básica de email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showError('Por favor, insira um e-mail válido');
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Função para atualizar estado do botão
+        function updateButtonState(loading = false) {
+            if (loading) {
+                loginBtn.innerHTML = '<div class="loading"></div>';
+                loginBtn.disabled = true;
+            } else {
+                loginBtn.innerHTML = 'Entrar';
+                loginBtn.disabled = false;
+            }
+        }
+
+        // Função principal de login
+        async function login() {
+            const email = emailInput.value.trim();
+            const senha = senhaInput.value;
+
+            // Validar formulário
+            if (!validateForm(email, senha)) {
                 return;
             }
 
             hideError();
-            loginBtn.innerHTML = '<div class="loading"></div>';
-            loginBtn.disabled = true;
+            updateButtonState(true);
 
             try {
                 const response = await fetch('/api/admin/login', {
@@ -210,18 +571,64 @@
                 const data = await response.json();
 
                 if (response.ok && data.success) {
+                    // Feedback visual de sucesso
+                    loginBtn.style.background = 'linear-gradient(135deg, var(--success-color), var(--success-light))';
+                    loginBtn.innerHTML = '✓ Login realizado com sucesso!';
                     
-                    // Redirecionar para o painel administrativo
-                    window.location.href = '/admindex.html';
+                    // Redirecionar após breve delay para feedback visual
+                    setTimeout(() => {
+                        window.location.href = '/admindex.html';
+                    }, 1000);
                 } else {
-                    showError(data.message || 'Erro ao fazer login');
+                    showError(data.message || 'Erro ao fazer login. Verifique suas credenciais.');
+                    // Efeito visual de erro nos campos
+                    emailInput.style.borderColor = 'var(--danger-color)';
+                    senhaInput.style.borderColor = 'var(--danger-color)';
+                    
+                    setTimeout(() => {
+                        emailInput.style.borderColor = '';
+                        senhaInput.style.borderColor = '';
+                    }, 2000);
                 }
             } catch (error) {
                 console.error('Erro:', error);
-                showError('Erro de conexão. Tente novamente.');
+                showError('Erro de conexão. Verifique sua internet e tente novamente.');
             } finally {
-                loginBtn.innerHTML = 'Entrar';
-                loginBtn.disabled = false;
+                updateButtonState(false);
+            }
+        }
+
+        // Função para criar partículas animadas
+        function createParticles() {
+            // Só criar partículas em telas maiores
+            if (window.innerWidth <= 768) return;
+            
+            const particleCount = 20;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                // Tamanho aleatório
+                const size = Math.random() * 6 + 2;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // Posição aleatória
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                
+                // Opacidade aleatória
+                const opacity = Math.random() * 0.4 + 0.1;
+                particle.style.background = `rgba(180, 148, 52, ${opacity})`;
+                
+                // Delay e duração da animação aleatórios
+                const delay = Math.random() * 5;
+                const duration = Math.random() * 10 + 10;
+                particle.style.animationDelay = `${delay}s`;
+                particle.style.animationDuration = `${duration}s`;
+                
+                particlesContainer.appendChild(particle);
             }
         }
 
@@ -232,19 +639,46 @@
             }
         });
 
-        // Verificar se já está logado
+        // Validação em tempo real
+        emailInput.addEventListener('input', hideError);
+        senhaInput.addEventListener('input', hideError);
+
+        // Verificar se já está logado ao carregar a página
         document.addEventListener('DOMContentLoaded', async function() {
             try {
                 const response = await fetch('/api/admin/check-auth', {
                     credentials: 'include'
                 });
-                const data = await response.json();
                 
-                if (data.success) {
-                    window.location.href = '/admindex.html';
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        // Usuário já está logado, redirecionar
+                        window.location.href = '/admindex.html';
+                    }
                 }
             } catch (error) {
-                // Usuário não está logado, continuar na página de login
+                // Usuário não está logado ou erro na verificação
+                console.log('Usuário não autenticado');
+            }
+            
+            // Criar partículas
+            createParticles();
+            
+            // Focar no campo de email após carregamento
+            setTimeout(() => {
+                emailInput.focus();
+            }, 500);
+        });
+
+        // Recalcular partículas ao redimensionar a janela
+        window.addEventListener('resize', function() {
+            // Limpar partículas existentes
+            particlesContainer.innerHTML = '';
+            
+            // Recriar partículas se a tela for grande o suficiente
+            if (window.innerWidth > 768) {
+                createParticles();
             }
         });
     </script>

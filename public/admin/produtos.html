@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produtos - OilSmart</title>
+    <link rel="stylesheet" href="/admincss/index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Layout Principal -->
+    <div class="dashboard-container">
+        <!-- Sidebar (igual às outras páginas) -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-oil-can"></i>
+                    <span>OilSmart</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="menu-item">
+                    <a href="dashboard.html">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="oficinas.html">
+                        <i class="fas fa-wrench"></i>
+                        <span>Oficinas</span>
+                    </a>
+                </li>
+                <li class="menu-item active">
+                    <a href="produtos.html">
+                        <i class="fas fa-oil-can"></i>
+                        <span>Produtos</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="mensalidades.html">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span>Mensalidades</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="oficinas-admin.html">
+                        <i class="fas fa-cog"></i>
+                        <span>Admin Oficinas</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <div class="user-name">Administrador</div>
+                        <div class="user-role">Supervisor</div>
+                    </div>
+                </div>
+                <button class="btn-logout" id="btnLogout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header do Conteúdo -->
+            <header class="content-header">
+                <div class="header-title">
+                    <h1>Gerenciamento de Produtos</h1>
+                    <p>Gerencie óleos e filtros do sistema</p>
+                </div>
+                <div class="header-actions">
+                    <div class="header-buttons">
+                        <button class="btn btn-primary" id="btnNovoProduto">
+                            <i class="fas fa-plus"></i>
+                            Novo Produto
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Seção de Óleos -->
+            <section class="produtos-section">
+                <div class="section-header">
+                    <h2>Óleos</h2>
+                    <div class="section-actions">
+                        <button class="btn btn-primary" id="btnNovoOleo">
+                            <i class="fas fa-plus"></i>
+                            Novo Óleo
+                        </button>
+                    </div>
+                </div>
+                <div class="produtos-grid" id="oleosGrid">
+                    <div class="loading-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span>Carregando óleos...</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Seção de Filtros -->
+            <section class="produtos-section">
+                <div class="section-header">
+                    <h2>Filtros</h2>
+                    <div class="section-actions">
+                        <button class="btn btn-primary" id="btnNovoFiltro">
+                            <i class="fas fa-plus"></i>
+                            Novo Filtro
+                        </button>
+                    </div>
+                </div>
+                <div class="produtos-grid" id="filtrosGrid">
+                    <div class="loading-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span>Carregando filtros...</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal Novo Óleo -->
+    <div id="modalNovoOleo" class="modal hidden">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>Novo Óleo</h3>
+                <button type="button" class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formNovoOleo" class="oficina-form">
+                    <input type="hidden" id="oleoId">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="nomeOleo" class="required">Nome do Óleo</label>
+                            <input type="text" id="nomeOleo" name="nome" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="tipoOleo" class="required">Tipo</label>
+                            <select id="tipoOleo" name="tipo" required>
+                                <option value="carro">Carro</option>
+                                <option value="moto">Moto</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="viscosidadeOleo" class="required">Viscosidade</label>
+                            <input type="text" id="viscosidadeOleo" name="viscosidade" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="especificacaoOleo">Especificação</label>
+                            <input type="text" id="especificacaoOleo" name="especificacao">
+                        </div>
+                        <div class="form-group">
+                            <label for="marcaOleo">Marca</label>
+                            <input type="text" id="marcaOleo" name="marca">
+                        </div>
+                        <div class="form-group">
+                            <label for="precoOleo" class="required">Preço</label>
+                            <input type="number" id="precoOleo" name="preco" step="0.01" min="0" required>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="produtosManager.closeModal('modalNovoOleo')">
+                    Cancelar
+                </button>
+                <button type="submit" form="formNovoOleo" class="btn btn-primary">
+                    <i class="fas fa-save"></i>
+                    Salvar Óleo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Novo Filtro -->
+    <div id="modalNovoFiltro" class="modal hidden">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>Novo Filtro</h3>
+                <button type="button" class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formNovoFiltro" class="oficina-form">
+                    <input type="hidden" id="filtroId">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="nomeFiltro" class="required">Nome do Filtro</label>
+                            <input type="text" id="nomeFiltro" name="nome" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="tipoFiltro" class="required">Tipo</label>
+                            <select id="tipoFiltro" name="tipo" required>
+                                <option value="carro">Carro</option>
+                                <option value="moto">Moto</option>
+                            </select>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="compatibilidadeFiltro">Compatibilidade</label>
+                            <textarea id="compatibilidadeFiltro" name="compatibilidade_modelo" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="precoFiltro" class="required">Preço</label>
+                            <input type="number" id="precoFiltro" name="preco" step="0.01" min="0" required>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="produtosManager.closeModal('modalNovoFiltro')">
+                    Cancelar
+                </button>
+                <button type="submit" form="formNovoFiltro" class="btn btn-primary">
+                    <i class="fas fa-save"></i>
+                    Salvar Filtro
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div class="notification-container" id="notificationContainer"></div>
+
+    <!-- JavaScript -->
+    <script src="/adminjs/admin-consolidated.js"></script>
+</body>
+</html>

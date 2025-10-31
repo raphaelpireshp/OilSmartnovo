@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oficinas - OilSmart</title>
+    <link rel="stylesheet" href="/admincss/index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Layout Principal -->
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-oil-can"></i>
+                    <span>OilSmart</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="menu-item">
+                    <a href="dashboard.html">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item active">
+                    <a href="oficinas.html">
+                        <i class="fas fa-wrench"></i>
+                        <span>Oficinas</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="mensalidades.html">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span>Mensalidades</span>
+                    </a>
+                </li>                
+                <li class="menu-item">
+                    <a href="#">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Relatórios</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <div class="user-name">Administrador</div>
+                        <div class="user-role">Supervisor</div>
+                    </div>
+                </div>
+                <button class="btn-logout" id="btnLogout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header do Conteúdo -->
+            <header class="content-header">
+                <div class="header-title">
+                    <h1>Gerenciamento de Oficinas</h1>
+                    <p>Gerencie todas as oficinas parceiras do sistema</p>
+                </div>
+                <div class="header-actions">
+                    <div class="header-buttons">
+                        <button class="btn btn-primary" id="btnNovaOficina">
+                            <i class="fas fa-plus"></i>
+                            Cadastrar Nova Oficina
+                        </button>
+                        <button class="btn btn-secondary" id="btnRefresh">
+                            <i class="fas fa-sync-alt"></i>
+                            Atualizar
+                        </button>
+                        <button class="btn btn-secondary" id="btnExport">
+                            <i class="fas fa-download"></i>
+                            Exportar
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Estatísticas do Dashboard -->
+            <section class="dashboard-stats">
+                <div class="stat-card">
+                    <div class="stat-icon total-oficinas">
+                        <i class="fas fa-wrench"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalOficinas">0</h3>
+                        <p>Total de Oficinas</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon oficinas-ativas">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="oficinasAtivas">0</h3>
+                        <p>Oficinas Ativas</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon cidades-atendidas">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalCidades">0</h3>
+                        <p>Cidades Atendidas</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon capacidade-total">
+                        <i class="fas fa-car"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="capacidadeTotal">0</h3>
+                        <p>Capacidade Total</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Buscar por nome, CNPJ, cidade, responsável...">
+                    <button type="button" class="btn-search-clear" id="btnSearchClear">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="filters">
+                    <div class="filter-group">
+                        <div class="filter-label">Status</div>
+                        <select id="filterStatus" class="filter-select">
+                            <option value="">Todos os status</option>
+                            <option value="ativo">Ativas</option>
+                            <option value="inativo">Inativas</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <div class="filter-label">Cidade</div>
+                        <select id="filterCidade" class="filter-select">
+                            <option value="">Todas as cidades</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="toolbar-actions">
+                    <button type="button" class="btn btn-secondary" id="btnLimparFiltros">
+                        <i class="fas fa-eraser"></i>
+                        Limpar Filtros
+                    </button>
+                </div>
+            </div>
+
+            <!-- Seção de Oficinas -->
+            <section class="oficinas-section">
+                <div class="section-header">
+                    <h2>Oficinas Cadastradas</h2>
+                    <div class="table-info">
+                        <span id="tableInfo">Mostrando 0 de 0 oficinas</span>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <!-- Tabela de Oficinas -->
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th data-sort="nome">
+                                        <div class="th-content">
+                                            Nome da Oficina
+                                            <i class="fas fa-sort"></i>
+                                        </div>
+                                    </th>
+                                    <th data-sort="cnpj">
+                                        <div class="th-content">
+                                            CNPJ
+                                            <i class="fas fa-sort"></i>
+                                        </div>
+                                    </th>
+                                    <th data-sort="cidade">
+                                        <div class="th-content">
+                                            Cidade
+                                            <i class="fas fa-sort"></i>
+                                        </div>
+                                    </th>
+                                    <th data-sort="responsavel">
+                                        <div class="th-content">
+                                            Responsável
+                                            <i class="fas fa-sort"></i>
+                                        </div>
+                                    </th>
+                                    <th data-sort="telefone">
+                                        <div class="th-content">
+                                            Contato
+                                            <i class="fas fa-sort"></i>
+                                        </div>
+                                    </th>
+                                    <th data-sort="status">
+                                        <div class="th-content">
+                                            Status
+                                            <i class="fas fa-sort"></i>
+                                        </div>
+                                    </th>
+                                    <th width="120">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabela-oficinas">
+                                <!-- Dados serão carregados dinamicamente pelo JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Paginação -->
+                    <div class="pagination-container">
+                        <div class="pagination-info">
+                            <span id="paginationInfo">Página 1 de 1</span>
+                        </div>
+                        <div class="pagination-controls">
+                            <div class="page-size-group">
+                                <label class="page-size-label" for="pageSizeSelect">Itens por página:</label>
+                                <select id="pageSizeSelect" class="page-size-select">
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                </select>
+                            </div>
+                            <button type="button" class="btn-pagination" id="btnFirstPage" disabled>
+                                <i class="fas fa-angle-double-left"></i>
+                            </button>
+                            <button type="button" class="btn-pagination" id="btnPrevPage" disabled>
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <div class="page-numbers" id="pageNumbers">
+                                <button type="button" class="btn-pagination active">1</button>
+                            </div>
+                            <button type="button" class="btn-pagination" id="btnNextPage" disabled>
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                            <button type="button" class="btn-pagination" id="btnLastPage" disabled>
+                                <i class="fas fa-angle-double-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal de Detalhes -->
+    <div id="detalhesModal" class="modal hidden">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3>Detalhes da Oficina</h3>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="detalhes-grid">
+                    <div class="detalhe-item">
+                        <label>Nome:</label>
+                        <span id="detalheNome">-</span>
+                    </div>
+                    <div class="detalhe-item">
+                        <label>CNPJ:</label>
+                        <span id="detalheCnpj">-</span>
+                    </div>
+                    <div class="detalhe-item">
+                        <label>Responsável:</label>
+                        <span id="detalheResponsavel">-</span>
+                    </div>
+                    <div class="detalhe-item">
+                        <label>Telefone:</label>
+                        <span id="detalheTelefone">-</span>
+                    </div>
+                    <div class="detalhe-item">
+                        <label>Email:</label>
+                        <span id="detalheEmail">-</span>
+                    </div>
+                    <div class="detalhe-item">
+                        <label>Status:</label>
+                        <span id="detalheStatus">-</span>
+                    </div>
+                    <div class="detalhe-item">
+                        <label>Capacidade:</label>
+                        <span id="detalheCapacidade">-</span>
+                    </div>
+                    <div class="detalhe-item full-width">
+                        <label>Serviços:</label>
+                        <div class="servicos-list" id="detalheServicos">
+                            <!-- Serviços serão inseridos aqui -->
+                        </div>
+                    </div>
+                    <div class="detalhe-item full-width">
+                        <label>Endereço:</label>
+                        <span id="detalheEndereco">-</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="btnFecharDetalhes">
+                    Fechar
+                </button>
+                <button class="btn btn-primary" id="btnEditarDetalhes">
+                    <i class="fas fa-edit"></i>
+                    Editar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Edição -->
+<div id="editarModal" class="modal hidden">
+    <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-header">
+            <h3>Editar Oficina</h3>
+            <button class="close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="formEditarOficina" class="form-vertical">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="editarNome" class="required">Nome da Oficina</label>
+                        <input type="text" id="editarNome" name="nome" required class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="editarCnpj">CNPJ</label>
+                        <input type="text" id="editarCnpj" name="cnpj" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="editarResponsavel" class="required">Responsável</label>
+                        <input type="text" id="editarResponsavel" name="responsavel" required class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="editarTelefone" class="required">Telefone</label>
+                        <input type="text" id="editarTelefone" name="telefone" required class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="editarEmail">Email</label>
+                        <input type="email" id="editarEmail" name="email" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="editarEmailResponsavel">Email do Responsável</label>
+                        <input type="email" id="editarEmailResponsavel" name="emailResponsavel" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="editarCapacidade">Capacidade</label>
+                        <input type="number" id="editarCapacidade" name="capacidade" min="1" max="100" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="editarStatus">Status</label>
+                        <select id="editarStatus" name="status" class="form-control">
+                            <option value="ativo">Ativa</option>
+                            <option value="inativo">Inativa</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="editarCep">CEP</label>
+                        <input type="text" id="editarCep" name="cep" class="form-control">
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="editarLogradouro">Logradouro</label>
+                        <input type="text" id="editarLogradouro" name="logradouro" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="editarNumero">Número</label>
+                        <input type="text" id="editarNumero" name="numero" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="editarComplemento">Complemento</label>
+                        <input type="text" id="editarComplemento" name="complemento" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="editarBairro">Bairro</label>
+                        <input type="text" id="editarBairro" name="bairro" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="editarCidade">Cidade</label>
+                        <input type="text" id="editarCidade" name="cidade" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="editarEstado">Estado</label>
+                        <select id="editarEstado" name="estado" class="form-control">
+                            <option value="">Selecione</option>
+                            <option value="AC">Acre</option>
+                            <option value="AL">Alagoas</option>
+                            <option value="AP">Amapá</option>
+                            <option value="AM">Amazonas</option>
+                            <option value="BA">Bahia</option>
+                            <option value="CE">Ceará</option>
+                            <option value="DF">Distrito Federal</option>
+                            <option value="ES">Espírito Santo</option>
+                            <option value="GO">Goiás</option>
+                            <option value="MA">Maranhão</option>
+                            <option value="MT">Mato Grosso</option>
+                            <option value="MS">Mato Grosso do Sul</option>
+                            <option value="MG">Minas Gerais</option>
+                            <option value="PA">Pará</option>
+                            <option value="PB">Paraíba</option>
+                            <option value="PR">Paraná</option>
+                            <option value="PE">Pernambuco</option>
+                            <option value="PI">Piauí</option>
+                            <option value="RJ">Rio de Janeiro</option>
+                            <option value="RN">Rio Grande do Norte</option>
+                            <option value="RS">Rio Grande do Sul</option>
+                            <option value="RO">Rondônia</option>
+                            <option value="RR">Roraima</option>
+                            <option value="SC">Santa Catarina</option>
+                            <option value="SP">São Paulo</option>
+                            <option value="SE">Sergipe</option>
+                            <option value="TO">Tocantins</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Serviços Oferecidos</label>
+                        <div class="services-grid" id="editarServicosContainer">
+                            <!-- Serviços serão preenchidos dinamicamente -->
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" id="btnCancelarEdicao">
+                Cancelar
+            </button>
+            <button class="btn btn-primary" id="btnSalvarEdicao">
+                <i class="fas fa-save"></i>
+                Salvar Alterações
+            </button>
+        </div>
+    </div>
+</div>
+
+    <!-- Modal de Confirmação -->
+    <div id="confirmModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Confirmar Exclusão</h3>
+                <button type="button" class="modal-close" id="confirmModalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir a oficina "<span id="modalOficinaName"></span>"? Esta ação não pode ser desfeita.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="confirmModalCancel">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmModalConfirm">
+                    <i class="fas fa-trash"></i>
+                    Excluir
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+<script src="/adminjs/admin-consolidated.js"></script>
+</body>
+</html>

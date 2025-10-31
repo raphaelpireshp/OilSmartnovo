@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Editar Oficina - OilSmart</title>
+    <link rel="stylesheet" href="/admincss/index.css">
+</head>
+<body>
+
+    
+  <div class="form-container">
+    <h2>Editar Oficina</h2>
+
+    <form id="form-editar">
+      <input type="hidden" id="oficinaId"/>
+
+      <div class="form-group">
+        <label for="nome">Nome da Oficina</label>
+        <input type="text" id="nome" required/>
+      </div>
+
+      <div class="form-group">
+        <label for="cnpj">CNPJ</label>
+        <input type="text" id="cnpj" maxlength="14" required/>
+      </div>
+
+      <div class="form-group">
+        <label for="endereco">Endereço</label>
+        <input type="text" id="endereco" required/>
+      </div>
+
+      <div class="form-group">
+        <label for="cidade">Cidade</label>
+        <input type="text" id="cidade" required/>
+      </div>
+
+      <div class="form-group">
+        <label for="telefone">Telefone</label>
+        <input type="tel" id="telefone" maxlength="13" required/>
+      </div>
+
+      <hr class="divider"/>
+      <h3>Responsável</h3>
+
+      <div class="form-group">
+        <label for="responsavel">Nome</label>
+        <input type="text" id="responsavel" required/>
+      </div>
+
+      <div class="form-group">
+        <label for="telefoneResponsavel">Telefone</label>
+        <input type="tel" id="telefoneResponsavel" maxlength="13" required/>
+      </div>
+
+      <div class="form-group">
+        <label for="emailResponsavel">E-mail</label>
+        <input type="email" id="emailResponsavel" required/>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn">Salvar Alterações</button>
+        <a href="index.html" class="btn-secondary">Voltar</a>
+      </div>
+    </form>
+  </div>
+
+<script src="/adminjs/admin-consolidated.js"></script>
+  <script>
+    verificarLogin(); // Bloqueia acesso se não estiver logado
+    const params = new URLSearchParams(window.location.search);
+    const id = parseInt(params.get("id"));
+    const oficinas = JSON.parse(localStorage.getItem("oficinas")) || [];
+    const oficina = oficinas[id];
+
+    if(!oficina){
+      alert("Oficina não encontrada!");
+      window.location.href = "index.html";
+    }
+
+    document.getElementById("oficinaId").value = id;
+    document.getElementById("nome").value = oficina.nome;
+    document.getElementById("cnpj").value = oficina.cnpj;
+    document.getElementById("endereco").value = oficina.endereco;
+    document.getElementById("cidade").value = oficina.cidade;
+    document.getElementById("telefone").value = oficina.telefone;
+    document.getElementById("responsavel").value = oficina.responsavel;
+    document.getElementById("telefoneResponsavel").value = oficina.telefoneResponsavel;
+    document.getElementById("emailResponsavel").value = oficina.emailResponsavel;
+
+    document.getElementById("form-editar").addEventListener("submit", e => {
+      e.preventDefault();
+      oficinas[id] = {
+        ...oficina,
+        nome: nome.value,
+        cnpj: cnpj.value,
+        endereco: endereco.value,
+        cidade: cidade.value,
+        telefone: telefone.value,
+        responsavel: responsavel.value,
+        telefoneResponsavel: telefoneResponsavel.value,
+        emailResponsavel: emailResponsavel.value
+      };
+      localStorage.setItem("oficinas", JSON.stringify(oficinas));
+      alert("Oficina atualizada com sucesso!");
+      window.location.href = "index.html";
+    });
+  </script>
+</body>
+</html>

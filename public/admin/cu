@@ -1,0 +1,2706 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastrar Oficina - OilSmart</title>
+    <link rel="stylesheet" href="/admincss/cadastrar-oficina.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Layout Principal -->
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-oil-can"></i>
+                    <span>OilSmart</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle" aria-label="Alternar menu lateral">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="menu-item">
+                    <a href="dashboard.html">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item active">
+                    <a href="oficinas.html">
+                        <i class="fas fa-wrench"></i>
+                        <span>Oficinas</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="mensalidades.html">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span>Mensalidades</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Relatórios</span>
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Footer movido para fora da lista -->
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <div class="user-name">Administrador</div>
+                        <div class="user-role">Supervisor</div>
+                    </div>
+                </div>
+                <button class="btn-logout" id="btnLogout" aria-label="Sair do sistema">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header do Conteúdo -->
+            <header class="content-header">
+                <div class="header-title">
+                    <h1>Cadastrar Nova Oficina</h1>
+                    <p>Preencha os dados da nova oficina parceira</p>
+                </div>
+                <div class="header-actions">
+                    <a href="oficinas.html" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i>
+                        Voltar para Oficinas
+                    </a>
+                </div>
+            </header>
+
+            <!-- Formulário de Cadastro -->
+            <section class="form-section">
+                <div class="form-container">
+                    <form id="form-cadastro" class="oficina-form" novalidate>
+                        <!-- Dados da Oficina -->
+                        <fieldset class="form-section-fieldset">
+                            <legend>
+                                <i class="fas fa-wrench"></i>
+                                Dados da Oficina
+                            </legend>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="nome" class="required">Nome da Oficina</label>
+                                    <input type="text" id="nome" name="nome" required>
+                                    <div class="form-error" id="nome-error"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="cnpj" class="required">CNPJ</label>
+                                    <input type="text" id="cnpj" name="cnpj" maxlength="18" required>
+                                    <div class="form-error" id="cnpj-error"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="telefone" class="required">Telefone</label>
+                                    <input type="tel" id="telefone" name="telefone" required>
+                                    <div class="form-error" id="telefone-error"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="email" class="required">E-mail</label>
+                                    <input type="email" id="email" name="email" required>
+                                    <div class="form-error" id="email-error"></div>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <!-- Endereço -->
+                        <fieldset class="form-section-fieldset">
+                            <legend>
+                                <i class="fas fa-map-marker-alt"></i>
+                                Endereço
+                            </legend>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="cep" class="required">CEP</label>
+                                    <input type="text" id="cep" name="cep" required>
+                                    <div class="form-error" id="cep-error"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="logradouro" class="required">Logradouro</label>
+                                    <input type="text" id="logradouro" name="logradouro" required>
+                                    <div class="form-error" id="logradouro-error"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="numero" class="required">Número</label>
+                                    <input type="text" id="numero" name="numero" required>
+                                    <div class="form-error" id="numero-error"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="complemento">Complemento</label>
+                                    <input type="text" id="complemento" name="complemento">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="bairro" class="required">Bairro</label>
+                                    <input type="text" id="bairro" name="bairro" required>
+                                    <div class="form-error" id="bairro-error"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="cidade" class="required">Cidade</label>
+                                    <input type="text" id="cidade" name="cidade" required>
+                                    <div class="form-error" id="cidade-error"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="estado" class="required">Estado</label>
+                                    <select id="estado" name="estado" required>
+                                        <option value="">Selecione</option>
+                                        <option value="AC">Acre</option>
+                                        <option value="AL">Alagoas</option>
+                                        <option value="AP">Amapá</option>
+                                        <option value="AM">Amazonas</option>
+                                        <option value="BA">Bahia</option>
+                                        <option value="CE">Ceará</option>
+                                        <option value="DF">Distrito Federal</option>
+                                        <option value="ES">Espírito Santo</option>
+                                        <option value="GO">Goiás</option>
+                                        <option value="MA">Maranhão</option>
+                                        <option value="MT">Mato Grosso</option>
+                                        <option value="MS">Mato Grosso do Sul</option>
+                                        <option value="MG">Minas Gerais</option>
+                                        <option value="PA">Pará</option>
+                                        <option value="PB">Paraíba</option>
+                                        <option value="PR">Paraná</option>
+                                        <option value="PE">Pernambuco</option>
+                                        <option value="PI">Piauí</option>
+                                        <option value="RJ">Rio de Janeiro</option>
+                                        <option value="RN">Rio Grande do Norte</option>
+                                        <option value="RS">Rio Grande do Sul</option>
+                                        <option value="RO">Rondônia</option>
+                                        <option value="RR">Roraima</option>
+                                        <option value="SC">Santa Catarina</option>
+                                        <option value="SP">São Paulo</option>
+                                        <option value="SE">Sergipe</option>
+                                        <option value="TO">Tocantins</option>
+                                    </select>
+                                    <div class="form-error" id="estado-error"></div>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <!-- Responsável -->
+                        <fieldset class="form-section-fieldset">
+                            <legend>
+                                <i class="fas fa-user"></i>
+                                Responsável
+                            </legend>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="responsavel" class="required">Nome Completo</label>
+                                    <input type="text" id="responsavel" name="responsavel" required>
+                                    <div class="form-error" id="responsavel-error"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="telefoneResponsavel" class="required">Telefone</label>
+                                    <input type="tel" id="telefoneResponsavel" name="telefoneResponsavel" required>
+                                    <div class="form-error" id="telefoneResponsavel-error"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="emailResponsavel" class="required">E-mail</label>
+                                    <input type="email" id="emailResponsavel" name="emailResponsavel" required>
+                                    <div class="form-error" id="emailResponsavel-error"></div>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <!-- Serviços -->
+                        <fieldset class="form-section-fieldset">
+                            <legend>
+                                <i class="fas fa-cogs"></i>
+                                Serviços Oferecidos
+                            </legend>
+                            <div class="services-grid">
+                                <label class="service-checkbox">
+                                    <input type="checkbox" name="servicos" value="Troca de Óleo">
+                                    <span class="checkmark"></span>
+                                    Troca de Óleo
+                                </label>
+                                <label class="service-checkbox">
+                                    <input type="checkbox" name="servicos" value="Alinhamento">
+                                    <span class="checkmark"></span>
+                                    Alinhamento
+                                </label>
+                                <label class="service-checkbox">
+                                    <input type="checkbox" name="servicos" value="Balanceamento">
+                                    <span class="checkmark"></span>
+                                    Balanceamento
+                                </label>
+                                <label class="service-checkbox">
+                                    <input type="checkbox" name="servicos" value="Freios">
+                                    <span class="checkmark"></span>
+                                    Freios
+                                </label>
+                                <label class="service-checkbox">
+                                    <input type="checkbox" name="servicos" value="Suspensão">
+                                    <span class="checkmark"></span>
+                                    Suspensão
+                                </label>
+                                <label class="service-checkbox">
+                                    <input type="checkbox" name="servicos" value="Pneus">
+                                    <span class="checkmark"></span>
+                                    Pneus
+                                </label>
+                            </div>
+                        </fieldset>
+
+                        <!-- Configurações -->
+                        <fieldset class="form-section-fieldset">
+                            <legend>
+                                <i class="fas fa-cog"></i>
+                                Configurações
+                            </legend>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="capacidade" class="required">Capacidade Simultânea</label>
+                                    <input type="number" id="capacidade" name="capacidade" min="1" max="20" value="3"
+                                        required>
+                                    <div class="form-help">Número máximo de veículos atendidos simultaneamente</div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="status">Status</label>
+                                    <select id="status" name="status">
+                                        <option value="ativo">Ativa</option>
+                                        <option value="inativo">Inativa</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <!-- Ações do Formulário -->
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="btnCancelar">
+                                Cancelar
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i>
+                                Cadastrar Oficina
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Notification Container -->
+    <div class="notification-container" id="notificationContainer"></div>
+
+    <!-- JavaScript -->
+    <script src="js/utils.js"></script>
+    <script src="js/cadastrar-oficina.js"></script>
+    <script src="js/logout.js"></script>
+</body>
+
+</html>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novo Usuário - OilSmart</title>
+    <link rel="stylesheet" href="/admincss/cadastroUsuario.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Elementos decorativos de oficina -->
+    <div class="mechanic-elements">
+        <i class="fas fa-tools tool-element tool-1"></i>
+        <i class="fas fa-oil-can tool-element tool-2"></i>
+        <i class="fas fa-cog tool-element tool-3"></i>
+        <i class="fas fa-wrench tool-element tool-4"></i>
+    </div>
+
+    <div class="login-container">
+        <div class="login-card">
+            <div class="card-header">
+                <h2>Cadastrar Novo Usuário</h2>
+                <p>Crie sua conta no sistema OilSmart</p>
+            </div>
+            
+            <form id="form-cadastro-usuario" class="oficina-form">
+                <div class="form-group">
+                    <label for="novoUsuario" class="required">
+                        <i class="fas fa-user"></i> Login
+                    </label>
+                    <input type="text" id="novoUsuario" name="novoUsuario" required 
+                           placeholder="Digite o nome de usuário">
+                    <div class="form-error" id="novoUsuario-error"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="emailUsuario" class="required">
+                        <i class="fas fa-envelope"></i> E-mail
+                    </label>
+                    <input type="email" id="emailUsuario" name="emailUsuario" required 
+                           placeholder="Digite seu e-mail para recuperação">
+                    <div class="form-help">
+                        <i class="fas fa-info-circle"></i>
+                        Este e-mail será usado para recuperação de senha
+                    </div>
+                    <div class="form-error" id="emailUsuario-error"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="novaSenha" class="required">
+                        <i class="fas fa-lock"></i> Senha
+                    </label>
+                    <input type="password" id="novaSenha" name="novaSenha" required 
+                           placeholder="Digite a senha">
+                    <div class="password-strength">
+                        <div class="strength-bar">
+                            <div class="strength-fill" id="strengthFill"></div>
+                        </div>
+                        <div class="strength-text" id="strengthText">Força da senha</div>
+                    </div>
+                    <div class="form-error" id="novaSenha-error"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmarSenha" class="required">
+                        <i class="fas fa-lock"></i> Confirmar Senha
+                    </label>
+                    <input type="password" id="confirmarSenha" name="confirmarSenha" required 
+                           placeholder="Digite a senha novamente">
+                    <div class="form-error" id="confirmarSenha-error"></div>
+                </div>
+
+                <div class="form-terms">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="aceitarTermos" name="aceitarTermos" required>
+                        <span class="checkmark"></span>
+                        Concordo com os <a href="#" class="terms-link">Termos de Uso</a> e 
+                        <a href="#" class="terms-link">Política de Privacidade</a>
+                    </label>
+                    <div class="form-error" id="termos-error"></div>
+                </div>
+                
+                <div class="form-actions">
+                    <a href="login.html" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i>
+                        Voltar para Login
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-user-plus"></i>
+                        Cadastrar Usuário
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const formCadastroUsuario = document.getElementById("form-cadastro-usuario");
+            const novaSenhaInput = document.getElementById("novaSenha");
+            const confirmarSenhaInput = document.getElementById("confirmarSenha");
+            const strengthFill = document.getElementById("strengthFill");
+            const strengthText = document.getElementById("strengthText");
+
+            // Validação de força da senha em tempo real
+            novaSenhaInput.addEventListener('input', function() {
+                const senha = this.value;
+                const forca = calcularForcaSenha(senha);
+                atualizarIndicadorForca(forca);
+                validarConfirmacaoSenha();
+            });
+
+            // Validação de confirmação de senha em tempo real
+            confirmarSenhaInput.addEventListener('input', validarConfirmacaoSenha);
+
+            function calcularForcaSenha(senha) {
+                let forca = 0;
+                
+                if (senha.length >= 6) forca += 1;
+                if (senha.length >= 8) forca += 1;
+                if (/[A-Z]/.test(senha)) forca += 1;
+                if (/[0-9]/.test(senha)) forca += 1;
+                if (/[^A-Za-z0-9]/.test(senha)) forca += 1;
+                
+                return Math.min(forca, 5);
+            }
+
+            function atualizarIndicadorForca(forca) {
+                const cores = ['#ff4d4d', '#ff6b6b', '#ffa726', '#66bb6a', '#2e7d32'];
+                const textos = ['Muito fraca', 'Fraca', 'Moderada', 'Forte', 'Muito forte'];
+                
+                strengthFill.style.width = `${(forca / 5) * 100}%`;
+                strengthFill.style.backgroundColor = cores[forca - 1] || '#ff4d4d';
+                strengthText.textContent = forca > 0 ? textos[forca - 1] : 'Força da senha';
+                strengthText.style.color = cores[forca - 1] || '#666';
+            }
+
+            function validarConfirmacaoSenha() {
+                const senha = novaSenhaInput.value;
+                const confirmacao = confirmarSenhaInput.value;
+                const errorElement = document.getElementById('confirmarSenha-error');
+                
+                if (confirmacao && senha !== confirmacao) {
+                    showError('confirmarSenha-error', 'As senhas não coincidem');
+                    return false;
+                } else {
+                    document.getElementById('confirmarSenha-error').classList.remove('show');
+                    return true;
+                }
+            }
+
+            function validarEmail(email) {
+                const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return regex.test(email);
+            }
+
+            formCadastroUsuario.addEventListener("submit", function(e){
+                e.preventDefault();
+
+                const login = document.getElementById("novoUsuario").value.trim();
+                const email = document.getElementById("emailUsuario").value.trim();
+                const senha = document.getElementById("novaSenha").value.trim();
+                const confirmarSenha = document.getElementById("confirmarSenha").value.trim();
+                const aceitarTermos = document.getElementById("aceitarTermos").checked;
+
+                // Limpar erros anteriores
+                clearErrors();
+
+                // Validações
+                let valido = true;
+
+                if (login.length < 3) {
+                    showError('novoUsuario-error', 'Login deve ter pelo menos 3 caracteres');
+                    valido = false;
+                }
+
+                if (!validarEmail(email)) {
+                    showError('emailUsuario-error', 'Digite um e-mail válido');
+                    valido = false;
+                }
+
+                if (senha.length < 6) {
+                    showError('novaSenha-error', 'Senha deve ter pelo menos 6 caracteres');
+                    valido = false;
+                }
+
+                if (!validarConfirmacaoSenha()) {
+                    valido = false;
+                }
+
+                if (!aceitarTermos) {
+                    showError('termos-error', 'Você deve aceitar os termos de uso');
+                    valido = false;
+                }
+
+                if (!valido) return;
+
+                const usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+
+                if(usuarios.find(u => u.login === login)){
+                    showError('novoUsuario-error', 'Este usuário já existe!');
+                    return;
+                }
+
+                if(usuarios.find(u => u.email === email)){
+                    showError('emailUsuario-error', 'Este e-mail já está cadastrado!');
+                    return;
+                }
+
+                // Efeito visual de loading
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cadastrando...';
+                submitBtn.disabled = true;
+
+                // Simular processamento
+                setTimeout(() => {
+                    usuarios.push({
+                        login: login,
+                        email: email,
+                        senha: senha,
+                        dataCadastro: new Date().toISOString()
+                    });
+                    
+                    localStorage.setItem("usuarios", JSON.stringify(usuarios));
+                    
+                    submitBtn.innerHTML = '<i class="fas fa-check"></i> Cadastrado!';
+                    submitBtn.classList.add('success');
+                    
+                    setTimeout(() => {
+                        alert("Usuário cadastrado com sucesso!\nVocê será redirecionado para a página de login.");
+                        window.location.href = "login.html";
+                    }, 1000);
+                    
+                }, 1500);
+            });
+
+            function showError(elementId, message) {
+                const errorElement = document.getElementById(elementId);
+                errorElement.textContent = message;
+                errorElement.classList.add('show');
+                
+                // Auto-remove error after 5 seconds
+                setTimeout(() => {
+                    errorElement.classList.remove('show');
+                }, 5000);
+            }
+
+            function clearErrors() {
+                const errors = document.querySelectorAll('.form-error');
+                errors.forEach(error => {
+                    error.classList.remove('show');
+                });
+            }
+
+            // Clear errors on input
+            document.getElementById('novoUsuario').addEventListener('input', function() {
+                document.getElementById('novoUsuario-error').classList.remove('show');
+            });
+
+            document.getElementById('emailUsuario').addEventListener('input', function() {
+                document.getElementById('emailUsuario-error').classList.remove('show');
+            });
+
+            document.getElementById('novaSenha').addEventListener('input', function() {
+                document.getElementById('novaSenha-error').classList.remove('show');
+            });
+
+            document.getElementById('confirmarSenha').addEventListener('input', function() {
+                document.getElementById('confirmarSenha-error').classList.remove('show');
+            });
+
+            document.getElementById('aceitarTermos').addEventListener('change', function() {
+                document.getElementById('termos-error').classList.remove('show');
+            });
+        });
+    </script>
+
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OilSmart - Sistema de Gestão</title>
+    <link rel="stylesheet" href="/admincss/style.css">
+    <link rel="stylesheet" href="/admincss/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Container Principal -->
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-oil-can"></i>
+                    <span>OilSmart</span>
+                </div>
+                <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="Alternar menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="menu-item active">
+                    <a href="dashboard.html">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="oficinas.html">
+                        <i class="fas fa-wrench"></i>
+                        <span>Oficinas</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="mensalidades.html">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span>Mensalidades</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="relatorios.html">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Relatórios</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <span class="user-name">Administrador</span>
+                        <span class="user-role">Super Admin</span>
+                    </div>
+                </div>
+                <button type="button" class="btn-logout" id="btnLogout" aria-label="Sair do sistema">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content" id="mainContent">
+            <!-- Header -->
+            <header class="content-header">
+                <div class="header-title">
+                    <h1>Dashboard</h1>
+                    <p>Visão geral do sistema e mensalidades das oficinas</p>
+                </div>
+                <div class="header-actions">
+                    <div class="header-buttons">
+                        <button type="button" class="btn-icon" id="btnNotifications" aria-label="Notificações">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge" id="notificationCount">0</span>
+                        </button>
+                        <button type="button" class="btn-icon" id="btnFullscreen" aria-label="Tela cheia">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                        <button type="button" class="btn-icon" id="btnRefresh" aria-label="Atualizar dados" title="Atualizar Dados">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Stats -->
+            <section class="dashboard-stats">
+                <div class="stat-card">
+                    <div class="stat-icon total-oficinas">
+                        <i class="fas fa-wrench"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalOficinas">0</h3>
+                        <p>Total de Oficinas</p>
+                    </div>
+                    <div class="stat-trend up">
+                        <i class="fas fa-arrow-up"></i>
+                        <span id="trendOficinas">0%</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon oficinas-ativas">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="oficinasAtivas">0</h3>
+                        <p>Oficinas Ativas</p>
+                    </div>
+                    <div class="stat-trend up">
+                        <i class="fas fa-arrow-up"></i>
+                        <span id="trendAtivas">0%</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon cidades-atendidas">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalCidades">0</h3>
+                        <p>Cidades Atendidas</p>
+                    </div>
+                    <div class="stat-trend up">
+                        <i class="fas fa-arrow-up"></i>
+                        <span id="trendCidades">0%</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon capacidade-total">
+                        <i class="fas fa-car"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="capacidadeTotal">0</h3>
+                        <p>Capacidade Total</p>
+                    </div>
+                    <div class="stat-trend down">
+                        <i class="fas fa-arrow-down"></i>
+                        <span id="trendCapacidade">0%</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Gráficos e Métricas de Mensalidades -->
+            <section class="charts-section">
+                <div class="charts-grid">
+                    <!-- Gráfico de Mensalidades por Mês -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Mensalidades - Últimos 6 Meses</h3>
+                            <div class="chart-actions">
+                                <button type="button" class="btn-icon" id="btnExportMensalidades" title="Exportar">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <button type="button" class="btn-icon" id="btnRefreshMensalidades" title="Atualizar">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="mensalidadesChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Status de Pagamentos -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Status de Pagamentos</h3>
+                            <div class="chart-actions">
+                                <button type="button" class="btn-icon" id="btnRefreshStatus" title="Atualizar">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="statusPagamentosChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Receita por Cidade -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Receita por Cidade</h3>
+                            <div class="chart-actions">
+                                <button type="button" class="btn-icon" id="btnRefreshCidades" title="Atualizar">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="receitaCidadeChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Métricas de Mensalidades -->
+                    <div class="metrics-card">
+                        <div class="metrics-header">
+                            <h3>Resumo Financeiro</h3>
+                            <span class="periodo" id="periodoAtual">Este Mês</span>
+                        </div>
+                        <div class="metrics-content">
+                            <div class="metric-item">
+                                <div class="metric-info">
+                                    <span class="metric-label">Receita Total</span>
+                                    <span class="metric-value" id="receitaTotal">R$ 0,00</span>
+                                </div>
+                                <div class="metric-trend up">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span id="trendReceita">0%</span>
+                                </div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-info">
+                                    <span class="metric-label">Pagamentos em Dia</span>
+                                    <span class="metric-value" id="pagamentosEmDia">0 oficinas</span>
+                                </div>
+                                <div class="metric-trend up">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span id="trendPagamentos">0%</span>
+                                </div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-info">
+                                    <span class="metric-label">Pagamentos Atrasados</span>
+                                    <span class="metric-value" id="pagamentosAtrasados">0 oficinas</span>
+                                </div>
+                                <div class="metric-trend down">
+                                    <i class="fas fa-arrow-down"></i>
+                                    <span id="trendAtrasos">0%</span>
+                                </div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-info">
+                                    <span class="metric-label">Taxa de Adimplência</span>
+                                    <span class="metric-value" id="taxaAdimplencia">0%</span>
+                                </div>
+                                <div class="metric-trend up">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span id="trendAdimplencia">0%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Lista de Mensalidades em Destaque -->
+            <section class="mensalidades-section">
+                <div class="section-header">
+                    <h2>Mensalidades em Destaque</h2>
+                    <div class="section-actions">
+                        <button type="button" class="btn btn-secondary" id="btnVerTodas">
+                            <i class="fas fa-list"></i>
+                            Ver Todas
+                        </button>
+                        <button type="button" class="btn btn-primary" id="btnRegistrarPagamento">
+                            <i class="fas fa-money-bill-wave"></i>
+                            Registrar Pagamento
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mensalidades-grid" id="mensalidadesGrid">
+                    <!-- As mensalidades serão carregadas dinamicamente aqui -->
+                    <div class="loading-state" id="loadingMensalidades">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span>Carregando mensalidades...</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Lista Rápida de Oficinas -->
+            <section class="oficinas-section">
+                <div class="section-header">
+                    <h2>Oficinas Recentes</h2>
+                    <div class="section-actions">
+                        <a href="oficinas.html" class="btn btn-secondary">
+                            <i class="fas fa-eye"></i>
+                            Ver Todas
+                        </a>
+                        <a href="cadastrar-oficina.html" class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            Nova Oficina
+                        </a>
+                    </div>
+                </div>
+
+                <div class="oficinas-grid" id="oficinasGrid">
+                    <!-- As oficinas serão carregadas dinamicamente aqui -->
+                    <div class="loading-state" id="loadingOficinas">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span>Carregando oficinas...</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal de Registro de Pagamento -->
+    <div id="modalPagamento" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Registrar Pagamento</h3>
+                <button>type="button" class="modal-close" id="modalPagamentoClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formPagamento">
+                    <div class="form-group">
+                        <label for="selectOficina">Oficina</label>
+                        <select id="selectOficina" class="form-select" required>
+                            <option value="">Selecione uma oficina</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="valorPagamento">Valor (R$)</label>
+                        <input type="number" id="valorPagamento" class="form-input" step="0.01" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="dataPagamento">Data do Pagamento</label>
+                        <input type="date" id="dataPagamento" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="observacaoPagamento">Observação</label>
+                        <textarea id="observacaoPagamento" class="form-textarea" rows="3" placeholder="Observações sobre o pagamento..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="btnCancelarPagamento">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" id="btnConfirmarPagamento">
+                    <i class="fas fa-check"></i>
+                    Registrar Pagamento
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação -->
+    <div id="confirmModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Confirmar Ação</h3>
+                <button> type="button" class="modal-close" id="confirmModalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmModalMessage">Tem certeza que deseja realizar esta ação?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="confirmModalCancel">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="confirmModalConfirm">
+                    <i class="fas fa-check"></i>
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div class="notification-container" id="notificationContainer"></div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay hidden" id="loadingOverlay">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <span>Carregando...</span>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <!-- Incluir o State Manager primeiro -->
+    <script src="js/state-manager.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/logout.js"></script>
+    <script src="js/relatorios.js"></script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Editar Oficina - OilSmart</title>
+  <link rel="stylesheet" href="/admincss/oficinas.css"/>
+</head>
+<body>
+
+    
+  <div class="form-container">
+    <h2>Editar Oficina</h2>
+
+    <form id="form-editar">
+      <input type="hidden" id="oficinaId"/>
+
+      <div class="form-group">
+        <label for="nome">Nome da Oficina</label>
+        <input type="text" id="nome" required/>
+      </div>
+
+      <div class="form-group">
+        <label for="cnpj">CNPJ</label>
+        <input type="text" id="cnpj" maxlength="14" required/>
+      </div>
+
+      <div class="form-group">
+        <label for="endereco">Endereço</label>
+        <input type="text" id="endereco" required/>
+      </div>
+
+      <div class="form-group">
+        <label for="cidade">Cidade</label>
+        <input type="text" id="cidade" required/>
+      </div>
+
+      <div class="form-group">
+        <label for="telefone">Telefone</label>
+        <input type="tel" id="telefone" maxlength="13" required/>
+      </div>
+
+      <hr class="divider"/>
+      <h3>Responsável</h3>
+
+      <div class="form-group">
+        <label for="responsavel">Nome</label>
+        <input type="text" id="responsavel" required/>
+      </div>
+
+      <div class="form-group">
+        <label for="telefoneResponsavel">Telefone</label>
+        <input type="tel" id="telefoneResponsavel" maxlength="13" required/>
+      </div>
+
+      <div class="form-group">
+        <label for="emailResponsavel">E-mail</label>
+        <input type="email" id="emailResponsavel" required/>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn">Salvar Alterações</button>
+        <a href="index.html" class="btn-secondary">Voltar</a>
+      </div>
+    </form>
+  </div>
+
+  <script src="js/oficinas.js"></script>
+  <script src="js/logout.js"></script>
+  <script>
+    verificarLogin(); // Bloqueia acesso se não estiver logado
+    const params = new URLSearchParams(window.location.search);
+    const id = parseInt(params.get("id"));
+    const oficinas = JSON.parse(localStorage.getItem("oficinas")) || [];
+    const oficina = oficinas[id];
+
+    if(!oficina){
+      alert("Oficina não encontrada!");
+      window.location.href = "index.html";
+    }
+
+    document.getElementById("oficinaId").value = id;
+    document.getElementById("nome").value = oficina.nome;
+    document.getElementById("cnpj").value = oficina.cnpj;
+    document.getElementById("endereco").value = oficina.endereco;
+    document.getElementById("cidade").value = oficina.cidade;
+    document.getElementById("telefone").value = oficina.telefone;
+    document.getElementById("responsavel").value = oficina.responsavel;
+    document.getElementById("telefoneResponsavel").value = oficina.telefoneResponsavel;
+    document.getElementById("emailResponsavel").value = oficina.emailResponsavel;
+
+    document.getElementById("form-editar").addEventListener("submit", e => {
+      e.preventDefault();
+      oficinas[id] = {
+        ...oficina,
+        nome: nome.value,
+        cnpj: cnpj.value,
+        endereco: endereco.value,
+        cidade: cidade.value,
+        telefone: telefone.value,
+        responsavel: responsavel.value,
+        telefoneResponsavel: telefoneResponsavel.value,
+        emailResponsavel: emailResponsavel.value
+      };
+      localStorage.setItem("oficinas", JSON.stringify(oficinas));
+      alert("Oficina atualizada com sucesso!");
+      window.location.href = "index.html";
+    });
+  </script>
+</body>
+</html>
+
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - OilSmart</title>
+  <link rel="stylesheet" href="/admincss/login.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <!-- Elementos decorativos de oficina -->
+  <div class="mechanic-elements">
+    <i class="fas fa-tools tool-element tool-1"></i>
+    <i class="fas fa-oil-can tool-element tool-2"></i>
+    <i class="fas fa-cog tool-element tool-3"></i>
+    <i class="fas fa-wrench tool-element tool-4"></i>
+  </div>
+
+  <div class="login-container">
+    <!-- Lado esquerdo - Brand -->
+    <div class="login-brand">
+      <div class="brand-header">
+        <div class="brand-logo">
+          <div class="logo-icon">
+            <i class="fas fa-oil-can"></i>
+          </div>
+          <div class="logo-text">OilSmart</div>
+        </div>
+        <h1 class="brand-tagline">Check Your Project Progress</h1>
+        <p class="brand-subtitle">
+          Gerencie sua oficina de forma inteligente. Acompanhe trocas de óleo, 
+          mantenha o controle de estoque e otimize seus processos.
+        </p>
+      </div>
+
+      <div class="progress-stats">
+        <div class="stat-item">
+          <div class="stat-number">500+</div>
+          <div class="stat-label">Clientes Atendidos</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">98%</div>
+          <div class="stat-label">Satisfação</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">24/7</div>
+          <div class="stat-label">Suporte</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">50+</div>
+          <div class="stat-label">Oficinas</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lado direito - Login -->
+    <div class="login-card">
+      <div class="card-header">
+        <h2>Login</h2>
+        <p>Acesse sua conta OilSmart</p>
+      </div>
+
+      <form id="form-login">
+        <div class="form-group">
+          <label for="usuario">
+            <i class="fas fa-user"></i> Login
+          </label>
+          <input type="text" id="usuario" required placeholder="Digite seu usuário">
+        </div>
+
+        <div class="form-group">
+          <label for="senha">
+            <i class="fas fa-lock"></i> Senha
+          </label>
+          <input type="password" id="senha" required placeholder="Digite sua senha">
+          <button type="button" class="password-toggle" id="togglePassword">
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
+
+        <button type="submit" class="btn-login" id="btnLogin">
+          <i class="fas fa-sign-in-alt"></i> Entrar no Sistema
+        </button>
+      </form>
+
+      <div class="login-links">
+          <a href="cadastroUsuario.html">
+              <i class="fas fa-user-plus"></i>
+              Criar nova conta
+          </a>
+          <a href="#" id="esqueci-senha">
+              <i class="fas fa-key"></i>
+              Recuperar senha
+          </a>
+      </div>
+
+      <div id="msg-erro" class="msg-erro"></div>
+      <div id="msg-sucesso" class="msg-sucesso"></div>
+    </div>
+  </div>
+
+  <!-- Modal de Recuperação de Senha -->
+  <div id="modalRecuperacao" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>
+          <i class="fas fa-key"></i>
+          Recuperar Senha
+        </h3>
+        <button class="modal-close" id="closeModal">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <!-- Indicador de Passos -->
+        <div class="recovery-steps">
+          <div class="step active">
+            <div class="step-number">1</div>
+            <div class="step-label">E-mail</div>
+          </div>
+          <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-label">Código</div>
+          </div>
+          <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-label">Nova Senha</div>
+          </div>
+        </div>
+
+        <form id="form-recuperacao">
+          <!-- Passo 1: E-mail -->
+          <div id="step-1" class="recovery-step">
+            <div class="form-group">
+              <label for="emailRecuperacao" class="required">E-mail ou Usuário</label>
+              <input type="text" id="emailRecuperacao" required 
+                     placeholder="Digite seu e-mail ou usuário cadastrado">
+              <div class="form-help">
+                <i class="fas fa-info-circle"></i>
+                Enviaremos um código de verificação para seu e-mail
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-secondary" id="btnCancelarRecuperacao">
+                Cancelar
+              </button>
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-paper-plane"></i>
+                Enviar Código
+              </button>
+            </div>
+          </div>
+
+          <!-- Passo 2: Verificação do Código -->
+          <div id="step-2" class="recovery-step" style="display: none;">
+            <div class="form-group">
+              <label for="codigoVerificacao" class="required">Código de Verificação</label>
+              <div class="code-inputs">
+                <input type="text" class="code-input" maxlength="1" pattern="[0-9]">
+                <input type="text" class="code-input" maxlength="1" pattern="[0-9]">
+                <input type="text" class="code-input" maxlength="1" pattern="[0-9]">
+                <input type="text" class="code-input" maxlength="1" pattern="[0-9]">
+                <input type="text" class="code-input" maxlength="1" pattern="[0-9]">
+                <input type="text" class="code-input" maxlength="1" pattern="[0-9]">
+              </div>
+              <div class="form-help">
+                <i class="fas fa-info-circle"></i>
+                Digite o código de 6 dígitos enviado para seu e-mail
+              </div>
+            </div>
+
+            <div class="resend-code">
+              <button type="button" id="btnReenviarCodigo">
+                <i class="fas fa-redo"></i>
+                Reenviar código
+              </button>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-secondary" id="btnVoltarEmail">
+                <i class="fas fa-arrow-left"></i>
+                Voltar
+              </button>
+              <button type="submit" class="btn btn-primary">
+                Verificar Código
+              </button>
+            </div>
+          </div>
+
+          <!-- Passo 3: Nova Senha -->
+          <div id="step-3" class="recovery-step" style="display: none;">
+            <div class="form-group">
+              <label for="novaSenhaRecuperacao" class="required">Nova Senha</label>
+              <input type="password" id="novaSenhaRecuperacao" required 
+                     placeholder="Digite sua nova senha" minlength="6">
+              <div class="password-strength">
+                <div class="strength-bar">
+                  <div class="strength-fill" id="strengthFill"></div>
+                </div>
+                <div class="strength-text" id="strengthText">Força da senha</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="confirmarSenhaRecuperacao" class="required">Confirmar Nova Senha</label>
+              <input type="password" id="confirmarSenhaRecuperacao" required 
+                     placeholder="Digite novamente sua nova senha">
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-secondary" id="btnVoltarCodigo">
+                <i class="fas fa-arrow-left"></i>
+                Voltar
+              </button>
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i>
+                Redefinir Senha
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/login.js"></script>
+  <script src="js/recuperacaoSenha.js"></script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mensalidades - OilSmart</title>
+    <link rel="stylesheet" href="/admincss/mensalidades.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Layout Principal -->
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-oil-can"></i>
+                    <span>OilSmart</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="menu-item">
+                    <a href="dashboard.html">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="oficinas.html">
+                        <i class="fas fa-wrench"></i>
+                        <span>Oficinas</span>
+                    </a>
+                </li>
+                <li class="menu-item active">
+                    <a href="mensalidades.html">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span>Mensalidades</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Relatórios</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <div class="user-name">Administrador</div>
+                        <div class="user-role">Supervisor</div>
+                    </div>
+                </div>
+                <button class="btn-logout" id="btnLogout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header do Conteúdo -->
+            <header class="content-header">
+                <div class="header-title">
+                    <h1>Gerenciamento de Mensalidades</h1>
+                    <p>Controle de planos, assinaturas e cobranças das oficinas</p>
+                </div>
+                <div class="header-actions">
+                    <div class="header-buttons">
+                        <button class="btn btn-add" id="btnNovaCobranca">
+                            <i class="fas fa-plus"></i>
+                            Nova Cobrança
+                        </button>
+                        <button class="btn btn-primary" id="btnConfigurarPlanos">
+                            <i class="fas fa-cog"></i>
+                            Configurar Planos
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Estatísticas do Dashboard -->
+            <section class="dashboard-stats">
+                <div class="stat-card">
+                    <div class="stat-icon receita-total">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="receitaTotal">R$ 4.850,00</h3>
+                        <p>Receita do Mês</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon pagamentos-dia">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="pagamentosDia">6</h3>
+                        <p>Pagamentos em Dia</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon pagamentos-atrasados">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="pagamentosAtrasados">2</h3>
+                        <p>Pagamentos Atrasados</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon taxa-adimplencia">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="taxaAdimplencia">75%</h3>
+                        <p>Taxa de Adimplência</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Buscar por oficina, CNPJ, código...">
+                    <button type="button" class="btn-search-clear" id="btnSearchClear">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="filters">
+                    <div class="filter-group">
+                        <div class="filter-label">Status</div>
+                        <select id="filterStatus" class="filter-select">
+                            <option value="">Todos os status</option>
+                            <option value="pago">Pago</option>
+                            <option value="pendente">Pendente</option>
+                            <option value="atrasado">Atrasado</option>
+                            <option value="cancelado">Cancelado</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <div class="filter-label">Mês/Ano</div>
+                        <select id="filterMes" class="filter-select">
+                            <option value="">Todos os meses</option>
+                            <option value="2024-11">Novembro 2024</option>
+                            <option value="2024-10">Outubro 2024</option>
+                            <option value="2024-09">Setembro 2024</option>
+                            <option value="2024-08">Agosto 2024</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <div class="filter-label">Método Pagto.</div>
+                        <select id="filterMetodo" class="filter-select">
+                            <option value="">Todos os métodos</option>
+                            <option value="pix">PIX</option>
+                            <option value="cartao">Cartão</option>
+                            <option value="boleto">Boleto</option>
+                            <option value="transferencia">Transferência</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="toolbar-actions">
+                    <button type="button" class="btn btn-secondary" id="btnLimparFiltros">
+                        <i class="fas fa-eraser"></i>
+                        Limpar Filtros
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="btnExportarRelatorio">
+                        <i class="fas fa-file-export"></i>
+                        Exportar Relatório
+                    </button>
+                    <button type="button" class="btn btn-primary" id="btnEmitirNotas">
+                        <i class="fas fa-file-invoice"></i>
+                        Emitir Notas
+                    </button>
+                </div>
+            </div>
+
+            <!-- Seção de Mensalidades -->
+            <section class="mensalidades-section">
+                <div class="section-header">
+                    <h2>Cobranças e Pagamentos</h2>
+                    <div class="table-info">
+                        <span id="mensalidadesInfo">Mostrando 8 de 8 cobranças</span>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <!-- Grid de Mensalidades -->
+                    <div class="mensalidades-grid" id="mensalidadesGrid">
+                        <!-- Cobrança 1 -->
+                        <div class="mensalidade-card fade-in">
+                            <div class="mensalidade-header">
+                                <div class="mensalidade-info">
+                                    <h3 class="oficina-name">AutoCenter São Paulo</h3>
+                                    <span class="codigo-cobranca">#CB202411001</span>
+                                </div>
+                                <span class="status-badge status-pago">Pago</span>
+                            </div>
+                            <div class="mensalidade-details">
+                                <div class="detail-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>Vencimento: 15/11/2024</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    <span>Valor: R$ 650,00</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-credit-card"></i>
+                                    <span>PIX • 10/11/2024</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-receipt"></i>
+                                    <span>NF-e: 123456789</span>
+                                </div>
+                            </div>
+                            <div class="plano-info">
+                                <div class="plano-label">Plano Contratado:</div>
+                                <div class="plano-tags">
+                                    <span class="plano-tag premium">Premium</span>
+                                    <span class="plano-valor">R$ 650,00/mês</span>
+                                </div>
+                            </div>
+                            <div class="mensalidade-actions">
+                                <button class="btn-action view" title="Ver Detalhes">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn-action invoice" title="Emitir Nota">
+                                    <i class="fas fa-file-invoice"></i>
+                                </button>
+                                <button class="btn-action resend" title="Reenviar Cobrança">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Cobrança 2 -->
+                        <div class="mensalidade-card fade-in">
+                            <div class="mensalidade-header">
+                                <div class="mensalidade-info">
+                                    <h3 class="oficina-name">Mecânica Rio Sul</h3>
+                                    <span class="codigo-cobranca">#CB202411002</span>
+                                </div>
+                                <span class="status-badge status-pago">Pago</span>
+                            </div>
+                            <div class="mensalidade-details">
+                                <div class="detail-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>Vencimento: 15/11/2024</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    <span>Valor: R$ 550,00</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-credit-card"></i>
+                                    <span>Cartão • 12/11/2024</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-receipt"></i>
+                                    <span>NF-e: 123456790</span>
+                                </div>
+                            </div>
+                            <div class="plano-info">
+                                <div class="plano-label">Plano Contratado:</div>
+                                <div class="plano-tags">
+                                    <span class="plano-tag professional">Professional</span>
+                                    <span class="plano-valor">R$ 550,00/mês</span>
+                                </div>
+                            </div>
+                            <div class="mensalidade-actions">
+                                <button class="btn-action view" title="Ver Detalhes">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn-action invoice" title="Emitir Nota">
+                                    <i class="fas fa-file-invoice"></i>
+                                </button>
+                                <button class="btn-action resend" title="Reenviar Cobrança">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Cobrança 3 -->
+                        <div class="mensalidade-card fade-in">
+                            <div class="mensalidade-header">
+                                <div class="mensalidade-info">
+                                    <h3 class="oficina-name">Oficina BH Center</h3>
+                                    <span class="codigo-cobranca">#CB202411003</span>
+                                </div>
+                                <span class="status-badge status-atrasado">Atrasado</span>
+                            </div>
+                            <div class="mensalidade-details">
+                                <div class="detail-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>Vencimento: 10/11/2024</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    <span>Valor: R$ 600,00</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>5 dias em atraso</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-envelope"></i>
+                                    <span>Lembrete enviado: 12/11</span>
+                                </div>
+                            </div>
+                            <div class="plano-info">
+                                <div class="plano-label">Plano Contratado:</div>
+                                <div class="plano-tags">
+                                    <span class="plano-tag premium">Premium</span>
+                                    <span class="plano-valor">R$ 600,00/mês</span>
+                                </div>
+                            </div>
+                            <div class="mensalidade-actions">
+                                <button class="btn-action view" title="Ver Detalhes">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn-action reminder" title="Enviar Lembrete">
+                                    <i class="fas fa-bell"></i>
+                                </button>
+                                <button class="btn-action resend" title="Reenviar Cobrança">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Cobrança 4 -->
+                        <div class="mensalidade-card fade-in">
+                            <div class="mensalidade-header">
+                                <div class="mensalidade-info">
+                                    <h3 class="oficina-name">AutoService Curitiba</h3>
+                                    <span class="codigo-cobranca">#CB202411004</span>
+                                </div>
+                                <span class="status-badge status-pendente">Pendente</span>
+                            </div>
+                            <div class="mensalidade-details">
+                                <div class="detail-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>Vencimento: 20/11/2024</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    <span>Valor: R$ 500,00</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-hourglass-half"></i>
+                                    <span>Aguardando pagamento</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-barcode"></i>
+                                    <span>Boleto gerado</span>
+                                </div>
+                            </div>
+                            <div class="plano-info">
+                                <div class="plano-label">Plano Contratado:</div>
+                                <div class="plano-tags">
+                                    <span class="plano-tag basic">Básico</span>
+                                    <span class="plano-valor">R$ 500,00/mês</span>
+                                </div>
+                            </div>
+                            <div class="mensalidade-actions">
+                                <button class="btn-action view" title="Ver Detalhes">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn-action reminder" title="Enviar Lembrete">
+                                    <i class="fas fa-bell"></i>
+                                </button>
+                                <button class="btn-action resend" title="Reenviar Cobrança">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Cobrança 5 -->
+                        <div class="mensalidade-card fade-in">
+                            <div class="mensalidade-header">
+                                <div class="mensalidade-info">
+                                    <h3 class="oficina-name">Mecânica Brasília</h3>
+                                    <span class="codigo-cobranca">#CB202411005</span>
+                                </div>
+                                <span class="status-badge status-pago">Pago</span>
+                            </div>
+                            <div class="mensalidade-details">
+                                <div class="detail-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>Vencimento: 15/11/2024</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    <span>Valor: R$ 700,00</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-credit-card"></i>
+                                    <span>Transferência • 14/11/2024</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-receipt"></i>
+                                    <span>NF-e: 123456791</span>
+                                </div>
+                            </div>
+                            <div class="plano-info">
+                                <div class="plano-label">Plano Contratado:</div>
+                                <div class="plano-tags">
+                                    <span class="plano-tag enterprise">Enterprise</span>
+                                    <span class="plano-valor">R$ 700,00/mês</span>
+                                </div>
+                            </div>
+                            <div class="mensalidade-actions">
+                                <button class="btn-action view" title="Ver Detalhes">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn-action invoice" title="Emitir Nota">
+                                    <i class="fas fa-file-invoice"></i>
+                                </button>
+                                <button class="btn-action resend" title="Reenviar Cobrança">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Cobrança 6 -->
+                        <div class="mensalidade-card fade-in">
+                            <div class="mensalidade-header">
+                                <div class="mensalidade-info">
+                                    <h3 class="oficina-name">Oficina Paulista</h3>
+                                    <span class="codigo-cobranca">#CB202411006</span>
+                                </div>
+                                <span class="status-badge status-pago">Pago</span>
+                            </div>
+                            <div class="mensalidade-details">
+                                <div class="detail-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>Vencimento: 15/11/2024</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    <span>Valor: R$ 550,00</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-credit-card"></i>
+                                    <span>PIX • 13/11/2024</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-receipt"></i>
+                                    <span>NF-e: 123456792</span>
+                                </div>
+                            </div>
+                            <div class="plano-info">
+                                <div class="plano-label">Plano Contratado:</div>
+                                <div class="plano-tags">
+                                    <span class="plano-tag professional">Professional</span>
+                                    <span class="plano-valor">R$ 550,00/mês</span>
+                                </div>
+                            </div>
+                            <div class="mensalidade-actions">
+                                <button class="btn-action view" title="Ver Detalhes">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn-action invoice" title="Emitir Nota">
+                                    <i class="fas fa-file-invoice"></i>
+                                </button>
+                                <button class="btn-action resend" title="Reenviar Cobrança">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Cobrança 7 -->
+                        <div class="mensalidade-card fade-in">
+                            <div class="mensalidade-header">
+                                <div class="mensalidade-info">
+                                    <h3 class="oficina-name">AutoMec Ipanema</h3>
+                                    <span class="codigo-cobranca">#CB202411007</span>
+                                </div>
+                                <span class="status-badge status-cancelado">Cancelado</span>
+                            </div>
+                            <div class="mensalidade-details">
+                                <div class="detail-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>Vencimento: 10/11/2024</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    <span>Valor: R$ 450,00</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-ban"></i>
+                                    <span>Oficina inativada</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-calendar-times"></i>
+                                    <span>Cancelado: 05/11/2024</span>
+                                </div>
+                            </div>
+                            <div class="plano-info">
+                                <div class="plano-label">Plano Contratado:</div>
+                                <div class="plano-tags">
+                                    <span class="plano-tag basic">Básico</span>
+                                    <span class="plano-valor">R$ 450,00/mês</span>
+                                </div>
+                            </div>
+                            <div class="mensalidade-actions">
+                                <button class="btn-action view" title="Ver Detalhes">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn-action reactivate" title="Reativar">
+                                    <i class="fas fa-redo"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Cobrança 8 -->
+                        <div class="mensalidade-card fade-in">
+                            <div class="mensalidade-header">
+                                <div class="mensalidade-info">
+                                    <h3 class="oficina-name">Mecânica Minas</h3>
+                                    <span class="codigo-cobranca">#CB202411008</span>
+                                </div>
+                                <span class="status-badge status-atrasado">Atrasado</span>
+                            </div>
+                            <div class="mensalidade-details">
+                                <div class="detail-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>Vencimento: 12/11/2024</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    <span>Valor: R$ 550,00</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>3 dias em atraso</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-envelope"></i>
+                                    <span>Lembrete enviado: 13/11</span>
+                                </div>
+                            </div>
+                            <div class="plano-info">
+                                <div class="plano-label">Plano Contratado:</div>
+                                <div class="plano-tags">
+                                    <span class="plano-tag professional">Professional</span>
+                                    <span class="plano-valor">R$ 550,00/mês</span>
+                                </div>
+                            </div>
+                            <div class="mensalidade-actions">
+                                <button class="btn-action view" title="Ver Detalhes">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn-action reminder" title="Enviar Lembrete">
+                                    <i class="fas fa-bell"></i>
+                                </button>
+                                <button class="btn-action resend" title="Reenviar Cobrança">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paginação -->
+                    <div class="pagination-container">
+                        <div class="pagination-info">
+                            <span id="paginationInfo">Página 1 de 1</span>
+                        </div>
+                        <div class="pagination-controls">
+                            <div class="page-size-group">
+                                <label class="page-size-label" for="pageSizeSelect">Itens por página:</label>
+                                <select id="pageSizeSelect" class="page-size-select">
+                                    <option value="12">12</option>
+                                    <option value="24">24</option>
+                                    <option value="48">48</option>
+                                </select>
+                            </div>
+                            <button type="button" class="btn-pagination" id="btnFirstPage" disabled>
+                                <i class="fas fa-angle-double-left"></i>
+                            </button>
+                            <button type="button" class="btn-pagination" id="btnPrevPage" disabled>
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <div class="page-numbers" id="pageNumbers">
+                                <button type="button" class="btn-pagination active">1</button>
+                            </div>
+                            <button type="button" class="btn-pagination" id="btnNextPage" disabled>
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                            <button type="button" class="btn-pagination" id="btnLastPage" disabled>
+                                <i class="fas fa-angle-double-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal de Configuração de Planos -->
+    <div id="modalPlanos" class="modal hidden">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>Configuração de Planos e Assinaturas</h3>
+                <button type="button" class="modal-close" id="modalPlanosClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="planos-container">
+                    <!-- Plano Básico -->
+                    <div class="plano-card">
+                        <div class="plano-header">
+                            <h4>Plano Básico</h4>
+                            <span class="plano-preco">R$ 500,00</span>
+                        </div>
+                        <div class="plano-descricao">
+                            <p>Ideal para oficinas iniciantes</p>
+                        </div>
+                        <div class="plano-beneficios">
+                            <div class="beneficio-item">
+                                <i class="fas fa-check"></i>
+                                <span>Até 2 usuários</span>
+                            </div>
+                            <div class="beneficio-item">
+                                <i class="fas fa-check"></i>
+                                <span>Suporte por e-mail</span>
+                            </div>
+                            <div class="beneficio-item">
+                                <i class="fas fa-check"></i>
+                                <span>Relatórios básicos</span>
+                            </div>
+                        </div>
+                        <div class="plano-actions">
+                            <button class="btn btn-secondary btn-sm">Editar</button>
+                            <button class="btn btn-primary btn-sm">Ativar</button>
+                        </div>
+                    </div>
+
+                    <!-- Plano Professional -->
+                    <div class="plano-card featured">
+                        <div class="plano-badge">Mais Popular</div>
+                        <div class="plano-header">
+                            <h4>Plano Professional</h4>
+                            <span class="plano-preco">R$ 550,00</span>
+                        </div>
+                        <div class="plano-descricao">
+                            <p>Para oficinas em crescimento</p>
+                        </div>
+                        <div class="plano-beneficios">
+                            <div class="beneficio-item">
+                                <i class="fas fa-check"></i>
+                                <span>Até 5 usuários</span>
+                            </div>
+                            <div class="beneficio-item">
+                                <i class="fas fa-check"></i>
+                                <span>Suporte prioritário</span>
+                            </div>
+                            <div class="beneficio-item">
+                                <i class="fas fa-check"></i>
+                                <span>Relatórios avançados</span>
+                            </div>
+                            <div class="beneficio-item">
+                                <i class="fas fa-check"></i>
+                                <span>Integração API</span>
+                            </div>
+                        </div>
+                        <div class="plano-actions">
+                            <button class="btn btn-secondary btn-sm">Editar</button>
+                            <button class="btn btn-primary btn-sm">Ativar</button>
+                        </div>
+                    </div>
+
+                    <!-- Plano Premium -->
+                    <div class="plano-card">
+                        <div class="plano-header">
+                            <h4>Plano Premium</h4>
+                            <span class="plano-preco">R$ 650,00</span>
+                        </div>
+                        <div class="plano-descricao">
+                            <p>Para oficinas estabelecidas</p>
+                        </div>
+                        <div class="plano-beneficios">
+                            <div class="beneficio-item">
+                                <i class="fas fa-check"></i>
+                                <span>Usuários ilimitados</span>
+                            </div>
+                            <div class="beneficio-item">
+                                <i class="fas fa-check"></i>
+                                <span>Suporte 24/7</span>
+                            </div>
+                            <div class="beneficio-item">
+                                <i class="fas fa-check"></i>
+                                <span>Relatórios personalizados</span>
+                            </div>
+                            <div class="beneficio-item">
+                                <i class="fas fa-check"></i>
+                                <span>Treinamento inclusivo</span>
+                            </div>
+                        </div>
+                        <div class="plano-actions">
+                            <button class="btn btn-secondary btn-sm">Editar</button>
+                            <button class="btn btn-primary btn-sm">Ativar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Nova Cobrança -->
+    <div id="modalNovaCobranca" class="modal hidden">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>Nova Cobrança</h3>
+                <button type="button" class="modal-close" id="modalCobrancaClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formNovaCobranca" class="cobranca-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="oficinaSelect" class="required">Oficina</label>
+                            <select id="oficinaSelect" name="oficina" required>
+                                <option value="">Selecione a oficina</option>
+                                <option value="1">AutoCenter São Paulo</option>
+                                <option value="2">Mecânica Rio Sul</option>
+                                <option value="3">Oficina BH Center</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="planoSelect" class="required">Plano</label>
+                            <select id="planoSelect" name="plano" required>
+                                <option value="">Selecione o plano</option>
+                                <option value="basico">Básico - R$ 500,00</option>
+                                <option value="professional">Professional - R$ 550,00</option>
+                                <option value="premium">Premium - R$ 650,00</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="valorCobranca" class="required">Valor</label>
+                            <input type="text" id="valorCobranca" name="valor" value="R$ 550,00" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="vencimentoCobranca" class="required">Data de Vencimento</label>
+                            <input type="date" id="vencimentoCobranca" name="vencimento" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="metodoPagamento" class="required">Método de Pagamento</label>
+                            <select id="metodoPagamento" name="metodo" required>
+                                <option value="pix">PIX</option>
+                                <option value="boleto">Boleto</option>
+                                <option value="cartao">Cartão de Crédito</option>
+                                <option value="transferencia">Transferência</option>
+                            </select>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="observacoesCobranca">Observações</label>
+                            <textarea id="observacoesCobranca" name="observacoes" rows="3" placeholder="Observações adicionais sobre a cobrança..."></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="btnCancelarCobranca">
+                    Cancelar
+                </button>
+                <button type="submit" form="formNovaCobranca" class="btn btn-primary" id="btnGerarCobranca">
+                    <i class="fas fa-bolt"></i>
+                    Gerar Cobrança
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div class="notification-container" id="notificationContainer"></div>
+
+    <!-- JavaScript -->
+    <script src="js/mensalidades.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/logout.js"></script>
+    <script src="js/relatorios.js"></script>
+    <script src="js/relatorios.js"></script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oficinas - OilSmart</title>
+    <link rel="stylesheet" href="/admincss/oficinas.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Layout Principal -->
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-oil-can"></i>
+                    <span>OilSmart</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="menu-item">
+                    <a href="dashboard.html">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item active">
+                    <a href="oficinas.html">
+                        <i class="fas fa-wrench"></i>
+                        <span>Oficinas</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="mensalidades.html">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span>Mensalidades</span>
+                    </a>
+                </li>                
+                <li class="menu-item">
+                    <a href="#">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Relatórios</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <div class="user-name">Administrador</div>
+                        <div class="user-role">Supervisor</div>
+                    </div>
+                </div>
+                <button class="btn-logout" id="btnLogout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header do Conteúdo -->
+            <header class="content-header">
+                <div class="header-title">
+                    <h1>Gerenciamento de Oficinas</h1>
+                    <p>Gerencie todas as oficinas parceiras do sistema</p>
+                </div>
+                <div class="header-actions">
+                    <div class="header-buttons">
+                        <button class="btn btn-primary" id="btnNovaOficina">
+                            <i class="fas fa-plus"></i>
+                            Cadastrar Nova Oficina
+                        </button>
+                        <button class="btn btn-secondary" id="btnRefresh">
+                            <i class="fas fa-sync-alt"></i>
+                            Atualizar
+                        </button>
+                        <button class="btn btn-secondary" id="btnExport">
+                            <i class="fas fa-download"></i>
+                            Exportar
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Estatísticas do Dashboard -->
+            <section class="dashboard-stats">
+                <div class="stat-card">
+                    <div class="stat-icon total-oficinas">
+                        <i class="fas fa-wrench"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalOficinas">0</h3>
+                        <p>Total de Oficinas</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon oficinas-ativas">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="oficinasAtivas">0</h3>
+                        <p>Oficinas Ativas</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon cidades-atendidas">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalCidades">0</h3>
+                        <p>Cidades Atendidas</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon capacidade-total">
+                        <i class="fas fa-car"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="capacidadeTotal">0</h3>
+                        <p>Capacidade Total</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Buscar por nome, CNPJ, cidade, responsável...">
+                    <button type="button" class="btn-search-clear" id="btnSearchClear">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="filters">
+                    <div class="filter-group">
+                        <div class="filter-label">Status</div>
+                        <select id="filterStatus" class="filter-select">
+                            <option value="">Todos os status</option>
+                            <option value="ativo">Ativas</option>
+                            <option value="inativo">Inativas</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <div class="filter-label">Cidade</div>
+                        <select id="filterCidade" class="filter-select">
+                            <option value="">Todas as cidades</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="toolbar-actions">
+                    <button type="button" class="btn btn-secondary" id="btnLimparFiltros">
+                        <i class="fas fa-eraser"></i>
+                        Limpar Filtros
+                    </button>
+                </div>
+            </div>
+
+            <!-- Seção de Oficinas -->
+            <section class="oficinas-section">
+                <div class="section-header">
+                    <h2>Oficinas Cadastradas</h2>
+                    <div class="table-info">
+                        <span id="tableInfo">Mostrando 0 de 0 oficinas</span>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <!-- Tabela de Oficinas -->
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th data-sort="nome">
+                                        <div class="th-content">
+                                            Nome da Oficina
+                                            <i class="fas fa-sort"></i>
+                                        </div>
+                                    </th>
+                                    <th data-sort="cnpj">
+                                        <div class="th-content">
+                                            CNPJ
+                                            <i class="fas fa-sort"></i>
+                                        </div>
+                                    </th>
+                                    <th data-sort="cidade">
+                                        <div class="th-content">
+                                            Cidade
+                                            <i class="fas fa-sort"></i>
+                                        </div>
+                                    </th>
+                                    <th data-sort="responsavel">
+                                        <div class="th-content">
+                                            Responsável
+                                            <i class="fas fa-sort"></i>
+                                        </div>
+                                    </th>
+                                    <th data-sort="telefone">
+                                        <div class="th-content">
+                                            Contato
+                                            <i class="fas fa-sort"></i>
+                                        </div>
+                                    </th>
+                                    <th data-sort="status">
+                                        <div class="th-content">
+                                            Status
+                                            <i class="fas fa-sort"></i>
+                                        </div>
+                                    </th>
+                                    <th width="120">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabela-oficinas">
+                                <!-- Dados serão carregados dinamicamente pelo JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Paginação -->
+                    <div class="pagination-container">
+                        <div class="pagination-info">
+                            <span id="paginationInfo">Página 1 de 1</span>
+                        </div>
+                        <div class="pagination-controls">
+                            <div class="page-size-group">
+                                <label class="page-size-label" for="pageSizeSelect">Itens por página:</label>
+                                <select id="pageSizeSelect" class="page-size-select">
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                </select>
+                            </div>
+                            <button type="button" class="btn-pagination" id="btnFirstPage" disabled>
+                                <i class="fas fa-angle-double-left"></i>
+                            </button>
+                            <button type="button" class="btn-pagination" id="btnPrevPage" disabled>
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <div class="page-numbers" id="pageNumbers">
+                                <button type="button" class="btn-pagination active">1</button>
+                            </div>
+                            <button type="button" class="btn-pagination" id="btnNextPage" disabled>
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                            <button type="button" class="btn-pagination" id="btnLastPage" disabled>
+                                <i class="fas fa-angle-double-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal de Detalhes -->
+    <div id="detalhesModal" class="modal hidden">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3>Detalhes da Oficina</h3>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="detalhes-grid">
+                    <div class="detalhe-item">
+                        <label>Nome:</label>
+                        <span id="detalheNome">-</span>
+                    </div>
+                    <div class="detalhe-item">
+                        <label>CNPJ:</label>
+                        <span id="detalheCnpj">-</span>
+                    </div>
+                    <div class="detalhe-item">
+                        <label>Responsável:</label>
+                        <span id="detalheResponsavel">-</span>
+                    </div>
+                    <div class="detalhe-item">
+                        <label>Telefone:</label>
+                        <span id="detalheTelefone">-</span>
+                    </div>
+                    <div class="detalhe-item">
+                        <label>Email:</label>
+                        <span id="detalheEmail">-</span>
+                    </div>
+                    <div class="detalhe-item">
+                        <label>Status:</label>
+                        <span id="detalheStatus">-</span>
+                    </div>
+                    <div class="detalhe-item">
+                        <label>Capacidade:</label>
+                        <span id="detalheCapacidade">-</span>
+                    </div>
+                    <div class="detalhe-item full-width">
+                        <label>Serviços:</label>
+                        <div class="servicos-list" id="detalheServicos">
+                            <!-- Serviços serão inseridos aqui -->
+                        </div>
+                    </div>
+                    <div class="detalhe-item full-width">
+                        <label>Endereço:</label>
+                        <span id="detalheEndereco">-</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="btnFecharDetalhes">
+                    Fechar
+                </button>
+                <button class="btn btn-primary" id="btnEditarDetalhes">
+                    <i class="fas fa-edit"></i>
+                    Editar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Edição -->
+<div id="editarModal" class="modal hidden">
+    <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-header">
+            <h3>Editar Oficina</h3>
+            <button class="close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="formEditarOficina" class="form-vertical">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="editarNome" class="required">Nome da Oficina</label>
+                        <input type="text" id="editarNome" name="nome" required class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="editarCnpj">CNPJ</label>
+                        <input type="text" id="editarCnpj" name="cnpj" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="editarResponsavel" class="required">Responsável</label>
+                        <input type="text" id="editarResponsavel" name="responsavel" required class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="editarTelefone" class="required">Telefone</label>
+                        <input type="text" id="editarTelefone" name="telefone" required class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="editarEmail">Email</label>
+                        <input type="email" id="editarEmail" name="email" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="editarEmailResponsavel">Email do Responsável</label>
+                        <input type="email" id="editarEmailResponsavel" name="emailResponsavel" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="editarCapacidade">Capacidade</label>
+                        <input type="number" id="editarCapacidade" name="capacidade" min="1" max="100" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="editarStatus">Status</label>
+                        <select id="editarStatus" name="status" class="form-control">
+                            <option value="ativo">Ativa</option>
+                            <option value="inativo">Inativa</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="editarCep">CEP</label>
+                        <input type="text" id="editarCep" name="cep" class="form-control">
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="editarLogradouro">Logradouro</label>
+                        <input type="text" id="editarLogradouro" name="logradouro" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="editarNumero">Número</label>
+                        <input type="text" id="editarNumero" name="numero" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="editarComplemento">Complemento</label>
+                        <input type="text" id="editarComplemento" name="complemento" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="editarBairro">Bairro</label>
+                        <input type="text" id="editarBairro" name="bairro" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="editarCidade">Cidade</label>
+                        <input type="text" id="editarCidade" name="cidade" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="editarEstado">Estado</label>
+                        <select id="editarEstado" name="estado" class="form-control">
+                            <option value="">Selecione</option>
+                            <option value="AC">Acre</option>
+                            <option value="AL">Alagoas</option>
+                            <option value="AP">Amapá</option>
+                            <option value="AM">Amazonas</option>
+                            <option value="BA">Bahia</option>
+                            <option value="CE">Ceará</option>
+                            <option value="DF">Distrito Federal</option>
+                            <option value="ES">Espírito Santo</option>
+                            <option value="GO">Goiás</option>
+                            <option value="MA">Maranhão</option>
+                            <option value="MT">Mato Grosso</option>
+                            <option value="MS">Mato Grosso do Sul</option>
+                            <option value="MG">Minas Gerais</option>
+                            <option value="PA">Pará</option>
+                            <option value="PB">Paraíba</option>
+                            <option value="PR">Paraná</option>
+                            <option value="PE">Pernambuco</option>
+                            <option value="PI">Piauí</option>
+                            <option value="RJ">Rio de Janeiro</option>
+                            <option value="RN">Rio Grande do Norte</option>
+                            <option value="RS">Rio Grande do Sul</option>
+                            <option value="RO">Rondônia</option>
+                            <option value="RR">Roraima</option>
+                            <option value="SC">Santa Catarina</option>
+                            <option value="SP">São Paulo</option>
+                            <option value="SE">Sergipe</option>
+                            <option value="TO">Tocantins</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Serviços Oferecidos</label>
+                        <div class="services-grid" id="editarServicosContainer">
+                            <!-- Serviços serão preenchidos dinamicamente -->
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" id="btnCancelarEdicao">
+                Cancelar
+            </button>
+            <button class="btn btn-primary" id="btnSalvarEdicao">
+                <i class="fas fa-save"></i>
+                Salvar Alterações
+            </button>
+        </div>
+    </div>
+</div>
+
+    <!-- Modal de Confirmação -->
+    <div id="confirmModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Confirmar Exclusão</h3>
+                <button type="button" class="modal-close" id="confirmModalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir a oficina "<span id="modalOficinaName"></span>"? Esta ação não pode ser desfeita.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="confirmModalCancel">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmModalConfirm">
+                    <i class="fas fa-trash"></i>
+                    Excluir
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/state-manager.js"></script>
+    <script src="js/oficinas.js"></script>
+    <script src="js/relatorios.js"></script>
+    <script src="js/state-manager.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/logout.js"></script>
+    <script src="js/relatorios.js"></script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios - OilSmart</title>
+    <link rel="stylesheet" href="/admincss/style.css">
+    <link rel="stylesheet" href="/admincss/relatorios.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+<!-- Container Principal -->
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-oil-can"></i>
+                    <span>OilSmart</span>
+                </div>
+                <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="Alternar menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="menu-item active">
+                    <a href="dashboard.html">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="oficinas.html">
+                        <i class="fas fa-wrench"></i>
+                        <span>Oficinas</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="mensalidades.html">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span>Mensalidades</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="relatorios.html">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Relatórios</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <span class="user-name">Administrador</span>
+                        <span class="user-role">Super Admin</span>
+                    </div>
+                </div>
+                <button type="button" class="btn-logout" id="btnLogout" aria-label="Sair do sistema">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </nav>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/mensalidades.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/logout.js"></script>
+</body>
+</html>

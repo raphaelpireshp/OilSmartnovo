@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OilSmart - Gerenciamento</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --secondary-color: #6c757d;
+            --success-color: #198754;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #0dcaf0;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .sidebar {
+            min-height: 100vh;
+            background-color: #343a40;
+            color: white;
+            padding: 0;
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 20px;
+            border-radius: 0;
+            transition: all 0.3s;
+        }
+        
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .main-content {
+            padding: 20px;
+        }
+        
+        .card {
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border: none;
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+            font-weight: 600;
+        }
+        
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+        
+        .btn-action {
+            padding: 4px 8px;
+            margin: 0 2px;
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--secondary-color);
+        }
+        
+        .search-box input {
+            padding-left: 35px;
+        }
+        
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-active {
+            background-color: rgba(25, 135, 84, 0.1);
+            color: var(--success-color);
+        }
+        
+        .status-inactive {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: var(--danger-color);
+        }
+        
+        .form-section {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .form-section h5 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .tab-content {
+            padding: 20px 0;
+        }
+        
+        .nav-tabs .nav-link.active {
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-2 sidebar">
+                <div class="d-flex flex-column p-3">
+                    <h4 class="text-center mb-4">OilSmart</h4>
+                    <ul class="nav nav-pills flex-column mb-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link active" data-section="dashboard">
+                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-section="workshops">
+                                <i class="fas fa-wrench"></i> Oficinas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-section="oils">
+                                <i class="fas fa-oil-can"></i> Óleos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-section="filters">
+                                <i class="fas fa-filter"></i> Filtros
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-section="brands">
+                                <i class="fas fa-car"></i> Marcas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-section="models">
+                                <i class="fas fa-cog"></i> Modelos
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-10 main-content">
+                <!-- Dashboard Section -->
+                <div id="dashboard" class="content-section">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Dashboard</h2>
+                        <div class="d-flex">
+                            <div class="search-box me-3">
+                                <i class="fas fa-search"></i>
+                                <input type="text" class="form-control" placeholder="Pesquisar...">
+                            </div>
+                            <button class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Novo
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title text-primary">Oficinas</h5>
+                                    <h2 class="card-text">35</h2>
+                                    <p class="text-muted">Ativas</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title text-success">Óleos</h5>
+                                    <h2 class="card-text">26</h2>
+                                    <p class="text-muted">Cadastrados</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title text-info">Filtros</h5>
+                                    <h2 class="card-text">16</h2>
+                                    <p class="text-muted">Cadastrados</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title text-warning">Marcas</h5>
+                                    <h2 class="card-text">30</h2>
+                                    <p class="text-muted">Cadastradas</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Oficinas Recentes</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="list-group">
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-0">Motul Oficina Norte</h6>
+                                                <small class="text-muted">São Paulo - SP</small>
+                                            </div>
+                                            <span class="status-badge status-active">Ativa</span>
+                                        </div>
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-0">Motul Oficina Sul</h6>
+                                                <small class="text-muted">São Paulo - SP</small>
+                                            </div>
+                                            <span class="status-badge status-active">Ativa</span>
+                                        </div>
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-0">Motul Oficina Leste</h6>
+                                                <small class="text-muted">São Paulo - SP</small>
+                                            </div>
+                                            <span class="status-badge status-active">Ativa</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Produtos Mais Utilizados</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="list-group">
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-0">Óleo Sintético 5W-30</h6>
+                                                <small class="text-muted">Motul</small>
+                                            </div>
+                                            <span class="badge bg-primary rounded-pill">85</span>
+                                        </div>
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-0">Filtro de Óleo Universal</h6>
+                                                <small class="text-muted">Universal</small>
+                                            </div>
+                                            <span class="badge bg-primary rounded-pill">72</span>
+                                        </div>
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-0">Óleo Semissintético 10W-40</h6>
+                                                <small class="text-muted">Castrol</small>
+                                            </div>
+                                            <span class="badge bg-primary rounded-pill">68</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Workshops Section -->
+                <div id="workshops" class="content-section d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Gerenciar Oficinas</h2>
+                        <div class="d-flex">
+                            <div class="search-box me-3">
+                                <i class="fas fa-search"></i>
+                                <input type="text" class="form-control" placeholder="Pesquisar oficinas...">
+                            </div>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#workshopModal">
+                                <i class="fas fa-plus"></i> Nova Oficina
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Nome</th>
+                                            <th>Email</th>
+                                            <th>Telefone</th>
+                                            <th>Cidade/Estado</th>
+                                            <th>Status</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Motul Oficina Norte</td>
+                                            <td>adm_norte@motul.com</td>
+                                            <td>(11) 3333-0001</td>
+                                            <td>São Paulo - SP</td>
+                                            <td><span class="status-badge status-active">Ativa</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary btn-action" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger btn-action" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Motul Oficina Sul</td>
+                                            <td>adm_sul@motul.com</td>
+                                            <td>(11) 3333-0002</td>
+                                            <td>São Paulo - SP</td>
+                                            <td><span class="status-badge status-active">Ativa</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary btn-action" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger btn-action" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Motul Oficina Leste</td>
+                                            <td>adm_leste@motul.com</td>
+                                            <td>(11) 3333-0003</td>
+                                            <td>São Paulo - SP</td>
+                                            <td><span class="status-badge status-active">Ativa</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary btn-action" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger btn-action" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Oils Section -->
+                <div id="oils" class="content-section d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Gerenciar Óleos</h2>
+                        <div class="d-flex">
+                            <div class="search-box me-3">
+                                <i class="fas fa-search"></i>
+                                <input type="text" class="form-control" placeholder="Pesquisar óleos...">
+                            </div>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#oilModal">
+                                <i class="fas fa-plus"></i> Novo Óleo
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Nome</th>
+                                            <th>Tipo</th>
+                                            <th>Viscosidade</th>
+                                            <th>Marca</th>
+                                            <th>Preço</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Óleo Sintético 5W-30</td>
+                                            <td>Carro</td>
+                                            <td>5W-30</td>
+                                            <td>Motul</td>
+                                            <td>R$ 85,00</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary btn-action" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger btn-action" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Óleo Semissintético 10W-40</td>
+                                            <td>Carro</td>
+                                            <td>10W-40</td>
+                                            <td>Castrol</td>
+                                            <td>R$ 60,00</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary btn-action" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger btn-action" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Óleo Sintético 10W-30 Moto</td>
+                                            <td>Moto</td>
+                                            <td>10W-30</td>
+                                            <td>Mobil</td>
+                                            <td>R$ 75,00</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary btn-action" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger btn-action" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters Section -->
+                <div id="filters" class="content-section d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Gerenciar Filtros</h2>
+                        <div class="d-flex">
+                            <div class="search-box me-3">
+                                <i class="fas fa-search"></i>
+                                <input type="text" class="form-control" placeholder="Pesquisar filtros...">
+                            </div>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
+                                <i class="fas fa-plus"></i> Novo Filtro
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Nome</th>
+                                            <th>Tipo</th>
+                                            <th>Compatibilidade</th>
+                                            <th>Preço</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Filtro de Óleo Universal Carro Pequeno</td>
+                                            <td>Carro</td>
+                                            <td>Fiat Palio, Uno, VW Gol, Chevrolet Onix</td>
+                                            <td>R$ 30,00</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary btn-action" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger btn-action" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Filtro de Óleo Universal Carro Médio</td>
+                                            <td>Carro</td>
+                                            <td>Ford Focus, Honda Civic, Toyota Corolla</td>
+                                            <td>R$ 35,00</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary btn-action" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger btn-action" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Filtro de Óleo Universal Moto Pequena</td>
+                                            <td>Moto</td>
+                                            <td>Honda CG 160, Yamaha Fazer 250</td>
+                                            <td>R$ 25,00</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary btn-action" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger btn-action" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Brands Section -->
+                <div id="brands" class="content-section d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Gerenciar Marcas</h2>
+                        <div class="d-flex">
+                            <div class="search-box me-3">
+                                <i class="fas fa-search"></i>
+                                <input type="text" class="form-control" placeholder="Pesquisar marcas...">
+                            </div>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#brandModal">
+                                <i class="fas fa-plus"></i> Nova Marca
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Nome</th>
+                                            <th>Quantidade de Modelos</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Fiat</td>
+                                            <td>4</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary btn-action" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger btn-action" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Ford</td>
+                                            <td>4</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary btn-action" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger btn-action" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Chevrolet</td>
+                                            <td>4</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary btn-action" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger btn-action" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Models Section -->
+                <div id="models" class="content-section d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Gerenciar Modelos</h2>
+                        <div class="d-flex">
+                            <div class="search-box me-3">
+                                <i class="fas fa-search"></i>
+                                <input type="text" class="form-control" placeholder="Pesquisar modelos...">
+                            </div>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modelModal">
+                                <i class="fas fa-plus"></i> Novo Modelo
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Nome</th>
+                                            <th>Marca</th>
+                                            <th>Tipo</th>
+                                            <th>Anos</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Palio</td>
+                                            <td>Fiat</td>
+                                            <td>Carro</td>
+                                            <td>2020-2024</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary btn-action" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger btn-action" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Uno</td>
+                                            <td>Fiat</td>
+                                            <td>Carro</td>
+                                            <td>2020-2024</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary btn-action" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger btn-action" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>CG 160</td>
+                                            <td>Honda</td>
+                                            <td>Moto</td>
+                                            <td>2020-2024</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary btn-action" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger btn-action" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Workshop Modal -->
+    <div class="modal fade" id="workshopModal" tabindex="-1" aria-labelledby="workshopModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="workshopModalLabel">Nova Oficina</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="workshopForm">
+                        <div class="form-section">
+                            <h5>Informações da Conta</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="workshopName" class="form-label">Nome da Oficina</label>
+                                        <input type="text" class="form-control" id="workshopName" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="workshopEmail" class="form-label">Email</label>
+                                        <input type="email" class="form-control" id="workshopEmail" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="workshopPassword" class="form-label">Senha</label>
+                                        <input type="password" class="form-control" id="workshopPassword" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="workshopConfirmPassword" class="form-label">Confirmar Senha</label>
+                                        <input type="password" class="form-control" id="workshopConfirmPassword" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h5>Informações de Contato</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="workshopPhone" class="form-label">Telefone</label>
+                                        <input type="text" class="form-control" id="workshopPhone" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="workshopCNPJ" class="form-label">CNPJ</label>
+                                        <input type="text" class="form-control" id="workshopCNPJ" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h5>Localização</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="workshopCEP" class="form-label">CEP</label>
+                                        <input type="text" class="form-control" id="workshopCEP" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="workshopCity" class="form-label">Cidade</label>
+                                        <input type="text" class="form-control" id="workshopCity" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="workshopState" class="form-label">Estado</label>
+                                        <select class="form-select" id="workshopState" required>
+                                            <option value="">Selecione...</option>
+                                            <option value="AC">Acre</option>
+                                            <option value="AL">Alagoas</option>
+                                            <option value="AP">Amapá</option>
+                                            <option value="AM">Amazonas</option>
+                                            <option value="BA">Bahia</option>
+                                            <option value="CE">Ceará</option>
+                                            <option value="DF">Distrito Federal</option>
+                                            <option value="ES">Espírito Santo</option>
+                                            <option value="GO">Goiás</option>
+                                            <option value="MA">Maranhão</option>
+                                            <option value="MT">Mato Grosso</option>
+                                            <option value="MS">Mato Grosso do Sul</option>
+                                            <option value="MG">Minas Gerais</option>
+                                            <option value="PA">Pará</option>
+                                            <option value="PB">Paraíba</option>
+                                            <option value="PR">Paraná</option>
+                                            <option value="PE">Pernambuco</option>
+                                            <option value="PI">Piauí</option>
+                                            <option value="RJ">Rio de Janeiro</option>
+                                            <option value="RN">Rio Grande do Norte</option>
+                                            <option value="RS">Rio Grande do Sul</option>
+                                            <option value="RO">Rondônia</option>
+                                            <option value="RR">Roraima</option>
+                                            <option value="SC">Santa Catarina</option>
+                                            <option value="SP">São Paulo</option>
+                                            <option value="SE">Sergipe</option>
+                                            <option value="TO">Tocantins</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="workshopAddress" class="form-label">Endereço</label>
+                                        <input type="text" class="form-control" id="workshopAddress" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h5>Horário de Funcionamento</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="workshopOpenTime" class="form-label">Horário de Abertura</label>
+                                        <input type="time" class="form-control" id="workshopOpenTime" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="workshopCloseTime" class="form-label">Horário de Fechamento</label>
+                                        <input type="time" class="form-control" id="workshopCloseTime" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Dias de Funcionamento</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="monday" checked>
+                                    <label class="form-check-label" for="monday">Segunda-feira</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="tuesday" checked>
+                                    <label class="form-check-label" for="tuesday">Terça-feira</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="wednesday" checked>
+                                    <label class="form-check-label" for="wednesday">Quarta-feira</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="thursday" checked>
+                                    <label class="form-check-label" for="thursday">Quinta-feira</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="friday" checked>
+                                    <label class="form-check-label" for="friday">Sexta-feira</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="saturday">
+                                    <label class="form-check-label" for="saturday">Sábado</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="sunday">
+                                    <label class="form-check-label" for="sunday">Domingo</label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Oil Modal -->
+    <div class="modal fade" id="oilModal" tabindex="-1" aria-labelledby="oilModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="oilModalLabel">Novo Óleo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="oilForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="oilName" class="form-label">Nome</label>
+                                    <input type="text" class="form-control" id="oilName" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="oilType" class="form-label">Tipo</label>
+                                    <select class="form-select" id="oilType" required>
+                                        <option value="">Selecione...</option>
+                                        <option value="carro">Carro</option>
+                                        <option value="moto">Moto</option>
+                                        <option value="caminhao">Caminhão</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="oilViscosity" class="form-label">Viscosidade</label>
+                                    <input type="text" class="form-control" id="oilViscosity" placeholder="Ex: 5W-30" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="oilBrand" class="form-label">Marca</label>
+                                    <select class="form-select" id="oilBrand" required>
+                                        <option value="">Selecione...</option>
+                                        <option value="motul">Motul</option>
+                                        <option value="castrol">Castrol</option>
+                                        <option value="mobil">Mobil</option>
+                                        <option value="petronas">Petronas</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="oilPrice" class="form-label">Preço (R$)</label>
+                                    <input type="number" step="0.01" class="form-control" id="oilPrice" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="oilStock" class="form-label">Estoque</label>
+                                    <input type="number" class="form-control" id="oilStock" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="oilCompatibility" class="form-label">Compatibilidade</label>
+                            <select class="form-select" id="oilCompatibility" multiple>
+                                <option value="fiat_palio">Fiat Palio</option>
+                                <option value="fiat_uno">Fiat Uno</option>
+                                <option value="vw_gol">VW Gol</option>
+                                <option value="chevrolet_onix">Chevrolet Onix</option>
+                                <option value="ford_focus">Ford Focus</option>
+                                <option value="honda_civic">Honda Civic</option>
+                                <option value="toyota_corolla">Toyota Corolla</option>
+                            </select>
+                            <div class="form-text">Segure Ctrl (ou Cmd no Mac) para selecionar múltiplos modelos.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="oilDescription" class="form-label">Descrição</label>
+                            <textarea class="form-control" id="oilDescription" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Modal -->
+    <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="filterModalLabel">Novo Filtro</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="filterForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="filterName" class="form-label">Nome</label>
+                                    <input type="text" class="form-control" id="filterName" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="filterType" class="form-label">Tipo</label>
+                                    <select class="form-select" id="filterType" required>
+                                        <option value="">Selecione...</option>
+                                        <option value="carro">Carro</option>
+                                        <option value="moto">Moto</option>
+                                        <option value="caminhao">Caminhão</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="filterPrice" class="form-label">Preço (R$)</label>
+                                    <input type="number" step="0.01" class="form-control" id="filterPrice" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="filterStock" class="form-label">Estoque</label>
+                                    <input type="number" class="form-control" id="filterStock" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="filterCompatibility" class="form-label">Compatibilidade</label>
+                            <select class="form-select" id="filterCompatibility" multiple>
+                                <option value="fiat_palio">Fiat Palio</option>
+                                <option value="fiat_uno">Fiat Uno</option>
+                                <option value="vw_gol">VW Gol</option>
+                                <option value="chevrolet_onix">Chevrolet Onix</option>
+                                <option value="ford_focus">Ford Focus</option>
+                                <option value="honda_civic">Honda Civic</option>
+                                <option value="toyota_corolla">Toyota Corolla</option>
+                            </select>
+                            <div class="form-text">Segure Ctrl (ou Cmd no Mac) para selecionar múltiplos modelos.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="filterDescription" class="form-label">Descrição</label>
+                            <textarea class="form-control" id="filterDescription" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Brand Modal -->
+    <div class="modal fade" id="brandModal" tabindex="-1" aria-labelledby="brandModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="brandModalLabel">Nova Marca</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="brandForm">
+                        <div class="mb-3">
+                            <label for="brandName" class="form-label">Nome da Marca</label>
+                            <input type="text" class="form-control" id="brandName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="brandCountry" class="form-label">País de Origem</label>
+                            <input type="text" class="form-control" id="brandCountry">
+                        </div>
+                        <div class="mb-3">
+                            <label for="brandDescription" class="form-label">Descrição</label>
+                            <textarea class="form-control" id="brandDescription" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Model Modal -->
+    <div class="modal fade" id="modelModal" tabindex="-1" aria-labelledby="modelModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modelModalLabel">Novo Modelo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="modelForm">
+                        <div class="mb-3">
+                            <label for="modelName" class="form-label">Nome do Modelo</label>
+                            <input type="text" class="form-control" id="modelName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="modelBrand" class="form-label">Marca</label>
+                            <select class="form-select" id="modelBrand" required>
+                                <option value="">Selecione...</option>
+                                <option value="fiat">Fiat</option>
+                                <option value="ford">Ford</option>
+                                <option value="chevrolet">Chevrolet</option>
+                                <option value="volkswagen">Volkswagen</option>
+                                <option value="honda">Honda</option>
+                                <option value="toyota">Toyota</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="modelType" class="form-label">Tipo</label>
+                            <select class="form-select" id="modelType" required>
+                                <option value="">Selecione...</option>
+                                <option value="carro">Carro</option>
+                                <option value="moto">Moto</option>
+                                <option value="caminhao">Caminhão</option>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="modelStartYear" class="form-label">Ano Inicial</label>
+                                    <input type="number" class="form-control" id="modelStartYear" min="1900" max="2030" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="modelEndYear" class="form-label">Ano Final</label>
+                                    <input type="number" class="form-control" id="modelEndYear" min="1900" max="2030">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="modelDescription" class="form-label">Descrição</label>
+                            <textarea class="form-control" id="modelDescription" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Navigation between sections
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.sidebar .nav-link');
+            const contentSections = document.querySelectorAll('.content-section');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all links
+                    navLinks.forEach(navLink => {
+                        navLink.classList.remove('active');
+                    });
+                    
+                    // Add active class to clicked link
+                    this.classList.add('active');
+                    
+                    // Hide all content sections
+                    contentSections.forEach(section => {
+                        section.classList.add('d-none');
+                    });
+                    
+                    // Show the selected section
+                    const sectionId = this.getAttribute('data-section');
+                    document.getElementById(sectionId).classList.remove('d-none');
+                });
+            });
+            
+            // Initialize tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+</body>
+</html>

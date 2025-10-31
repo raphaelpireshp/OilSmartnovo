@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OilSmart - Sistema de Gestão</title>
+    <link rel="stylesheet" href="/admincss/index.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Container Principal -->
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-oil-can"></i>
+                    <span>OilSmart</span>
+                </div>
+                <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="Alternar menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="menu-item active">
+                    <a href="dashboard.html">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="oficinas.html">
+                        <i class="fas fa-wrench"></i>
+                        <span>Oficinas</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="mensalidades.html">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span>Mensalidades</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="relatorios.html">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Relatórios</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <span class="user-name">Administrador</span>
+                        <span class="user-role">Super Admin</span>
+                    </div>
+                </div>
+                <button type="button" class="btn-logout" id="btnLogout" aria-label="Sair do sistema">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content" id="mainContent">
+            <!-- Header -->
+            <header class="content-header">
+                <div class="header-title">
+                    <h1>Dashboard</h1>
+                    <p>Visão geral do sistema e mensalidades das oficinas</p>
+                </div>
+                <div class="header-actions">
+                    <div class="header-buttons">
+                        <button type="button" class="btn-icon" id="btnNotifications" aria-label="Notificações">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge" id="notificationCount">0</span>
+                        </button>
+                        <button type="button" class="btn-icon" id="btnFullscreen" aria-label="Tela cheia">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                        <button type="button" class="btn-icon" id="btnRefresh" aria-label="Atualizar dados" title="Atualizar Dados">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Stats -->
+            <section class="dashboard-stats">
+                <div class="stat-card">
+                    <div class="stat-icon total-oficinas">
+                        <i class="fas fa-wrench"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalOficinas">0</h3>
+                        <p>Total de Oficinas</p>
+                    </div>
+                    <div class="stat-trend up">
+                        <i class="fas fa-arrow-up"></i>
+                        <span id="trendOficinas">0%</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon oficinas-ativas">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="oficinasAtivas">0</h3>
+                        <p>Oficinas Ativas</p>
+                    </div>
+                    <div class="stat-trend up">
+                        <i class="fas fa-arrow-up"></i>
+                        <span id="trendAtivas">0%</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon cidades-atendidas">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalCidades">0</h3>
+                        <p>Cidades Atendidas</p>
+                    </div>
+                    <div class="stat-trend up">
+                        <i class="fas fa-arrow-up"></i>
+                        <span id="trendCidades">0%</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon capacidade-total">
+                        <i class="fas fa-car"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="capacidadeTotal">0</h3>
+                        <p>Capacidade Total</p>
+                    </div>
+                    <div class="stat-trend down">
+                        <i class="fas fa-arrow-down"></i>
+                        <span id="trendCapacidade">0%</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Gráficos e Métricas de Mensalidades -->
+            <section class="charts-section">
+                <div class="charts-grid">
+                    <!-- Gráfico de Mensalidades por Mês -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Mensalidades - Últimos 6 Meses</h3>
+                            <div class="chart-actions">
+                                <button type="button" class="btn-icon" id="btnExportMensalidades" title="Exportar">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <button type="button" class="btn-icon" id="btnRefreshMensalidades" title="Atualizar">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="mensalidadesChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Status de Pagamentos -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Status de Pagamentos</h3>
+                            <div class="chart-actions">
+                                <button type="button" class="btn-icon" id="btnRefreshStatus" title="Atualizar">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="statusPagamentosChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Receita por Cidade -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Receita por Cidade</h3>
+                            <div class="chart-actions">
+                                <button type="button" class="btn-icon" id="btnRefreshCidades" title="Atualizar">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="receitaCidadeChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Métricas de Mensalidades -->
+                    <div class="metrics-card">
+                        <div class="metrics-header">
+                            <h3>Resumo Financeiro</h3>
+                            <span class="periodo" id="periodoAtual">Este Mês</span>
+                        </div>
+                        <div class="metrics-content">
+                            <div class="metric-item">
+                                <div class="metric-info">
+                                    <span class="metric-label">Receita Total</span>
+                                    <span class="metric-value" id="receitaTotal">R$ 0,00</span>
+                                </div>
+                                <div class="metric-trend up">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span id="trendReceita">0%</span>
+                                </div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-info">
+                                    <span class="metric-label">Pagamentos em Dia</span>
+                                    <span class="metric-value" id="pagamentosEmDia">0 oficinas</span>
+                                </div>
+                                <div class="metric-trend up">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span id="trendPagamentos">0%</span>
+                                </div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-info">
+                                    <span class="metric-label">Pagamentos Atrasados</span>
+                                    <span class="metric-value" id="pagamentosAtrasados">0 oficinas</span>
+                                </div>
+                                <div class="metric-trend down">
+                                    <i class="fas fa-arrow-down"></i>
+                                    <span id="trendAtrasos">0%</span>
+                                </div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-info">
+                                    <span class="metric-label">Taxa de Adimplência</span>
+                                    <span class="metric-value" id="taxaAdimplencia">0%</span>
+                                </div>
+                                <div class="metric-trend up">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span id="trendAdimplencia">0%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Lista de Mensalidades em Destaque -->
+            <section class="mensalidades-section">
+                <div class="section-header">
+                    <h2>Mensalidades em Destaque</h2>
+                    <div class="section-actions">
+                        <button type="button" class="btn btn-secondary" id="btnVerTodas">
+                            <i class="fas fa-list"></i>
+                            Ver Todas
+                        </button>
+                        <button type="button" class="btn btn-primary" id="btnRegistrarPagamento">
+                            <i class="fas fa-money-bill-wave"></i>
+                            Registrar Pagamento
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mensalidades-grid" id="mensalidadesGrid">
+                    <!-- As mensalidades serão carregadas dinamicamente aqui -->
+                    <div class="loading-state" id="loadingMensalidades">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span>Carregando mensalidades...</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Lista Rápida de Oficinas -->
+            <section class="oficinas-section">
+                <div class="section-header">
+                    <h2>Oficinas Recentes</h2>
+                    <div class="section-actions">
+                        <a href="oficinas.html" class="btn btn-secondary">
+                            <i class="fas fa-eye"></i>
+                            Ver Todas
+                        </a>
+                        <a href="cadastrar-oficina.html" class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            Nova Oficina
+                        </a>
+                    </div>
+                </div>
+
+                <div class="oficinas-grid" id="oficinasGrid">
+                    <!-- As oficinas serão carregadas dinamicamente aqui -->
+                    <div class="loading-state" id="loadingOficinas">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span>Carregando oficinas...</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal de Registro de Pagamento -->
+    <div id="modalPagamento" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Registrar Pagamento</h3>
+                <button>type="button" class="modal-close" id="modalPagamentoClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formPagamento">
+                    <div class="form-group">
+                        <label for="selectOficina">Oficina</label>
+                        <select id="selectOficina" class="form-select" required>
+                            <option value="">Selecione uma oficina</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="valorPagamento">Valor (R$)</label>
+                        <input type="number" id="valorPagamento" class="form-input" step="0.01" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="dataPagamento">Data do Pagamento</label>
+                        <input type="date" id="dataPagamento" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="observacaoPagamento">Observação</label>
+                        <textarea id="observacaoPagamento" class="form-textarea" rows="3" placeholder="Observações sobre o pagamento..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="btnCancelarPagamento">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" id="btnConfirmarPagamento">
+                    <i class="fas fa-check"></i>
+                    Registrar Pagamento
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação -->
+    <div id="confirmModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Confirmar Ação</h3>
+                <button> type="button" class="modal-close" id="confirmModalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmModalMessage">Tem certeza que deseja realizar esta ação?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="confirmModalCancel">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="confirmModalConfirm">
+                    <i class="fas fa-check"></i>
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div class="notification-container" id="notificationContainer"></div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay hidden" id="loadingOverlay">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <span>Carregando...</span>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <!-- Incluir o State Manager primeiro -->
+<script src="/adminjs/admin-consolidated.js"></script>
+</body>
+</html>
