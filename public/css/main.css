@@ -2381,10 +2381,9 @@ body {
 
 /* ===== FOOTER ===== */
 .footer {
-    background: var(--primary-color);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
     color: white;
-    padding: 40px 0 20px;
-    margin-top: 50px;
+    padding: var(--space-2xl) 0 var(--space-lg);
 }
 
 .footer-content {
@@ -2406,7 +2405,7 @@ body {
 
 .footer-links h3, 
 .footer-contact h3 {
-    color: var(--secondary-color);
+    color: #ffd700;
     margin-bottom: 20px;
     font-size: 1.2rem;
     position: relative;
@@ -2421,7 +2420,7 @@ body {
     bottom: 0;
     width: 40px;
     height: 2px;
-    background: var(--secondary-color);
+    background: #ffd700;
 }
 
 .footer-links ul {

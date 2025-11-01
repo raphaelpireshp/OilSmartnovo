@@ -1149,6 +1149,178 @@ app.post('/api/oficina', async (req, res) => {
 // ========== FIM DA ROTA DE OFICINA ==========
 // ========== FIM DA ROTA DE OFICINA ==========
 // ========== FIM DA ROTA DE OFICINA ==========
+// ========== ROTA PARA BUSCAR OFICINA COM DADOS DO USUÁRIO ==========
+
+// Rota para buscar oficina com dados do usuário
+app.get('/api/oficina-completa/:id', (req, res) => {
+    const { id } = req.params;
+    
+    console.log('🔍 Buscando oficina completa ID:', id);
+    
+    const sql = `
+        SELECT 
+            o.id, o.nome, o.endereco, o.cidade, o.estado, o.cep, o.telefone,
+            o.horario_abertura, o.horario_fechamento, o.dias_funcionamento,
+            o.lat, o.lng, o.usuario_id,
+            u.email
+        FROM oficina o
+        LEFT JOIN usuario u ON o.usuario_id = u.id
+        WHERE o.id = ?
+    `;
+    
+    db.query(sql, [id], (err, results) => {
+        if (err) {
+            console.error('❌ Erro ao buscar oficina completa:', err);
+            return res.status(500).json({ 
+                success: false, 
+                error: 'Erro interno do servidor' 
+            });
+        }
+        
+        if (results.length === 0) {
+            console.log('❌ Oficina não encontrada ID:', id);
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Oficina não encontrada' 
+            });
+        }
+        
+        const oficina = results[0];
+        console.log('✅ Oficina completa encontrada:', oficina);
+        
+        res.json({ 
+            success: true, 
+            oficina: oficina 
+        });
+    });
+});
+
+// ========== FIM DA ROTA DE OFICINA COMPLETA ==========
+// ========== ROTA PARA ATUALIZAR OFICINA ==========
+
+// Rota para atualizar oficina
+app.put('/api/oficina/:id', async (req, res) => {
+    const { id } = req.params;
+    const {
+        nome, email, senha, endereco, cidade, estado, telefone, horario_abertura,
+        horario_fechamento, dias_funcionamento, lat, lng, cep
+    } = req.body;
+
+    console.log('🔄 Atualizando oficina ID:', id);
+    console.log('📝 Dados recebidos:', req.body);
+
+    // Validação dos campos obrigatórios
+    if (!nome || !endereco || !cidade || !estado || !telefone || !cep) {
+        return res.status(400).json({ 
+            success: false, 
+            error: 'Campos obrigatórios faltando: nome, endereco, cidade, estado, telefone, cep' 
+        });
+    }
+
+    try {
+        // Primeiro, buscar a oficina para obter o usuario_id
+        const findOficinaSql = 'SELECT usuario_id FROM oficina WHERE id = ?';
+        const oficinaResult = await new Promise((resolve, reject) => {
+            db.query(findOficinaSql, [id], (err, results) => {
+                if (err) reject(err);
+                else resolve(results);
+            });
+        });
+
+        if (oficinaResult.length === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Oficina não encontrada' 
+            });
+        }
+
+        const usuarioId = oficinaResult[0].usuario_id;
+        console.log('🔍 Usuário ID encontrado:', usuarioId);
+
+        // Atualizar o usuário (email e senha se fornecida)
+        if (email) {
+            let usuarioSql = 'UPDATE usuario SET email = ?';
+            let usuarioParams = [email];
+
+            // Se senha foi fornecida, atualizar também
+            if (senha && senha.trim() !== '') {
+                console.log('🔑 Atualizando senha do usuário');
+                const bcrypt = require('bcryptjs');
+                const saltRounds = 10;
+                const senhaHash = await bcrypt.hash(senha, saltRounds);
+                
+                usuarioSql += ', senha = ?';
+                usuarioParams.push(senhaHash);
+            }
+
+            usuarioSql += ' WHERE id = ?';
+            usuarioParams.push(usuarioId);
+
+            await new Promise((resolve, reject) => {
+                db.query(usuarioSql, usuarioParams, (err, result) => {
+                    if (err) reject(err);
+                    else {
+                        console.log('✅ Usuário atualizado');
+                        resolve(result);
+                    }
+                });
+            });
+        }
+
+        // Atualizar a oficina
+        const oficinaSql = `
+            UPDATE oficina SET
+                nome = ?, endereco = ?, cidade = ?, estado = ?, telefone = ?, cep = ?,
+                horario_abertura = ?, horario_fechamento = ?, dias_funcionamento = ?, 
+                lat = ?, lng = ?, updated_at = NOW()
+            WHERE id = ?
+        `;
+        
+        const oficinaParams = [
+            nome, endereco, cidade, estado, telefone, cep,
+            horario_abertura || '08:00:00',
+            horario_fechamento || '18:00:00',
+            dias_funcionamento || 'Seg-Sex',
+            lat || null,
+            lng || null,
+            id
+        ];
+
+        console.log('🔍 Executando UPDATE da oficina com parâmetros:', oficinaParams);
+
+        const result = await new Promise((resolve, reject) => {
+            db.query(oficinaSql, oficinaParams, (err, result) => {
+                if (err) reject(err);
+                else resolve(result);
+            });
+        });
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Oficina não encontrada' 
+            });
+        }
+
+        console.log('✅ Oficina atualizada com sucesso!');
+        
+        res.json({ 
+            success: true, 
+            message: 'Oficina atualizada com sucesso!' 
+        });
+
+    } catch (error) {
+        console.error('❌ Erro ao atualizar oficina:', error);
+        return res.status(500).json({ 
+            success: false, 
+            error: 'Erro interno do servidor',
+            details: error.message 
+        });
+    }
+});
+
+// ========== FIM DA ROTA DE ATUALIZAÇÃO ==========
+
 // ========== ROTAS DE PRODUTOS ==========
 
 app.get('/api/produtos/oleo/:id', (req, res) => {

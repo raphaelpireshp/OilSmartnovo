@@ -206,7 +206,7 @@ p {
 .hero-content h2 {
     font-size: 2.5rem;
     margin-bottom: var(--space-md);
-    color: var(--primary-color);
+color: #ffd700;
     animation: fadeInUp 1s ease;
 }
 
@@ -453,7 +453,7 @@ p {
 .feature-card h3 {
     font-size: 1.5rem;
     margin-bottom: var(--space-md);
-    color: var(--text-color);
+    color: #1e4769
 }
 
 .feature-card p {
@@ -469,7 +469,7 @@ p {
 
 .process-steps h3 {
     font-size: 1.8rem;
-    color: var(--primary-color);
+color: #1e4769;
     margin-bottom: var(--space-xl);
     text-align: center;
 }
@@ -514,8 +514,7 @@ p {
 .step h4 {
     font-size: 1.3rem;
     margin-bottom: var(--space-sm);
-    color: var(--primary-color);
-}
+color: #1e4769;}
 
 .step p {
     color: var(--text-light);
@@ -530,7 +529,7 @@ p {
 
 .admin-benefits h3 {
     font-size: 1.8rem;
-    color: var(--primary-color);
+    color: #1e4769;
     margin-bottom: var(--space-lg);
     text-align: center;
 }
@@ -1220,4 +1219,27 @@ a:focus-visible {
     .phone-mockup {
         background: linear-gradient(135deg, #1a202c, #2d3748);
     }
+}
+
+/* Estilo para a imagem do logo no hero */
+.hero-oil {
+    max-width: 400px;
+    width: 100%;
+    height: auto;
+    border-radius: 15px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+    border: 3px solid #b49434;
+    transition: all 0.3s ease;
+    object-fit: cover;
+}
+
+/* Efeito hover para interatividade */
+.hero-oil:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 50px rgba(180, 148, 52, 0.3);
+}
+
+/* Remove o estilo do placeholder anterior */
+.image-placeholder {
+    display: none;
 }
