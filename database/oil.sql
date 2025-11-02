@@ -3760,3 +3760,36 @@ SELECT
     *
 FROM
     oficina_capacidade;
+    
+    -- Adicionar tabela para logs de atividades administrativas
+CREATE TABLE IF NOT EXISTS admin_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    admin_id INT NOT NULL,
+    acao VARCHAR(255) NOT NULL,
+    tabela_afetada VARCHAR(100),
+    registro_id INT,
+    detalhes TEXT,
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (admin_id) REFERENCES usuario(id) ON DELETE CASCADE
+);
+
+-- Adicionar coluna de status para produtos
+ALTER TABLE produto_oleo 
+ADD COLUMN status ENUM('ativo', 'inativo') DEFAULT 'ativo',
+ADD COLUMN data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ADD COLUMN data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+
+ALTER TABLE produto_filtro 
+ADD COLUMN status ENUM('ativo', 'inativo') DEFAULT 'ativo',
+ADD COLUMN data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ADD COLUMN data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+
+-- Tabela para compatibilidade de produtos com modelos/anos
+CREATE TABLE IF NOT EXISTS produto_compatibilidade (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    produto_id INT NOT NULL,
+    tipo_produto ENUM('oleo', 'filtro') NOT NULL,
+    modelo_ano_id INT NOT NULL,
+    data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (modelo_ano_id) REFERENCES modelo_ano(id) ON DELETE CASCADE
+);

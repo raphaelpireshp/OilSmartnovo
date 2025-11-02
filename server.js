@@ -1061,7 +1061,7 @@ app.get('/api/anos-completos', (req, res) => {
 });
 // ========== ROTA PARA ADICIONAR OFICINA ==========
 
-// Rota para adicionar oficina - VERSÃO COMPLETA
+// Rota para adicionar oficina - VERSÃO CORRIGIDA
 app.post('/api/oficina', async (req, res) => {
     const {
         nome, email, senha, endereco, cidade, estado, telefone, horario_abertura,
@@ -1078,29 +1078,102 @@ app.post('/api/oficina', async (req, res) => {
         });
     }
 
+    // Validação de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        return res.status(400).json({ 
+            success: false, 
+            error: 'Email inválido' 
+        });
+    }
+
+    // Validação de latitude e longitude - mais robusta
+    if (lat !== undefined && lat !== null && lat !== '') {
+        const latNum = parseFloat(lat);
+        if (isNaN(latNum) || latNum < -90 || latNum > 90) {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Latitude deve ser um número entre -90 e 90' 
+            });
+        }
+    }
+
+    if (lng !== undefined && lng !== null && lng !== '') {
+        const lngNum = parseFloat(lng);
+        if (isNaN(lngNum) || lngNum < -180 || lngNum > 180) {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Longitude deve ser um número entre -180 e 180' 
+            });
+        }
+    }
+
+    // Validação de CEP
+    if (cep.length < 8) {
+        return res.status(400).json({ 
+            success: false, 
+            error: 'CEP deve ter pelo menos 8 caracteres' 
+        });
+    }
+
+    // Validação de telefone
+    const telefoneLimpo = telefone.replace(/\D/g, '');
+    if (telefoneLimpo.length < 10) {
+        return res.status(400).json({ 
+            success: false, 
+            error: 'Telefone deve ter pelo menos 10 dígitos' 
+        });
+    }
+
     try {
-        // Primeiro, criar o usuário para a oficina
+        // Primeiro verificar se o email já existe
+        const checkEmailQuery = 'SELECT id FROM usuario WHERE email = ?';
+        const emailResults = await new Promise((resolve, reject) => {
+            db.query(checkEmailQuery, [email], (err, results) => {
+                if (err) reject(err);
+                else resolve(results);
+            });
+        });
+
+        if (emailResults.length > 0) {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Email já está em uso. Por favor, use outro email.' 
+            });
+        }
+
+        // Criar o usuário para a oficina
         const usuarioSql = `
             INSERT INTO usuario (nome, email, senha, tipo) 
             VALUES (?, ?, ?, 'oficina')
         `;
         
-        // Hash da senha (usando bcrypt como no seu sistema de login)
+        // Hash da senha
         const bcrypt = require('bcryptjs');
         const saltRounds = 10;
         const senhaHash = await bcrypt.hash(senha, saltRounds);
 
         const usuarioResult = await new Promise((resolve, reject) => {
-            db.query(usuarioSql, [nome, email, senhaHash, 'oficina'], (err, result) => {
-                if (err) reject(err);
-                else resolve(result);
+            db.query(usuarioSql, [nome, email, senhaHash], (err, result) => {
+                if (err) {
+                    // Tratamento específico para erro de email duplicado
+                    if (err.code === 'ER_DUP_ENTRY') {
+                        return res.status(400).json({ 
+                            success: false, 
+                            error: 'Email já está em uso. Por favor, use outro email.' 
+                        });
+                    }
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
             });
         });
 
         const usuarioId = usuarioResult.insertId;
         console.log('✅ Usuário criado com ID:', usuarioId);
 
-        // Agora criar a oficina com o usuario_id válido
+        // Criar a oficina com o usuario_id válido
         const oficinaSql = `
             INSERT INTO oficina (
                 nome, endereco, cidade, estado, telefone, cep,
@@ -1109,13 +1182,36 @@ app.post('/api/oficina', async (req, res) => {
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
         
+        // Converter valores vazios para NULL e validar números
+        let latValue = null;
+        let lngValue = null;
+
+        if (lat !== undefined && lat !== null && lat !== '') {
+            latValue = parseFloat(lat);
+            if (isNaN(latValue) || latValue < -90 || latValue > 90) {
+                latValue = null; // Se inválido, define como null
+            }
+        }
+
+        if (lng !== undefined && lng !== null && lng !== '') {
+            lngValue = parseFloat(lng);
+            if (isNaN(lngValue) || lngValue < -180 || lngValue > 180) {
+                lngValue = null; // Se inválido, define como null
+            }
+        }
+
         const params = [
-            nome, endereco, cidade, estado, telefone, cep,
-            horario_abertura || '08:00:00',
-            horario_fechamento || '18:00:00',
+            nome, 
+            endereco, 
+            cidade, 
+            estado, 
+            telefone, 
+            cep,
+            horario_abertura ? horario_abertura + ':00' : '08:00:00',
+            horario_fechamento ? horario_fechamento + ':00' : '18:00:00',
             dias_funcionamento || 'Seg-Sex',
-            lat || null,
-            lng || null,
+            latValue,
+            lngValue,
             usuarioId
         ];
 
@@ -1123,8 +1219,12 @@ app.post('/api/oficina', async (req, res) => {
 
         const oficinaResult = await new Promise((resolve, reject) => {
             db.query(oficinaSql, params, (err, result) => {
-                if (err) reject(err);
-                else resolve(result);
+                if (err) {
+                    console.error('❌ Erro SQL ao inserir oficina:', err);
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
             });
         });
 
@@ -1138,6 +1238,15 @@ app.post('/api/oficina', async (req, res) => {
 
     } catch (error) {
         console.error('❌ Erro ao adicionar oficina:', error);
+        
+        // Tratamento específico para erro de range
+        if (error.code === 'ER_WARN_DATA_OUT_OF_RANGE') {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Valores de latitude ou longitude fora do range permitido. Latitude: -90 a 90, Longitude: -180 a 180.' 
+            });
+        }
+
         return res.status(500).json({ 
             success: false, 
             error: 'Erro interno do servidor',
@@ -1320,7 +1429,172 @@ app.put('/api/oficina/:id', async (req, res) => {
 });
 
 // ========== FIM DA ROTA DE ATUALIZAÇÃO ==========
+// ========== ROTA PARA EXCLUIR OFICINA ==========
 
+// Rota para excluir oficina - VERSÃO COMPLETA
+app.delete('/api/oficina/:id', async (req, res) => {
+    const { id } = req.params;
+
+    console.log('🗑️ Iniciando exclusão da oficina ID:', id);
+
+    try {
+        // Primeiro, buscar a oficina para obter o usuario_id
+        const findOficinaSql = 'SELECT usuario_id FROM oficina WHERE id = ?';
+        const oficinaResult = await new Promise((resolve, reject) => {
+            db.query(findOficinaSql, [id], (err, results) => {
+                if (err) reject(err);
+                else resolve(results);
+            });
+        });
+
+        if (oficinaResult.length === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Oficina não encontrada' 
+            });
+        }
+
+        const usuarioId = oficinaResult[0].usuario_id;
+        console.log('🔍 Usuário ID encontrado:', usuarioId);
+
+        // Iniciar transação para garantir consistência
+        await new Promise((resolve, reject) => {
+            db.query('START TRANSACTION', (err) => {
+                if (err) reject(err);
+                else resolve();
+            });
+        });
+
+        try {
+            // 1. Excluir agendamentos relacionados à oficina
+            const deleteAgendamentosSql = 'DELETE FROM agendamento_simples WHERE oficina_id = ?';
+            await new Promise((resolve, reject) => {
+                db.query(deleteAgendamentosSql, [id], (err, result) => {
+                    if (err) reject(err);
+                    else {
+                        console.log('✅ Agendamentos excluídos:', result.affectedRows);
+                        resolve(result);
+                    }
+                });
+            });
+
+            // 2. Excluir estoque relacionado à oficina
+            const deleteEstoqueSql = 'DELETE FROM estoque WHERE oficina_id = ?';
+            await new Promise((resolve, reject) => {
+                db.query(deleteEstoqueSql, [id], (err, result) => {
+                    if (err) reject(err);
+                    else {
+                        console.log('✅ Estoque excluído:', result.affectedRows);
+                        resolve(result);
+                    }
+                });
+            });
+
+            // 3. Excluir configurações da oficina
+            const deleteConfigSql = 'DELETE FROM oficina_config WHERE oficina_id = ?';
+            await new Promise((resolve, reject) => {
+                db.query(deleteConfigSql, [id], (err, result) => {
+                    if (err) reject(err);
+                    else {
+                        console.log('✅ Configurações excluídas:', result.affectedRows);
+                        resolve(result);
+                    }
+                });
+            });
+
+            // 4. Excluir horários especiais
+            const deleteHorariosSql = 'DELETE FROM horarios_especiais WHERE oficina_id = ?';
+            await new Promise((resolve, reject) => {
+                db.query(deleteHorariosSql, [id], (err, result) => {
+                    if (err) reject(err);
+                    else {
+                        console.log('✅ Horários especiais excluídos:', result.affectedRows);
+                        resolve(result);
+                    }
+                });
+            });
+
+            // 5. Excluir capacidade da oficina
+            const deleteCapacidadeSql = 'DELETE FROM oficina_capacidade WHERE oficina_id = ?';
+            await new Promise((resolve, reject) => {
+                db.query(deleteCapacidadeSql, [id], (err, result) => {
+                    if (err) reject(err);
+                    else {
+                        console.log('✅ Capacidade excluída:', result.affectedRows);
+                        resolve(result);
+                    }
+                });
+            });
+
+            // 6. Excluir a oficina
+            const deleteOficinaSql = 'DELETE FROM oficina WHERE id = ?';
+            const oficinaResult = await new Promise((resolve, reject) => {
+                db.query(deleteOficinaSql, [id], (err, result) => {
+                    if (err) reject(err);
+                    else resolve(result);
+                });
+            });
+
+            if (oficinaResult.affectedRows === 0) {
+                throw new Error('Oficina não encontrada para exclusão');
+            }
+
+            // 7. Excluir o usuário associado
+            const deleteUsuarioSql = 'DELETE FROM usuario WHERE id = ?';
+            await new Promise((resolve, reject) => {
+                db.query(deleteUsuarioSql, [usuarioId], (err, result) => {
+                    if (err) reject(err);
+                    else {
+                        console.log('✅ Usuário excluído:', result.affectedRows);
+                        resolve(result);
+                    }
+                });
+            });
+
+            // Commit da transação
+            await new Promise((resolve, reject) => {
+                db.query('COMMIT', (err) => {
+                    if (err) reject(err);
+                    else resolve();
+                });
+            });
+
+            console.log('✅ Oficina e dados relacionados excluídos com sucesso!');
+            
+            res.json({ 
+                success: true, 
+                message: 'Oficina e todos os dados relacionados foram excluídos com sucesso!' 
+            });
+
+        } catch (error) {
+            // Rollback em caso de erro
+            await new Promise((resolve, reject) => {
+                db.query('ROLLBACK', (err) => {
+                    if (err) reject(err);
+                    else resolve();
+                });
+            });
+            throw error;
+        }
+
+    } catch (error) {
+        console.error('❌ Erro ao excluir oficina:', error);
+        
+        // Verificar se é um erro de chave estrangeira
+        if (error.code === 'ER_ROW_IS_REFERENCED_2' || error.errno === 1451) {
+            return res.status(409).json({ 
+                success: false, 
+                message: 'Não é possível excluir a oficina porque existem agendamentos ou outros registros vinculados a ela. Exclua primeiro os agendamentos relacionados.' 
+            });
+        }
+
+        res.status(500).json({ 
+            success: false, 
+            message: 'Erro interno do servidor ao excluir oficina',
+            details: error.message 
+        });
+    }
+});
 // ========== ROTAS DE PRODUTOS ==========
 
 app.get('/api/produtos/oleo/:id', (req, res) => {
@@ -2165,6 +2439,8 @@ app.delete('/api/ano-modelo/:id', (req, res) => {
         res.json({ success: true, message: 'Ano de modelo deletado com sucesso' });
     });
 });
+
+
 // ========== INICIAR SERVIDOR ==========
 
 app.listen(PORT, () => {
