@@ -6636,3 +6636,332 @@ select option[style*="color: #f4a261"] {
     white-space: nowrap;
     z-index: 1000;
 }
+
+/* ===== REMINDER CARD - MODO NOTURNO HARMONIOSO ===== */
+.reminder-card.next-appointment {
+    background: linear-gradient(135deg, #e7f3ff 0%, #d1e7ff 100%);
+    border-left: 4px solid #0066cc;
+}
+
+@media (prefers-color-scheme: dark) {
+    .reminder-card.next-appointment {
+        background: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
+        border-left: 4px solid #63b3ed;
+    }
+}
+
+/* ===== FILTER CONTROLS - MODO NOTURNO HARMONIOSO ===== */
+.filter-controls {
+    display: flex;
+    gap: 20px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    padding: 15px 20px;
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e1e5eb;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+    .filter-controls {
+        background: #2d3748;
+        border: 1px solid #4a5568;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+}
+
+/* ===== REMINDER CARD BASE - MODO NOTURNO ===== */
+.reminder-card {
+    background-color: var(--light-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: var(--transition);
+}
+
+@media (prefers-color-scheme: dark) {
+    .reminder-card {
+        background-color: #2d3748;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    }
+    
+    .reminder-card:hover {
+        background-color: #374151;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+    }
+}
+
+/* ===== FILTER CONTROLS ADICIONAIS - MODO NOTURNO ===== */
+.filter-controls {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .filter-controls:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        border-color: #718096;
+    }
+}
+
+/* ===== COMPONENTES DOS FILTROS - MODO NOTURNO ===== */
+.filter-group select {
+    padding: 10px 12px;
+    border: 1px solid #d0d7de;
+    border-radius: 8px;
+    background: #fdfdfd;
+    font-size: 14px;
+    transition: border 0.2s ease, box-shadow 0.2s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@media (prefers-color-scheme: dark) {
+    .filter-group select {
+        background: #4a5568;
+        border: 1px solid #718096;
+        color: #e2e8f0;
+    }
+    
+    .filter-group select:focus {
+        border-color: #63b3ed;
+        box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.15);
+    }
+    
+    .filter-group label {
+        color: #cbd5e0;
+    }
+}
+
+/* ===== BOTÕES DOS FILTROS - MODO NOTURNO ===== */
+.btn-small {
+    padding: 7px 14px;
+    font-size: 13px;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+@media (prefers-color-scheme: dark) {
+    .btn-secondary {
+        background: #718096;
+        color: #f7fafc;
+    }
+    
+    .btn-secondary:hover {
+        background: #4a5568;
+    }
+}
+
+/* ===== ESTADOS DOS CARDS - MODO NOTURNO ===== */
+.status-pending,
+.status-completed,
+.status-cancelled,
+.status-expired {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+@media (prefers-color-scheme: dark) {
+    .status-pending {
+        background: rgba(255, 193, 7, 0.2);
+        color: #faf089;
+        border: 1px solid rgba(255, 193, 7, 0.3);
+    }
+    
+    .status-completed {
+        background: rgba(40, 167, 69, 0.2);
+        color: #9ae6b4;
+        border: 1px solid rgba(40, 167, 69, 0.3);
+    }
+    
+    .status-cancelled {
+        background: rgba(220, 53, 69, 0.2);
+        color: #fc8181;
+        border: 1px solid rgba(220, 53, 69, 0.3);
+    }
+    
+    .status-expired {
+        background: rgba(107, 114, 128, 0.2);
+        color: #cbd5e0;
+        border: 1px solid rgba(107, 114, 128, 0.3);
+    }
+}
+
+/* ===== INFORMAÇÕES ADICIONAIS - MODO NOTURNO ===== */
+.price-info {
+    background: rgba(180, 148, 52, 0.05);
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+
+.cancel-info {
+    background: rgba(220, 53, 69, 0.08);
+    padding: 15px 20px;
+    border-radius: 12px;
+    margin-top: 15px;
+    border-left: 4px solid var(--danger-color);
+}
+
+@media (prefers-color-scheme: dark) {
+    .price-info {
+        background: rgba(180, 148, 52, 0.15);
+        border: 1px solid rgba(180, 148, 52, 0.3);
+    }
+    
+    .price-info p {
+        color: #d4b15f;
+    }
+    
+    .cancel-info {
+        background: rgba(220, 53, 69, 0.15);
+        border-left: 4px solid #fc8181;
+    }
+    
+    .cancel-info p {
+        color: #fc8181;
+    }
+}
+
+/* ===== CARDS DE AGENDAMENTO - MODO NOTURNO COMPLETO ===== */
+.appointment-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    margin-bottom: 25px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 1px solid var(--border-color);
+}
+
+@media (prefers-color-scheme: dark) {
+    .appointment-card {
+        background: #2d3748;
+        border: 1px solid #4a5568;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+    
+    .appointment-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+        border-color: #718096;
+    }
+    
+    .appointment-header {
+        background: #374151;
+        border-bottom: 1px solid #4a5568;
+    }
+    
+    .appointment-body {
+        background: #2d3748;
+    }
+    
+    .appointment-footer {
+        background: #374151;
+        border-top: 1px solid #4a5568;
+    }
+    
+    .protocol {
+        color: #e2e8f0;
+    }
+    
+    .service-info h3 {
+        color: #d4b15f;
+    }
+    
+    .service-info p, 
+    .date-info p, 
+    .location-info p {
+        color: #cbd5e0;
+    }
+}
+
+/* ===== TEXTOS E ELEMENTOS DE TEXTO - MODO NOTURNO ===== */
+@media (prefers-color-scheme: dark) {
+    .action-disabled {
+        color: #a0aec0;
+    }
+    
+    .text-muted {
+        color: #a0aec0 !important;
+    }
+    
+    .no-appointments {
+        color: #a0aec0;
+    }
+    
+    .no-appointments i {
+        color: #718096;
+    }
+    
+    .no-appointments h3 {
+        color: #e2e8f0;
+    }
+}
+
+/* ===== BOTÕES NO MODO NOTURNO ===== */
+@media (prefers-color-scheme: dark) {
+    .btn-outline {
+        border: 1px solid #d4b15f;
+        color: #d4b15f;
+    }
+    
+    .btn-outline:hover {
+        background: #d4b15f;
+        color: #2d3748;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #b49434, #d4b15f);
+        color: #2d3748;
+    }
+    
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #d4b15f, #b49434);
+    }
+}
+
+/* ===== TRANSITIONS SUAVES PARA O MODO NOTURNO ===== */
+.filter-controls,
+.reminder-card,
+.appointment-card,
+.filter-group select,
+.btn-small {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===== ACESSIBILIDADE NO MODO NOTURNO ===== */
+@media (prefers-color-scheme: dark) {
+    .filter-select:focus,
+    .btn-small:focus {
+        outline: 2px solid #63b3ed;
+        outline-offset: 2px;
+    }
+}
+
+/* ===== REDUÇÃO DE MOVIMENTO ===== */
+@media (prefers-reduced-motion: reduce) {
+    .filter-controls,
+    .reminder-card,
+    .appointment-card,
+    .filter-group select,
+    .btn-small {
+        transition: none;
+    }
+}

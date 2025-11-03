@@ -6,8 +6,9 @@
     <title>Painel Administrativo - OilSmart</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/css/adm.css">
-
-    <link rel="icon" href="/img/admin.png" type="image/x-icon"></head>
+            <link rel="icon" href="/img/admin.png" type="image/x-icon"></head>
+            <!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </head>
 
@@ -102,151 +103,137 @@
             <!-- Content Area -->
             <div class="content-area">
                 <!-- Dashboard Section -->
-                <section id="dashboard" class="content-section active">
-                    <div class="section-header">
-                        <h2>Visão Geral</h2>
-                        <div class="header-actions">
-                            <button class="btn btn-primary" onclick="loadDashboard()">
-                                <i class="fas fa-sync-alt"></i>
-                                Atualizar
-                            </button>
-                        </div>
+<!-- Dashboard Section -->
+<!-- Dashboard Section -->
+<section id="dashboard" class="content-section active">
+    <div class="section-header">
+        <h2>Painel de Informações</h2>
+        <div class="header-actions">
+            <button class="btn btn-primary" onclick="loadDashboard()">
+                <i class="fas fa-sync-alt"></i>
+                Atualizar
+            </button>
+        </div>
+    </div>
+
+    <!-- Informações Rápidas do Dia -->
+    <div class="info-grid">
+        <!-- Agendamentos para Hoje -->
+        <div class="info-card today-card">
+            <div class="info-icon">
+                <i class="fas fa-calendar-day"></i>
+            </div>
+            <div class="info-content">
+                <h3>Agendamentos para Hoje</h3>
+                <div class="info-value" id="agendamentosHoje">0</div>
+                <div class="info-detail">
+                    <span id="hojeDetalhes">Carregando...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Último Agendamento -->
+        <div class="info-card last-card">
+            <div class="info-icon">
+                <i class="fas fa-user-clock"></i>
+            </div>
+            <div class="info-content">
+                <h3>Último Agendamento</h3>
+                <div class="info-value" id="ultimoCliente">-</div>
+                <div class="info-detail">
+                    <span id="ultimoDetalhes">Nenhum agendamento</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Agendamentos do Mês -->
+        <div class="info-card month-card">
+            <div class="info-icon">
+                <i class="fas fa-chart-bar"></i>
+            </div>
+            <div class="info-content">
+                <h3>Este Mês</h3>
+                <div class="info-value" id="agendamentosMes">0</div>
+                <div class="info-detail">
+                    <span id="mesDetalhes">Total de agendamentos</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status dos Agendamentos -->
+        <div class="info-card status-card">
+            <div class="info-icon">
+                <i class="fas fa-clipboard-list"></i>
+            </div>
+            <div class="info-content">
+                <h3>Status Atual</h3>
+                <div class="status-mini-grid">
+                    <div class="status-item">
+                        <span class="status-badge status-pendente mini">Pendentes</span>
+                        <span class="status-count" id="countPendentes">0</span>
                     </div>
-
-                    <!-- Metrics Grid -->
-                    <div class="metrics-grid">
-                        <div class="metric-card">
-                            <div class="metric-icon">
-                                <i class="fas fa-calendar"></i>
-                            </div>
-                            <div class="metric-content">
-                                <h3>Total de Agendamentos</h3>
-                                <div class="metric-value" id="totalAgendamentos">0</div>
-                                <div class="metric-change positive">
-                                    <i class="fas fa-arrow-up"></i>
-                                    <span>Este mês</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="metric-card">
-                            <div class="metric-icon">
-                                <i class="fas fa-clock"></i>
-                            </div>
-                            <div class="metric-content">
-                                <h3>Agendamentos Pendentes</h3>
-                                <div class="metric-value" id="agendamentosPendentes">0</div>
-                                <div class="metric-change neutral">
-                                    <span>Precisa de atenção</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="metric-card">
-                            <div class="metric-icon">
-                                <i class="fas fa-check-circle"></i>
-                            </div>
-                            <div class="metric-content">
-                                <h3>Confirmados</h3>
-                                <div class="metric-value" id="agendamentosConfirmados">0</div>
-                                <div class="metric-change positive">
-                                    <i class="fas fa-arrow-up"></i>
-                                    <span>Para hoje</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="metric-card">
-                            <div class="metric-icon">
-                                <i class="fas fa-check-double"></i>
-                            </div>
-                            <div class="metric-content">
-                                <h3>Concluídos</h3>
-                                <div class="metric-value" id="agendamentosConcluidos">0</div>
-                                <div class="metric-change positive">
-                                    <i class="fas fa-arrow-up"></i>
-                                    <span>Este mês</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="metric-card">
-                            <div class="metric-icon">
-                                <i class="fas fa-chart-line"></i>
-                            </div>
-                            <div class="metric-content">
-                                <h3>Recentes (7 dias)</h3>
-                                <div class="metric-value" id="agendamentosRecentes">0</div>
-                                <div class="metric-change positive">
-                                    <i class="fas fa-arrow-up"></i>
-                                    <span>Comparado à semana passada</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="metric-card">
-                            <div class="metric-icon">
-                                <i class="fas fa-dollar-sign"></i>
-                            </div>
-                            <div class="metric-content">
-                                <h3>Valor Total</h3>
-                                <div class="metric-value" id="valorTotal">R$ 0,00</div>
-                                <div class="metric-change positive">
-                                    <i class="fas fa-arrow-up"></i>
-                                    <span>Receita mensal</span>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="status-item">
+                        <span class="status-badge status-confirmado mini">Confirmados</span>
+                        <span class="status-count" id="countConfirmados">0</span>
                     </div>
-
-                    <!-- Activities Section -->
-                    <div class="activities-section">
-                        <div class="activities-card">
-                            <div class="card-header">
-                                <h3>Agendamentos Recentes</h3>
-                                <a href="#" class="view-all" onclick="showSection('agendamentos')">Ver Todos</a>
-                            </div>
-                            <div class="activities-list" id="recentActivities">
-                                <div class="activity-item">
-                                    <div class="activity-icon">
-                                        <i class="fas fa-info-circle"></i>
-                                    </div>
-                                    <div class="activity-content">
-                                        <div class="activity-title">Carregando agendamentos...</div>
-                                        <div class="activity-time">Aguarde</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="activities-card">
-                            <div class="card-header">
-                                <h3>Alertas do Sistema</h3>
-                                <a href="#" class="view-all">Ver Todos</a>
-                            </div>
-                            <div class="activities-list">
-                                <div class="activity-item">
-                                    <div class="activity-icon" style="background-color: rgba(40, 167, 69, 0.1); color: #28a745;">
-                                        <i class="fas fa-check"></i>
-                                    </div>
-                                    <div class="activity-content">
-                                        <div class="activity-title">Sistema Online</div>
-                                        <div class="activity-time">Todos os serviços estão funcionando</div>
-                                    </div>
-                                </div>
-                                <div class="activity-item">
-                                    <div class="activity-icon" style="background-color: rgba(255, 193, 7, 0.1); color: #ffc107;">
-                                        <i class="fas fa-exclamation-triangle"></i>
-                                    </div>
-                                    <div class="activity-content">
-                                        <div class="activity-title">Verificar Estoque</div>
-                                        <div class="activity-time">Alguns produtos estão com baixa quantidade</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="status-item">
+                        <span class="status-badge status-cancelado mini">Cancelados</span>
+                        <span class="status-count" id="countCancelados">0</span>
                     </div>
-                </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notificações em Tempo Real -->
+    <div class="notifications-section">
+        <div class="section-header">
+            <h3><i class="fas fa-bell"></i> Notificações Recentes</h3>
+            <span class="notification-badge" id="notificationCount">0</span>
+        </div>
+        
+        <div class="notifications-list" id="notificationsList">
+            <div class="notification-item">
+                <div class="notification-icon info">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">Bem-vindo ao sistema</div>
+                    <div class="notification-time">Aguardando novas notificações...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ações Rápidas -->
+    <div class="quick-actions-section">
+        <div class="section-header">
+            <h3><i class="fas fa-bolt"></i> Ações Rápidas</h3>
+        </div>
+        
+        <div class="actions-grid">
+            <button class="action-btn primary" onclick="showSection('agendamentos')">
+                <i class="fas fa-calendar-check"></i>
+                <span>Ver Todos os Agendamentos</span>
+            </button>
+            
+            <button class="action-btn success" onclick="showSection('agendamentos')">
+                <i class="fas fa-check-double"></i>
+                <span>Concluir Agendamento</span>
+            </button>
+            
+            <button class="action-btn warning" onclick="verAgendamentosPendentes()">
+                <i class="fas fa-clock"></i>
+                <span>Agendamentos Pendentes</span>
+            </button>
+            
+            <button class="action-btn info" onclick="verRelatoriosRapido()">
+                <i class="fas fa-chart-bar"></i>
+                <span>Relatório do Dia</span>
+            </button>
+        </div>
+    </div>
+</section>
 
                 <!-- Agendamentos Section -->
                 <section id="agendamentos" class="content-section">
@@ -487,50 +474,147 @@
     </div>
 </div>
 
-                <!-- Relatórios Section -->
-                <section id="relatorios" class="content-section">
-                    <div class="section-header">
-                        <h2>Relatórios</h2>
-                        <div class="header-actions">
-                            <button class="btn btn-primary" id="gerarRelatorioBtn">
-                                <i class="fas fa-download"></i>
-                                Gerar Relatório
-                            </button>
-                        </div>
-                    </div>
+<!-- Relatórios Section -->
+<section id="relatorios" class="content-section">
+    <div class="section-header">
+        <h2>Relatórios e Analytics</h2>
+        <div class="header-actions relatorios-actions">
+            <button class="btn btn-outline" onclick="setPeriodo('hoje')">
+                <i class="fas fa-calendar-day"></i>
+                Hoje
+            </button>
+            <button class="btn btn-outline" onclick="setPeriodo('7dias')">
+                <i class="fas fa-calendar-week"></i>
+                7 Dias
+            </button>
+            <button class="btn btn-outline" onclick="setPeriodo('30dias')">
+                <i class="fas fa-calendar-alt"></i>
+                30 Dias
+            </button>
+            <button class="btn btn-primary" onclick="loadRelatorios()">
+                <i class="fas fa-chart-bar"></i>
+                Gerar Relatório
+            </button>
+            <button class="btn btn-success" onclick="exportarRelatorio('geral')">
+                <i class="fas fa-download"></i>
+                Exportar CSV
+            </button>
+        </div>
+    </div>
 
-                    <!-- Filtros Relatórios -->
-                    <div class="filters-bar">
-                        <div class="filter-group">
-                            <label for="relatorioDataInicio">Data Início</label>
-                            <input type="date" id="relatorioDataInicio">
-                        </div>
-                        <div class="filter-group">
-                            <label for="relatorioDataFim">Data Fim</label>
-                            <input type="date" id="relatorioDataFim">
-                        </div>
+    <div class="relatorios-container">
+        <!-- Resumo dos Relatórios -->
+        <div id="resumoRelatorios" class="resumo-container">
+            <div class="resumo-grid">
+                <div class="resumo-item">
+                    <div class="resumo-icon total">
+                        <i class="fas fa-calendar-alt"></i>
                     </div>
+                    <div class="resumo-content">
+                        <h4>Total de Agendamentos</h4>
+                        <div class="resumo-value">0</div>
+                    </div>
+                </div>
+                
+                <div class="resumo-item">
+                    <div class="resumo-icon valor">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="resumo-content">
+                        <h4>Valor Total</h4>
+                        <div class="resumo-value">R$ 0,00</div>
+                    </div>
+                </div>
+                
+                <div class="resumo-item">
+                    <div class="resumo-icon taxa">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                    <div class="resumo-content">
+                        <h4>Taxa de Conclusão</h4>
+                        <div class="resumo-value">0%</div>
+                    </div>
+                </div>
+                
+                <div class="resumo-item">
+                    <div class="resumo-icon media">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="resumo-content">
+                        <h4>Ticket Médio</h4>
+                        <div class="resumo-value">R$ 0,00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                    <!-- Relatórios Table -->
-                    <div class="table-container">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Status</th>
-                                    <th>Quantidade</th>
-                                    <th>Valor Total</th>
-                                </tr>
-                            </thead>
-                            <tbody id="relatoriosTable">
-                                <tr>
-                                    <td colspan="3" class="text-center">
-                                        Selecione um período e clique em "Gerar Relatório"
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
+        <!-- Filtros Relatórios -->
+        <div class="filters-bar relatorios">
+            <div class="filter-group">
+                <label for="relatorioDataInicio">
+                    <i class="fas fa-calendar-day"></i>
+                    Data Início
+                </label>
+                <input type="date" id="relatorioDataInicio" class="form-input">
+            </div>
+            <div class="filter-group">
+                <label for="relatorioDataFim">
+                    <i class="fas fa-calendar-day"></i>
+                    Data Fim
+                </label>
+                <input type="date" id="relatorioDataFim" class="form-input">
+            </div>
+            <div class="filter-group">
+                <label style="visibility: hidden;">Períodos</label>
+                <div class="quick-actions">
+                    <button class="btn btn-sm btn-outline" onclick="gerarRelatorioMesAtual()">
+                        Este Mês
+                    </button>
+                    <button class="btn btn-sm btn-outline" onclick="gerarRelatorioSemanaAtual()">
+                        Esta Semana
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Relatórios Table -->
+        <div class="table-container relatorios">
+            <table class="data-table relatorios">
+                <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th>Quantidade</th>
+                        <th>Valor Total</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="relatoriosTable">
+                    <tr>
+                        <td colspan="4" class="text-center">
+                            <div class="empty-state relatorios">
+                                <i class="fas fa-chart-bar"></i>
+                                <h4>Nenhum relatório gerado</h4>
+                                <p>Selecione um período e clique em "Gerar Relatório"</p>
+                                <p class="small">Use os filtros acima para definir as datas</p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Seção de Analytics (opcional) -->
+        <div id="analyticsSection" class="analytics-section" style="display: none;">
+            <h3>
+                <i class="fas fa-chart-line"></i>
+                Analytics Avançados
+            </h3>
+            <div class="analytics-grid">
+                <!-- Os gráficos serão inseridos aqui via JavaScript -->
+            </div>
+        </div>
+    </div>
+</section>
 
                 <!-- Configurações Section -->
 <section id="configuracoes" class="content-section">

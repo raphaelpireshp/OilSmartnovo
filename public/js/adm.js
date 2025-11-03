@@ -76,6 +76,178 @@ async function loadDashboard() {
         showNotification('Erro ao carregar dashboard', 'error');
     }
 }
+// ==================== DASHBOARD INFORMATIVO ====================
+
+// Carregar dados do dashboard informativo
+async function loadDashboard() {
+    try {
+        const response = await apiCall('/api/admin/dashboard-informativo');
+        const data = await response.json();
+
+        if (data.success) {
+            atualizarDashboardInformativo(data.dados);
+        } else {
+            console.error('Erro ao carregar dashboard:', data.message);
+        }
+    } catch (error) {
+        console.error('Erro ao carregar dashboard:', error);
+        showNotification('Erro ao carregar informações do dashboard', 'error');
+    }
+}
+
+// Atualizar interface do dashboard
+function atualizarDashboardInformativo(dados) {
+    // Agendamentos para hoje
+    document.getElementById('agendamentosHoje').textContent = dados.hoje.total || 0;
+    document.getElementById('hojeDetalhes').textContent = 
+        dados.hoje.total > 0 ? 
+        `${dados.hoje.confirmados || 0} confirmados, ${dados.hoje.pendentes || 0} pendentes` : 
+        'Nenhum agendamento hoje';
+
+    // Último agendamento
+    if (dados.ultimo_agendamento) {
+        document.getElementById('ultimoCliente').textContent = dados.ultimo_agendamento.cliente_nome;
+        document.getElementById('ultimoDetalhes').textContent = 
+            `${dados.ultimo_agendamento.veiculo} - ${formatDate(dados.ultimo_agendamento.data_hora)}`;
+    }
+
+    // Agendamentos do mês
+    document.getElementById('agendamentosMes').textContent = dados.mes.total || 0;
+    document.getElementById('mesDetalhes').textContent = 
+        dados.mes.total > 0 ? 
+        `${dados.mes.concluidos || 0} concluídos` : 
+        'Nenhum agendamento este mês';
+
+    // Status atual
+    document.getElementById('countPendentes').textContent = dados.status.pendentes || 0;
+    document.getElementById('countConfirmados').textContent = dados.status.confirmados || 0;
+    document.getElementById('countCancelados').textContent = dados.status.cancelados || 0;
+
+    // Notificações
+    atualizarNotificacoes(dados.notificacoes);
+}
+
+// Atualizar notificações
+function atualizarNotificacoes(notificacoes) {
+    const notificationsList = document.getElementById('notificationsList');
+    const notificationCount = document.getElementById('notificationCount');
+    
+    if (!notificacoes || notificacoes.length === 0) {
+        notificationsList.innerHTML = `
+            <div class="notification-item">
+                <div class="notification-icon info">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">Nenhuma notificação recente</div>
+                    <div class="notification-time">Tudo em ordem no momento</div>
+                </div>
+            </div>
+        `;
+        notificationCount.textContent = '0';
+        return;
+    }
+
+    notificationCount.textContent = notificacoes.length;
+    
+    notificationsList.innerHTML = notificacoes.map(notificacao => {
+        const iconClass = {
+            'novo': 'success',
+            'cancelamento': 'danger',
+            'conclusao': 'success',
+            'atencao': 'warning',
+            'info': 'info'
+        }[notificacao.tipo] || 'info';
+
+        const icon = {
+            'novo': 'fa-calendar-plus',
+            'cancelamento': 'fa-calendar-times',
+            'conclusao': 'fa-check-circle',
+            'atencao': 'fa-exclamation-triangle',
+            'info': 'fa-info-circle'
+        }[notificacao.tipo] || 'fa-info-circle';
+
+        return `
+            <div class="notification-item ${notificacao.lida ? '' : 'unread'}">
+                <div class="notification-icon ${iconClass}">
+                    <i class="fas ${icon}"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">${notificacao.titulo}</div>
+                    <div class="notification-message">${notificacao.mensagem}</div>
+                    <div class="notification-time">${formatRelativeTime(notificacao.data)}</div>
+                </div>
+                ${!notificacao.lida ? `<div class="notification-dot"></div>` : ''}
+            </div>
+        `;
+    }).join('');
+}
+
+// Funções de ações rápidas
+function concluirAgendamentoRapido() {
+    const protocolo = prompt('Digite o protocolo do agendamento para concluir:');
+    if (protocolo && protocolo.trim()) {
+        concluirPorProtocolo(protocolo);
+    }
+}
+
+function verAgendamentosPendentes() {
+    showSection('agendamentos');
+    // Focar no filtro de pendentes
+    setTimeout(() => {
+        const statusFilter = document.getElementById('statusFilter');
+        if (statusFilter) {
+            statusFilter.value = 'pendente';
+            loadAgendamentos('pendente');
+        }
+    }, 100);
+}
+
+function verRelatoriosRapido() {
+    showSection('relatorios');
+    // Configurar para o dia atual
+    const hoje = new Date().toISOString().split('T')[0];
+    setTimeout(() => {
+        document.getElementById('relatorioDataInicio').value = hoje;
+        document.getElementById('relatorioDataFim').value = hoje;
+        loadRelatorios();
+    }, 100);
+}
+
+// Utilitário para tempo relativo
+function formatRelativeTime(dateString) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'Agora mesmo';
+    if (diffMins < 60) return `Há ${diffMins} min`;
+    if (diffHours < 24) return `Há ${diffHours} h`;
+    if (diffDays === 1) return 'Ontem';
+    if (diffDays < 7) return `Há ${diffDays} dias`;
+    
+    return date.toLocaleDateString('pt-BR');
+}
+
+// Atualizar dashboard a cada 2 minutos
+setInterval(loadDashboard, 120000);
+
+// Carregar dashboard quando a seção for aberta
+document.addEventListener('DOMContentLoaded', function() {
+    const originalShowSection = window.showSection;
+    window.showSection = function(sectionId) {
+        originalShowSection(sectionId);
+        
+        if (sectionId === 'dashboard') {
+            setTimeout(() => {
+                loadDashboard();
+            }, 100);
+        }
+    };
+});
 // ==================== HORÁRIOS ESPECIAIS - FUNÇÕES COMPLETAS ====================
 
 // Inicializar horários especiais
@@ -1720,48 +1892,285 @@ if (agendamento.divergencia) {
     }
 }
 
-// Carregar relatórios
+// Carregar relatórios - VERSÃO CORRIGIDA E COMPLETA
 async function loadRelatorios() {
     try {
+        showLoading('relatoriosTable');
+        
         const dataInicio = document.getElementById('relatorioDataInicio').value;
         const dataFim = document.getElementById('relatorioDataFim').value;
 
         let url = '/api/admin/relatorios/agendamentos';
-        if (dataInicio && dataFim) {
-            url += `?data_inicio=${dataInicio}&data_fim=${dataFim}`;
+        const params = new URLSearchParams();
+        
+        if (dataInicio) params.append('data_inicio', dataInicio);
+        if (dataFim) params.append('data_fim', dataFim);
+        
+        if (params.toString()) {
+            url += '?' + params.toString();
         }
 
+        console.log('📊 Carregando relatórios:', url);
+        
         const response = await apiCall(url);
         const data = await response.json();
 
-        renderRelatorios(data.relatorio);
+        console.log('📦 Dados recebidos:', data);
+
+        if (data.success) {
+            renderRelatorios(data.relatorio);
+            atualizarResumoRelatorios(data.resumo);
+        } else {
+            showNotification(data.message || 'Erro ao carregar relatórios', 'error');
+            renderRelatorios([]);
+        }
     } catch (error) {
-        console.error('Erro ao carregar relatórios:', error);
+        console.error('❌ Erro ao carregar relatórios:', error);
         showNotification('Erro ao carregar relatórios', 'error');
+        renderRelatorios([]);
+    } finally {
+        hideLoading('relatoriosTable');
     }
 }
 
-// Renderizar relatórios
+// Atualizar resumo dos relatórios
+function atualizarResumoRelatorios(resumo) {
+    const resumoContainer = document.getElementById('resumoRelatorios');
+    if (!resumoContainer || !resumo) return;
+
+    resumoContainer.innerHTML = `
+        <div class="resumo-grid">
+            <div class="resumo-item">
+                <div class="resumo-icon total">
+                    <i class="fas fa-calendar"></i>
+                </div>
+                <div class="resumo-content">
+                    <h4>Total de Agendamentos</h4>
+                    <div class="resumo-value">${resumo.total_agendamentos || 0}</div>
+                </div>
+            </div>
+            
+            <div class="resumo-item">
+                <div class="resumo-icon valor">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="resumo-content">
+                    <h4>Valor Total</h4>
+                    <div class="resumo-value">R$ ${parseFloat(resumo.valor_total || 0).toFixed(2)}</div>
+                </div>
+            </div>
+            
+            <div class="resumo-item">
+                <div class="resumo-icon taxa">
+                    <i class="fas fa-percentage"></i>
+                </div>
+                <div class="resumo-content">
+                    <h4>Taxa de Conclusão</h4>
+                    <div class="resumo-value">${parseFloat(resumo.taxa_conclusao || 0).toFixed(1)}%</div>
+                </div>
+            </div>
+            
+            <div class="resumo-item">
+                <div class="resumo-item">
+                <div class="resumo-icon media">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="resumo-content">
+                    <h4>Ticket Médio</h4>
+                    <div class="resumo-value">R$ ${parseFloat(resumo.ticket_medio || 0).toFixed(2)}</div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Renderizar relatórios - VERSÃO MELHORADA
 function renderRelatorios(relatorio) {
     const tbody = document.getElementById('relatoriosTable');
     if (!tbody) return;
 
-    if (relatorio.length === 0) {
+    if (!relatorio || relatorio.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="3" class="text-center">Nenhum dado encontrado para o período</td>
+                <td colspan="4" class="text-center">
+                    <div class="empty-state">
+                        <i class="fas fa-chart-bar"></i>
+                        <p>Nenhum dado encontrado para o período selecionado</p>
+                        <p class="small">Tente alterar as datas do filtro</p>
+                    </div>
+                </td>
             </tr>
         `;
         return;
     }
 
-    tbody.innerHTML = relatorio.map(item => `
-        <tr>
-            <td>${getStatusText(item.status)}</td>
-            <td>${item.quantidade}</td>
-            <td>R$ ${parseFloat(item.valor_total || 0).toFixed(2)}</td>
+    // Calcular totais
+    const totalQuantidade = relatorio.reduce((sum, item) => sum + (item.quantidade || 0), 0);
+    const totalValor = relatorio.reduce((sum, item) => sum + (item.valor_total || 0), 0);
+
+    tbody.innerHTML = relatorio.map(item => {
+        const percentual = totalQuantidade > 0 ? ((item.quantidade / totalQuantidade) * 100).toFixed(1) : 0;
+        
+        return `
+            <tr>
+                <td>
+                    <span class="status-badge status-${item.status || 'pendente'}">
+                        ${getStatusText(item.status)}
+                    </span>
+                </td>
+                <td>
+                    <strong>${item.quantidade || 0}</strong>
+                    <small class="text-muted">(${percentual}%)</small>
+                </td>
+                <td>R$ ${parseFloat(item.valor_total || 0).toFixed(2)}</td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn btn-sm btn-outline" onclick="verDetalhesStatus('${item.status}')" title="Ver Detalhes">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('') + `
+        <tr class="total-row">
+            <td><strong>TOTAL</strong></td>
+            <td><strong>${totalQuantidade}</strong></td>
+            <td><strong>R$ ${parseFloat(totalValor).toFixed(2)}</strong></td>
+            <td></td>
         </tr>
-    `).join('');
+    `;
+}
+
+// Ver detalhes por status
+async function verDetalhesStatus(status) {
+    try {
+        const dataInicio = document.getElementById('relatorioDataInicio').value;
+        const dataFim = document.getElementById('relatorioDataFim').value;
+
+        let url = `/api/admin/relatorios/agendamentos/${status}`;
+        const params = new URLSearchParams();
+        
+        if (dataInicio) params.append('data_inicio', dataInicio);
+        if (dataFim) params.append('data_fim', dataFim);
+        
+        if (params.toString()) {
+            url += '?' + params.toString();
+        }
+
+        const response = await apiCall(url);
+        const data = await response.json();
+
+        if (data.success) {
+            mostrarDetalhesRelatorio(data.agendamentos, status);
+        } else {
+            showNotification(data.message || 'Erro ao carregar detalhes', 'error');
+        }
+    } catch (error) {
+        console.error('Erro ao carregar detalhes:', error);
+        showNotification('Erro ao carregar detalhes', 'error');
+    }
+}
+
+// Mostrar modal com detalhes do relatório
+function mostrarDetalhesRelatorio(agendamentos, status) {
+    const modal = document.createElement('div');
+    modal.className = 'modal active';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3>Detalhes - ${getStatusText(status)}</h3>
+                <button class="close-modal" onclick="closeModal(this)">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Veículo</th>
+                                <th>Data</th>
+                                <th>Valor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${agendamentos.map(ag => `
+                                <tr>
+                                    <td>${ag.cliente_nome}</td>
+                                    <td>${ag.veiculo}</td>
+                                    <td>${formatDate(ag.data_hora)}</td>
+                                    <td>R$ ${parseFloat(ag.total_servico || 0).toFixed(2)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal(this)">Fechar</button>
+                <button class="btn btn-primary" onclick="exportarRelatorio('${status}')">
+                    <i class="fas fa-download"></i> Exportar
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+// Exportar relatório
+async function exportarRelatorio(tipo = 'geral') {
+    try {
+        const dataInicio = document.getElementById('relatorioDataInicio').value;
+        const dataFim = document.getElementById('relatorioDataFim').value;
+
+        let url = `/api/admin/relatorios/exportar?tipo=${tipo}`;
+        const params = new URLSearchParams();
+        
+        if (dataInicio) params.append('data_inicio', dataInicio);
+        if (dataFim) params.append('data_fim', dataFim);
+        
+        if (params.toString()) {
+            url += '&' + params.toString();
+        }
+
+        // Criar link de download
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `relatorio_${tipo}_${new Date().toISOString().split('T')[0]}.csv`;
+        link.click();
+
+        showNotification('Relatório exportado com sucesso!', 'success');
+    } catch (error) {
+        console.error('Erro ao exportar relatório:', error);
+        showNotification('Erro ao exportar relatório', 'error');
+    }
+}
+
+// Gerar relatório automático do mês atual
+function gerarRelatorioMesAtual() {
+    const hoje = new Date();
+    const primeiroDiaMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+    const ultimoDiaMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
+    
+    document.getElementById('relatorioDataInicio').value = primeiroDiaMes.toISOString().split('T')[0];
+    document.getElementById('relatorioDataFim').value = ultimoDiaMes.toISOString().split('T')[0];
+    
+    loadRelatorios();
+}
+
+// Gerar relatório da semana atual
+function gerarRelatorioSemanaAtual() {
+    const hoje = new Date();
+    const primeiroDiaSemana = new Date(hoje);
+    primeiroDiaSemana.setDate(hoje.getDate() - hoje.getDay());
+    const ultimoDiaSemana = new Date(primeiroDiaSemana);
+    ultimoDiaSemana.setDate(primeiroDiaSemana.getDate() + 6);
+    
+    document.getElementById('relatorioDataInicio').value = primeiroDiaSemana.toISOString().split('T')[0];
+    document.getElementById('relatorioDataFim').value = ultimoDiaSemana.toISOString().split('T')[0];
+    
+    loadRelatorios();
 }
 
 // Utilitários
@@ -3861,4 +4270,34 @@ function showNotification(message, type = 'info') {
             notification.remove();
         }
     }, 5000);
+}
+
+// Função para definir períodos pré-configurados
+function setPeriodo(periodo) {
+    const hoje = new Date();
+    let dataInicio, dataFim;
+
+    switch(periodo) {
+        case 'hoje':
+            dataInicio = dataFim = hoje.toISOString().split('T')[0];
+            break;
+        case '7dias':
+            dataInicio = new Date(hoje);
+            dataInicio.setDate(hoje.getDate() - 7);
+            dataFim = hoje.toISOString().split('T')[0];
+            break;
+        case '30dias':
+            dataInicio = new Date(hoje);
+            dataInicio.setDate(hoje.getDate() - 30);
+            dataFim = hoje.toISOString().split('T')[0];
+            break;
+        default:
+            return;
+    }
+
+    document.getElementById('relatorioDataInicio').value = dataInicio.toISOString().split('T')[0];
+    document.getElementById('relatorioDataFim').value = dataFim;
+    
+    // Gerar relatório automaticamente
+    setTimeout(() => loadRelatorios(), 500);
 }

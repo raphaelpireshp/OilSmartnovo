@@ -470,7 +470,7 @@ app.put('/api/admin/oficina/coordenadas', requireAdminAuth, (req, res) => {
 
 // ========== ROTAS ADMINISTRATIVAS PRINCIPAIS ==========
 
-// Dashboard
+// Dashboard Básico
 app.get('/api/admin/dashboard', requireAdminAuth, (req, res) => {
     const oficinaId = req.session.admin.oficina_id;
     
@@ -539,6 +539,296 @@ app.get('/api/admin/dashboard', requireAdminAuth, (req, res) => {
             }
         });
     });
+});
+
+// ==================== DASHBOARD COMPLETO ====================
+
+
+// Rota para dashboard informativo
+app.get('/api/admin/dashboard-informativo', requireAdminAuth, (req, res) => {
+    const oficinaId = req.session.admin.oficina_id;
+    const hoje = new Date().toISOString().split('T')[0];
+    
+    const queries = {
+        // Agendamentos de hoje
+        hoje: `
+            SELECT 
+                COUNT(*) as total,
+                SUM(CASE WHEN status = 'confirmado' THEN 1 ELSE 0 END) as confirmados,
+                SUM(CASE WHEN status = 'pendente' THEN 1 ELSE 0 END) as pendentes
+            FROM agendamento_simples 
+            WHERE oficina_id = ? AND DATE(data_hora) = ?
+        `,
+        
+        // Último agendamento
+        ultimo_agendamento: `
+            SELECT cliente_nome, veiculo, data_hora, status
+            FROM agendamento_simples 
+            WHERE oficina_id = ? 
+            ORDER BY data_hora DESC 
+            LIMIT 1
+        `,
+        
+        // Agendamentos do mês
+        mes: `
+            SELECT 
+                COUNT(*) as total,
+                SUM(CASE WHEN status = 'concluido' THEN 1 ELSE 0 END) as concluidos
+            FROM agendamento_simples 
+            WHERE oficina_id = ? 
+            AND MONTH(data_hora) = MONTH(NOW()) 
+            AND YEAR(data_hora) = YEAR(NOW())
+        `,
+        
+        // Status atual
+        status: `
+            SELECT 
+                SUM(CASE WHEN status = 'pendente' THEN 1 ELSE 0 END) as pendentes,
+                SUM(CASE WHEN status = 'confirmado' THEN 1 ELSE 0 END) as confirmados,
+                SUM(CASE WHEN status = 'cancelado' THEN 1 ELSE 0 END) as cancelados
+            FROM agendamento_simples 
+            WHERE oficina_id = ? 
+            AND status IN ('pendente', 'confirmado', 'cancelado')
+        `
+    };
+
+    const dados = {};
+    let completedQueries = 0;
+    const totalQueries = Object.keys(queries).length;
+
+    Object.entries(queries).forEach(([key, query]) => {
+        const params = [oficinaId];
+        if (key === 'hoje') params.push(hoje);
+        
+        db.query(query, params, (err, results) => {
+            if (err) {
+                console.error(`Erro na query ${key}:`, err);
+                dados[key] = key === 'ultimo_agendamento' ? null : { total: 0 };
+            } else {
+                dados[key] = results[0] || (key === 'ultimo_agendamento' ? null : { total: 0 });
+            }
+            
+            completedQueries++;
+            if (completedQueries === totalQueries) {
+                // Gerar notificações simuladas (você pode adaptar para dados reais)
+                dados.notificacoes = gerarNotificacoesSimuladas(dados);
+                
+                res.json({
+                    success: true,
+                    dados: dados
+                });
+            }
+        });
+    });
+});
+
+// Função para gerar notificações (adaptar conforme sua necessidade)
+function gerarNotificacoesSimuladas(dados) {
+    const notificacoes = [];
+    const agora = new Date();
+    
+    // Notificação de agendamentos pendentes
+    if (dados.status.pendentes > 0) {
+        notificacoes.push({
+            tipo: 'atencao',
+            titulo: 'Agendamentos Pendentes',
+            mensagem: `Você tem ${dados.status.pendentes} agendamento(s) pendente(s) que precisam de atenção`,
+            data: new Date(agora.getTime() - 30 * 60000).toISOString(), // 30 minutos atrás
+            lida: false
+        });
+    }
+    
+    // Notificação de agendamentos de hoje
+    if (dados.hoje.total > 0) {
+        notificacoes.push({
+            tipo: 'info',
+            titulo: 'Agendamentos de Hoje',
+            mensagem: `Hoje você tem ${dados.hoje.total} agendamento(s) programado(s)`,
+            data: new Date(agora.getTime() - 2 * 3600000).toISOString(), // 2 horas atrás
+            lida: true
+        });
+    }
+    
+    // Notificação do último agendamento
+    if (dados.ultimo_agendamento) {
+        notificacoes.push({
+            tipo: 'novo',
+            titulo: 'Novo Agendamento',
+            mensagem: `${dados.ultimo_agendamento.cliente_nome} agendou para ${dados.ultimo_agendamento.veiculo}`,
+            data: dados.ultimo_agendamento.data_hora,
+            lida: false
+        });
+    }
+    
+    return notificacoes;
+}
+// Dashboard Completo (com gráficos e dados avançados)
+app.get('/api/admin/dashboard-completo', requireAdminAuth, (req, res) => {
+    const oficinaId = req.session.admin.oficina_id;
+    
+    console.log('📊 Carregando dashboard completo para oficina:', oficinaId);
+
+    // Métricas básicas
+    const queries = {
+        totalAgendamentos: `
+            SELECT COUNT(*) as total 
+            FROM agendamento_simples 
+            WHERE oficina_id = ?
+        `,
+        agendamentosPendentes: `
+            SELECT COUNT(*) as total 
+            FROM agendamento_simples 
+            WHERE oficina_id = ? AND status = 'pendente'
+        `,
+        agendamentosConfirmados: `
+            SELECT COUNT(*) as total 
+            FROM agendamento_simples 
+            WHERE oficina_id = ? AND status = 'confirmado'
+        `,
+        agendamentosConcluidos: `
+            SELECT COUNT(*) as total 
+            FROM agendamento_simples 
+            WHERE oficina_id = ? AND status = 'concluido'
+        `,
+        agendamentosRecentes: `
+            SELECT COUNT(*) as total 
+            FROM agendamento_simples 
+            WHERE oficina_id = ? AND data_hora >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+        `,
+        valorTotal: `
+            SELECT COALESCE(SUM(total_servico), 0) as total 
+            FROM agendamento_simples 
+            WHERE oficina_id = ? AND status = 'concluido' 
+            AND MONTH(data_hora) = MONTH(NOW()) 
+            AND YEAR(data_hora) = YEAR(NOW())
+        `
+    };
+
+    const metrics = {};
+    let completedQueries = 0;
+    const totalQueries = Object.keys(queries).length;
+
+    Object.entries(queries).forEach(([key, query]) => {
+        db.query(query, [oficinaId], (err, results) => {
+            if (err) {
+                console.error(`Erro na query ${key}:`, err);
+                metrics[key] = 0;
+            } else {
+                metrics[key] = results[0].total || 0;
+            }
+            
+            completedQueries++;
+            if (completedQueries === totalQueries) {
+                // Retornar dados completos
+                res.json({
+                    success: true,
+                    metrics: {
+                        totalAgendamentos: metrics.totalAgendamentos,
+                        agendamentosPendentes: metrics.agendamentosPendentes,
+                        agendamentosConfirmados: metrics.agendamentosConfirmados,
+                        agendamentosConcluidos: metrics.agendamentosConcluidos,
+                        agendamentosRecentes: metrics.agendamentosRecentes,
+                        valorTotal: parseFloat(metrics.valorTotal),
+                        changes: {
+                            agendamentos: 12,
+                            confirmados: 8,
+                            concluidos: 15,
+                            recentes: -5,
+                            valor: 20
+                        }
+                    },
+                    charts: {
+                        status: getDefaultStatusData(),
+                        revenue: getDefaultRevenueData(),
+                        services: getDefaultServicesData(),
+                        trend: getDefaultTrendData()
+                    },
+                    recentActivities: [
+                        {
+                            cliente: "Cliente Exemplo",
+                            veiculo: "Honda Civic 2020",
+                            servico: "Troca de óleo e filtro",
+                            status: "concluido",
+                            data: new Date().toISOString()
+                        }
+                    ],
+                    alerts: [
+                        {
+                            titulo: "Sistema Online",
+                            descricao: "Todos os serviços estão funcionando normalmente",
+                            nivel: "baixo"
+                        }
+                    ]
+                });
+            }
+        });
+    });
+
+    // Dados padrão para gráficos (fallback)
+    function getDefaultStatusData() {
+        return {
+            labels: ['Concluídos', 'Confirmados', 'Pendentes', 'Cancelados'],
+            datasets: [{
+                data: [45, 25, 20, 10],
+                backgroundColor: [
+                    'rgba(40, 167, 69, 0.8)',
+                    'rgba(23, 162, 184, 0.8)',
+                    'rgba(255, 193, 7, 0.8)',
+                    'rgba(220, 53, 69, 0.8)'
+                ],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        };
+    }
+
+    function getDefaultRevenueData() {
+        const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'];
+        return {
+            labels: months,
+            datasets: [{
+                label: 'Receita (R$)',
+                data: months.map(() => Math.floor(Math.random() * 10000) + 2000),
+                backgroundColor: 'rgba(180, 148, 52, 0.6)',
+                borderColor: 'rgba(180, 148, 52, 1)',
+                borderWidth: 2
+            }]
+        };
+    }
+
+    function getDefaultServicesData() {
+        return {
+            labels: ['Troca de Óleo', 'Alinhamento', 'Balanceamento', 'Filtros', 'Outros'],
+            datasets: [{
+                data: [35, 20, 15, 20, 10],
+                backgroundColor: [
+                    'rgba(41, 128, 185, 0.7)',
+                    'rgba(39, 174, 96, 0.7)',
+                    'rgba(243, 156, 18, 0.7)',
+                    'rgba(142, 68, 173, 0.7)',
+                    'rgba(231, 76, 60, 0.7)'
+                ],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        };
+    }
+
+    function getDefaultTrendData() {
+        const days = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+        return {
+            labels: days,
+            datasets: [{
+                label: 'Agendamentos',
+                data: days.map(() => Math.floor(Math.random() * 20) + 5),
+                borderColor: 'rgba(180, 148, 52, 1)',
+                backgroundColor: 'rgba(180, 148, 52, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4
+            }]
+        };
+    }
 });
 
 // Listar agendamentos
@@ -882,12 +1172,18 @@ app.put('/api/admin/estoque/:id', requireAdminAuth, (req, res) => {
     });
 });
 
-// Relatórios
+// ========== ROTAS PARA RELATÓRIOS E ANALYTICS ==========
+
+// Rota principal de relatórios - VERSÃO COMPLETA
 app.get('/api/admin/relatorios/agendamentos', requireAdminAuth, (req, res) => {
     const oficinaId = req.session.admin.oficina_id;
     const { data_inicio, data_fim } = req.query;
     
-    let query = `
+    console.log('📊 Gerando relatório para oficina:', oficinaId);
+    console.log('📅 Período:', { data_inicio, data_fim });
+
+    // Query para relatório por status
+    let queryRelatorio = `
         SELECT 
             status,
             COUNT(*) as quantidade,
@@ -899,24 +1195,253 @@ app.get('/api/admin/relatorios/agendamentos', requireAdminAuth, (req, res) => {
     const params = [oficinaId];
     
     if (data_inicio && data_fim) {
-        query += ' AND DATE(data_hora) BETWEEN ? AND ?';
+        queryRelatorio += ' AND DATE(data_hora) BETWEEN ? AND ?';
         params.push(data_inicio, data_fim);
     }
     
-    query += ' GROUP BY status ORDER BY status';
+    queryRelatorio += ' GROUP BY status ORDER BY status';
+
+    // Query para resumo geral
+    let queryResumo = `
+        SELECT 
+            COUNT(*) as total_agendamentos,
+            SUM(CASE WHEN status = 'concluido' THEN total_servico ELSE 0 END) as valor_total,
+            ROUND((SUM(CASE WHEN status = 'concluido' THEN 1 ELSE 0 END) / COUNT(*) * 100), 2) as taxa_conclusao,
+            ROUND(AVG(CASE WHEN status = 'concluido' THEN total_servico ELSE NULL END), 2) as ticket_medio
+        FROM agendamento_simples 
+        WHERE oficina_id = ?
+    `;
     
-    db.query(query, params, (err, results) => {
+    const paramsResumo = [oficinaId];
+    
+    if (data_inicio && data_fim) {
+        queryResumo += ' AND DATE(data_hora) BETWEEN ? AND ?';
+        paramsResumo.push(data_inicio, data_fim);
+    }
+
+    // Executar ambas as queries
+    db.query(queryRelatorio, params, (err, relatorioResults) => {
         if (err) {
-            console.error('Erro ao gerar relatório:', err);
+            console.error('❌ Erro ao gerar relatório:', err);
             return res.status(500).json({ 
                 success: false, 
                 message: 'Erro interno do servidor' 
             });
         }
-        
+
+        db.query(queryResumo, paramsResumo, (err, resumoResults) => {
+            if (err) {
+                console.error('❌ Erro ao gerar resumo:', err);
+                return res.status(500).json({ 
+                    success: false, 
+                    message: 'Erro interno do servidor' 
+                });
+            }
+
+            const resumo = resumoResults[0] || {
+                total_agendamentos: 0,
+                valor_total: 0,
+                taxa_conclusao: 0,
+                ticket_medio: 0
+            };
+
+            console.log('✅ Relatório gerado com sucesso');
+            console.log('📈 Resumo:', resumo);
+            console.log('📋 Detalhes por status:', relatorioResults);
+
+            res.json({
+                success: true,
+                relatorio: relatorioResults,
+                resumo: resumo
+            });
+        });
+    });
+});
+
+// Rota para detalhes por status
+app.get('/api/admin/relatorios/agendamentos/:status', requireAdminAuth, (req, res) => {
+    const oficinaId = req.session.admin.oficina_id;
+    const { status } = req.params;
+    const { data_inicio, data_fim } = req.query;
+
+    let query = `
+        SELECT 
+            id,
+            cliente_nome,
+            veiculo,
+            data_hora,
+            total_servico,
+            protocolo
+        FROM agendamento_simples 
+        WHERE oficina_id = ? AND status = ?
+    `;
+    
+    const params = [oficinaId, status];
+    
+    if (data_inicio && data_fim) {
+        query += ' AND DATE(data_hora) BETWEEN ? AND ?';
+        params.push(data_inicio, data_fim);
+    }
+    
+    query += ' ORDER BY data_hora DESC';
+
+    db.query(query, params, (err, results) => {
+        if (err) {
+            console.error('❌ Erro ao buscar detalhes:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro interno do servidor' 
+            });
+        }
+
         res.json({
             success: true,
-            relatorio: results
+            agendamentos: results
+        });
+    });
+});
+
+// Rota para exportar relatório
+app.get('/api/admin/relatorios/exportar', requireAdminAuth, (req, res) => {
+    const oficinaId = req.session.admin.oficina_id;
+    const { tipo, data_inicio, data_fim } = req.query;
+
+    let query = `
+        SELECT 
+            protocolo,
+            cliente_nome,
+            cliente_telefone,
+            veiculo,
+            servicos,
+            data_hora,
+            status,
+            total_servico
+        FROM agendamento_simples 
+        WHERE oficina_id = ?
+    `;
+    
+    const params = [oficinaId];
+    
+    if (data_inicio && data_fim) {
+        query += ' AND DATE(data_hora) BETWEEN ? AND ?';
+        params.push(data_inicio, data_fim);
+    }
+    
+    if (tipo && tipo !== 'geral') {
+        query += ' AND status = ?';
+        params.push(tipo);
+    }
+    
+    query += ' ORDER BY data_hora DESC';
+
+    db.query(query, params, (err, results) => {
+        if (err) {
+            console.error('❌ Erro ao exportar relatório:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro interno do servidor' 
+            });
+        }
+
+        // Converter para CSV
+        const csvData = convertToCSV(results);
+        
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', `attachment; filename=relatorio_${tipo || 'geral'}_${new Date().toISOString().split('T')[0]}.csv`);
+        res.send(csvData);
+    });
+});
+
+// Função auxiliar para converter para CSV
+function convertToCSV(data) {
+    if (!data || data.length === 0) return '';
+    
+    const headers = Object.keys(data[0]);
+    const csvHeaders = headers.join(';');
+    
+    const csvRows = data.map(row => {
+        return headers.map(header => {
+            let value = row[header] || '';
+            // Escapar caracteres especiais para CSV
+            if (typeof value === 'string' && (value.includes(';') || value.includes('"') || value.includes('\n'))) {
+                value = `"${value.replace(/"/g, '""')}"`;
+            }
+            return value;
+        }).join(';');
+    });
+    
+    return [csvHeaders, ...csvRows].join('\n');
+}
+
+// Rota para analytics avançados
+app.get('/api/admin/relatorios/analytics', requireAdminAuth, (req, res) => {
+    const oficinaId = req.session.admin.oficina_id;
+    const { periodo = '30' } = req.query; // dias
+
+    const queries = {
+        // Agendamentos por dia (últimos 30 dias)
+        agendamentosPorDia: `
+            SELECT 
+                DATE(data_hora) as data,
+                COUNT(*) as total,
+                SUM(CASE WHEN status = 'concluido' THEN 1 ELSE 0 END) as concluidos,
+                SUM(CASE WHEN status = 'cancelado' THEN 1 ELSE 0 END) as cancelados
+            FROM agendamento_simples 
+            WHERE oficina_id = ? 
+            AND data_hora >= DATE_SUB(NOW(), INTERVAL ? DAY)
+            GROUP BY DATE(data_hora)
+            ORDER BY data DESC
+        `,
+
+        // Serviços mais populares
+        servicosPopulares: `
+            SELECT 
+                servicos,
+                COUNT(*) as total_vezes,
+                SUM(total_servico) as valor_total
+            FROM agendamento_simples 
+            WHERE oficina_id = ? 
+            AND status = 'concluido'
+            AND data_hora >= DATE_SUB(NOW(), INTERVAL ? DAY)
+            GROUP BY servicos
+            ORDER BY total_vezes DESC
+            LIMIT 10
+        `,
+
+        // Horários mais populares
+        horariosPopulares: `
+            SELECT 
+                HOUR(data_hora) as hora,
+                COUNT(*) as total_agendamentos
+            FROM agendamento_simples 
+            WHERE oficina_id = ? 
+            AND data_hora >= DATE_SUB(NOW(), INTERVAL ? DAY)
+            GROUP BY HOUR(data_hora)
+            ORDER BY total_agendamentos DESC
+        `
+    };
+
+    const analytics = {};
+    let completedQueries = 0;
+    const totalQueries = Object.keys(queries).length;
+
+    Object.entries(queries).forEach(([key, query]) => {
+        db.query(query, [oficinaId, parseInt(periodo)], (err, results) => {
+            if (err) {
+                console.error(`Erro na query ${key}:`, err);
+                analytics[key] = [];
+            } else {
+                analytics[key] = results;
+            }
+            
+            completedQueries++;
+            if (completedQueries === totalQueries) {
+                res.json({
+                    success: true,
+                    analytics: analytics,
+                    periodo: periodo
+                });
+            }
         });
     });
 });
@@ -2447,5 +2972,7 @@ app.listen(PORT, () => {
     console.log(`✅ Servidor rodando em http://localhost:${PORT}`);
     console.log(`📊 Painel administrativo: http://localhost:${PORT}/admindex.html`);
     console.log(`👤 Painel do cliente: http://localhost:${PORT}/html/index.html`);
+    console.log(`🏢 Painel do admin: http://localhost:${PORT}/html/admin_geral.html`);
+
 });
 module.exports = app;

@@ -9,7 +9,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/css/main.css">
-<link rel="icon" href="/img/tentativa4.png" type="image/x-icon"></head>
+    <link rel="stylesheet" href="/css/auth.css">
+    <link rel="icon" href="/img/tentativa4.png" type="image/x-icon">
+    <script src="/js/auth.js" defer></script>
 </head>
 
 <body>
@@ -65,13 +67,241 @@
     </header>
 
     <main class="main-content">
-        <section class="about-banner">
-            <div class="container">
+        <!-- Banner Hero com Carrossel e Texto -->
+        <section class="hero-banner">
+            <!-- Carrossel como fundo -->
+            <div class="hero-carousel">
+                <div class="carousel-track">
+                    <div class="carousel-slide"><img src="/img/carro1.jpg" alt="Carro 1"></div>
+                    <div class="carousel-slide"><img src="/img/carro2.jpg" alt="Carro 2"></div>
+                    <div class="carousel-slide"><img src="/img/carro3.jpg" alt="Carro 3"></div>
+
+                    <div class="carousel-slide"><img src="/img/carro4.jpg" alt="Carro 4"></div>
+
+                </div>
+            </div>
+
+            <!-- Overlay escuro com blur -->
+            <div class="hero-overlay"></div>
+
+            <!-- Conteúdo do hero em destaque -->
+            <div class="hero-content container">
                 <h1>Entre em Contato</h1>
                 <p>Estamos aqui para ajudar com todas as suas necessidades automotivas</p>
+                <a href="/html/servicos.html" class="btn btn-primary">Agendar Serviço</a>
             </div>
         </section>
-                <div class="hero-divider"></div>
+        <div class="hero-divider"></div>
+
+        <style>
+/* ================= HERO BANNER ================= */
+
+.hero-banner {
+    position: relative;
+    width: 100%;
+    height: 65vh;
+    min-height: 450px;
+    max-height: 650px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-align: center;
+    isolation: isolate;
+}
+
+/* Carrossel de fundo */
+.hero-carousel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.hero-carousel .carousel-track {
+    display: flex;
+    height: 100%;
+    transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.hero-carousel .carousel-slide {
+    min-width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.hero-carousel img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.7) contrast(1.1);
+    transition: transform 10s linear;
+}
+
+.hero-carousel .carousel-slide.active img {
+    transform: scale(1.05);
+}
+
+/* Overlay escuro com blur */
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        135deg, 
+        rgba(0, 0, 0, 0.5) 0%, 
+        rgba(0, 0, 0, 0.3) 50%,
+        rgba(0, 0, 0, 0.5) 100%
+    );
+    backdrop-filter: blur(5px);
+    z-index: 2;
+}
+
+/* Conteúdo do banner */
+.hero-content {
+    position: relative;
+    z-index: 3;
+    padding: 2rem;
+    max-width: 900px;
+    animation: fadeInUp 1s ease-out 0.5s both;
+}
+
+.hero-content h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.hero-content p {
+    font-size: 1.3rem;
+    margin: 1rem 0 2rem;
+    text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+}
+
+/* Botão principal */
+.btn-primary {
+    background: linear-gradient(135deg, #f7b900, #E05D00);
+    border: none;
+    padding: 14px 35px;
+    font-size: 1.1rem;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(224, 93, 0, 0.4);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: 0.5s;
+}
+
+.btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(224, 93, 0, 0.6);
+}
+
+.btn-primary:hover::before {
+    left: 100%;
+}
+
+/* Indicadores do carrossel */
+.carousel-indicators {
+    position: absolute;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 4;
+}
+
+.carousel-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.carousel-indicator.active {
+    background: #f7b900;
+    transform: scale(1.2);
+    box-shadow: 0 0 8px rgba(247, 185, 0, 0.8);
+}
+
+/* Barra de progresso */
+.progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.2);
+    z-index: 4;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: #f7b900;
+    transition: width 0.1s linear;
+}
+
+/* Animação do conteúdo */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ================= DIVISOR ENTRE BANNER E SITE ================= */
+.hero-divider {
+    width: 100%;
+    height: 40px;
+    background: linear-gradient(to right, #f7b900, #E05D00);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    border-radius: 0 0 20px 20px;
+    margin-bottom: 2rem;
+}
+
+/* ================= RESPONSIVO ================= */
+@media (max-width: 992px) {
+    .hero-content h1 { font-size: 2.4rem; }
+}
+
+@media (max-width: 768px) {
+    .hero-banner { height: 55vh; min-height: 400px; }
+    .hero-content h1 { font-size: 2rem; }
+    .hero-content p { font-size: 1.1rem; }
+    .btn-primary { padding: 12px 30px; font-size: 1rem; }
+}
+
+@media (max-width: 576px) {
+    .hero-banner { min-height: 350px; }
+    .hero-content h1 { font-size: 1.7rem; }
+    .hero-content { padding: 1.5rem; }
+}
+
+    </style>
 
 
         <div class="container">
@@ -308,6 +538,86 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 5000);
     }
 });
+
+        // Script aprimorado para o carrossel
+        document.addEventListener("DOMContentLoaded", function () {
+            const track = document.querySelector(".hero-carousel .carousel-track");
+            const slides = document.querySelectorAll(".hero-carousel .carousel-slide");
+            const indicators = document.querySelectorAll(".carousel-indicator");
+            let index = 0;
+            let interval;
+
+            function updateCarousel() {
+                track.style.transform = `translateX(-${index * 100}%)`;
+                
+                // Atualiza classes ativas
+                slides.forEach(slide => slide.classList.remove('active'));
+                slides[index].classList.add('active');
+                
+                indicators.forEach(indicator => indicator.classList.remove('active'));
+                indicators[index].classList.add('active');
+            }
+
+            // Inicia auto-play
+            function startAutoPlay() {
+                interval = setInterval(() => {
+                    index = (index + 1) % slides.length;
+                    updateCarousel();
+                }, 4000);
+            }
+            
+            // Para auto-play ao interagir
+            function stopAutoPlay() {
+                clearInterval(interval);
+            }
+            
+            // Adiciona eventos aos indicadores
+            indicators.forEach(indicator => {
+                indicator.addEventListener('click', function() {
+                    stopAutoPlay();
+                    index = parseInt(this.getAttribute('data-index'));
+                    updateCarousel();
+                    startAutoPlay();
+                });
+            });
+            
+            // Pausa ao passar o mouse
+            const heroBanner = document.querySelector('.hero-banner');
+            heroBanner.addEventListener('mouseenter', stopAutoPlay);
+            heroBanner.addEventListener('mouseleave', startAutoPlay);
+            
+            // Inicia o carrossel
+            startAutoPlay();
+
+            function checkLoginStatus() {
+                const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+                const userDropdown = document.getElementById('user-dropdown');
+                const loginStatus = document.getElementById('login-status');
+
+                if (userDropdown && loginStatus) {
+                    if (isLoggedIn) {
+                        userDropdown.classList.add('user-logged-in');
+                        const userFullName = localStorage.getItem('userFullName');
+                        const userEmail = localStorage.getItem('userEmail');
+
+                        if (userFullName) {
+                            loginStatus.textContent = userFullName;
+                        } else if (userEmail) {
+                            loginStatus.textContent = userEmail.split('@')[0];
+                        } else {
+                            loginStatus.textContent = 'Minha Conta';
+                        }
+                    } else {
+                        userDropdown.classList.remove('user-logged-in');
+                        loginStatus.textContent = 'Login';
+                    }
+                }
+            }
+
+            // Inicializar componentes
+            checkLoginStatus();
+        });
+
 </script>
 </body>
 
