@@ -5120,3 +5120,135 @@
         padding: 12px;
     }
 }
+/* Estilos para informações de filtros */
+.filtros-info {
+    margin-bottom: 20px;
+    animation: slideDown 0.3s ease;
+}
+
+.filtros-badge {
+    background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+    color: white;
+    padding: 12px 20px;
+    border-radius: var(--border-radius);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 500;
+}
+
+.btn-clear-filters {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: var(--transition);
+}
+
+.btn-clear-filters:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Paginação */
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    margin-top: 20px;
+    border: 1px solid var(--border-color);
+}
+
+.pagination-info {
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+.pagination-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.pagination-pages {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.pagina-atual {
+    background: var(--secondary-color);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.btn-pagina {
+    background: none;
+    border: 1px solid var(--border-color);
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-pagina:hover {
+    background: var(--secondary-color);
+    color: white;
+    border-color: var(--secondary-color);
+}
+
+.pagination-ellipsis {
+    padding: 6px 4px;
+    color: var(--text-light);
+}
+
+/* Checkbox personalizado */
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--text-color);
+}
+
+.checkbox-container input {
+    margin-right: 8px;
+}
+
+/* Filtros avançados */
+.filters-bar.avancado {
+    background: linear-gradient(135deg, var(--light-color), rgba(180, 148, 52, 0.05));
+    border: 2px dashed var(--border-color);
+}
+
+.btn-concluir-protocolo.loading {
+    position: relative;
+    color: transparent;
+}
+
+.btn-concluir-protocolo.loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

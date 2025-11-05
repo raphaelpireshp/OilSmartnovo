@@ -222,6 +222,133 @@ app.get('/api/admin/check-auth', (req, res) => {
     }
 });
 
+
+// Rota para agendamentos filtrados - VERSÃO CORRIGIDA
+app.get('/api/admin/agendamentos/filtrados', requireAdminAuth, (req, res) => {
+    const oficinaId = req.session.admin.oficina_id;
+    
+    // Parâmetros de paginação
+    const pagina = parseInt(req.query.pagina) || 1;
+    const limite = parseInt(req.query.limite) || 10;
+    const offset = (pagina - 1) * limite;
+
+    // Construir query base
+    let query = `
+        SELECT a.*, o.nome as oficina_nome
+        FROM agendamento_simples a
+        JOIN oficina o ON a.oficina_id = o.id
+        WHERE a.oficina_id = ?
+    `;
+    
+    const params = [oficinaId];
+    
+    // Aplicar filtros
+    if (req.query.status && req.query.status !== 'todos') {
+        query += ' AND a.status = ?';
+        params.push(req.query.status);
+    }
+    
+    if (req.query.dataInicio) {
+        query += ' AND DATE(a.data_hora) >= ?';
+        params.push(req.query.dataInicio);
+    }
+    
+    if (req.query.dataFim) {
+        query += ' AND DATE(a.data_hora) <= ?';
+        params.push(req.query.dataFim);
+    }
+    
+    if (req.query.cliente) {
+        query += ' AND a.cliente_nome LIKE ?';
+        params.push(`%${req.query.cliente}%`);
+    }
+    
+    if (req.query.telefone) {
+        query += ' AND a.cliente_telefone LIKE ?';
+        params.push(`%${req.query.telefone}%`);
+    }
+    
+    if (req.query.veiculo) {
+        query += ' AND a.veiculo LIKE ?';
+        params.push(`%${req.query.veiculo}%`);
+    }
+    
+    // FILTRO DE SERVIÇOS SIMPLIFICADO (apenas troca de óleo e filtro)
+    if (req.query.servico && req.query.servico !== 'todos') {
+        if (req.query.servico === 'troca_oleo') {
+            query += ' AND a.servicos LIKE ?';
+            params.push('%troca de óleo%');
+        } else if (req.query.servico === 'filtro') {
+            query += ' AND (a.servicos LIKE ? OR a.servicos LIKE ?)';
+            params.push('%filtro de óleo%', '%filtro%');
+        }
+    }
+    
+    if (req.query.protocolo) {
+        query += ' AND a.protocolo LIKE ?';
+        params.push(`%${req.query.protocolo}%`);
+    }
+    
+    // Ordenação
+    const ordenarPor = req.query.ordenarPor || 'data_desc';
+    switch (ordenarPor) {
+        case 'data_asc':
+            query += ' ORDER BY a.data_hora ASC';
+            break;
+        case 'cliente_asc':
+            query += ' ORDER BY a.cliente_nome ASC';
+            break;
+        case 'cliente_desc':
+            query += ' ORDER BY a.cliente_nome DESC';
+            break;
+
+        default: // data_desc
+            query += ' ORDER BY a.data_hora DESC';
+    }
+    
+    // Query para contar total (para paginação)
+    const countQuery = query.replace(/SELECT a\.\*, o\.nome as oficina_nome/, 'SELECT COUNT(*) as total');
+    
+    // Adicionar paginação à query principal
+    query += ' LIMIT ? OFFSET ?';
+    params.push(limite, offset);
+    
+    console.log('📋 Query executada:', query);
+    console.log('🔍 Parâmetros:', params);
+    
+    // Executar ambas as queries
+    db.query(countQuery, params.slice(0, -2), (err, countResults) => {
+        if (err) {
+            console.error('❌ Erro ao contar agendamentos:', err);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Erro interno do servidor' 
+            });
+        }
+        
+        const total = countResults[0].total;
+        const totalPaginas = Math.ceil(total / limite);
+        
+        db.query(query, params, (err, results) => {
+            if (err) {
+                console.error('❌ Erro ao buscar agendamentos:', err);
+                return res.status(500).json({ 
+                    success: false, 
+                    message: 'Erro interno do servidor' 
+                });
+            }
+            
+            res.json({
+                success: true,
+                agendamentos: results,
+                total: total,
+                pagina: pagina,
+                totalPaginas: totalPaginas,
+                limite: limite
+            });
+        });
+    });
+});
 // ========== ROTAS ESPECÍFICAS (DEVEM VIR ANTES DAS ROTAS COM :id) ==========
 
 // Rota para concluir agendamento pelo protocolo "OILxxxx" - CORRIGIDA

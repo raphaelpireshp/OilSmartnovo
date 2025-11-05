@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Administrativo - OilSmart</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/css/adm.css">
-            <link rel="icon" href="/img/admin.png" type="image/x-icon"></head>
-            <!-- Chart.js -->
+    <link rel="icon" href="/img/admin.png" type="image/x-icon">
+</head>
+<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </head>
@@ -44,12 +46,12 @@
                             <span>Estoque</span>
                         </a>
                     </li>
-                            <li class="nav-item">
-            <a href="#" class="nav-link" onclick="showSection('horarios-especiais')">
-                <i class="fas fa-calendar-alt"></i>
-                <span>Horários Especiais</span>
-            </a>
-        </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" onclick="showSection('horarios-especiais')">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>Horários Especiais</span>
+                        </a>
+                    </li>
                     <li class="nav-item">
                         <a href="#" class="nav-link" onclick="showSection('relatorios')">
                             <i class="fas fa-chart-bar"></i>
@@ -84,156 +86,156 @@
         <!-- Main Content -->
         <div class="main-content">
             <!-- Header -->
-<header class="main-header">
-    <div class="header-left">
-        <button class="sidebar-toggle" id="sidebarToggle">
-            <i class="fas fa-bars"></i>
-        </button>
-        <h1 class="page-title" id="pageTitle">Dashboard</h1>
-    </div>
-    <div class="header-right">
+            <header class="main-header">
+                <div class="header-left">
+                    <button class="sidebar-toggle" id="sidebarToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="page-title" id="pageTitle">Dashboard</h1>
+                </div>
+                <div class="header-right">
 
-        <div class="date-time">
-            <span id="currentDate">Carregando...</span>
-            <span id="currentTime">--:--:--</span>
-        </div>
-    </div>
-</header>
+                    <div class="date-time">
+                        <span id="currentDate">Carregando...</span>
+                        <span id="currentTime">--:--:--</span>
+                    </div>
+                </div>
+            </header>
 
             <!-- Content Area -->
             <div class="content-area">
                 <!-- Dashboard Section -->
-<!-- Dashboard Section -->
-<!-- Dashboard Section -->
-<section id="dashboard" class="content-section active">
-    <div class="section-header">
-        <h2>Painel de Informações</h2>
-        <div class="header-actions">
-            <button class="btn btn-primary" onclick="loadDashboard()">
-                <i class="fas fa-sync-alt"></i>
-                Atualizar
-            </button>
-        </div>
-    </div>
-
-    <!-- Informações Rápidas do Dia -->
-    <div class="info-grid">
-        <!-- Agendamentos para Hoje -->
-        <div class="info-card today-card">
-            <div class="info-icon">
-                <i class="fas fa-calendar-day"></i>
-            </div>
-            <div class="info-content">
-                <h3>Agendamentos para Hoje</h3>
-                <div class="info-value" id="agendamentosHoje">0</div>
-                <div class="info-detail">
-                    <span id="hojeDetalhes">Carregando...</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Último Agendamento -->
-        <div class="info-card last-card">
-            <div class="info-icon">
-                <i class="fas fa-user-clock"></i>
-            </div>
-            <div class="info-content">
-                <h3>Último Agendamento</h3>
-                <div class="info-value" id="ultimoCliente">-</div>
-                <div class="info-detail">
-                    <span id="ultimoDetalhes">Nenhum agendamento</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Agendamentos do Mês -->
-        <div class="info-card month-card">
-            <div class="info-icon">
-                <i class="fas fa-chart-bar"></i>
-            </div>
-            <div class="info-content">
-                <h3>Este Mês</h3>
-                <div class="info-value" id="agendamentosMes">0</div>
-                <div class="info-detail">
-                    <span id="mesDetalhes">Total de agendamentos</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Status dos Agendamentos -->
-        <div class="info-card status-card">
-            <div class="info-icon">
-                <i class="fas fa-clipboard-list"></i>
-            </div>
-            <div class="info-content">
-                <h3>Status Atual</h3>
-                <div class="status-mini-grid">
-                    <div class="status-item">
-                        <span class="status-badge status-pendente mini">Pendentes</span>
-                        <span class="status-count" id="countPendentes">0</span>
+                <!-- Dashboard Section -->
+                <!-- Dashboard Section -->
+                <section id="dashboard" class="content-section active">
+                    <div class="section-header">
+                        <h2>Painel de Informações</h2>
+                        <div class="header-actions">
+                            <button class="btn btn-primary" onclick="loadDashboard()">
+                                <i class="fas fa-sync-alt"></i>
+                                Atualizar
+                            </button>
+                        </div>
                     </div>
-                    <div class="status-item">
-                        <span class="status-badge status-confirmado mini">Confirmados</span>
-                        <span class="status-count" id="countConfirmados">0</span>
-                    </div>
-                    <div class="status-item">
-                        <span class="status-badge status-cancelado mini">Cancelados</span>
-                        <span class="status-count" id="countCancelados">0</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Notificações em Tempo Real -->
-    <div class="notifications-section">
-        <div class="section-header">
-            <h3><i class="fas fa-bell"></i> Notificações Recentes</h3>
-            <span class="notification-badge" id="notificationCount">0</span>
-        </div>
-        
-        <div class="notifications-list" id="notificationsList">
-            <div class="notification-item">
-                <div class="notification-icon info">
-                    <i class="fas fa-info-circle"></i>
-                </div>
-                <div class="notification-content">
-                    <div class="notification-title">Bem-vindo ao sistema</div>
-                    <div class="notification-time">Aguardando novas notificações...</div>
-                </div>
-            </div>
-        </div>
-    </div>
+                    <!-- Informações Rápidas do Dia -->
+                    <div class="info-grid">
+                        <!-- Agendamentos para Hoje -->
+                        <div class="info-card today-card">
+                            <div class="info-icon">
+                                <i class="fas fa-calendar-day"></i>
+                            </div>
+                            <div class="info-content">
+                                <h3>Agendamentos para Hoje</h3>
+                                <div class="info-value" id="agendamentosHoje">0</div>
+                                <div class="info-detail">
+                                    <span id="hojeDetalhes">Carregando...</span>
+                                </div>
+                            </div>
+                        </div>
 
-    <!-- Ações Rápidas -->
-    <div class="quick-actions-section">
-        <div class="section-header">
-            <h3><i class="fas fa-bolt"></i> Ações Rápidas</h3>
-        </div>
-        
-        <div class="actions-grid">
-            <button class="action-btn primary" onclick="showSection('agendamentos')">
-                <i class="fas fa-calendar-check"></i>
-                <span>Ver Todos os Agendamentos</span>
-            </button>
-            
-            <button class="action-btn success" onclick="showSection('agendamentos')">
-                <i class="fas fa-check-double"></i>
-                <span>Concluir Agendamento</span>
-            </button>
-            
-            <button class="action-btn warning" onclick="verAgendamentosPendentes()">
-                <i class="fas fa-clock"></i>
-                <span>Agendamentos Pendentes</span>
-            </button>
-            
-            <button class="action-btn info" onclick="verRelatoriosRapido()">
-                <i class="fas fa-chart-bar"></i>
-                <span>Relatório do Dia</span>
-            </button>
-        </div>
-    </div>
-</section>
+                        <!-- Último Agendamento -->
+                        <div class="info-card last-card">
+                            <div class="info-icon">
+                                <i class="fas fa-user-clock"></i>
+                            </div>
+                            <div class="info-content">
+                                <h3>Último Agendamento</h3>
+                                <div class="info-value" id="ultimoCliente">-</div>
+                                <div class="info-detail">
+                                    <span id="ultimoDetalhes">Nenhum agendamento</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Agendamentos do Mês -->
+                        <div class="info-card month-card">
+                            <div class="info-icon">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            <div class="info-content">
+                                <h3>Este Mês</h3>
+                                <div class="info-value" id="agendamentosMes">0</div>
+                                <div class="info-detail">
+                                    <span id="mesDetalhes">Total de agendamentos</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Status dos Agendamentos -->
+                        <div class="info-card status-card">
+                            <div class="info-icon">
+                                <i class="fas fa-clipboard-list"></i>
+                            </div>
+                            <div class="info-content">
+                                <h3>Status Atual</h3>
+                                <div class="status-mini-grid">
+                                    <div class="status-item">
+                                        <span class="status-badge status-pendente mini">Pendentes</span>
+                                        <span class="status-count" id="countPendentes">0</span>
+                                    </div>
+                                    <div class="status-item">
+                                        <span class="status-badge status-confirmado mini">Confirmados</span>
+                                        <span class="status-count" id="countConfirmados">0</span>
+                                    </div>
+                                    <div class="status-item">
+                                        <span class="status-badge status-cancelado mini">Cancelados</span>
+                                        <span class="status-count" id="countCancelados">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notificações em Tempo Real -->
+                    <div class="notifications-section">
+                        <div class="section-header">
+                            <h3><i class="fas fa-bell"></i> Notificações Recentes</h3>
+                            <span class="notification-badge" id="notificationCount">0</span>
+                        </div>
+
+                        <div class="notifications-list" id="notificationsList">
+                            <div class="notification-item">
+                                <div class="notification-icon info">
+                                    <i class="fas fa-info-circle"></i>
+                                </div>
+                                <div class="notification-content">
+                                    <div class="notification-title">Bem-vindo ao sistema</div>
+                                    <div class="notification-time">Aguardando novas notificações...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ações Rápidas -->
+                    <div class="quick-actions-section">
+                        <div class="section-header">
+                            <h3><i class="fas fa-bolt"></i> Ações Rápidas</h3>
+                        </div>
+
+                        <div class="actions-grid">
+                            <button class="action-btn primary" onclick="showSection('agendamentos')">
+                                <i class="fas fa-calendar-check"></i>
+                                <span>Ver Todos os Agendamentos</span>
+                            </button>
+
+                            <button class="action-btn success" onclick="showSection('agendamentos')">
+                                <i class="fas fa-check-double"></i>
+                                <span>Concluir Agendamento</span>
+                            </button>
+
+                            <button class="action-btn warning" onclick="verAgendamentosPendentes()">
+                                <i class="fas fa-clock"></i>
+                                <span>Agendamentos Pendentes</span>
+                            </button>
+
+                            <button class="action-btn info" onclick="verRelatoriosRapido()">
+                                <i class="fas fa-chart-bar"></i>
+                                <span>Relatório do Dia</span>
+                            </button>
+                        </div>
+                    </div>
+                </section>
 
                 <!-- Agendamentos Section -->
                 <section id="agendamentos" class="content-section">
@@ -244,25 +246,158 @@
                                 <i class="fas fa-sync-alt"></i>
                                 Atualizar
                             </button>
+                            <button class="btn btn-success" onclick="exportarAgendamentos()">
+                                <i class="fas fa-download"></i>
+                                Exportar
+                            </button>
                         </div>
                     </div>
 
-                    <!-- Filters -->
-                    <div class="filters-bar">
+                    <!-- Filtros Avançados -->
+                    <div class="filters-bar agendamentos">
                         <div class="filter-group">
-                            <label for="statusFilter">Status</label>
+                            <label for="statusFilter">
+                                <i class="fas fa-filter"></i>
+                                Status
+                            </label>
                             <select id="statusFilter">
-                                <option value="todos">Todos</option>
+                                <option value="todos">Todos os Status</option>
                                 <option value="pendente">Pendentes</option>
-                                <option value="confirmado">Confirmados</option>
                                 <option value="concluido">Concluídos</option>
                                 <option value="cancelado">Cancelados</option>
                                 <option value="divergencia">Com Divergência</option>
                             </select>
                         </div>
+
                         <div class="filter-group">
-                            <label for="dataFilter">Data</label>
-                            <input type="date" id="dataFilter">
+                            <label for="dataInicioFilter">
+                                <i class="fas fa-calendar-day"></i>
+                                Data Início
+                            </label>
+                            <input type="date" id="dataInicioFilter">
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="dataFimFilter">
+                                <i class="fas fa-calendar-day"></i>
+                                Data Fim
+                            </label>
+                            <input type="date" id="dataFimFilter">
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="clienteFilter">
+                                <i class="fas fa-user"></i>
+                                Cliente
+                            </label>
+                            <input type="text" id="clienteFilter" placeholder="Nome do cliente">
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="telefoneFilter">
+                                <i class="fas fa-phone"></i>
+                                Telefone
+                            </label>
+                            <input type="text" id="telefoneFilter" placeholder="(11) 99999-9999">
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="veiculoFilter">
+                                <i class="fas fa-car"></i>
+                                Veículo
+                            </label>
+                            <input type="text" id="veiculoFilter" placeholder="Modelo do veículo">
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="servicoFilter">
+                                <i class="fas fa-tools"></i>
+                                Serviço
+                            </label>
+                            <select id="servicoFilter">
+                                <option value="todos">Todos os Serviços</option>
+                                <option value="troca_oleo">Troca de Óleo</option>
+                                <option value="filtro">Troca de Filtro</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="protocoloFilter">
+                                <i class="fas fa-tag"></i>
+                                Protocolo
+                            </label>
+                            <input type="text" id="protocoloFilter" placeholder="Nº do protocolo">
+                        </div>
+
+                        <div class="filter-actions">
+                            <button class="btn btn-primary" onclick="aplicarFiltrosAgendamentos()">
+                                <i class="fas fa-search"></i>
+                                Aplicar Filtros
+                            </button>
+                            <button class="btn btn-secondary" onclick="limparFiltrosAgendamentos()">
+                                <i class="fas fa-undo"></i>
+                                Limpar
+                            </button>
+
+                        </div>
+                    </div>
+
+                    <!-- Filtros Avançados (Ocultos por padrão) -->
+                    <div class="filters-bar agendamentos avancado" id="filtrosAvancados"
+                        style="display: none; margin-top: 15px;">
+
+                        <div class="filter-group">
+                            <label for="ordenarPor">
+                                <i class="fas fa-sort"></i>
+                                Ordenar Por
+                            </label>
+                            <select id="ordenarPor">
+                                <option value="data_desc">Data (Mais Recente)</option>
+                                <option value="data_asc">Data (Mais Antigo)</option>
+                                <option value="cliente_asc">Cliente (A-Z)</option>
+                                <option value="cliente_desc">Cliente (Z-A)</option>
+
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="canceladoPorFilter">
+                                <i class="fas fa-user-times"></i>
+                                Cancelado Por
+                            </label>
+                            <select id="canceladoPorFilter">
+                                <option value="todos">Todos</option>
+                                <option value="cliente">Cliente</option>
+                                <option value="oficina">Oficina</option>
+                                <option value="sistema">Sistema</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="apenasComProtocolo">
+                                <span class="checkmark"></span>
+                                Apenas com Protocolo
+                            </label>
+                        </div>
+
+                        <div class="filter-group">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="apenasDivergencias">
+                                <span class="checkmark"></span>
+                                Apenas com Divergências
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Contador de resultados -->
+                    <div class="filtros-info" id="filtrosInfo" style="display: none;">
+                        <div class="filtros-badge">
+                            <span id="contadorResultados">0</span> agendamentos encontrados
+                            <button class="btn-clear-filters" onclick="limparFiltrosAgendamentos()">
+                                <i class="fas fa-times"></i>
+                                Limpar filtros
+                            </button>
                         </div>
                     </div>
 
@@ -272,32 +407,27 @@
                             <i class="fas fa-check-double protocolo-icon"></i>
                             Concluir Agendamento pelo Protocolo
                         </h2>
-                        
+
                         <div class="protocolo-container">
                             <div class="protocolo-input-group">
                                 <label for="protocoloInput">
                                     <i class="fas fa-tag"></i>
                                     Digite o protocolo do cliente:
                                 </label>
-                                <input 
-                                    type="text" 
-                                    id="protocoloInput" 
-                                    class="protocolo-input"
-                                    placeholder="Ex: OIL20231201-001"
-                                    maxlength="20"
-                                >
+                                <input type="text" id="protocoloInput" class="protocolo-input"
+                                    placeholder="Ex: OIL20231201-001" maxlength="20">
                             </div>
-                            
+
                             <button id="btnConcluir" class="btn-concluir-protocolo">
                                 <i class="fas fa-check-circle protocolo-icon"></i>
                                 Concluir Agendamento
                             </button>
                         </div>
-                        
+
                         <div id="msgConcluir" class="protocolo-message">
                             <!-- Mensagens serão inseridas aqui via JavaScript -->
                         </div>
-                        
+
                         <div style="margin-top: 15px; font-size: 0.85rem; color: #6c757d;">
                             <i class="fas fa-info-circle"></i>
                             <strong>Dica:</strong> O protocolo é fornecido ao cliente no momento do agendamento.
@@ -320,579 +450,597 @@
                             </thead>
                             <tbody id="agendamentosTable">
                                 <tr>
-                                    <td colspan="8" class="text-center">
+                                    <td colspan="9" class="text-center">
                                         <div class="loading"></div>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
+
+                    <!-- Paginação -->
+                    <div class="pagination-container" id="paginationContainer" style="display: none;">
+                        <div class="pagination-info">
+                            Mostrando <span id="paginationStart">0</span>-<span id="paginationEnd">0</span> de <span
+                                id="paginationTotal">0</span> agendamentos
+                        </div>
+                        <div class="pagination-buttons">
+                            <button class="btn btn-outline btn-sm" id="prevPage" onclick="mudarPagina(-1)">
+                                <i class="fas fa-chevron-left"></i> Anterior
+                            </button>
+                            <span class="pagination-pages" id="paginationPages"></span>
+                            <button class="btn btn-outline btn-sm" id="nextPage" onclick="mudarPagina(1)">
+                                Próxima <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
                 </section>
 
                 <!-- Estoque Section -->
-<!-- Estoque Section -->
-<section id="estoque" class="content-section">
-    <div class="section-header">
-        <h2>Gerenciar Estoque</h2>
-        <div class="header-actions">
-            <button class="btn btn-primary" onclick="showDevAlert()">
-                <i class="fas fa-sync-alt"></i>
-                Atualizar
-            </button>
-            <button class="btn btn-success" onclick="showDevAlert()">
-                <i class="fas fa-plus"></i>
-                Adicionar Produto
-            </button>
-        </div>
-    </div>
-
-    <!-- AVISO DE DESENVOLVIMENTO -->
-    <div class="dev-alert-container">
-        <div class="dev-alert">
-            <div class="dev-alert-icon">
-                <i class="fas fa-tools"></i>
-            </div>
-            <div class="dev-alert-content">
-                <h3>Módulo em Desenvolvimento</h3>
-                <p>O sistema de gerenciamento de estoque está em desenvolvimento como um projeto à parte.</p>
-                <p><strong>Previsão de lançamento:</strong> Em breve</p>
-            </div>
-            <div class="dev-alert-actions">
-                <button class="btn btn-outline" onclick="showDevDetails()">
-                    <i class="fas fa-info-circle"></i>
-                    Mais Informações
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Placeholder para demonstração -->
-    <div class="dev-placeholder">
-        <div class="placeholder-header">
-            <i class="fas fa-boxes"></i>
-            <h4>Visualização do Módulo de Estoque</h4>
-        </div>
-        <div class="placeholder-content">
-            <div class="placeholder-table">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Produto</th>
-                            <th>Marca</th>
-                            <th>Tipo</th>
-                            <th>Quantidade</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="dev-row">
-                            <td>
-                                <i class="fas fa-wrench"></i>
-                                Óleo Sintético 5W-30
-                            </td>
-                            <td>Petrobras</td>
-                            <td>Óleo</td>
-                            <td>
-                                <span class="quantidade-baixa">5 unidades</span>
-                            </td>
-                            <td>
-                                <span class="status-badge status-pendente">Estoque Baixo</span>
-                            </td>
-                        </tr>
-                        <tr class="dev-row">
-                            <td>
-                                <i class="fas fa-filter"></i>
-                                Filtro de Óleo Esportivo
-                            </td>
-                            <td>Fram</td>
-                            <td>Filtro</td>
-                            <td>
-                                <span class="quantidade-normal">25 unidades</span>
-                            </td>
-                            <td>
-                                <span class="status-badge status-concluido">Disponível</span>
-                            </td>
-                        </tr>
-                        <tr class="dev-row">
-                            <td>
-                                <i class="fas fa-oil-can"></i>
-                                Óleo Mineral 20W-50
-                            </td>
-                            <td>Shell</td>
-                            <td>Óleo</td>
-                            <td>
-                                <span class="quantidade-zerada">0 unidades</span>
-                            </td>
-                            <td>
-                                <span class="status-badge status-cancelado">Esgotado</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="placeholder-note">
-                <i class="fas fa-exclamation-triangle"></i>
-                <strong>Nota:</strong> Esta é apenas uma visualização estática para demonstração. 
-                O módulo completo estará disponível em breve.
-            </div>
-        </div>
-    </div>
-</section>
-<!-- Seção de Horários Especiais -->
-<div id="horarios-especiais" class="content-section">
-    <div class="section-header">
-        <h2>Horários Especiais</h2>
-        <p>Configure horários diferentes para datas específicas ou dias da semana</p>
-    </div>
-
-    <div class="special-hours-container">
-        <!-- Horários Especiais (Datas Específicas) -->
-        <div class="special-hours-section">
-            <div class="section-header">
-                <h3>Datas Especiais</h3>
-                <button class="btn btn-primary" onclick="showAddSpecialHourModal()">
-                    <i class="fas fa-plus"></i> Adicionar Data Especial
-                </button>
-            </div>
-            <div id="specialHoursList" class="special-hours-list">
-                <!-- Lista de horários especiais será carregada aqui -->
-            </div>
-        </div>
-
-        <!-- Exceções de Dias da Semana -->
-        <div class="exceptions-section">
-            <div class="section-header">
-                <h3>Exceções de Dias da Semana</h3>
-                <button class="btn btn-primary" onclick="showAddExceptionModal()">
-                    <i class="fas fa-plus"></i> Adicionar Exceção
-                </button>
-            </div>
-            <div id="exceptionsList" class="exceptions-list">
-                <!-- Lista de exceções será carregada aqui -->
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Relatórios Section -->
-<section id="relatorios" class="content-section">
-    <div class="section-header">
-        <h2>Relatórios e Analytics</h2>
-        <div class="header-actions relatorios-actions">
-            <button class="btn btn-outline" onclick="setPeriodo('hoje')">
-                <i class="fas fa-calendar-day"></i>
-                Hoje
-            </button>
-            <button class="btn btn-outline" onclick="setPeriodo('7dias')">
-                <i class="fas fa-calendar-week"></i>
-                7 Dias
-            </button>
-            <button class="btn btn-outline" onclick="setPeriodo('30dias')">
-                <i class="fas fa-calendar-alt"></i>
-                30 Dias
-            </button>
-            <button class="btn btn-primary" onclick="loadRelatorios()">
-                <i class="fas fa-chart-bar"></i>
-                Gerar Relatório
-            </button>
-            <button class="btn btn-success" onclick="exportarRelatorio('geral')">
-                <i class="fas fa-download"></i>
-                Exportar CSV
-            </button>
-        </div>
-    </div>
-
-    <div class="relatorios-container">
-        <!-- Resumo dos Relatórios -->
-        <div id="resumoRelatorios" class="resumo-container">
-            <div class="resumo-grid">
-                <div class="resumo-item">
-                    <div class="resumo-icon total">
-                        <i class="fas fa-calendar-alt"></i>
+                <!-- Estoque Section -->
+                <section id="estoque" class="content-section">
+                    <div class="section-header">
+                        <h2>Gerenciar Estoque</h2>
+                        <div class="header-actions">
+                            <button class="btn btn-primary" onclick="showDevAlert()">
+                                <i class="fas fa-sync-alt"></i>
+                                Atualizar
+                            </button>
+                            <button class="btn btn-success" onclick="showDevAlert()">
+                                <i class="fas fa-plus"></i>
+                                Adicionar Produto
+                            </button>
+                        </div>
                     </div>
-                    <div class="resumo-content">
-                        <h4>Total de Agendamentos</h4>
-                        <div class="resumo-value">0</div>
-                    </div>
-                </div>
-                
-                <div class="resumo-item">
-                    <div class="resumo-icon valor">
-                        <i class="fas fa-dollar-sign"></i>
-                    </div>
-                    <div class="resumo-content">
-                        <h4>Valor Total</h4>
-                        <div class="resumo-value">R$ 0,00</div>
-                    </div>
-                </div>
-                
-                <div class="resumo-item">
-                    <div class="resumo-icon taxa">
-                        <i class="fas fa-percentage"></i>
-                    </div>
-                    <div class="resumo-content">
-                        <h4>Taxa de Conclusão</h4>
-                        <div class="resumo-value">0%</div>
-                    </div>
-                </div>
-                
-                <div class="resumo-item">
-                    <div class="resumo-icon media">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <div class="resumo-content">
-                        <h4>Ticket Médio</h4>
-                        <div class="resumo-value">R$ 0,00</div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- Filtros Relatórios -->
-        <div class="filters-bar relatorios">
-            <div class="filter-group">
-                <label for="relatorioDataInicio">
-                    <i class="fas fa-calendar-day"></i>
-                    Data Início
-                </label>
-                <input type="date" id="relatorioDataInicio" class="form-input">
-            </div>
-            <div class="filter-group">
-                <label for="relatorioDataFim">
-                    <i class="fas fa-calendar-day"></i>
-                    Data Fim
-                </label>
-                <input type="date" id="relatorioDataFim" class="form-input">
-            </div>
-            <div class="filter-group">
-                <label style="visibility: hidden;">Períodos</label>
-                <div class="quick-actions">
-                    <button class="btn btn-sm btn-outline" onclick="gerarRelatorioMesAtual()">
-                        Este Mês
-                    </button>
-                    <button class="btn btn-sm btn-outline" onclick="gerarRelatorioSemanaAtual()">
-                        Esta Semana
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Relatórios Table -->
-        <div class="table-container relatorios">
-            <table class="data-table relatorios">
-                <thead>
-                    <tr>
-                        <th>Status</th>
-                        <th>Quantidade</th>
-                        <th>Valor Total</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="relatoriosTable">
-                    <tr>
-                        <td colspan="4" class="text-center">
-                            <div class="empty-state relatorios">
-                                <i class="fas fa-chart-bar"></i>
-                                <h4>Nenhum relatório gerado</h4>
-                                <p>Selecione um período e clique em "Gerar Relatório"</p>
-                                <p class="small">Use os filtros acima para definir as datas</p>
+                    <!-- AVISO DE DESENVOLVIMENTO -->
+                    <div class="dev-alert-container">
+                        <div class="dev-alert">
+                            <div class="dev-alert-icon">
+                                <i class="fas fa-tools"></i>
                             </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+                            <div class="dev-alert-content">
+                                <h3>Módulo em Desenvolvimento</h3>
+                                <p>O sistema de gerenciamento de estoque está em desenvolvimento como um projeto à
+                                    parte.</p>
+                                <p><strong>Previsão de lançamento:</strong> Em breve</p>
+                            </div>
+                            <div class="dev-alert-actions">
+                                <button class="btn btn-outline" onclick="showDevDetails()">
+                                    <i class="fas fa-info-circle"></i>
+                                    Mais Informações
+                                </button>
+                            </div>
+                        </div>
+                    </div>
 
-        <!-- Seção de Analytics (opcional) -->
-        <div id="analyticsSection" class="analytics-section" style="display: none;">
-            <h3>
-                <i class="fas fa-chart-line"></i>
-                Analytics Avançados
-            </h3>
-            <div class="analytics-grid">
-                <!-- Os gráficos serão inseridos aqui via JavaScript -->
-            </div>
-        </div>
-    </div>
-</section>
+                    <!-- Placeholder para demonstração -->
+                    <div class="dev-placeholder">
+                        <div class="placeholder-header">
+                            <i class="fas fa-boxes"></i>
+                            <h4>Visualização do Módulo de Estoque</h4>
+                        </div>
+                        <div class="placeholder-content">
+                            <div class="placeholder-table">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Produto</th>
+                                            <th>Marca</th>
+                                            <th>Tipo</th>
+                                            <th>Quantidade</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="dev-row">
+                                            <td>
+                                                <i class="fas fa-wrench"></i>
+                                                Óleo Sintético 5W-30
+                                            </td>
+                                            <td>Petrobras</td>
+                                            <td>Óleo</td>
+                                            <td>
+                                                <span class="quantidade-baixa">5 unidades</span>
+                                            </td>
+                                            <td>
+                                                <span class="status-badge status-pendente">Estoque Baixo</span>
+                                            </td>
+                                        </tr>
+                                        <tr class="dev-row">
+                                            <td>
+                                                <i class="fas fa-filter"></i>
+                                                Filtro de Óleo Esportivo
+                                            </td>
+                                            <td>Fram</td>
+                                            <td>Filtro</td>
+                                            <td>
+                                                <span class="quantidade-normal">25 unidades</span>
+                                            </td>
+                                            <td>
+                                                <span class="status-badge status-concluido">Disponível</span>
+                                            </td>
+                                        </tr>
+                                        <tr class="dev-row">
+                                            <td>
+                                                <i class="fas fa-oil-can"></i>
+                                                Óleo Mineral 20W-50
+                                            </td>
+                                            <td>Shell</td>
+                                            <td>Óleo</td>
+                                            <td>
+                                                <span class="quantidade-zerada">0 unidades</span>
+                                            </td>
+                                            <td>
+                                                <span class="status-badge status-cancelado">Esgotado</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="placeholder-note">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <strong>Nota:</strong> Esta é apenas uma visualização estática para demonstração.
+                                O módulo completo estará disponível em breve.
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- Seção de Horários Especiais -->
+                <div id="horarios-especiais" class="content-section">
+                    <div class="section-header">
+                        <h2>Horários Especiais</h2>
+                        <p>Configure horários diferentes para datas específicas ou dias da semana</p>
+                    </div>
+
+                    <div class="special-hours-container">
+                        <!-- Horários Especiais (Datas Específicas) -->
+                        <div class="special-hours-section">
+                            <div class="section-header">
+                                <h3>Datas Especiais</h3>
+                                <button class="btn btn-primary" onclick="showAddSpecialHourModal()">
+                                    <i class="fas fa-plus"></i> Adicionar Data Especial
+                                </button>
+                            </div>
+                            <div id="specialHoursList" class="special-hours-list">
+                                <!-- Lista de horários especiais será carregada aqui -->
+                            </div>
+                        </div>
+
+                        <!-- Exceções de Dias da Semana -->
+                        <div class="exceptions-section">
+                            <div class="section-header">
+                                <h3>Exceções de Dias da Semana</h3>
+                                <button class="btn btn-primary" onclick="showAddExceptionModal()">
+                                    <i class="fas fa-plus"></i> Adicionar Exceção
+                                </button>
+                            </div>
+                            <div id="exceptionsList" class="exceptions-list">
+                                <!-- Lista de exceções será carregada aqui -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Relatórios Section -->
+                <section id="relatorios" class="content-section">
+                    <div class="section-header">
+                        <h2>Relatórios e Analytics</h2>
+                        <div class="header-actions relatorios-actions">
+
+                            <button class="btn btn-outline" onclick="setPeriodo('7dias')">
+                                <i class="fas fa-calendar-week"></i>
+                                7 Dias
+                            </button>
+                            <button class="btn btn-outline" onclick="setPeriodo('30dias')">
+                                <i class="fas fa-calendar-alt"></i>
+                                30 Dias
+                            </button>
+                            <button class="btn btn-primary" onclick="loadRelatorios()">
+                                <i class="fas fa-chart-bar"></i>
+                                Gerar Relatório
+                            </button>
+                            <button class="btn btn-success" onclick="exportarRelatorio('geral')">
+                                <i class="fas fa-download"></i>
+                                Exportar CSV
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="relatorios-container">
+                        <!-- Resumo dos Relatórios -->
+                        <div id="resumoRelatorios" class="resumo-container">
+                            <div class="resumo-grid">
+                                <div class="resumo-item">
+                                    <div class="resumo-icon total">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </div>
+                                    <div class="resumo-content">
+                                        <h4>Total de Agendamentos</h4>
+                                        <div class="resumo-value">0</div>
+                                    </div>
+                                </div>
+
+                                <div class="resumo-item">
+                                    <div class="resumo-icon valor">
+                                        <i class="fas fa-dollar-sign"></i>
+                                    </div>
+                                    <div class="resumo-content">
+                                        <h4>Valor Total</h4>
+                                        <div class="resumo-value">R$ 0,00</div>
+                                    </div>
+                                </div>
+
+                                <div class="resumo-item">
+                                    <div class="resumo-icon taxa">
+                                        <i class="fas fa-percentage"></i>
+                                    </div>
+                                    <div class="resumo-content">
+                                        <h4>Taxa de Conclusão</h4>
+                                        <div class="resumo-value">0%</div>
+                                    </div>
+                                </div>
+
+                                <div class="resumo-item">
+                                    <div class="resumo-icon media">
+                                        <i class="fas fa-chart-line"></i>
+                                    </div>
+                                    <div class="resumo-content">
+                                        <h4>Ticket Médio</h4>
+                                        <div class="resumo-value">R$ 0,00</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Filtros Relatórios -->
+                        <div class="filters-bar relatorios">
+                            <div class="filter-group">
+                                <label for="relatorioDataInicio">
+                                    <i class="fas fa-calendar-day"></i>
+                                    Data Início
+                                </label>
+                                <input type="date" id="relatorioDataInicio" class="form-input">
+                            </div>
+                            <div class="filter-group">
+                                <label for="relatorioDataFim">
+                                    <i class="fas fa-calendar-day"></i>
+                                    Data Fim
+                                </label>
+                                <input type="date" id="relatorioDataFim" class="form-input">
+                            </div>
+                            <div class="filter-group">
+                                <label style="visibility: hidden;">Períodos</label>
+                                <div class="quick-actions">
+                                    <button class="btn btn-sm btn-outline" onclick="gerarRelatorioMesAtual()">
+                                        Este Mês
+                                    </button>
+                                    <button class="btn btn-sm btn-outline" onclick="gerarRelatorioSemanaAtual()">
+                                        Esta Semana
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Relatórios Table -->
+                        <div class="table-container relatorios">
+                            <table class="data-table relatorios">
+                                <thead>
+                                    <tr>
+                                        <th>Status</th>
+                                        <th>Quantidade</th>
+                                        <th>Valor Total</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="relatoriosTable">
+                                    <tr>
+                                        <td colspan="4" class="text-center">
+                                            <div class="empty-state relatorios">
+                                                <i class="fas fa-chart-bar"></i>
+                                                <h4>Nenhum relatório gerado</h4>
+                                                <p>Selecione um período e clique em "Gerar Relatório"</p>
+                                                <p class="small">Use os filtros acima para definir as datas</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Seção de Analytics (opcional) -->
+                        <div id="analyticsSection" class="analytics-section" style="display: none;">
+                            <h3>
+                                <i class="fas fa-chart-line"></i>
+                                Analytics Avançados
+                            </h3>
+                            <div class="analytics-grid">
+                                <!-- Os gráficos serão inseridos aqui via JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
                 <!-- Configurações Section -->
-<section id="configuracoes" class="content-section">
-    <div class="section-header">
-        <h2>Configurações da Oficina</h2>
-        <div class="header-actions">
-            <button class="btn btn-primary" onclick="salvarConfiguracoes()">
-                <i class="fas fa-save"></i>
-                Salvar Configurações
-            </button>
-        </div>
-    </div>
-
-    <div class="configuracoes-container">
-        <!-- Horário de Funcionamento -->
-        <div class="config-card">
-            <div class="config-header">
-                <h3><i class="fas fa-clock"></i> Horário de Funcionamento</h3>
-                <span class="config-status">
-                    <i class="fas fa-check-circle"></i>
-                    Configurado
-                </span>
-            </div>
-            <div class="config-body">
-                <div class="time-input-group">
-                    <input type="time" id="horarioAbertura" class="time-input" value="08:00">
-                    <span class="time-separator">às</span>
-                    <input type="time" id="horarioFechamento" class="time-input" value="18:00">
-                </div>
-                <div style="margin-top: 15px; font-size: 0.9rem; color: var(--text-light);">
-                    <i class="fas fa-info-circle"></i>
-                    Defina o horário comercial da sua oficina
-                </div>
-            </div>
-        </div>
-<!-- Adicione este card após o card de "Horário de Funcionamento" -->
-<div class="config-card">
-    <div class="config-header">
-        <h3><i class="fas fa-stopwatch"></i> Intervalo Entre Agendamentos</h3>
-        <span class="config-status">
-            <i class="fas fa-clock"></i>
-            Duração do Serviço
-        </span>
-    </div>
-    <div class="config-body">
-        <div class="intervalo-info">
-            <p style="margin-bottom: 15px; color: var(--text-light);">
-                <i class="fas fa-info-circle"></i>
-                Defina o tempo necessário para realizar uma troca de óleo completa.
-                Isso determinará quantos agendamentos podem ser feitos por dia.
-            </p>
-            
-            <div class="intervalo-options">
-                <label class="intervalo-option">
-                    <input type="radio" name="intervaloAgendamento" value="30" checked>
-                    <span class="intervalo-label">
-                        <span class="intervalo-tempo">30 minutos</span>
-                        <span class="intervalo-desc">(Serviço rápido)</span>
-                    </span>
-                </label>
-                
-                <label class="intervalo-option">
-                    <input type="radio" name="intervaloAgendamento" value="45">
-                    <span class="intervalo-label">
-                        <span class="intervalo-tempo">45 minutos</span>
-                        <span class="intervalo-desc">(Serviço padrão)</span>
-                    </span>
-                </label>
-                
-                <label class="intervalo-option">
-                    <input type="radio" name="intervaloAgendamento" value="60">
-                    <span class="intervalo-label">
-                        <span class="intervalo-tempo">1 hora</span>
-                        <span class="intervalo-desc">(Serviço completo)</span>
-                    </span>
-                </label>
-                
-                <label class="intervalo-option">
-                    <input type="radio" name="intervaloAgendamento" value="90">
-                    <span class="intervalo-label">
-                        <span class="intervalo-tempo">1 hora e 30 minutos</span>
-                        <span class="intervalo-desc">(Serviço + revisão)</span>
-                    </span>
-                </label>
-                
-                <label class="intervalo-option">
-                    <input type="radio" name="intervaloAgendamento" value="120">
-                    <span class="intervalo-label">
-                        <span class="intervalo-tempo">2 horas</span>
-                        <span class="intervalo-desc">(Serviço completo + detalhes)</span>
-                    </span>
-                </label>
-            </div>
-            
-            <!-- Preview de capacidade -->
-            <div class="capacidade-preview" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
-                <h4 style="margin: 0 0 10px 0; color: var(--primary-color);">
-                    <i class="fas fa-chart-bar"></i>
-                    Capacidade de Atendimento
-                </h4>
-                <div id="capacidadeInfo">
-                    <p style="margin: 5px 0; font-size: 14px;">
-                        Com intervalo de <strong id="intervaloSelecionado">30 minutos</strong>:
-                    </p>
-                    <p style="margin: 5px 0; font-size: 14px; color: var(--success-color);">
-                        <strong id="totalAtendimentos">16</strong> atendimentos possíveis por dia
-                    </p>
-                    <p style="margin: 5px 0; font-size: 12px; color: var(--text-light);">
-                        Baseado no horário comercial de 8 horas (08:00 às 18:00)
-                    </p>
-                </div>
-
-            </div>
-            
-        </div>
-        
-    </div>
-</div>
-<!-- Card de Capacidade de Atendimento -->
-<div class="config-card">
-    <div class="config-header">
-        <h3><i class="fas fa-users"></i> Capacidade de Atendimento Simultâneo</h3>
-        <span class="config-status">
-            <i class="fas fa-user-friends"></i>
-            Clientes por Horário
-        </span>
-    </div>
-    <div class="config-body">
-        <div class="capacidade-info">
-            <p style="margin-bottom: 15px; color: var(--text-light);">
-                <i class="fas fa-info-circle"></i>
-                Defina quantos clientes sua oficina pode atender simultaneamente no mesmo horário.
-            </p>
-            
-            <div class="form-group">
-                <label for="capacidadeAtendimento">Clientes por horário:</label>
-                <select id="capacidadeAtendimento" class="form-input">
-                    <option value="1">1 cliente (atendimento individual)</option>
-                    <option value="2">2 clientes (atendimento duplo)</option>
-                    <option value="3">3 clientes (atendimento triplo)</option>
-                    <option value="4">4 clientes</option>
-                    <option value="5">5 clientes</option>
-                </select>
-            </div>
-            
-            <!-- Preview de capacidade -->
-            <div id="previewCapacidade" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
-                <!-- Preview será gerado via JavaScript -->
-            </div>
-        </div>
-    </div>
-</div>
-        <!-- Dias de Funcionamento -->
-        <div class="config-card">
-            <div class="config-header">
-                <h3><i class="fas fa-calendar-alt"></i> Dias de Funcionamento</h3>
-            </div>
-            <div class="config-body">
-                <div class="dias-semana-grid">
-                    <label class="dia-checkbox">
-                        <input type="checkbox" id="segunda" value="segunda" checked>
-                        <span class="dia-label">Segunda-feira</span>
-                    </label>
-                    <label class="dia-checkbox">
-                        <input type="checkbox" id="terca" value="terca" checked>
-                        <span class="dia-label">Terça-feira</span>
-                    </label>
-                    <label class="dia-checkbox">
-                        <input type="checkbox" id="quarta" value="quarta" checked>
-                        <span class="dia-label">Quarta-feira</span>
-                    </label>
-                    <label class="dia-checkbox">
-                        <input type="checkbox" id="quinta" value="quinta" checked>
-                        <span class="dia-label">Quinta-feira</span>
-                    </label>
-                    <label class="dia-checkbox">
-                        <input type="checkbox" id="sexta" value="sexta" checked>
-                        <span class="dia-label">Sexta-feira</span>
-                    </label>
-                    <label class="dia-checkbox">
-                        <input type="checkbox" id="sabado" value="sabado" checked>
-                        <span class="dia-label">Sábado</span>
-                    </label>
-                    <label class="dia-checkbox">
-                        <input type="checkbox" id="domingo" value="domingo">
-                        <span class="dia-label">Domingo</span>
-                    </label>
-                </div>
-            </div>
-            
-        </div>
-
-        <!-- Informações da Oficina -->
-        <div class="config-card">
-            <div class="config-header">
-                <h3><i class="fas fa-info-circle"></i> Informações da Oficina</h3>
-            </div>
-            <div class="config-body">
-                <div class="info-oficina-grid">
-                    <div class="form-group">
-                        <label for="oficinaNome">
-                            <i class="fas fa-store"></i>
-                            Nome da Oficina
-                        </label>
-                        <input type="text" id="oficinaNome" class="form-input" 
-                               placeholder="Ex: Kwil Oloma Brasilândia"
-                               value="Kwil Oloma Brasilândia">
-                    </div>
-                    <div class="form-group">
-                        <label for="oficinaTelefone">
-                            <i class="fas fa-phone"></i>
-                            Telefone
-                        </label>
-                        <input type="text" id="oficinaTelefone" class="form-input" 
-                               placeholder="(11) 99999-9999"
-                               value="(11) 2020-0010">
-                    </div>
-                    <div class="form-group" style="grid-column: 1 / -1;">
-                        <label for="oficinaEndereco">
-                            <i class="fas fa-map-marker-alt"></i>
-                            Endereço Completo
-                        </label>
-                        <textarea id="oficinaEndereco" class="form-textarea" 
-                                  placeholder="Endereço completo da oficina" 
-                                  rows="3">Av. Brasilândia, 321 - São Paulo, SP</textarea>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Preview do Horário -->
-        <div class="config-card">
-            <div class="config-header">
-                <h3><i class="fas fa-eye"></i> Preview do Horário</h3>
-            </div>
-            <div class="config-body">
-                <div id="previewHorario" class="preview-horario">
-                    <div class="horario-preview-list">
-                        <div class="horario-item">
-                            <span class="dia-semana">Segunda-feira</span>
-                            <span class="horario-funcionamento">08:00 - 18:00</span>
-                        </div>
-                        <div class="horario-item">
-                            <span class="dia-semana">Terça-feira</span>
-                            <span class="horario-funcionamento">08:00 - 18:00</span>
-                        </div>
-                        <div class="horario-item">
-                            <span class="dia-semana">Quarta-feira</span>
-                            <span class="horario-funcionamento">08:00 - 18:00</span>
-                        </div>
-                        <div class="horario-item">
-                            <span class="dia-semana">Quinta-feira</span>
-                            <span class="horario-funcionamento">08:00 - 18:00</span>
-                        </div>
-                        <div class="horario-item">
-                            <span class="dia-semana">Sexta-feira</span>
-                            <span class="horario-funcionamento">08:00 - 18:00</span>
-                        </div>
-                        <div class="horario-item">
-                            <span class="dia-semana">Sábado</span>
-                            <span class="horario-funcionamento">08:00 - 18:00</span>
-                        </div>
-                        <div class="horario-item">
-                            <span class="dia-semana">Domingo</span>
-                            <span class="horario-fechado">Fechado</span>
+                <section id="configuracoes" class="content-section">
+                    <div class="section-header">
+                        <h2>Configurações da Oficina</h2>
+                        <div class="header-actions">
+                            <button class="btn btn-primary" onclick="salvarConfiguracoes()">
+                                <i class="fas fa-save"></i>
+                                Salvar Configurações
+                            </button>
                         </div>
                     </div>
-                </div>
-                <div style="margin-top: 15px; font-size: 0.9rem; color: var(--text-light); text-align: center;">
-                    <i class="fas fa-sync-alt"></i>
-                    O preview é atualizado automaticamente quando você altera as configurações
-                </div>
-                
-            </div>
-        </div>
-    </div>
 
-</section>
+                    <div class="configuracoes-container">
+                        <!-- Horário de Funcionamento -->
+                        <div class="config-card">
+                            <div class="config-header">
+                                <h3><i class="fas fa-clock"></i> Horário de Funcionamento</h3>
+                                <span class="config-status">
+                                    <i class="fas fa-check-circle"></i>
+                                    Configurado
+                                </span>
+                            </div>
+                            <div class="config-body">
+                                <div class="time-input-group">
+                                    <input type="time" id="horarioAbertura" class="time-input" value="08:00">
+                                    <span class="time-separator">às</span>
+                                    <input type="time" id="horarioFechamento" class="time-input" value="18:00">
+                                </div>
+                                <div style="margin-top: 15px; font-size: 0.9rem; color: var(--text-light);">
+                                    <i class="fas fa-info-circle"></i>
+                                    Defina o horário comercial da sua oficina
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Adicione este card após o card de "Horário de Funcionamento" -->
+                        <div class="config-card">
+                            <div class="config-header">
+                                <h3><i class="fas fa-stopwatch"></i> Intervalo Entre Agendamentos</h3>
+                                <span class="config-status">
+                                    <i class="fas fa-clock"></i>
+                                    Duração do Serviço
+                                </span>
+                            </div>
+                            <div class="config-body">
+                                <div class="intervalo-info">
+                                    <p style="margin-bottom: 15px; color: var(--text-light);">
+                                        <i class="fas fa-info-circle"></i>
+                                        Defina o tempo necessário para realizar uma troca de óleo completa.
+                                        Isso determinará quantos agendamentos podem ser feitos por dia.
+                                    </p>
+
+                                    <div class="intervalo-options">
+                                        <label class="intervalo-option">
+                                            <input type="radio" name="intervaloAgendamento" value="30" checked>
+                                            <span class="intervalo-label">
+                                                <span class="intervalo-tempo">30 minutos</span>
+                                                <span class="intervalo-desc">(Serviço rápido)</span>
+                                            </span>
+                                        </label>
+
+                                        <label class="intervalo-option">
+                                            <input type="radio" name="intervaloAgendamento" value="45">
+                                            <span class="intervalo-label">
+                                                <span class="intervalo-tempo">45 minutos</span>
+                                                <span class="intervalo-desc">(Serviço padrão)</span>
+                                            </span>
+                                        </label>
+
+                                        <label class="intervalo-option">
+                                            <input type="radio" name="intervaloAgendamento" value="60">
+                                            <span class="intervalo-label">
+                                                <span class="intervalo-tempo">1 hora</span>
+                                                <span class="intervalo-desc">(Serviço completo)</span>
+                                            </span>
+                                        </label>
+
+                                        <label class="intervalo-option">
+                                            <input type="radio" name="intervaloAgendamento" value="90">
+                                            <span class="intervalo-label">
+                                                <span class="intervalo-tempo">1 hora e 30 minutos</span>
+                                                <span class="intervalo-desc">(Serviço + revisão)</span>
+                                            </span>
+                                        </label>
+
+                                        <label class="intervalo-option">
+                                            <input type="radio" name="intervaloAgendamento" value="120">
+                                            <span class="intervalo-label">
+                                                <span class="intervalo-tempo">2 horas</span>
+                                                <span class="intervalo-desc">(Serviço completo + detalhes)</span>
+                                            </span>
+                                        </label>
+                                    </div>
+
+                                    <!-- Preview de capacidade -->
+                                    <div class="capacidade-preview"
+                                        style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                                        <h4 style="margin: 0 0 10px 0; color: var(--primary-color);">
+                                            <i class="fas fa-chart-bar"></i>
+                                            Capacidade de Atendimento
+                                        </h4>
+                                        <div id="capacidadeInfo">
+                                            <p style="margin: 5px 0; font-size: 14px;">
+                                                Com intervalo de <strong id="intervaloSelecionado">30 minutos</strong>:
+                                            </p>
+                                            <p style="margin: 5px 0; font-size: 14px; color: var(--success-color);">
+                                                <strong id="totalAtendimentos">16</strong> atendimentos possíveis por
+                                                dia
+                                            </p>
+                                            <p style="margin: 5px 0; font-size: 12px; color: var(--text-light);">
+                                                Baseado no horário comercial de 8 horas (08:00 às 18:00)
+                                            </p>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <!-- Card de Capacidade de Atendimento -->
+                        <div class="config-card">
+                            <div class="config-header">
+                                <h3><i class="fas fa-users"></i> Capacidade de Atendimento Simultâneo</h3>
+                                <span class="config-status">
+                                    <i class="fas fa-user-friends"></i>
+                                    Clientes por Horário
+                                </span>
+                            </div>
+                            <div class="config-body">
+                                <div class="capacidade-info">
+                                    <p style="margin-bottom: 15px; color: var(--text-light);">
+                                        <i class="fas fa-info-circle"></i>
+                                        Defina quantos clientes sua oficina pode atender simultaneamente no mesmo
+                                        horário.
+                                    </p>
+
+                                    <div class="form-group">
+                                        <label for="capacidadeAtendimento">Clientes por horário:</label>
+                                        <select id="capacidadeAtendimento" class="form-input">
+                                            <option value="1">1 cliente (atendimento individual)</option>
+                                            <option value="2">2 clientes (atendimento duplo)</option>
+                                            <option value="3">3 clientes (atendimento triplo)</option>
+                                            <option value="4">4 clientes</option>
+                                            <option value="5">5 clientes</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Preview de capacidade -->
+                                    <div id="previewCapacidade"
+                                        style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                                        <!-- Preview será gerado via JavaScript -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Dias de Funcionamento -->
+                        <div class="config-card">
+                            <div class="config-header">
+                                <h3><i class="fas fa-calendar-alt"></i> Dias de Funcionamento</h3>
+                            </div>
+                            <div class="config-body">
+                                <div class="dias-semana-grid">
+                                    <label class="dia-checkbox">
+                                        <input type="checkbox" id="segunda" value="segunda" checked>
+                                        <span class="dia-label">Segunda-feira</span>
+                                    </label>
+                                    <label class="dia-checkbox">
+                                        <input type="checkbox" id="terca" value="terca" checked>
+                                        <span class="dia-label">Terça-feira</span>
+                                    </label>
+                                    <label class="dia-checkbox">
+                                        <input type="checkbox" id="quarta" value="quarta" checked>
+                                        <span class="dia-label">Quarta-feira</span>
+                                    </label>
+                                    <label class="dia-checkbox">
+                                        <input type="checkbox" id="quinta" value="quinta" checked>
+                                        <span class="dia-label">Quinta-feira</span>
+                                    </label>
+                                    <label class="dia-checkbox">
+                                        <input type="checkbox" id="sexta" value="sexta" checked>
+                                        <span class="dia-label">Sexta-feira</span>
+                                    </label>
+                                    <label class="dia-checkbox">
+                                        <input type="checkbox" id="sabado" value="sabado" checked>
+                                        <span class="dia-label">Sábado</span>
+                                    </label>
+                                    <label class="dia-checkbox">
+                                        <input type="checkbox" id="domingo" value="domingo">
+                                        <span class="dia-label">Domingo</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Informações da Oficina -->
+                        <div class="config-card">
+                            <div class="config-header">
+                                <h3><i class="fas fa-info-circle"></i> Informações da Oficina</h3>
+                            </div>
+                            <div class="config-body">
+                                <div class="info-oficina-grid">
+                                    <div class="form-group">
+                                        <label for="oficinaNome">
+                                            <i class="fas fa-store"></i>
+                                            Nome da Oficina
+                                        </label>
+                                        <input type="text" id="oficinaNome" class="form-input"
+                                            placeholder="Ex: Kwil Oloma Brasilândia" value="Kwil Oloma Brasilândia">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="oficinaTelefone">
+                                            <i class="fas fa-phone"></i>
+                                            Telefone
+                                        </label>
+                                        <input type="text" id="oficinaTelefone" class="form-input"
+                                            placeholder="(11) 99999-9999" value="(11) 2020-0010">
+                                    </div>
+                                    <div class="form-group" style="grid-column: 1 / -1;">
+                                        <label for="oficinaEndereco">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            Endereço Completo
+                                        </label>
+                                        <textarea id="oficinaEndereco" class="form-textarea"
+                                            placeholder="Endereço completo da oficina"
+                                            rows="3">Av. Brasilândia, 321 - São Paulo, SP</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Preview do Horário -->
+                        <div class="config-card">
+                            <div class="config-header">
+                                <h3><i class="fas fa-eye"></i> Preview do Horário</h3>
+                            </div>
+                            <div class="config-body">
+                                <div id="previewHorario" class="preview-horario">
+                                    <div class="horario-preview-list">
+                                        <div class="horario-item">
+                                            <span class="dia-semana">Segunda-feira</span>
+                                            <span class="horario-funcionamento">08:00 - 18:00</span>
+                                        </div>
+                                        <div class="horario-item">
+                                            <span class="dia-semana">Terça-feira</span>
+                                            <span class="horario-funcionamento">08:00 - 18:00</span>
+                                        </div>
+                                        <div class="horario-item">
+                                            <span class="dia-semana">Quarta-feira</span>
+                                            <span class="horario-funcionamento">08:00 - 18:00</span>
+                                        </div>
+                                        <div class="horario-item">
+                                            <span class="dia-semana">Quinta-feira</span>
+                                            <span class="horario-funcionamento">08:00 - 18:00</span>
+                                        </div>
+                                        <div class="horario-item">
+                                            <span class="dia-semana">Sexta-feira</span>
+                                            <span class="horario-funcionamento">08:00 - 18:00</span>
+                                        </div>
+                                        <div class="horario-item">
+                                            <span class="dia-semana">Sábado</span>
+                                            <span class="horario-funcionamento">08:00 - 18:00</span>
+                                        </div>
+                                        <div class="horario-item">
+                                            <span class="dia-semana">Domingo</span>
+                                            <span class="horario-fechado">Fechado</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                    style="margin-top: 15px; font-size: 0.9rem; color: var(--text-light); text-align: center;">
+                                    <i class="fas fa-sync-alt"></i>
+                                    O preview é atualizado automaticamente quando você altera as configurações
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </section>
 
             </div>
         </div>
@@ -965,7 +1113,8 @@
                 <div class="form-row" id="divergenciaContainer" style="display: none;">
                     <div class="form-group" style="flex: 2;">
                         <label>Divergência Registrada:</label>
-                        <div class="detail-value" id="detailDivergencia" style="color: #d32f2f; font-style: italic;"></div>
+                        <div class="detail-value" id="detailDivergencia" style="color: #d32f2f; font-style: italic;">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -977,73 +1126,73 @@
 
     <script src="/js/adm.js"></script>
     <script>
-    // Mobile menu functionality
-    document.addEventListener('DOMContentLoaded', function() {
-        const sidebarToggle = document.getElementById('sidebarToggle');
-        const sidebar = document.querySelector('.sidebar');
-        
-        // Criar overlay
-        const overlay = document.createElement('div');
-        overlay.className = 'sidebar-overlay';
-        document.body.appendChild(overlay);
-        
-        // Toggle sidebar
-        function toggleSidebar() {
-            sidebar.classList.toggle('mobile-open');
-            overlay.classList.toggle('active');
-            document.body.style.overflow = sidebar.classList.contains('mobile-open') ? 'hidden' : '';
-        }
-        
-        // Fechar sidebar
-        function closeSidebar() {
-            sidebar.classList.remove('mobile-open');
-            overlay.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-        
-        // Event listeners
-        if (sidebarToggle) {
-            sidebarToggle.addEventListener('click', toggleSidebar);
-        }
-        
-        overlay.addEventListener('click', closeSidebar);
-        
-        // Fechar ao clicar em um link
-        const navLinks = document.querySelectorAll('.nav-link');
-        navLinks.forEach(link => {
-            link.addEventListener('click', function() {
-                if (window.innerWidth <= 768) {
+        // Mobile menu functionality
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebar = document.querySelector('.sidebar');
+
+            // Criar overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'sidebar-overlay';
+            document.body.appendChild(overlay);
+
+            // Toggle sidebar
+            function toggleSidebar() {
+                sidebar.classList.toggle('mobile-open');
+                overlay.classList.toggle('active');
+                document.body.style.overflow = sidebar.classList.contains('mobile-open') ? 'hidden' : '';
+            }
+
+            // Fechar sidebar
+            function closeSidebar() {
+                sidebar.classList.remove('mobile-open');
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            // Event listeners
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', toggleSidebar);
+            }
+
+            overlay.addEventListener('click', closeSidebar);
+
+            // Fechar ao clicar em um link
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function () {
+                    if (window.innerWidth <= 768) {
+                        closeSidebar();
+                    }
+                });
+            });
+
+            // Fechar ao redimensionar para desktop
+            window.addEventListener('resize', function () {
+                if (window.innerWidth > 768) {
                     closeSidebar();
                 }
             });
-        });
-        
-        // Fechar ao redimensionar para desktop
-        window.addEventListener('resize', function() {
-            if (window.innerWidth > 768) {
-                closeSidebar();
+
+            // Search functionality para mobile
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('focus', function () {
+                    if (window.innerWidth <= 768) {
+                        this.parentElement.classList.add('mobile-visible');
+                    }
+                });
+
+                searchInput.addEventListener('blur', function () {
+                    setTimeout(() => {
+                        if (window.innerWidth <= 768) {
+                            this.parentElement.classList.remove('mobile-visible');
+                        }
+                    }, 200);
+                });
             }
         });
-        
-        // Search functionality para mobile
-        const searchInput = document.getElementById('searchInput');
-        if (searchInput) {
-            searchInput.addEventListener('focus', function() {
-                if (window.innerWidth <= 768) {
-                    this.parentElement.classList.add('mobile-visible');
-                }
-            });
-            
-            searchInput.addEventListener('blur', function() {
-                setTimeout(() => {
-                    if (window.innerWidth <= 768) {
-                        this.parentElement.classList.remove('mobile-visible');
-                    }
-                }, 200);
-            });
-        }
-    });
-</script>
+    </script>
     <script>
         // Atualizar data e hora em tempo real
         function updateDateTime() {
@@ -1051,12 +1200,12 @@
             document.getElementById('currentDate').textContent = now.toLocaleDateString('pt-BR');
             document.getElementById('currentTime').textContent = now.toLocaleTimeString('pt-BR');
         }
-        
+
         setInterval(updateDateTime, 1000);
         updateDateTime();
 
         // Fechar modal ao clicar fora
-        document.addEventListener('click', function(event) {
+        document.addEventListener('click', function (event) {
             if (event.target.classList.contains('modal')) {
                 event.target.classList.remove('active');
             }
@@ -1070,14 +1219,14 @@
             const section = document.querySelector('.concluir-agendamento');
 
             // Focar no input quando a seção for clicada
-            section.addEventListener('click', function() {
+            section.addEventListener('click', function () {
                 protocoloInput.focus();
             });
 
             // Validar input em tempo real
-            protocoloInput.addEventListener('input', function() {
+            protocoloInput.addEventListener('input', function () {
                 const value = this.value.trim();
-                
+
                 if (value.length > 0) {
                     this.style.borderColor = '#28a745';
                     btnConcluir.disabled = false;
@@ -1085,26 +1234,26 @@
                     this.style.borderColor = '#e9ecef';
                     btnConcluir.disabled = true;
                 }
-                
+
                 // Esconder mensagem quando o usuário digitar
                 hideMessage();
             });
 
             // Enter para submeter
-            protocoloInput.addEventListener('keypress', function(e) {
+            protocoloInput.addEventListener('keypress', function (e) {
                 if (e.key === 'Enter' && !btnConcluir.disabled) {
                     btnConcluir.click();
                 }
             });
 
             // Feedback visual no botão
-            btnConcluir.addEventListener('mouseenter', function() {
+            btnConcluir.addEventListener('mouseenter', function () {
                 if (!this.disabled) {
                     this.style.transform = 'translateY(-2px)';
                 }
             });
 
-            btnConcluir.addEventListener('mouseleave', function() {
+            btnConcluir.addEventListener('mouseleave', function () {
                 this.style.transform = 'translateY(0)';
             });
         }
@@ -1145,15 +1294,15 @@
         }
 
         // Inicializar quando o DOM estiver carregado
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             enhanceProtocolSection();
-            
+
             // Event listeners para configurações
             const horarioInputs = document.querySelectorAll('#horarioAbertura, #horarioFechamento');
             horarioInputs.forEach(input => {
                 input.addEventListener('change', atualizarPreviewHorario);
             });
-            
+
             const diaCheckboxes = document.querySelectorAll('.dias-semana-grid input[type="checkbox"]');
             diaCheckboxes.forEach(checkbox => {
                 checkbox.addEventListener('change', atualizarPreviewHorario);
@@ -1165,14 +1314,14 @@
             const preview = document.getElementById('previewHorario');
             const horarioAbertura = document.getElementById('horarioAbertura').value;
             const horarioFechamento = document.getElementById('horarioFechamento').value;
-            
+
             if (!preview) return;
-            
+
             if (!horarioAbertura || !horarioFechamento) {
                 preview.innerHTML = '<p>Configure os horários de abertura e fechamento</p>';
                 return;
             }
-            
+
             const diasSemana = [
                 { id: 'segunda', nome: 'Segunda-feira' },
                 { id: 'terca', nome: 'Terça-feira' },
@@ -1182,13 +1331,13 @@
                 { id: 'sabado', nome: 'Sábado' },
                 { id: 'domingo', nome: 'Domingo' }
             ];
-            
+
             let html = '<div class="horario-preview-list">';
-            
+
             diasSemana.forEach(dia => {
                 const checkbox = document.getElementById(dia.id);
                 const estaAberto = checkbox && checkbox.checked;
-                
+
                 html += `
                     <div class="horario-item">
                         <span class="dia-semana">${dia.nome}</span>
@@ -1198,10 +1347,11 @@
                     </div>
                 `;
             });
-            
+
             html += '</div>';
             preview.innerHTML = html;
         }
     </script>
 </body>
+
 </html>

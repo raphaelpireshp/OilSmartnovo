@@ -248,6 +248,274 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 });
+
+// Variáveis para filtros e paginação
+let filtrosAtuais = {};
+let paginaAtual = 1;
+const itensPorPagina = 10;
+
+// Aplicar filtros de agendamentos - VERSÃO CORRIGIDA
+async function aplicarFiltrosAgendamentos() {
+    try {
+        // Coletar apenas os filtros que existem no HTML
+        filtrosAtuais = {
+            status: document.getElementById('statusFilter').value,
+            dataInicio: document.getElementById('dataInicioFilter').value,
+            dataFim: document.getElementById('dataFimFilter').value,
+            cliente: document.getElementById('clienteFilter').value,
+            telefone: document.getElementById('telefoneFilter').value,
+            veiculo: document.getElementById('veiculoFilter').value,
+            servico: document.getElementById('servicoFilter').value,
+            protocolo: document.getElementById('protocoloFilter').value
+            // REMOVIDOS: ordenarPor, canceladoPor, apenasComProtocolo, apenasDivergencias
+        };
+
+        paginaAtual = 1;
+        await carregarAgendamentosComFiltros();
+
+    } catch (error) {
+        console.error('Erro ao aplicar filtros:', error);
+        showNotification('Erro ao aplicar filtros', 'error');
+    }
+}
+
+// Carregar agendamentos com filtros
+async function carregarAgendamentosComFiltros() {
+    try {
+        showLoading('agendamentosTable');
+        
+        const params = new URLSearchParams();
+        
+        // Adicionar filtros aos parâmetros
+        Object.keys(filtrosAtuais).forEach(key => {
+            if (filtrosAtuais[key] && filtrosAtuais[key] !== 'todos') {
+                params.append(key, filtrosAtuais[key]);
+            }
+        });
+        
+        // Adicionar paginação
+        params.append('pagina', paginaAtual);
+        params.append('limite', itensPorPagina);
+
+        const response = await apiCall(`/api/admin/agendamentos/filtrados?${params.toString()}`);
+        const data = await response.json();
+
+        if (data.success) {
+            renderAgendamentos(data.agendamentos);
+            atualizarPaginacao(data.total, data.pagina, data.totalPaginas);
+            atualizarContadorResultados(data.total);
+        } else {
+            showNotification(data.message || 'Erro ao carregar agendamentos', 'error');
+        }
+
+    } catch (error) {
+        console.error('Erro ao carregar agendamentos com filtros:', error);
+        showNotification('Erro ao carregar agendamentos', 'error');
+    } finally {
+        hideLoading('agendamentosTable');
+    }
+}
+
+// Limpar filtros - VERSÃO CORRIGIDA
+function limparFiltrosAgendamentos() {
+    // Limpar apenas os campos que existem
+    document.getElementById('statusFilter').value = 'todos';
+    document.getElementById('dataInicioFilter').value = '';
+    document.getElementById('dataFimFilter').value = '';
+    document.getElementById('clienteFilter').value = '';
+    document.getElementById('telefoneFilter').value = '';
+    document.getElementById('veiculoFilter').value = '';
+    document.getElementById('servicoFilter').value = 'todos';
+    document.getElementById('protocoloFilter').value = '';
+    // REMOVIDOS: valorMinFilter, valorMaxFilter, ordenarPor, canceladoPorFilter, apenasComProtocolo, apenasDivergencias
+
+    filtrosAtuais = {};
+    paginaAtual = 1;
+    
+    // Esconder filtros avançados
+    const filtrosAvancados = document.getElementById('filtrosAvancados');
+    if (filtrosAvancados) {
+        filtrosAvancados.style.display = 'none';
+    }
+    
+    document.getElementById('filtrosInfo').style.display = 'none';
+    
+    // Recarregar sem filtros
+    loadAgendamentos();
+}
+
+
+
+// Atualizar contador de resultados
+function atualizarContadorResultados(total) {
+    const filtrosInfo = document.getElementById('filtrosInfo');
+    const contador = document.getElementById('contadorResultados');
+    
+    if (total > 0 && Object.keys(filtrosAtuais).some(key => filtrosAtuais[key] && filtrosAtuais[key] !== 'todos')) {
+        contador.textContent = total;
+        filtrosInfo.style.display = 'block';
+    } else {
+        filtrosInfo.style.display = 'none';
+    }
+}
+
+// Atualizar paginação
+function atualizarPaginacao(total, pagina, totalPaginas) {
+    const paginationContainer = document.getElementById('paginationContainer');
+    const paginationStart = document.getElementById('paginationStart');
+    const paginationEnd = document.getElementById('paginationEnd');
+    const paginationTotal = document.getElementById('paginationTotal');
+    const paginationPages = document.getElementById('paginationPages');
+    const prevPage = document.getElementById('prevPage');
+    const nextPage = document.getElementById('nextPage');
+
+    if (total > itensPorPagina) {
+        paginationContainer.style.display = 'flex';
+        
+        const start = ((pagina - 1) * itensPorPagina) + 1;
+        const end = Math.min(pagina * itensPorPagina, total);
+        
+        paginationStart.textContent = start;
+        paginationEnd.textContent = end;
+        paginationTotal.textContent = total;
+        
+        // Atualizar botões de navegação
+        prevPage.disabled = pagina === 1;
+        nextPage.disabled = pagina === totalPaginas;
+        
+        // Gerar números de página
+        let paginasHTML = '';
+        for (let i = 1; i <= totalPaginas; i++) {
+            if (i === pagina) {
+                paginasHTML += `<span class="pagina-atual">${i}</span>`;
+            } else if (i === 1 || i === totalPaginas || Math.abs(i - pagina) <= 2) {
+                paginasHTML += `<button class="btn-pagina" onclick="irParaPagina(${i})">${i}</button>`;
+            } else if (Math.abs(i - pagina) === 3) {
+                paginasHTML += '<span class="pagination-ellipsis">...</span>';
+            }
+        }
+        
+        paginationPages.innerHTML = paginasHTML;
+    } else {
+        paginationContainer.style.display = 'none';
+    }
+}
+
+// Mudar página
+function mudarPagina(direcao) {
+    paginaAtual += direcao;
+    carregarAgendamentosComFiltros();
+}
+
+// Ir para página específica
+function irParaPagina(pagina) {
+    paginaAtual = pagina;
+    carregarAgendamentosComFiltros();
+}
+
+// Exportar agendamentos
+async function exportarAgendamentos() {
+    try {
+        const params = new URLSearchParams();
+        
+        // Adicionar filtros atuais aos parâmetros de exportação
+        Object.keys(filtrosAtuais).forEach(key => {
+            if (filtrosAtuais[key] && filtrosAtuais[key] !== 'todos') {
+                params.append(key, filtrosAtuais[key]);
+            }
+        });
+
+        const url = `/api/admin/agendamentos/exportar?${params.toString()}`;
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `agendamentos_${new Date().toISOString().split('T')[0]}.csv`;
+        link.click();
+
+        showNotification('Exportação iniciada!', 'success');
+    } catch (error) {
+        console.error('Erro ao exportar agendamentos:', error);
+        showNotification('Erro ao exportar agendamentos', 'error');
+    }
+}
+
+// Atualizar função loadAgendamentos existente para usar filtros
+async function loadAgendamentos(status = 'todos') {
+    if (status !== 'todos') {
+        document.getElementById('statusFilter').value = status;
+    }
+    await aplicarFiltrosAgendamentos();
+}
+
+// Função para debug dos filtros
+function debugFiltros() {
+    console.log('🔍 Filtros atuais:', filtrosAtuais);
+    console.log('📊 Página atual:', paginaAtual);
+    
+    const params = new URLSearchParams();
+    Object.keys(filtrosAtuais).forEach(key => {
+        if (filtrosAtuais[key] && filtrosAtuais[key] !== 'todos') {
+            params.append(key, filtrosAtuais[key]);
+        }
+    });
+    
+    params.append('pagina', paginaAtual);
+    params.append('limite', itensPorPagina);
+    
+    console.log('🌐 URL que seria chamada:', `/api/admin/agendamentos/filtrados?${params.toString()}`);
+}
+
+// Adicione ao console para testar
+window.debugFiltros = debugFiltros;
+
+
+// Função corrigida para concluir por protocolo com tratamento de erro
+async function concluirPorProtocolo() {
+    try {
+        const input = document.getElementById('protocoloInput');
+        const btn = document.getElementById('btnConcluir');
+        const msgEl = document.getElementById('msgConcluir');
+        
+        if (!input || !btn) {
+            console.error('❌ Elementos do protocolo não encontrados');
+            return;
+        }
+
+        const protocolo = input.value.trim();
+        
+        if (!protocolo) {
+            if (msgEl) { 
+                msgEl.innerText = 'Digite um protocolo válido.'; 
+                msgEl.style.color = 'red'; 
+            }
+            return;
+        }
+
+        // Prevenir múltiplos cliques
+        if (btn.classList.contains('loading')) {
+            return;
+        }
+
+        // Mostrar loading
+        btn.classList.add('loading');
+        btn.disabled = true;
+        
+        if (msgEl) { 
+            msgEl.innerText = 'Processando...'; 
+            msgEl.style.color = 'blue'; 
+        }
+
+        // ... resto do código da função concluirPorProtocolo
+        
+    } catch (error) {
+        console.error('❌ Erro em concluirPorProtocolo:', error);
+        // Restaurar estado do botão em caso de erro
+        const btn = document.getElementById('btnConcluir');
+        if (btn) {
+            btn.classList.remove('loading');
+            btn.disabled = false;
+        }
+    }
+}
 // ==================== HORÁRIOS ESPECIAIS - FUNÇÕES COMPLETAS ====================
 
 // Inicializar horários especiais
