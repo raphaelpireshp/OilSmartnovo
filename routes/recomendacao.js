@@ -14,7 +14,7 @@ router.get("/", (req, res) => {
     });
   }
 
-  // Consulta otimizada para buscar recomendações
+  // Consulta otimizada para buscar recomendações (sem LIMIT para capturar múltiplas linhas)
   const sql = `
     SELECT 
       r.id AS recomendacao_id,
@@ -40,7 +40,6 @@ router.get("/", (req, res) => {
     LEFT JOIN modelo m ON ma.modelo_id = m.id
     LEFT JOIN marca mar ON m.marca_id = mar.id
     WHERE r.modelo_ano_id = ?
-    LIMIT 1
   `;
 
   console.log("Executando SQL para recomendação");
@@ -63,18 +62,22 @@ router.get("/", (req, res) => {
       });
     }
 
-    const recomendacao = results[0];
-    
-    // Formatar resposta
-    const response = {
-      success: true,
-      data: {
-        veiculo: {
+    // Processar resultados para combinar óleo e filtro de múltiplas linhas
+    let oleo = null;
+    let filtro = null;
+    let veiculo = null;
+
+    results.forEach(recomendacao => {
+      if (!veiculo && recomendacao.modelo_nome) {
+        veiculo = {
           modelo: recomendacao.modelo_nome,
           marca: recomendacao.marca_nome,
           ano: recomendacao.ano_modelo
-        },
-        oleo: recomendacao.oleo_id ? {
+        };
+      }
+
+      if (recomendacao.oleo_id && !oleo) {
+        oleo = {
           id: recomendacao.oleo_id,
           nome: recomendacao.oleo_nome,
           tipo: recomendacao.oleo_tipo,
@@ -82,15 +85,28 @@ router.get("/", (req, res) => {
           especificacao: recomendacao.oleo_especificacao,
           marca: recomendacao.oleo_marca,
           preco: parseFloat(recomendacao.oleo_preco)
-        } : null,
-        filtro: recomendacao.filtro_id ? {
+        };
+      }
+
+      if (recomendacao.filtro_id && !filtro) {
+        filtro = {
           id: recomendacao.filtro_id,
           nome: recomendacao.filtro_nome,
           tipo: recomendacao.filtro_tipo,
           compatibilidade_modelo: recomendacao.filtro_compatibilidade,
           preco: parseFloat(recomendacao.filtro_preco)
-        } : null,
-        total: (parseFloat(recomendacao.oleo_preco || 0) + parseFloat(recomendacao.filtro_preco || 0)).toFixed(2)
+        };
+      }
+    });
+
+    // Formatar resposta
+    const response = {
+      success: true,
+      data: {
+        veiculo: veiculo,
+        oleo: oleo,
+        filtro: filtro,
+        total: (parseFloat(oleo ? oleo.preco : 0) + parseFloat(filtro ? filtro.preco : 0)).toFixed(2)
       }
     };
 
@@ -135,7 +151,6 @@ router.get("/por-veiculo", (req, res) => {
     LEFT JOIN modelo m ON ma.modelo_id = m.id
     LEFT JOIN marca mar ON m.marca_id = mar.id
     WHERE m.marca_id = ? AND m.id = ? AND ma.ano = ?
-    LIMIT 1
   `;
 
   db.query(sql, [marca_id, modelo_id, ano], (err, results) => {
@@ -154,17 +169,22 @@ router.get("/por-veiculo", (req, res) => {
       });
     }
 
-    const recomendacao = results[0];
-    
-    const response = {
-      success: true,
-      data: {
-        veiculo: {
+    // Processar resultados para combinar óleo e filtro de múltiplas linhas
+    let oleo = null;
+    let filtro = null;
+    let veiculo = null;
+
+    results.forEach(recomendacao => {
+      if (!veiculo && recomendacao.modelo_nome) {
+        veiculo = {
           modelo: recomendacao.modelo_nome,
           marca: recomendacao.marca_nome,
           ano: recomendacao.ano_modelo
-        },
-        oleo: {
+        };
+      }
+
+      if (recomendacao.oleo_id && !oleo) {
+        oleo = {
           id: recomendacao.oleo_id,
           nome: recomendacao.oleo_nome,
           tipo: recomendacao.oleo_tipo,
@@ -172,18 +192,31 @@ router.get("/por-veiculo", (req, res) => {
           especificacao: recomendacao.oleo_especificacao,
           marca: recomendacao.oleo_marca,
           preco: parseFloat(recomendacao.oleo_preco)
-        },
-        filtro: {
+        };
+      }
+
+      if (recomendacao.filtro_id && !filtro) {
+        filtro = {
           id: recomendacao.filtro_id,
           nome: recomendacao.filtro_nome,
           tipo: recomendacao.filtro_tipo,
           compatibilidade_modelo: recomendacao.filtro_compatibilidade,
           preco: parseFloat(recomendacao.filtro_preco)
-        },
-        total: (parseFloat(recomendacao.oleo_preco || 0) + parseFloat(recomendacao.filtro_preco || 0)).toFixed(2)
+        };
+      }
+    });
+
+    const response = {
+      success: true,
+      data: {
+        veiculo: veiculo,
+        oleo: oleo,
+        filtro: filtro,
+        total: (parseFloat(oleo ? oleo.preco : 0) + parseFloat(filtro ? filtro.preco : 0)).toFixed(2)
       }
     };
 
+    console.log("Recomendação enviada com sucesso");
     res.json(response);
   });
 });

@@ -166,14 +166,14 @@ const selectionModalStyles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#0f172a",
   },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#334155",
-  },
+header: {
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "center",
+  padding: 16,
+  borderBottomWidth: 1,
+  borderBottomColor: "#334155",
+},
   title: {
     fontSize: 18,
     fontWeight: "bold",
@@ -670,12 +670,7 @@ Status: ${agendamento.status}
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerTop}>
-          <View style={styles.logoContainer}>
-            <View style={styles.logo}>
-              <Text style={styles.logoText}>OS</Text>
-            </View>
-            <Text style={styles.logoTitle}>OilSmart</Text>
-          </View>
+
           <Text style={styles.headerTitle}>Meus Agendamentos</Text>
         </View>
       </View>

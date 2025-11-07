@@ -3,6 +3,7 @@
 import { useState } from "react"
 import {
   View,
+  Image,
   Text,
   TextInput,
   TouchableOpacity,
@@ -19,47 +20,47 @@ export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("")
   const [senha, setSenha] = useState("")
 
-const handleLogin = async () => {
+  const handleLogin = async () => {
     if (!email || !senha) {
-        Alert.alert("Erro", "Preencha todos os campos");
-        return;
+      Alert.alert("Erro", "Preencha todos os campos");
+      return;
     }
 
     try {
-        console.log("🔐 Tentando login...");
-        
-        // Chamada REAL para a API
-        const response = await api.post("/auth/login", {
-            email: email,
-            senha: senha
-        });
+      console.log("🔐 Tentando login...");
 
-        if (response.data.success) {
-            console.log("✅ Login realizado com sucesso!");
-            
-            // Salvar usuário no AsyncStorage
-            await AsyncStorage.setItem("oilsmart_current_user", JSON.stringify(response.data.user));
-            
-            // Navegar para a tela principal
-            navigation.replace("Main");
-        } else {
-            Alert.alert("Erro", response.data.message || "Credenciais inválidas");
-        }
+      // Chamada REAL para a API
+      const response = await api.post("/auth/login", {
+        email: email,
+        senha: senha
+      });
+
+      if (response.data.success) {
+        console.log("✅ Login realizado com sucesso!");
+
+        // Salvar usuário no AsyncStorage
+        await AsyncStorage.setItem("oilsmart_current_user", JSON.stringify(response.data.user));
+
+        // Navegar para a tela principal
+        navigation.replace("Main");
+      } else {
+        Alert.alert("Erro", response.data.message || "Credenciais inválidas");
+      }
     } catch (error) {
-        console.error("❌ Erro no login:", error);
-        
-        if (error.response) {
-            // Erro da API
-            Alert.alert("Erro", error.response.data.message || "Falha ao fazer login");
-        } else if (error.request) {
-            // Erro de conexão
-            Alert.alert("Erro", "Não foi possível conectar ao servidor. Verifique sua internet.");
-        } else {
-            // Outro erro
-            Alert.alert("Erro", "Falha ao fazer login");
-        }
+      console.error("❌ Erro no login:", error);
+
+      if (error.response) {
+        // Erro da API
+        Alert.alert("Erro", error.response.data.message || "Falha ao fazer login");
+      } else if (error.request) {
+        // Erro de conexão
+        Alert.alert("Erro", "Não foi possível conectar ao servidor. Verifique sua internet.");
+      } else {
+        // Outro erro
+        Alert.alert("Erro", "Falha ao fazer login");
+      }
     }
-};
+  };
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : "height"}>
@@ -67,10 +68,10 @@ const handleLogin = async () => {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.logoContainer}>
-            <View style={styles.logo}>
-              <Text style={styles.logoText}>OS</Text>
-            </View>
-            <Text style={styles.logoTitle}>OilSmart</Text>
+            <Image
+source={require('../../oilamarelo.png')}              style={styles.logo}
+              resizeMode="contain"
+            />
           </View>
         </View>
 
@@ -141,17 +142,8 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   logo: {
-    width: 40,
-    height: 40,
-    backgroundColor: "#eab308",
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  logoText: {
-    color: "#0f172a",
-    fontSize: 18,
-    fontWeight: "bold",
+    width: 120,
+    height: 120,
   },
   logoTitle: {
     fontSize: 24,

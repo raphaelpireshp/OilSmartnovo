@@ -1645,7 +1645,7 @@ app.post('/api/produtos/oleo', (req, res) => {
     });
 });
 
-// Rota para adicionar filtro - ADICIONE AQUI
+// Rota para adicionar filtro - VERSÃO CORRIGIDA (SEM modelo_ano_id)
 app.post('/api/produtos/filtro', (req, res) => {
     const { nome, tipo, compatibilidade_modelo, preco } = req.body;
     
@@ -1711,9 +1711,13 @@ app.get('/api/anos-completos', (req, res) => {
         res.json({ success: true, data: results });
     });
 });
+
+
+
+
 // ========== ROTA PARA ADICIONAR OFICINA ==========
 
-// Rota para adicionar oficina - VERSÃO CORRIGIDA
+// Rota para adicionar oficina - VERSÃO CORRIGIDA COM VALIDAÇÃO DE CEP
 app.post('/api/oficina', async (req, res) => {
     const {
         nome, email, senha, endereco, cidade, estado, telefone, horario_abertura,
@@ -1739,34 +1743,22 @@ app.post('/api/oficina', async (req, res) => {
         });
     }
 
-    // Validação de latitude e longitude - mais robusta
-    if (lat !== undefined && lat !== null && lat !== '') {
-        const latNum = parseFloat(lat);
-        if (isNaN(latNum) || latNum < -90 || latNum > 90) {
-            return res.status(400).json({ 
-                success: false, 
-                error: 'Latitude deve ser um número entre -90 e 90' 
-            });
-        }
+    // Validação e formatação do CEP
+    let cepFormatado = cep.toString().replace(/\D/g, ''); // Remove não dígitos
+    
+    if (cepFormatado.length > 8) {
+        cepFormatado = cepFormatado.substring(0, 8); // Limita a 8 dígitos
     }
-
-    if (lng !== undefined && lng !== null && lng !== '') {
-        const lngNum = parseFloat(lng);
-        if (isNaN(lngNum) || lngNum < -180 || lngNum > 180) {
-            return res.status(400).json({ 
-                success: false, 
-                error: 'Longitude deve ser um número entre -180 e 180' 
-            });
-        }
-    }
-
-    // Validação de CEP
-    if (cep.length < 8) {
+    
+    if (cepFormatado.length < 8) {
         return res.status(400).json({ 
             success: false, 
-            error: 'CEP deve ter pelo menos 8 caracteres' 
+            error: 'CEP deve ter 8 dígitos' 
         });
     }
+
+    // Formatar CEP com hífen (opcional)
+    // cepFormatado = cepFormatado.replace(/^(\d{5})(\d{3})$/, '$1-$2');
 
     // Validação de telefone
     const telefoneLimpo = telefone.replace(/\D/g, '');
@@ -1777,13 +1769,21 @@ app.post('/api/oficina', async (req, res) => {
         });
     }
 
+    // Limitar telefone a 15 dígitos
+    const telefoneFormatado = telefoneLimpo.substring(0, 15);
+
     try {
         // Primeiro verificar se o email já existe
         const checkEmailQuery = 'SELECT id FROM usuario WHERE email = ?';
+        
         const emailResults = await new Promise((resolve, reject) => {
             db.query(checkEmailQuery, [email], (err, results) => {
-                if (err) reject(err);
-                else resolve(results);
+                if (err) {
+                    console.error('❌ Erro ao verificar email:', err);
+                    reject(err);
+                } else {
+                    resolve(results);
+                }
             });
         });
 
@@ -1805,25 +1805,21 @@ app.post('/api/oficina', async (req, res) => {
         const saltRounds = 10;
         const senhaHash = await bcrypt.hash(senha, saltRounds);
 
+        console.log('🔐 Criando usuário...');
+        
         const usuarioResult = await new Promise((resolve, reject) => {
             db.query(usuarioSql, [nome, email, senhaHash], (err, result) => {
                 if (err) {
-                    // Tratamento específico para erro de email duplicado
-                    if (err.code === 'ER_DUP_ENTRY') {
-                        return res.status(400).json({ 
-                            success: false, 
-                            error: 'Email já está em uso. Por favor, use outro email.' 
-                        });
-                    }
+                    console.error('❌ Erro ao criar usuário:', err);
                     reject(err);
                 } else {
+                    console.log('✅ Usuário criado com ID:', result.insertId);
                     resolve(result);
                 }
             });
         });
 
         const usuarioId = usuarioResult.insertId;
-        console.log('✅ Usuário criado com ID:', usuarioId);
 
         // Criar a oficina com o usuario_id válido
         const oficinaSql = `
@@ -1834,22 +1830,19 @@ app.post('/api/oficina', async (req, res) => {
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
         
-        // Converter valores vazios para NULL e validar números
-        let latValue = null;
-        let lngValue = null;
+        // Converter valores vazios para NULL
+        const latValue = (lat && lat !== '') ? parseFloat(lat) : null;
+        const lngValue = (lng && lng !== '') ? parseFloat(lng) : null;
 
-        if (lat !== undefined && lat !== null && lat !== '') {
-            latValue = parseFloat(lat);
-            if (isNaN(latValue) || latValue < -90 || latValue > 90) {
-                latValue = null; // Se inválido, define como null
-            }
+        // Validar latitude e longitude
+        if (latValue !== null && (isNaN(latValue) || latValue < -90 || latValue > 90)) {
+            console.warn('⚠️ Latitude inválida, definindo como null');
+            latValue = null;
         }
 
-        if (lng !== undefined && lng !== null && lng !== '') {
-            lngValue = parseFloat(lng);
-            if (isNaN(lngValue) || lngValue < -180 || lngValue > 180) {
-                lngValue = null; // Se inválido, define como null
-            }
+        if (lngValue !== null && (isNaN(lngValue) || lngValue < -180 || lngValue > 180)) {
+            console.warn('⚠️ Longitude inválida, definindo como null');
+            lngValue = null;
         }
 
         const params = [
@@ -1857,8 +1850,8 @@ app.post('/api/oficina', async (req, res) => {
             endereco, 
             cidade, 
             estado, 
-            telefone, 
-            cep,
+            telefoneFormatado, // Telefone limitado
+            cepFormatado,      // CEP formatado
             horario_abertura ? horario_abertura + ':00' : '08:00:00',
             horario_fechamento ? horario_fechamento + ':00' : '18:00:00',
             dias_funcionamento || 'Seg-Sex',
@@ -1875,12 +1868,13 @@ app.post('/api/oficina', async (req, res) => {
                     console.error('❌ Erro SQL ao inserir oficina:', err);
                     reject(err);
                 } else {
+                    console.log('✅ Oficina criada com ID:', result.insertId);
                     resolve(result);
                 }
             });
         });
 
-        console.log('✅ Oficina adicionada com sucesso, ID:', oficinaResult.insertId);
+        console.log('🎉 Oficina e usuário criados com sucesso!');
         
         res.json({ 
             success: true, 
@@ -1889,8 +1883,16 @@ app.post('/api/oficina', async (req, res) => {
         });
 
     } catch (error) {
-        console.error('❌ Erro ao adicionar oficina:', error);
+        console.error('❌ Erro completo ao adicionar oficina:', error);
         
+        // Tratamento específico para erro de tamanho de dados
+        if (error.code === 'ER_DATA_TOO_LONG') {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Dados muito longos para algum campo. Verifique CEP (8 dígitos) e telefone.' 
+            });
+        }
+
         // Tratamento específico para erro de range
         if (error.code === 'ER_WARN_DATA_OUT_OF_RANGE') {
             return res.status(400).json({ 
@@ -1899,17 +1901,655 @@ app.post('/api/oficina', async (req, res) => {
             });
         }
 
+        // Tratamento para erro de duplicação de email
+        if (error.code === 'ER_DUP_ENTRY') {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Email já está em uso. Por favor, use outro email.' 
+            });
+        }
+
         return res.status(500).json({ 
             success: false, 
-            error: 'Erro interno do servidor',
-            details: error.message 
+            error: 'Erro interno do servidor ao processar a solicitação'
         });
     }
 });
 
 // ========== FIM DA ROTA DE OFICINA ==========
-// ========== FIM DA ROTA DE OFICINA ==========
-// ========== FIM DA ROTA DE OFICINA ==========
+
+
+// ========== ROTAS PARA MARCAS ==========
+
+// Rota para obter marcas
+app.get('/api/marcas', (req, res) => {
+    const sql = 'SELECT * FROM marca ORDER BY nome';
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar marcas:', err);
+            return res.status(500).json({ error: 'Erro interno do servidor' });
+        }
+        res.json(results);
+    });
+});
+
+
+
+
+// Rota para adicionar marca
+app.post('/api/marca', (req, res) => {
+    const { nome } = req.body;
+    
+    console.log('📝 Adicionando nova marca:', nome);
+    
+    if (!nome || nome.trim() === '') {
+        return res.status(400).json({ 
+            success: false, 
+            error: 'Nome da marca é obrigatório' 
+        });
+    }
+    
+    const sql = 'INSERT INTO marca (nome) VALUES (?)';
+    
+    db.query(sql, [nome.trim()], (err, result) => {
+        if (err) {
+            console.error('Erro ao adicionar marca:', err);
+            return res.status(500).json({ 
+                success: false, 
+                error: 'Erro interno do servidor' 
+            });
+        }
+        
+        res.json({ 
+            success: true, 
+            id: result.insertId, 
+            message: 'Marca adicionada com sucesso' 
+        });
+    });
+});
+
+// Rota para deletar marca
+app.delete('/api/marca/:id', (req, res) => {
+    const { id } = req.params;
+    
+    const sql = 'DELETE FROM marca WHERE id = ?';
+    
+    db.query(sql, [id], (err, result) => {
+        if (err) {
+            console.error('Erro ao deletar marca:', err);
+            return res.status(500).json({ 
+                success: false, 
+                error: 'Erro interno do servidor' 
+            });
+        }
+        
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                error: 'Marca não encontrada' 
+            });
+        }
+        
+        res.json({ 
+            success: true, 
+            message: 'Marca deletada com sucesso' 
+        });
+    });
+});
+
+//fim da rota  d emarca// ========== ROTAS PARA MODELOS ==========
+
+// Rota para obter modelos
+app.get('/api/modelos', (req, res) => {
+    const sql = 'SELECT * FROM modelo ORDER BY nome';
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar modelos:', err);
+            return res.status(500).json({ error: 'Erro interno do servidor' });
+        }
+        res.json(results);
+    });
+});
+
+// Rota para adicionar modelo
+app.post('/api/modelo', (req, res) => {
+    const { nome, marca_id, tipo } = req.body;
+    
+    console.log('📝 Adicionando novo modelo:', { nome, marca_id, tipo });
+    
+    if (!nome || !marca_id || !tipo) {
+        return res.status(400).json({ 
+            success: false, 
+            error: 'Nome, marca_id e tipo são obrigatórios' 
+        });
+    }
+    
+    const sql = 'INSERT INTO modelo (nome, marca_id, tipo) VALUES (?, ?, ?)';
+    
+    db.query(sql, [nome.trim(), parseInt(marca_id), tipo], (err, result) => {
+        if (err) {
+            console.error('Erro ao adicionar modelo:', err);
+            return res.status(500).json({ 
+                success: false, 
+                error: 'Erro interno do servidor' 
+            });
+        }
+        
+        res.json({ 
+            success: true, 
+            id: result.insertId, 
+            message: 'Modelo adicionado com sucesso' 
+        });
+    });
+});
+
+// Rota para deletar modelo
+app.delete('/api/modelo/:id', (req, res) => {
+    const { id } = req.params;
+    
+    const sql = 'DELETE FROM modelo WHERE id = ?';
+    
+    db.query(sql, [id], (err, result) => {
+        if (err) {
+            console.error('Erro ao deletar modelo:', err);
+            return res.status(500).json({ 
+                success: false, 
+                error: 'Erro interno do servidor' 
+            });
+        }
+        
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                error: 'Modelo não encontrado' 
+            });
+        }
+        
+        res.json({ 
+            success: true, 
+            message: 'Modelo deletado com sucesso' 
+        });
+    });
+});
+
+
+
+
+// ========== ROTAS PARA ANOS DE MODELO ==========
+
+// Rota para obter anos de modelo
+app.get('/api/anos-modelo', (req, res) => {
+    const sql = 'SELECT * FROM modelo_ano ORDER BY ano';
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar anos de modelo:', err);
+            return res.status(500).json({ error: 'Erro interno do servidor' });
+        }
+        res.json(results);
+    });
+});
+
+// Rota para adicionar ano de modelo
+app.post('/api/ano-modelo', (req, res) => {
+    const { modelo_id, ano } = req.body;
+    
+    console.log('📝 Adicionando novo ano de modelo:', { modelo_id, ano });
+    
+    if (!modelo_id || !ano) {
+        return res.status(400).json({ 
+            success: false, 
+            error: 'modelo_id e ano são obrigatórios' 
+        });
+    }
+    
+    const sql = 'INSERT INTO modelo_ano (modelo_id, ano) VALUES (?, ?)';
+    
+    db.query(sql, [parseInt(modelo_id), parseInt(ano)], (err, result) => {
+        if (err) {
+            console.error('Erro ao adicionar ano de modelo:', err);
+            return res.status(500).json({ 
+                success: false, 
+                error: 'Erro interno do servidor' 
+            });
+        }
+        
+        res.json({ 
+            success: true, 
+            id: result.insertId, 
+            message: 'Ano de modelo adicionado com sucesso' 
+        });
+    });
+});
+
+// Rota para deletar ano de modelo
+app.delete('/api/ano-modelo/:id', (req, res) => {
+    const { id } = req.params;
+    
+    const sql = 'DELETE FROM modelo_ano WHERE id = ?';
+    
+    db.query(sql, [id], (err, result) => {
+        if (err) {
+            console.error('Erro ao deletar ano de modelo:', err);
+            return res.status(500).json({ 
+                success: false, 
+                error: 'Erro interno do servidor' 
+            });
+        }
+        
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                error: 'Ano de modelo não encontrado' 
+            });
+        }
+        
+        res.json({ 
+            success: true, 
+            message: 'Ano de modelo deletado com sucesso' 
+        });
+    });
+});
+
+
+
+// Rota para obter modelo específico
+app.get('/api/modelo/:id', (req, res) => {
+    const { id } = req.params;
+    
+    const sql = 'SELECT * FROM modelo WHERE id = ?';
+    
+    db.query(sql, [id], (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar modelo:', err);
+            return res.status(500).json({ error: 'Erro interno do servidor' });
+        }
+        
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Modelo não encontrado' });
+        }
+        
+        res.json(results[0]);
+    });
+});
+
+// Rota para atualizar modelo
+app.put('/api/modelo/:id', (req, res) => {
+    const { id } = req.params;
+    const { nome, marca_id, tipo } = req.body;
+    
+    console.log('🔄 Atualizando modelo ID:', id, 'Dados:', { nome, marca_id, tipo });
+    
+    if (!nome || !marca_id || !tipo) {
+        return res.status(400).json({ 
+            success: false, 
+            error: 'Nome, marca_id e tipo são obrigatórios' 
+        });
+    }
+    
+    const sql = 'UPDATE modelo SET nome = ?, marca_id = ?, tipo = ? WHERE id = ?';
+    
+    db.query(sql, [nome.trim(), parseInt(marca_id), tipo, id], (err, result) => {
+        if (err) {
+            console.error('Erro ao atualizar modelo:', err);
+            return res.status(500).json({ 
+                success: false, 
+                error: 'Erro interno do servidor' 
+            });
+        }
+        
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                error: 'Modelo não encontrado' 
+            });
+        }
+        
+        res.json({ 
+            success: true, 
+            message: 'Modelo atualizado com sucesso' 
+        });
+    });
+});
+// Rota para obter ano específico
+app.get('/api/ano-modelo/:id', (req, res) => {
+    const { id } = req.params;
+    
+    const sql = 'SELECT * FROM modelo_ano WHERE id = ?';
+    
+    db.query(sql, [id], (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar ano de modelo:', err);
+            return res.status(500).json({ error: 'Erro interno do servidor' });
+        }
+        
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Ano de modelo não encontrado' });
+        }
+        
+        res.json(results[0]);
+    });
+});
+
+// Rota para atualizar ano de modelo
+app.put('/api/ano-modelo/:id', (req, res) => {
+    const { id } = req.params;
+    const { modelo_id, ano } = req.body;
+    
+    console.log('🔄 Atualizando ano ID:', id, 'Dados:', { modelo_id, ano });
+    
+    if (!modelo_id || !ano) {
+        return res.status(400).json({ 
+            success: false, 
+            error: 'modelo_id e ano são obrigatórios' 
+        });
+    }
+    
+    const sql = 'UPDATE modelo_ano SET modelo_id = ?, ano = ? WHERE id = ?';
+    
+    db.query(sql, [parseInt(modelo_id), parseInt(ano), id], (err, result) => {
+        if (err) {
+            console.error('Erro ao atualizar ano de modelo:', err);
+            return res.status(500).json({ 
+                success: false, 
+                error: 'Erro interno do servidor' 
+            });
+        }
+        
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                error: 'Ano de modelo não encontrado' 
+            });
+        }
+        
+        res.json({ 
+            success: true, 
+            message: 'Ano de modelo atualizado com sucesso' 
+        });
+    });
+});
+
+// Rota para obter marca específica - CORREÇÃO DA ROTA FALTANTE
+app.get('/api/marca/:id', (req, res) => {
+    const { id } = req.params;
+    
+    console.log('🔍 Buscando marca ID:', id);
+    
+    const sql = 'SELECT * FROM marca WHERE id = ?';
+    
+    db.query(sql, [id], (err, results) => {
+        if (err) {
+            console.error('❌ Erro ao buscar marca:', err);
+            return res.status(500).json({ error: 'Erro interno do servidor' });
+        }
+        
+        if (results.length === 0) {
+            console.log('❌ Marca não encontrada ID:', id);
+            return res.status(404).json({ error: 'Marca não encontrada' });
+        }
+        
+        console.log('✅ Marca encontrada:', results[0]);
+        res.json(results[0]);
+    });
+});
+// Rota para atualizar marca - CORREÇÃO DA ROTA FALTANTE
+app.put('/api/marca/:id', (req, res) => {
+    const { id } = req.params;
+    const { nome } = req.body;
+    
+    console.log('🔄 Atualizando marca ID:', id, 'Nome:', nome);
+    
+    if (!nome || nome.trim() === '') {
+        return res.status(400).json({ 
+            success: false, 
+            error: 'Nome da marca é obrigatório' 
+        });
+    }
+    
+    const sql = 'UPDATE marca SET nome = ? WHERE id = ?';
+    
+    db.query(sql, [nome.trim(), id], (err, result) => {
+        if (err) {
+            console.error('❌ Erro ao atualizar marca:', err);
+            return res.status(500).json({ 
+                success: false, 
+                error: 'Erro interno do servidor' 
+            });
+        }
+        
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                error: 'Marca não encontrada' 
+            });
+        }
+        
+        console.log('✅ Marca atualizada com sucesso');
+        res.json({ 
+            success: true, 
+            message: 'Marca atualizada com sucesso' 
+        });
+    });
+});
+// Rota para criar recomendação
+// Rota para criar recomendação
+app.post('/api/recomendacao', (req, res) => {
+    const { modelo_ano_id, oleo_id, filtro_id } = req.body;
+    
+    console.log('🎯 Criando recomendação:', { modelo_ano_id, oleo_id, filtro_id });
+    
+    const sql = `
+        INSERT INTO recomendacao (modelo_ano_id, oleo_id, filtro_id)
+        VALUES (?, ?, ?)
+    `;
+    
+    db.query(sql, [modelo_ano_id, oleo_id, filtro_id], (err, result) => {
+        if (err) {
+            console.error('Erro ao criar recomendação:', err);
+            return res.status(500).json({ 
+                success: false, 
+                error: 'Erro interno do servidor' 
+            });
+        }
+        
+        res.json({ 
+            success: true, 
+            id: result.insertId, 
+            message: 'Recomendação criada com sucesso' 
+        });
+    });
+});
+
+// Rota para buscar óleo específico
+app.get('/api/produtos/oleo/:id', (req, res) => {
+    const { id } = req.params;
+    
+    const sql = 'SELECT * FROM produto_oleo WHERE id = ?';
+    
+    db.query(sql, [id], (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar óleo:', err);
+            return res.status(500).json({ error: 'Erro interno do servidor' });
+        }
+        
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Óleo não encontrado' });
+        }
+        
+        res.json(results[0]);
+    });
+});
+
+// Rota para buscar filtro específico
+app.get('/api/produtos/filtro/:id', (req, res) => {
+    const { id } = req.params;
+    
+    const sql = 'SELECT * FROM produto_filtro WHERE id = ?';
+    
+    db.query(sql, [id], (err, results) => {
+        if (err) {
+            console.error('Erro ao buscar filtro:', err);
+            return res.status(500).json({ error: 'Erro interno do servidor' });
+        }
+        
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Filtro não encontrado' });
+        }
+        
+        res.json(results[0]);
+    });
+});
+// ========== ROTAS PARA DELETAR PRODUTOS ==========
+
+// Rota para deletar óleo
+app.delete('/api/produtos/oleo/:id', (req, res) => {
+    const { id } = req.params;
+    
+    console.log('🗑️ Deletando óleo ID:', id);
+    
+    const sql = 'DELETE FROM produto_oleo WHERE id = ?';
+    
+    db.query(sql, [id], (err, result) => {
+        if (err) {
+            console.error('❌ Erro ao deletar óleo:', err);
+            return res.status(500).json({ 
+                success: false, 
+                error: 'Erro interno do servidor' 
+            });
+        }
+        
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                error: 'Óleo não encontrado' 
+            });
+        }
+        
+        console.log('✅ Óleo deletado com sucesso');
+        res.json({ 
+            success: true, 
+            message: 'Óleo deletado com sucesso' 
+        });
+    });
+});
+
+// Rota para deletar filtro
+app.delete('/api/produtos/filtro/:id', (req, res) => {
+    const { id } = req.params;
+    
+    console.log('🗑️ Deletando filtro ID:', id);
+    
+    const sql = 'DELETE FROM produto_filtro WHERE id = ?';
+    
+    db.query(sql, [id], (err, result) => {
+        if (err) {
+            console.error('❌ Erro ao deletar filtro:', err);
+            return res.status(500).json({ 
+                success: false, 
+                error: 'Erro interno do servidor' 
+            });
+        }
+        
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                error: 'Filtro não encontrado' 
+            });
+        }
+        
+        console.log('✅ Filtro deletado com sucesso');
+        res.json({ 
+            success: true, 
+            message: 'Filtro deletado com sucesso' 
+        });
+    });
+});
+
+// Rota para atualizar óleo
+app.put('/api/produtos/oleo/:id', (req, res) => {
+    const { id } = req.params;
+    const { nome, tipo, viscosidade, especificacao, marca, preco } = req.body;
+    
+    console.log('🔄 Atualizando óleo ID:', id, 'Dados:', req.body);
+    
+    if (!nome || !tipo || !viscosidade || !especificacao || !marca || !preco) {
+        return res.status(400).json({ 
+            success: false, 
+            error: 'Todos os campos são obrigatórios' 
+        });
+    }
+    
+    const sql = `
+        UPDATE produto_oleo 
+        SET nome = ?, tipo = ?, viscosidade = ?, especificacao = ?, marca = ?, preco = ?
+        WHERE id = ?
+    `;
+    
+    db.query(sql, [nome, tipo, viscosidade, especificacao, marca, preco, id], (err, result) => {
+        if (err) {
+            console.error('Erro ao atualizar óleo:', err);
+            return res.status(500).json({ 
+                success: false, 
+                error: 'Erro interno do servidor' 
+            });
+        }
+        
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                error: 'Óleo não encontrado' 
+            });
+        }
+        
+        res.json({ 
+            success: true, 
+            message: 'Óleo atualizado com sucesso' 
+        });
+    });
+});
+
+// Rota para atualizar filtro
+app.put('/api/produtos/filtro/:id', (req, res) => {
+    const { id } = req.params;
+    const { nome, tipo, compatibilidade_modelo, preco } = req.body;
+    
+    console.log('🔄 Atualizando filtro ID:', id, 'Dados:', req.body);
+    
+    if (!nome || !tipo || !compatibilidade_modelo || !preco) {
+        return res.status(400).json({ 
+            success: false, 
+            error: 'Todos os campos são obrigatórios' 
+        });
+    }
+    
+    const sql = `
+        UPDATE produto_filtro 
+        SET nome = ?, tipo = ?, compatibilidade_modelo = ?, preco = ?
+        WHERE id = ?
+    `;
+    
+    db.query(sql, [nome, tipo, compatibilidade_modelo, preco, id], (err, result) => {
+        if (err) {
+            console.error('Erro ao atualizar filtro:', err);
+            return res.status(500).json({ 
+                success: false, 
+                error: 'Erro interno do servidor' 
+            });
+        }
+        
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                error: 'Filtro não encontrado' 
+            });
+        }
+        
+        res.json({ 
+            success: true, 
+            message: 'Filtro atualizado com sucesso' 
+        });
+    });
+});
 // ========== ROTA PARA BUSCAR OFICINA COM DADOS DO USUÁRIO ==========
 
 // Rota para buscar oficina com dados do usuário
@@ -2835,23 +3475,6 @@ app.post('/api/produtos/oleo', (req, res) => {
     });
 });
 
-// Rota para adicionar filtro
-app.post('/api/produtos/filtro', (req, res) => {
-    const { nome, tipo, compatibilidade_modelo, preco } = req.body;
-    
-    const sql = `
-        INSERT INTO produto_filtro (nome, tipo, compatibilidade_modelo, preco)
-        VALUES (?, ?, ?, ?)
-    `;
-    
-    db.query(sql, [nome, tipo, compatibilidade_modelo, preco], (err, result) => {
-        if (err) {
-            console.error('Erro ao adicionar filtro:', err);
-            return res.status(500).json({ error: 'Erro interno do servidor' });
-        }
-        res.json({ success: true, id: result.insertId, message: 'Filtro adicionado com sucesso' });
-    });
-});
 
 // Rota para adicionar oficina
 app.post('/api/oficina', (req, res) => {

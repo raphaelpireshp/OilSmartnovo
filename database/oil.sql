@@ -3793,3 +3793,57 @@ CREATE TABLE IF NOT EXISTS produto_compatibilidade (
     data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (modelo_ano_id) REFERENCES modelo_ano(id) ON DELETE CASCADE
 );
+
+ALTER TABLE oficina MODIFY cep VARCHAR(10);
+
+
+SELECT COUNT(*) as total_para_criar
+FROM produto_oleo po
+CROSS JOIN modelo_ano ma
+WHERE ma.id IN (SELECT id FROM modelo_ano WHERE ano = 2023) -- Ajuste o ano conforme necessário
+AND NOT EXISTS (
+    SELECT 1 FROM recomendacao r 
+    WHERE r.modelo_ano_id = ma.id AND r.oleo_id = po.id
+);
+
+INSERT INTO recomendacao (modelo_ano_id, oleo_id, filtro_id)
+SELECT 
+    ma.id as modelo_ano_id,
+    po.id as oleo_id,
+    NULL as filtro_id
+FROM produto_oleo po
+CROSS JOIN modelo_ano ma
+WHERE ma.ano = 2023  -- Apenas para veículos de 2023
+AND po.tipo = 'carro' -- Apenas óleos para carros
+AND NOT EXISTS (
+    SELECT 1 FROM recomendacao r 
+    WHERE r.modelo_ano_id = ma.id AND r.oleo_id = po.id
+)
+LIMIT 50;
+
+INSERT INTO recomendacao (modelo_ano_id, oleo_id, filtro_id)
+SELECT 
+    ma.id as modelo_ano_id,
+    NULL as oleo_id,
+    pf.id as filtro_id
+FROM produto_filtro pf
+CROSS JOIN modelo_ano ma
+WHERE ma.ano = 2023  -- Apenas para veículos de 2023
+AND pf.tipo = 'carro' -- Apenas filtros para carros
+AND NOT EXISTS (
+    SELECT 1 FROM recomendacao r 
+    WHERE r.modelo_ano_id = ma.id AND r.filtro_id = pf.id
+)
+LIMIT 50;
+
+SELECT 
+    r.modelo_ano_id,
+    MAX(r.oleo_id) AS oleo_id,
+    MAX(r.filtro_id) AS filtro_id
+FROM recomendacao r
+WHERE r.modelo_ano_id = ?
+GROUP BY r.modelo_ano_id;
+
+
+
+

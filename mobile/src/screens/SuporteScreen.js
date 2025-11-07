@@ -94,15 +94,11 @@ export default function SuporteScreen({ navigation }) {
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerTop}>
-          <View style={styles.logoContainer}>
-            <View style={styles.logo}>
-              <Text style={styles.logoText}>OS</Text>
-            </View>
-            <Text style={styles.logoTitle}>OilSmart</Text>
-          </View>
-          <TouchableOpacity onPress={handleLogout}>
-            <Text style={styles.logoutText}>Sair</Text>
-          </TouchableOpacity>
+<View style={styles.headerTop}>
+  <TouchableOpacity onPress={handleLogout}>
+    <Text style={styles.logoutText}>Sair</Text>
+  </TouchableOpacity>
+</View>
         </View>
         <Text style={styles.headerTitle}>Suporte</Text>
       </View>

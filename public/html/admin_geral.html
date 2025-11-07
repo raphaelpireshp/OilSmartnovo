@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Gerenciamento - OilSmart</title>
     <link rel="stylesheet" href="/css/admin_geral.css">
-        <link rel="icon" href="/img/Design sem nome (1).png" type="image/x-icon"></head>
+    <link rel="icon" href="/img/Design sem nome (1).png" type="image/x-icon">
+</head>
 
 
 </head>
+
 <body>
     <header>
         <div class="container">
@@ -18,7 +21,7 @@
             </div>
         </div>
     </header>
-    
+
     <div class="container">
         <div class="tabs">
             <div class="tab active" data-tab="products">Produtos</div>
@@ -27,40 +30,62 @@
             <div class="tab" data-tab="models">Modelos</div>
             <div class="tab" data-tab="years">Anos</div>
         </div>
-        
+
+        <!-- TAB PRODUTOS -->
         <!-- TAB PRODUTOS -->
         <div class="tab-content active" id="products-tab">
             <h2>Gerenciar Produtos</h2>
-            
+
+            <!-- Formulário para Adicionar Óleo -->
             <div class="form-section">
                 <h3>Adicionar Óleo</h3>
                 <form id="oil-form">
-                    <div class="form-group">
-                        <label for="oil-name">Nome</label>
-                        <input type="text" id="oil-name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="oil-type">Tipo</label>
-                        <select id="oil-type" required>
-                            <option value="carro">Carro</option>
-                            <option value="moto">Moto</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="oil-viscosity">Viscosidade</label>
-                        <input type="text" id="oil-viscosity" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="oil-specification">Especificação</label>
-                        <input type="text" id="oil-specification" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="oil-brand">Marca</label>
-                        <input type="text" id="oil-brand" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="oil-price">Preço</label>
-                        <input type="number" id="oil-price" step="0.01" required>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="oil-marca">Marca do Veículo</label>
+                            <select id="oil-marca" required onchange="loadModelsForProduct('oil')">
+                                <option value="">Selecione uma marca</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="oil-modelo">Modelo do Veículo</label>
+                            <select id="oil-modelo" required onchange="loadYearsForProduct('oil')">
+                                <option value="">Selecione um modelo</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="oil-ano">Ano do Veículo</label>
+                            <select id="oil-ano" required>
+                                <option value="">Selecione um ano</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="oil-name">Nome do Óleo</label>
+                            <input type="text" id="oil-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="oil-type">Tipo</label>
+                            <select id="oil-type" required>
+                                <option value="carro">Carro</option>
+                                <option value="moto">Moto</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="oil-viscosity">Viscosidade</label>
+                            <input type="text" id="oil-viscosity" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="oil-specification">Especificação</label>
+                            <input type="text" id="oil-specification" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="oil-brand">Marca do Óleo</label>
+                            <input type="text" id="oil-brand" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="oil-price">Preço</label>
+                            <input type="number" id="oil-price" step="0.01" required>
+                        </div>
                     </div>
                     <div class="actions">
                         <button type="submit" class="btn-primary">Adicionar Óleo</button>
@@ -68,28 +93,49 @@
                     </div>
                 </form>
             </div>
-            
+
+            <!-- Formulário para Adicionar Filtro -->
             <div class="form-section">
                 <h3>Adicionar Filtro</h3>
                 <form id="filter-form">
-                    <div class="form-group">
-                        <label for="filter-name">Nome</label>
-                        <input type="text" id="filter-name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="filter-type">Tipo</label>
-                        <select id="filter-type" required>
-                            <option value="carro">Carro</option>
-                            <option value="moto">Moto</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="filter-compatibility">Compatibilidade</label>
-                        <textarea id="filter-compatibility" rows="3" required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="filter-price">Preço</label>
-                        <input type="number" id="filter-price" step="0.01" required>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="filter-marca">Marca do Veículo</label>
+                            <select id="filter-marca" required onchange="loadModelsForProduct('filter')">
+                                <option value="">Selecione uma marca</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="filter-modelo">Modelo do Veículo</label>
+                            <select id="filter-modelo" required onchange="loadYearsForProduct('filter')">
+                                <option value="">Selecione um modelo</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="filter-ano">Ano do Veículo</label>
+                            <select id="filter-ano" required>
+                                <option value="">Selecione um ano</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="filter-name">Nome do Filtro</label>
+                            <input type="text" id="filter-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="filter-type">Tipo</label>
+                            <select id="filter-type" required>
+                                <option value="carro">Carro</option>
+                                <option value="moto">Moto</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="filter-compatibility">Compatibilidade</label>
+                            <textarea id="filter-compatibility" rows="3" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="filter-price">Preço</label>
+                            <input type="number" id="filter-price" step="0.01" required>
+                        </div>
                     </div>
                     <div class="actions">
                         <button type="submit" class="btn-primary">Adicionar Filtro</button>
@@ -97,9 +143,11 @@
                     </div>
                 </form>
             </div>
-            
+
+            <!-- Sistema de Busca -->
             <div class="search-container">
-                <input type="text" id="product-search" class="search-input" placeholder="Buscar produtos...">
+                <input type="text" id="product-search" class="search-input"
+                    placeholder="Buscar produtos por nome, marca, modelo ou ano...">
             </div>
 
             <!-- Filtros para Produtos -->
@@ -110,18 +158,22 @@
                     <button class="filter-btn" data-type="products" data-sort="id" data-order="desc">ID ↓</button>
                     <button class="filter-btn" data-type="products" data-sort="nome" data-order="asc">Nome A-Z</button>
                     <button class="filter-btn" data-type="products" data-sort="nome" data-order="desc">Nome Z-A</button>
+                    <button class="filter-btn" data-type="products" data-sort="preco" data-order="asc">Preço ↑</button>
+                    <button class="filter-btn" data-type="products" data-sort="preco" data-order="desc">Preço ↓</button>
                 </div>
             </div>
-            
+
+            <!-- Lista de Produtos -->
             <div id="products-list">
                 <h3>Lista de Produtos</h3>
                 <table id="products-table">
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Nome</th>
                             <th>Tipo</th>
-                            <th>Detalhes</th>
+                            <th>Nome</th>
+                            <th>Veículo</th>
+                            <th>Viscosidade/Compatibilidade</th>
                             <th>Preço</th>
                             <th>Ações</th>
                         </tr>
@@ -135,11 +187,11 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- TAB OFICINAS -->
         <div class="tab-content" id="workshops-tab">
             <h2>Gerenciar Oficinas</h2>
-            
+
             <div class="form-section">
                 <h3>Adicionar Oficina</h3>
                 <form id="workshop-form">
@@ -187,23 +239,23 @@
                         <label for="workshop-days">Dias de Funcionamento</label>
                         <input type="text" id="workshop-days" placeholder="Seg-Sex" required>
                     </div>
-<div class="form-group">
-    <label for="workshop-lat">Latitude</label>
-    <input type="number" id="workshop-lat" step="any" placeholder="Ex: -23.5505 (opcional)">
-    <small style="color: #666; font-size: 12px;">Deve estar entre -90 e 90</small>
-</div>
-<div class="form-group">
-    <label for="workshop-lng">Longitude</label>
-    <input type="number" id="workshop-lng" step="any" placeholder="Ex: -46.6333 (opcional)">
-    <small style="color: #666; font-size: 12px;">Deve estar entre -180 e 180</small>
-</div>
+                    <div class="form-group">
+                        <label for="workshop-lat">Latitude</label>
+                        <input type="number" id="workshop-lat" step="any" placeholder="Ex: -23.5505 (opcional)">
+                        <small style="color: #666; font-size: 12px;">Deve estar entre -90 e 90</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="workshop-lng">Longitude</label>
+                        <input type="number" id="workshop-lng" step="any" placeholder="Ex: -46.6333 (opcional)">
+                        <small style="color: #666; font-size: 12px;">Deve estar entre -180 e 180</small>
+                    </div>
                     <div class="actions">
                         <button type="submit" class="btn-primary">Adicionar Oficina</button>
                         <button type="button" class="btn-warning" id="clear-workshop-form">Limpar</button>
                     </div>
                 </form>
             </div>
-            
+
             <div class="search-container">
                 <input type="text" id="workshop-search" class="search-input" placeholder="Buscar oficinas...">
             </div>
@@ -212,13 +264,15 @@
             <div class="filters-container">
                 <span>Ordenar por:</span>
                 <div class="filter-group">
-                    <button class="filter-btn active" data-type="workshops" data-sort="id" data-order="asc">ID ↑</button>
+                    <button class="filter-btn active" data-type="workshops" data-sort="id" data-order="asc">ID
+                        ↑</button>
                     <button class="filter-btn" data-type="workshops" data-sort="id" data-order="desc">ID ↓</button>
                     <button class="filter-btn" data-type="workshops" data-sort="nome" data-order="asc">Nome A-Z</button>
-                    <button class="filter-btn" data-type="workshops" data-sort="nome" data-order="desc">Nome Z-A</button>
+                    <button class="filter-btn" data-type="workshops" data-sort="nome" data-order="desc">Nome
+                        Z-A</button>
                 </div>
             </div>
-            
+
             <div id="workshops-list">
                 <h3>Lista de Oficinas</h3>
                 <table id="workshops-table">
@@ -242,11 +296,11 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- TAB MARCAS -->
         <div class="tab-content" id="brands-tab">
             <h2>Gerenciar Marcas</h2>
-            
+
             <div class="form-section">
                 <h3>Adicionar Marca</h3>
                 <form id="brand-form">
@@ -260,7 +314,7 @@
                     </div>
                 </form>
             </div>
-            
+
             <div class="search-container">
                 <input type="text" id="brand-search" class="search-input" placeholder="Buscar marcas...">
             </div>
@@ -275,7 +329,7 @@
                     <button class="filter-btn" data-type="brands" data-sort="nome" data-order="desc">Nome Z-A</button>
                 </div>
             </div>
-            
+
             <div id="brands-list">
                 <h3>Lista de Marcas</h3>
                 <table id="brands-table">
@@ -295,11 +349,11 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- TAB MODELOS -->
         <div class="tab-content" id="models-tab">
             <h2>Gerenciar Modelos</h2>
-            
+
             <div class="form-section">
                 <h3>Adicionar Modelo</h3>
                 <form id="model-form">
@@ -326,7 +380,7 @@
                     </div>
                 </form>
             </div>
-            
+
             <div class="search-container">
                 <input type="text" id="model-search" class="search-input" placeholder="Buscar modelos...">
             </div>
@@ -335,13 +389,16 @@
             <div class="filters-container">
                 <span>Ordenar por:</span>
                 <div class="filter-group">
-                    <button class="filter-btn active" data-type="models" data-sort="id_modelo" data-order="asc">ID ↑</button>
+                    <button class="filter-btn active" data-type="models" data-sort="id_modelo" data-order="asc">ID
+                        ↑</button>
                     <button class="filter-btn" data-type="models" data-sort="id_modelo" data-order="desc">ID ↓</button>
-                    <button class="filter-btn" data-type="models" data-sort="nome_modelo" data-order="asc">Nome A-Z</button>
-                    <button class="filter-btn" data-type="models" data-sort="nome_modelo" data-order="desc">Nome Z-A</button>
+                    <button class="filter-btn" data-type="models" data-sort="nome_modelo" data-order="asc">Nome
+                        A-Z</button>
+                    <button class="filter-btn" data-type="models" data-sort="nome_modelo" data-order="desc">Nome
+                        Z-A</button>
                 </div>
             </div>
-            
+
             <div id="models-list">
                 <h3>Lista de Modelos</h3>
                 <table id="models-table">
@@ -363,11 +420,11 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- TAB ANOS DE MODELO -->
         <div class="tab-content" id="years-tab">
             <h2>Gerenciar Anos de Modelo</h2>
-            
+
             <div class="form-section">
                 <h3>Adicionar Ano de Modelo</h3>
                 <form id="year-form">
@@ -387,7 +444,7 @@
                     </div>
                 </form>
             </div>
-            
+
             <div class="search-container">
                 <input type="text" id="year-search" class="search-input" placeholder="Buscar anos...">
             </div>
@@ -396,13 +453,16 @@
             <div class="filters-container">
                 <span>Ordenar por:</span>
                 <div class="filter-group">
-                    <button class="filter-btn active" data-type="years" data-sort="id_ano" data-order="asc">ID ↑</button>
+                    <button class="filter-btn active" data-type="years" data-sort="id_ano" data-order="asc">ID
+                        ↑</button>
                     <button class="filter-btn" data-type="years" data-sort="id_ano" data-order="desc">ID ↓</button>
-                    <button class="filter-btn" data-type="years" data-sort="nome_modelo" data-order="asc">Modelo A-Z</button>
-                    <button class="filter-btn" data-type="years" data-sort="nome_modelo" data-order="desc">Modelo Z-A</button>
+                    <button class="filter-btn" data-type="years" data-sort="nome_modelo" data-order="asc">Modelo
+                        A-Z</button>
+                    <button class="filter-btn" data-type="years" data-sort="nome_modelo" data-order="desc">Modelo
+                        Z-A</button>
                 </div>
             </div>
-            
+
             <div id="years-list">
                 <h3>Lista de Anos de Modelo</h3>
                 <table id="years-table">
@@ -425,86 +485,276 @@
         </div>
     </div>
 
-    
-<!-- MODAL DE EDIÇÃO DE OFICINA -->
-<div id="edit-workshop-modal" class="modal" style="display: none;">
+
+    <!-- MODAL DE EDIÇÃO DE OFICINA -->
+    <div id="edit-workshop-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Editar Oficina</h2>
+                <span class="close-modal" onclick="closeEditModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="edit-workshop-form">
+                    <input type="hidden" id="edit-workshop-id">
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="edit-workshop-name">Nome da Oficina</label>
+                            <input type="text" id="edit-workshop-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-workshop-email">Email</label>
+                            <input type="email" id="edit-workshop-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-workshop-password">Senha</label>
+                            <input type="password" id="edit-workshop-password"
+                                placeholder="Deixe em branco para manter a atual">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-workshop-address">Endereço</label>
+                            <input type="text" id="edit-workshop-address" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-workshop-city">Cidade</label>
+                            <input type="text" id="edit-workshop-city" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-workshop-state">Estado</label>
+                            <input type="text" id="edit-workshop-state" maxlength="2" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-workshop-cep">CEP</label>
+                            <input type="text" id="edit-workshop-cep" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-workshop-phone">Telefone</label>
+                            <input type="text" id="edit-workshop-phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-workshop-opening">Horário de Abertura</label>
+                            <input type="time" id="edit-workshop-opening" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-workshop-closing">Horário de Fechamento</label>
+                            <input type="time" id="edit-workshop-closing" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-workshop-days">Dias de Funcionamento</label>
+                            <input type="text" id="edit-workshop-days" placeholder="Seg-Sex" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-workshop-lat">Latitude</label>
+                            <input type="number" id="edit-workshop-lat" step="any">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-workshop-lng">Longitude</label>
+                            <input type="number" id="edit-workshop-lng" step="any">
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn-warning" onclick="closeEditModal()">Cancelar</button>
+                        <button type="submit" class="btn-success">Atualizar Oficina</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script src="/js/admin_geral.js"></script>
+
+    <!-- MODAL DE EDIÇÃO DE MARCA -->
+    <div id="edit-brand-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Editar Marca</h2>
+                <span class="close-modal" onclick="closeEditBrandModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="edit-brand-form">
+                    <input type="hidden" id="edit-brand-id">
+
+                    <div class="form-group">
+                        <label for="edit-brand-name">Nome da Marca</label>
+                        <input type="text" id="edit-brand-name" required>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn-warning" onclick="closeEditBrandModal()">Cancelar</button>
+                        <button type="submit" class="btn-success">Atualizar Marca</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE EDIÇÃO DE MODELO -->
+    <div id="edit-model-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Editar Modelo</h2>
+                <span class="close-modal" onclick="closeEditModelModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="edit-model-form">
+                    <input type="hidden" id="edit-model-id">
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="edit-model-name">Nome do Modelo</label>
+                            <input type="text" id="edit-model-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-model-brand">Marca</label>
+                            <select id="edit-model-brand" required>
+                                <!-- Marcas serão carregadas aqui -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-model-type">Tipo</label>
+                            <select id="edit-model-type" required>
+                                <option value="carro">Carro</option>
+                                <option value="moto">Moto</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn-warning" onclick="closeEditModelModal()">Cancelar</button>
+                        <button type="submit" class="btn-success">Atualizar Modelo</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE EDIÇÃO DE ANO -->
+    <div id="edit-year-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Editar Ano de Modelo</h2>
+                <span class="close-modal" onclick="closeEditYearModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="edit-year-form">
+                    <input type="hidden" id="edit-year-id">
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="edit-year-model">Modelo</label>
+                            <select id="edit-year-model" required>
+                                <!-- Modelos serão carregados aqui -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-year-value">Ano</label>
+                            <input type="number" id="edit-year-value" min="1900" max="2030" required>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn-warning" onclick="closeEditYearModal()">Cancelar</button>
+                        <button type="submit" class="btn-success">Atualizar Ano</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE EDIÇÃO DE ÓLEO -->
+<div id="edit-oil-modal" class="modal" style="display: none;">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>Editar Oficina</h2>
-            <span class="close-modal" onclick="closeEditModal()">&times;</span>
+            <h2>Editar Óleo</h2>
+            <span class="close-modal" onclick="closeEditOilModal()">&times;</span>
         </div>
         <div class="modal-body">
-            <form id="edit-workshop-form">
-                <input type="hidden" id="edit-workshop-id">
+            <form id="edit-oil-form">
+                <input type="hidden" id="edit-oil-id">
                 
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="edit-workshop-name">Nome da Oficina</label>
-                        <input type="text" id="edit-workshop-name" required>
+                        <label for="edit-oil-name">Nome do Óleo</label>
+                        <input type="text" id="edit-oil-name" required>
                     </div>
                     <div class="form-group">
-                        <label for="edit-workshop-email">Email</label>
-                        <input type="email" id="edit-workshop-email" required>
+                        <label for="edit-oil-type">Tipo</label>
+                        <select id="edit-oil-type" required>
+                            <option value="carro">Carro</option>
+                            <option value="moto">Moto</option>
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label for="edit-workshop-password">Senha</label>
-                        <input type="password" id="edit-workshop-password" placeholder="Deixe em branco para manter a atual">
+                        <label for="edit-oil-viscosity">Viscosidade</label>
+                        <input type="text" id="edit-oil-viscosity" required>
                     </div>
                     <div class="form-group">
-                        <label for="edit-workshop-address">Endereço</label>
-                        <input type="text" id="edit-workshop-address" required>
+                        <label for="edit-oil-specification">Especificação</label>
+                        <input type="text" id="edit-oil-specification" required>
                     </div>
                     <div class="form-group">
-                        <label for="edit-workshop-city">Cidade</label>
-                        <input type="text" id="edit-workshop-city" required>
+                        <label for="edit-oil-brand">Marca do Óleo</label>
+                        <input type="text" id="edit-oil-brand" required>
                     </div>
                     <div class="form-group">
-                        <label for="edit-workshop-state">Estado</label>
-                        <input type="text" id="edit-workshop-state" maxlength="2" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="edit-workshop-cep">CEP</label>
-                        <input type="text" id="edit-workshop-cep" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="edit-workshop-phone">Telefone</label>
-                        <input type="text" id="edit-workshop-phone" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="edit-workshop-opening">Horário de Abertura</label>
-                        <input type="time" id="edit-workshop-opening" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="edit-workshop-closing">Horário de Fechamento</label>
-                        <input type="time" id="edit-workshop-closing" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="edit-workshop-days">Dias de Funcionamento</label>
-                        <input type="text" id="edit-workshop-days" placeholder="Seg-Sex" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="edit-workshop-lat">Latitude</label>
-                        <input type="number" id="edit-workshop-lat" step="any">
-                    </div>
-                    <div class="form-group">
-                        <label for="edit-workshop-lng">Longitude</label>
-                        <input type="number" id="edit-workshop-lng" step="any">
+                        <label for="edit-oil-price">Preço</label>
+                        <input type="number" id="edit-oil-price" step="0.01" required>
                     </div>
                 </div>
-                
+
                 <div class="modal-actions">
-                    <button type="button" class="btn-warning" onclick="closeEditModal()">Cancelar</button>
-                    <button type="submit" class="btn-success">Atualizar Oficina</button>
+                    <button type="button" class="btn-warning" onclick="closeEditOilModal()">Cancelar</button>
+                    <button type="submit" class="btn-success">Atualizar Óleo</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
+<!-- MODAL DE EDIÇÃO DE FILTRO -->
+<div id="edit-filter-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Editar Filtro</h2>
+            <span class="close-modal" onclick="closeEditFilterModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="edit-filter-form">
+                <input type="hidden" id="edit-filter-id">
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="edit-filter-name">Nome do Filtro</label>
+                        <input type="text" id="edit-filter-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-filter-type">Tipo</label>
+                        <select id="edit-filter-type" required>
+                            <option value="carro">Carro</option>
+                            <option value="moto">Moto</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-filter-compatibility">Compatibilidade</label>
+                        <textarea id="edit-filter-compatibility" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-filter-price">Preço</label>
+                        <input type="number" id="edit-filter-price" step="0.01" required>
+                    </div>
+                </div>
 
-
-    <script src="/js/admin_geral.js"></script>
-
-
+                <div class="modal-actions">
+                    <button type="button" class="btn-warning" onclick="closeEditFilterModal()">Cancelar</button>
+                    <button type="submit" class="btn-success">Atualizar Filtro</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 </body>
+
 </html>

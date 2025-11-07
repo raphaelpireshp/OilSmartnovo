@@ -1,9 +1,10 @@
+// App.js - CORRIGIDO com caminhos da imagem
 import { NavigationContainer } from "@react-navigation/native"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { Ionicons } from "@expo/vector-icons"
 import { useState, useEffect } from "react"
-import { View, Text, TouchableOpacity, Alert, StyleSheet } from "react-native"
+import { View, Text, TouchableOpacity, Alert, StyleSheet, Image } from "react-native"
 
 // Importar telas
 import LoginScreen from "./src/screens/LoginScreen"
@@ -18,7 +19,7 @@ import api from "./src/screens/services/api.js";
 const Stack = createNativeStackNavigator()
 const Tab = createBottomTabNavigator()
 
-// 🔧 COMPONENTE DE DEBUG - ADICIONE ESTE CÓDIGO
+// 🔧 COMPONENTE DE DEBUG - CORRIGIDO
 const DebugPanel = ({ isVisible, onClose }) => {
   const [testStatus, setTestStatus] = useState('')
   const [loading, setLoading] = useState(false)
@@ -27,17 +28,17 @@ const DebugPanel = ({ isVisible, onClose }) => {
   const testApiConnection = async () => {
     setLoading(true)
     setTestStatus('')
-    
+
     try {
       console.log("🧪 INICIANDO TESTE DE CONEXÃO...")
       console.log("🌐 URL sendo testada:", api.defaults.baseURL)
-      
+
       const response = await api.get('/test')
-      
+
       console.log("✅ TESTE BÁSICO - SUCESSO!")
       console.log("📊 Status:", response.status)
       console.log("📦 Dados:", response.data)
-      
+
       setTestStatus('success')
       setApiInfo(`Servidor: ${response.data.message}`)
       Alert.alert("✅ CONEXÃO OK!", `Servidor respondendo!\n\nStatus: ${response.status}\nMensagem: ${response.data.message}`)
@@ -45,7 +46,7 @@ const DebugPanel = ({ isVisible, onClose }) => {
       console.log("❌ TESTE BÁSICO - FALHA!")
       console.log("🔴 Tipo de erro:", error.name)
       console.log("📝 Mensagem:", error.message)
-      
+
       if (error.response) {
         console.log("📡 Resposta de erro:", error.response.status, error.response.data)
         setApiInfo(`Erro ${error.response.status}: ${JSON.stringify(error.response.data)}`)
@@ -56,7 +57,7 @@ const DebugPanel = ({ isVisible, onClose }) => {
         console.log("💥 Erro na configuração:", error.message)
         setApiInfo(`Erro: ${error.message}`)
       }
-      
+
       setTestStatus('error')
       Alert.alert("❌ FALHA NA CONEXÃO", "Não foi possível conectar ao servidor. Verifique:\n\n1. Se o backend está rodando\n2. Se o Ngrok está ativo\n3. Sua conexão com internet")
     } finally {
@@ -66,15 +67,15 @@ const DebugPanel = ({ isVisible, onClose }) => {
 
   const testOficinas = async () => {
     setLoading(true)
-    
+
     try {
       console.log("🏢 TESTANDO OFICINAS...")
       const response = await api.get('/oficinas-completas')
-      
+
       console.log("✅ OFICINAS - SUCESSO!")
       console.log("📊 Total de oficinas:", response.data.data?.length || 0)
       console.log("📦 Primeira oficina:", response.data.data?.[0])
-      
+
       const count = response.data.data?.length || 0
       setTestStatus('success')
       setApiInfo(`${count} oficinas carregadas`)
@@ -82,13 +83,13 @@ const DebugPanel = ({ isVisible, onClose }) => {
     } catch (error) {
       console.log("❌ OFICINAS - FALHA!")
       console.log("🔴 Erro:", error.message)
-      
+
       if (error.response) {
         setApiInfo(`Erro ${error.response.status} nas oficinas`)
       } else {
         setApiInfo("Falha ao carregar oficinas")
       }
-      
+
       setTestStatus('error')
       Alert.alert("❌ ERRO NAS OFICINAS", "Não foi possível carregar a lista de oficinas")
     } finally {
@@ -98,7 +99,7 @@ const DebugPanel = ({ isVisible, onClose }) => {
 
   const testAuth = async () => {
     setLoading(true)
-    
+
     try {
       console.log("🔐 TESTANDO AUTENTICAÇÃO...")
       // Teste com dados fictícios
@@ -106,16 +107,16 @@ const DebugPanel = ({ isVisible, onClose }) => {
         email: "teste@email.com",
         senha: "senhateste"
       })
-      
+
       console.log("✅ AUTENTICAÇÃO - Resposta recebida")
       console.log("📊 Status:", response.status)
-      
+
       setTestStatus('success')
       setApiInfo("Endpoint de auth respondendo")
       Alert.alert("✅ AUTH OK!", "Endpoint de login está respondendo!\n\n(Usuário não existe, mas a API funciona)")
     } catch (error) {
       console.log("🔐 AUTENTICAÇÃO - Resposta de erro (normal para usuário inexistente)")
-      
+
       if (error.response && error.response.status === 401) {
         // 401 é esperado para usuário não encontrado
         console.log("✅ AUTH - Endpoint funcionando (erro 401 esperado)")
@@ -139,7 +140,13 @@ const DebugPanel = ({ isVisible, onClose }) => {
     <View style={debugStyles.overlay}>
       <View style={debugStyles.panel}>
         <View style={debugStyles.header}>
-          <Text style={debugStyles.title}>🔧 PAINEL DE DEBUG</Text>
+          <View style={debugStyles.logoContainer}>
+            <Image
+              source={require('./oilamarelo.png')} style={debugStyles.logo}
+              resizeMode="contain"
+            />
+            <Text style={debugStyles.title}>PAINEL DE DEBUG</Text>
+          </View>
           <TouchableOpacity onPress={onClose}>
             <Text style={debugStyles.closeButton}>✕</Text>
           </TouchableOpacity>
@@ -152,7 +159,7 @@ const DebugPanel = ({ isVisible, onClose }) => {
         </View>
 
         <View style={debugStyles.buttonsContainer}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[debugStyles.button, debugStyles.buttonPrimary]}
             onPress={testApiConnection}
             disabled={loading}
@@ -160,7 +167,7 @@ const DebugPanel = ({ isVisible, onClose }) => {
             <Text style={debugStyles.buttonText}>🧪 Testar Conexão</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[debugStyles.button, debugStyles.buttonSecondary]}
             onPress={testOficinas}
             disabled={loading}
@@ -168,7 +175,7 @@ const DebugPanel = ({ isVisible, onClose }) => {
             <Text style={debugStyles.buttonText}>🏢 Testar Oficinas</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[debugStyles.button, debugStyles.buttonTertiary]}
             onPress={testAuth}
             disabled={loading}
@@ -217,6 +224,15 @@ const debugStyles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#334155',
     paddingBottom: 12,
+  },
+  logoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  logo: {
+    width: 32,
+    height: 32,
   },
   title: {
     color: '#eab308',
@@ -332,7 +348,7 @@ function MainTabs() {
   )
 }
 
-// Tela de Login com botão de debug
+// Tela de Login com botão de debug - CORRIGIDO
 function LoginWithDebug({ navigation }) {
   const [showDebug, setShowDebug] = useState(false)
 
@@ -350,9 +366,9 @@ function LoginWithDebug({ navigation }) {
   return (
     <View style={{ flex: 1 }}>
       <LoginScreen navigation={navigation} />
-      
+
       {/* Botão flutuante para abrir debug */}
-      <TouchableOpacity 
+      <TouchableOpacity
         style={floatingButtonStyles.button}
         onPress={() => setShowDebug(true)}
         onLongPress={() => {
@@ -361,7 +377,10 @@ function LoginWithDebug({ navigation }) {
           console.log("🕒 Hora:", new Date().toLocaleTimeString())
         }}
       >
-        <Text style={floatingButtonStyles.text}>🔧</Text>
+        <Image
+          source={require('./oilamarelo.png')} style={floatingButtonStyles.logo}
+          resizeMode="contain"
+        />
       </TouchableOpacity>
 
       <DebugPanel isVisible={showDebug} onClose={() => setShowDebug(false)} />
@@ -374,10 +393,10 @@ const floatingButtonStyles = StyleSheet.create({
     position: 'absolute',
     bottom: 20,
     right: 20,
-    backgroundColor: '#eab308',
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    backgroundColor: '#0f172a',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -385,10 +404,12 @@ const floatingButtonStyles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 5,
+    borderWidth: 2,
+    borderColor: '#eab308',
   },
-  text: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  logo: {
+    width: 35,
+    height: 35,
   },
 })
 

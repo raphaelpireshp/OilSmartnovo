@@ -162,7 +162,7 @@ p {
 }
 
 .logo img {
-    height: 120px;
+    height: 220px;
     transition: var(--transition);
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
 }
@@ -318,7 +318,7 @@ color: #ffd700;
 }
 
 .btn-secondary {
-    background: var(--primary-color);
+    background: #1a3246;
     color: white;
     box-shadow: var(--shadow-md);
 }
@@ -925,7 +925,7 @@ a:focus-visible {
     align-items: center;
     gap: var(--space-md);
     padding: var(--space-md);
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0);
     border-radius: var(--radius-lg);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);

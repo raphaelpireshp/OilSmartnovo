@@ -52,12 +52,9 @@ const LoadingOverlay = ({ visible, message = "Buscando..." }) => {
       transparent
       animationType="fade"
     >
-      <View style={loadingStyles.overlay}>
-        <View style={loadingStyles.container}>
-          <ActivityIndicator size="large" color="#eab308" />
-          <Text style={loadingStyles.message}>{message}</Text>
-        </View>
-      </View>
+<View style={styles.headerTop}>
+  <Text style={styles.headerTitle}>Agendar Serviço</Text>
+</View>
     </Modal>
   )
 }
@@ -1058,7 +1055,7 @@ export default function ServicosScreen({ navigation, route }) {
                 setSelectedVehicle(null)
               
                 // Navegar para home
-                navigation.navigate("Home")
+                navigation.navigate("Servicos")
               }
             }
           ]
@@ -1084,12 +1081,7 @@ export default function ServicosScreen({ navigation, route }) {
       
       <View style={styles.header}>
         <View style={styles.headerTop}>
-          <View style={styles.logoContainer}>
-            <View style={styles.logo}>
-              <Text style={styles.logoText}>OS</Text>
-            </View>
-            <Text style={styles.logoTitle}>OilSmart</Text>
-          </View>
+
           <Text style={styles.headerTitle}>Agendar Serviço</Text>
         </View>
         
