@@ -6965,3 +6965,117 @@ select option[style*="color: #f4a261"] {
         transition: none;
     }
 }
+/* ===== MODAIS DE CANCELAMENTO - MODO NOTURNO ===== */
+@media (prefers-color-scheme: dark) {
+    .cancel-confirmation-modal,
+    .cancel-reason-modal,
+    .success-cancel-modal {
+        background: rgba(0, 0, 0, 0.8);
+    }
+    
+    .cancel-modal-content,
+    .reason-modal-content,
+    .success-modal-content {
+        background: #2d3748;
+        border: 2px solid #4a5568;
+        color: #e2e8f0;
+    }
+    
+    .cancel-modal-content h3,
+    .reason-modal-content h3,
+    .success-modal-content h3 {
+        color: #f7fafc;
+    }
+    
+    .cancel-modal-content p,
+    .reason-modal-content p,
+    .success-modal-content p {
+        color: #cbd5e0;
+    }
+    
+    #cancel-reason-input {
+        background: #4a5568;
+        border-color: #718096;
+        color: #e2e8f0;
+    }
+    
+    #cancel-reason-input::placeholder {
+        color: #a0aec0;
+    }
+    
+    #cancel-reason-input:focus {
+        border-color: #ff6b6b;
+        box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
+    }
+    
+    .btn-cancel-secondary,
+    .btn-reason-cancel {
+        border-color: #718096;
+        color: #e2e8f0;
+    }
+    
+    .btn-cancel-secondary:hover,
+    .btn-reason-cancel:hover {
+        background: #4a5568;
+    }
+    
+    .char-counter {
+        color: #a0aec0;
+    }
+}
+
+/* ===== ANIMAÇÕES PARA OS MODAIS ===== */
+@keyframes modalAppear {
+    from {
+        opacity: 0;
+        transform: translateY(-30px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes successAppear {
+    0% {
+        opacity: 0;
+        transform: scale(0.5) rotate(-10deg);
+    }
+    70% {
+        transform: scale(1.1) rotate(5deg);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) rotate(0);
+    }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+/* ===== ESTILOS DE HOVER CONSISTENTES ===== */
+.btn-cancel-secondary:hover,
+.btn-reason-cancel:hover {
+    background: var(--border-color);
+    transform: translateY(-2px);
+}
+
+.btn-cancel-primary:hover,
+.btn-reason-confirm:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+}
+
+.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
+}
