@@ -5,8 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OilSmart - Contatos</title>
-    <meta name="description" content="Entre em contato com a OilSmart. Estamos à disposição para tirar suas dúvidas sobre serviços automotivos.">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="description"
+        content="Entre em contato com a OilSmart. Estamos à disposição para tirar suas dúvidas sobre serviços automotivos.">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/auth.css">
@@ -17,51 +19,51 @@
 <body>
     <header class="header">
         <div class="container">
-           
-<div class="navbar">
-    <button class="hamburger" id="hamburger">
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-    </button>
 
-    <div class="logo">
-        <a href="/html/Início.html"><img src="/img/oilamarelo.png" alt="OilSmart"></a>
-    </div>
+            <div class="navbar">
+                <button class="hamburger" id="hamburger">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </button>
+
+                <div class="logo">
+                    <a href="/html/Início.html"><img src="/img/oilamarelo.png" alt="OilSmart"></a>
+                </div>
 
                 <nav class="nav" id="nav">
                     <ul class="nav__list">
-                    <li><a href="/html/Início.html">Início</a></li>
+                        <li><a href="/html/Início.html">Início</a></li>
                         <li><a href="/html/servicos.html">Serviços</a></li>
                         <li><a href="/html/agenda.html">Agenda</a></li>
                         <li><a href="/html/sobre.html">Sobre</a></li>
-                                        <li><a href="/html/Contato.html" class="active">Contato</a></li>
+                        <li><a href="/html/Contato.html" class="active">Contato</a></li>
                     </ul>
                 </nav>
 
-<div class="action-icons">
-    <div class="user-dropdown" id="user-dropdown">
-        <div class="user-icon" id="login-btn">
-            <i class="fas fa-user"></i>
-            <span class="login-status" id="login-status">Login</span>
-        </div>
-        <div class="dropdown-menu" id="dropdown-menu">
-            <div class="user-info">
-                <strong id="user-display-name">Usuário</strong>
-                <span id="user-email">email@exemplo.com</span>
-            </div>
-            <div class="dropdown-divider"></div>
+                <div class="action-icons">
+                    <div class="user-dropdown" id="user-dropdown">
+                        <div class="user-icon" id="login-btn">
+                            <i class="fas fa-user"></i>
+                            <span class="login-status" id="login-status">Login</span>
+                        </div>
+                        <div class="dropdown-menu" id="dropdown-menu">
+                            <div class="user-info">
+                                <strong id="user-display-name">Usuário</strong>
+                                <span id="user-email">email@exemplo.com</span>
+                            </div>
+                            <div class="dropdown-divider"></div>
 
-            <a href="/html/agenda.html" class="dropdown-item">
-                <i class="fas fa-calendar-alt"></i> Meus Agendamentos
-            </a>
-            <div class="dropdown-divider"></div>
-            <a href="/html/Início.html" id="logout-btn" class="dropdown-item">
-                <i class="fas fa-sign-out-alt"></i> Sair
-            </a>
-        </div>
-    </div>
-</div>
+                            <a href="/html/agenda.html" class="dropdown-item">
+                                <i class="fas fa-calendar-alt"></i> Meus Agendamentos
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="/html/Início.html" id="logout-btn" class="dropdown-item">
+                                <i class="fas fa-sign-out-alt"></i> Sair
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </header>
@@ -94,221 +96,242 @@
         <div class="hero-divider"></div>
 
         <style>
-/* ================= HERO BANNER ================= */
+            /* ================= HERO BANNER ================= */
 
-.hero-banner {
-    position: relative;
-    width: 100%;
-    height: 65vh;
-    min-height: 450px;
-    max-height: 650px;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    text-align: center;
-    isolation: isolate;
-}
+            .hero-banner {
+                position: relative;
+                width: 100%;
+                height: 65vh;
+                min-height: 450px;
+                max-height: 650px;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                text-align: center;
+                isolation: isolate;
+            }
 
-/* Carrossel de fundo */
-.hero-carousel {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-    overflow: hidden;
-}
+            /* Carrossel de fundo */
+            .hero-carousel {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 1;
+                overflow: hidden;
+            }
 
-.hero-carousel .carousel-track {
-    display: flex;
-    height: 100%;
-    transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1);
-}
+            .hero-carousel .carousel-track {
+                display: flex;
+                height: 100%;
+                transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+            }
 
-.hero-carousel .carousel-slide {
-    min-width: 100%;
-    height: 100%;
-    position: relative;
-}
+            .hero-carousel .carousel-slide {
+                min-width: 100%;
+                height: 100%;
+                position: relative;
+            }
 
-.hero-carousel img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    filter: brightness(0.7) contrast(1.1);
-    transition: transform 10s linear;
-}
+            .hero-carousel img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                filter: brightness(0.7) contrast(1.1);
+                transition: transform 10s linear;
+            }
 
-.hero-carousel .carousel-slide.active img {
-    transform: scale(1.05);
-}
+            .hero-carousel .carousel-slide.active img {
+                transform: scale(1.05);
+            }
 
-/* Overlay escuro com blur */
-.hero-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-        135deg, 
-        rgba(0, 0, 0, 0.5) 0%, 
-        rgba(0, 0, 0, 0.3) 50%,
-        rgba(0, 0, 0, 0.5) 100%
-    );
-    backdrop-filter: blur(5px);
-    z-index: 2;
-}
+            /* Overlay escuro com blur */
+            .hero-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(135deg,
+                        rgba(0, 0, 0, 0.5) 0%,
+                        rgba(0, 0, 0, 0.3) 50%,
+                        rgba(0, 0, 0, 0.5) 100%);
+                backdrop-filter: blur(5px);
+                z-index: 2;
+            }
 
-/* Conteúdo do banner */
-.hero-content {
-    position: relative;
-    z-index: 3;
-    padding: 2rem;
-    max-width: 900px;
-    animation: fadeInUp 1s ease-out 0.5s both;
-}
+            /* Conteúdo do banner */
+            .hero-content {
+                position: relative;
+                z-index: 3;
+                padding: 2rem;
+                max-width: 900px;
+                animation: fadeInUp 1s ease-out 0.5s both;
+            }
 
-.hero-content h1 {
-    font-size: 3rem;
-    font-weight: 700;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-}
+            .hero-content h1 {
+                font-size: 3rem;
+                font-weight: 700;
+                text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            }
 
-.hero-content p {
-    font-size: 1.3rem;
-    margin: 1rem 0 2rem;
-    text-shadow: 0 2px 5px rgba(0,0,0,0.5);
-}
+            .hero-content p {
+                font-size: 1.3rem;
+                margin: 1rem 0 2rem;
+                text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            }
 
-/* Botão principal */
-.btn-primary {
-    background: linear-gradient(135deg, #f7b900, #E05D00);
-    border: none;
-    padding: 14px 35px;
-    font-size: 1.1rem;
-    border-radius: 50px;
-    transition: all 0.3s ease;
-    box-shadow: 0 5px 15px rgba(224, 93, 0, 0.4);
-    position: relative;
-    overflow: hidden;
-}
+            /* Botão principal */
+            .btn-primary {
+                background: linear-gradient(135deg, #f7b900, #E05D00);
+                border: none;
+                padding: 14px 35px;
+                font-size: 1.1rem;
+                border-radius: 50px;
+                transition: all 0.3s ease;
+                box-shadow: 0 5px 15px rgba(224, 93, 0, 0.4);
+                position: relative;
+                overflow: hidden;
+            }
 
-.btn-primary::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-    transition: 0.5s;
-}
+            .btn-primary::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+                transition: 0.5s;
+            }
 
-.btn-primary:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(224, 93, 0, 0.6);
-}
+            .btn-primary:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 20px rgba(224, 93, 0, 0.6);
+            }
 
-.btn-primary:hover::before {
-    left: 100%;
-}
+            .btn-primary:hover::before {
+                left: 100%;
+            }
 
-/* Indicadores do carrossel */
-.carousel-indicators {
-    position: absolute;
-    bottom: 25px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 10px;
-    z-index: 4;
-}
+            /* Indicadores do carrossel */
+            .carousel-indicators {
+                position: absolute;
+                bottom: 25px;
+                left: 50%;
+                transform: translateX(-50%);
+                display: flex;
+                gap: 10px;
+                z-index: 4;
+            }
 
-.carousel-indicator {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.5);
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
+            .carousel-indicator {
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.5);
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
 
-.carousel-indicator.active {
-    background: #f7b900;
-    transform: scale(1.2);
-    box-shadow: 0 0 8px rgba(247, 185, 0, 0.8);
-}
+            .carousel-indicator.active {
+                background: #f7b900;
+                transform: scale(1.2);
+                box-shadow: 0 0 8px rgba(247, 185, 0, 0.8);
+            }
 
-/* Barra de progresso */
-.progress-bar {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 4px;
-    width: 100%;
-    background: rgba(255, 255, 255, 0.2);
-    z-index: 4;
-}
+            /* Barra de progresso */
+            .progress-bar {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                height: 4px;
+                width: 100%;
+                background: rgba(255, 255, 255, 0.2);
+                z-index: 4;
+            }
 
-.progress-fill {
-    height: 100%;
-    width: 0%;
-    background: #f7b900;
-    transition: width 0.1s linear;
-}
+            .progress-fill {
+                height: 100%;
+                width: 0%;
+                background: #f7b900;
+                transition: width 0.1s linear;
+            }
 
-/* Animação do conteúdo */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(40px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+            /* Animação do conteúdo */
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(40px);
+                }
 
-/* ================= DIVISOR ENTRE BANNER E SITE ================= */
-.hero-divider {
-    width: 100%;
-    height: 40px;
-    background: linear-gradient(to right, #f7b900, #E05D00);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    border-radius: 0 0 20px 20px;
-    margin-bottom: 2rem;
-}
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
 
-/* ================= RESPONSIVO ================= */
-@media (max-width: 992px) {
-    .hero-content h1 { font-size: 2.4rem; }
-}
+            /* ================= DIVISOR ENTRE BANNER E SITE ================= */
+            .hero-divider {
+                width: 100%;
+                height: 40px;
+                background: linear-gradient(to right, #f7b900, #E05D00);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+                border-radius: 0 0 20px 20px;
+                margin-bottom: 2rem;
+            }
 
-@media (max-width: 768px) {
-    .hero-banner { height: 55vh; min-height: 400px; }
-    .hero-content h1 { font-size: 2rem; }
-    .hero-content p { font-size: 1.1rem; }
-    .btn-primary { padding: 12px 30px; font-size: 1rem; }
-}
+            /* ================= RESPONSIVO ================= */
+            @media (max-width: 992px) {
+                .hero-content h1 {
+                    font-size: 2.4rem;
+                }
+            }
 
-@media (max-width: 576px) {
-    .hero-banner { min-height: 350px; }
-    .hero-content h1 { font-size: 1.7rem; }
-    .hero-content { padding: 1.5rem; }
-}
+            @media (max-width: 768px) {
+                .hero-banner {
+                    height: 55vh;
+                    min-height: 400px;
+                }
 
-    </style>
+                .hero-content h1 {
+                    font-size: 2rem;
+                }
+
+                .hero-content p {
+                    font-size: 1.1rem;
+                }
+
+                .btn-primary {
+                    padding: 12px 30px;
+                    font-size: 1rem;
+                }
+            }
+
+            @media (max-width: 576px) {
+                .hero-banner {
+                    min-height: 350px;
+                }
+
+                .hero-content h1 {
+                    font-size: 1.7rem;
+                }
+
+                .hero-content {
+                    padding: 1.5rem;
+                }
+            }
+        </style>
 
 
         <div class="container">
             <!-- Informações de Contato -->
             <section class="contact-info-section">
                 <h2 class="section-title">Nossos Canais de Atendimento</h2>
-                
+
                 <div class="contact-grid">
                     <div class="contact-card">
                         <div class="contact-icon">
@@ -318,7 +341,7 @@
                         <p>(11) 4002-8922</p>
                         <span class="contact-detail">Segunda a Sexta, 8h às 18h</span>
                     </div>
-                    
+
                     <div class="contact-card">
                         <div class="contact-icon">
                             <i class="fas fa-envelope"></i>
@@ -327,7 +350,7 @@
                         <p>oilsmartoficiall@gmail.com</p>
                         <span class="contact-detail">Respondemos em até 24h</span>
                     </div>
-                    
+
                     <div class="contact-card">
                         <div class="contact-icon">
                             <i class="fab fa-whatsapp"></i>
@@ -336,7 +359,7 @@
                         <p>(11) 99999-9999</p>
                         <span class="contact-detail">Atendimento rápido pelo app</span>
                     </div>
-                    
+
 
                 </div>
             </section>
@@ -348,26 +371,26 @@
                         <h2>Envie sua Mensagem</h2>
                         <p>Preencha o formulário abaixo e entraremos em contato o mais breve possível</p>
                     </div>
-                    
+
                     <form id="contact-form" class="contact-form">
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="contact-name">Nome Completo *</label>
                                 <input type="text" id="contact-name" placeholder="Digite seu nome completo" required>
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="contact-email">E-mail *</label>
                                 <input type="email" id="contact-email" placeholder="Digite seu e-mail" required>
                             </div>
                         </div>
-                        
+
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="contact-phone">Telefone</label>
                                 <input type="tel" id="contact-phone" placeholder="(11) 99999-9999">
                             </div>
-                            
+
                             <div class="form-group">
                                 <label for="contact-subject">Assunto *</label>
                                 <select id="contact-subject" required>
@@ -381,16 +404,17 @@
                                 </select>
                             </div>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="contact-message">Mensagem *</label>
-                            <textarea id="contact-message" rows="5" placeholder="Descreva sua dúvida, solicitação ou mensagem" required></textarea>
+                            <textarea id="contact-message" rows="5"
+                                placeholder="Descreva sua dúvida, solicitação ou mensagem" required></textarea>
                         </div>
-                        
+
                         <button type="submit" class="btn btn-primary btn-block">Enviar Mensagem</button>
                     </form>
                 </div>
-                
+
                 <div class="contact-extra-info">
                     <div class="info-card">
                         <h3><i class="fas fa-clock"></i> Horário de Atendimento</h3>
@@ -398,15 +422,16 @@
                         <p>Sábado: 9h às 13h</p>
                         <p>Domingo: Fechado</p>
                     </div>
-                    
+
                     <div class="info-card">
                         <h3><i class="fas fa-info-circle"></i> Resposta Rápida</h3>
-                        <p>Garantimos retorno em até 24 horas úteis para todas as solicitações recebidas através do nosso formulário.</p>
+                        <p>Garantimos retorno em até 24 horas úteis para todas as solicitações recebidas através do
+                            nosso formulário.</p>
                     </div>
                 </div>
             </section>
 
-           
+
         </div>
     </main>
 
@@ -437,85 +462,125 @@
         </div>
     </footer>
 
+    <!-- Chatbot Widget -->
+    <div id="chatbot-widget" class="chatbot-widget">
+        <div class="chatbot-header">
+            <div class="chatbot-avatar">
+                <i class="fas fa-oil-can"></i>
+            </div>
+            <div class="chatbot-info">
+                <h4>OilSmart Assistente</h4>
+            </div>
+            <button id="chatbot-close" class="chatbot-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div id="chatbot-messages" class="chatbot-messages">
+            <div class="chatbot-message bot-message">
+                <div class="message-avatar">
+                    <i class="fas fa-oil-can"></i>
+                </div>
+                <div class="message-content">
+                    <p>Olá! Sou o assistente virtual da OilSmart. Como posso ajudá-lo hoje?</p>
+                    <div class="quick-options">
+                        <button class="quick-option" data-option="agendamento">📅 Agendar serviço</button>
+                        <button class="quick-option" data-option="duvidas">❓ Tirar dúvidas</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="chatbot-input">
+            <input type="text" id="chatbot-input" placeholder="Digite sua mensagem..." maxlength="200">
+            <button id="chatbot-send">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Botão de abertura do chatbot -->
+    <button id="chatbot-toggle" class="chatbot-toggle">
+        <i class="fas fa-comments"></i>
+        <span class="chatbot-notification"></span>
+    </button>
 
     <script src="/js/main.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const contactForm = document.getElementById('contact-form');
-    
-    if (contactForm) {
-        contactForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            // Coletar dados do formulário
-            const formData = {
-                name: document.getElementById('contact-name').value.trim(),
-                email: document.getElementById('contact-email').value.trim(),
-                phone: document.getElementById('contact-phone').value.trim(),
-                subject: document.getElementById('contact-subject').value,
-                message: document.getElementById('contact-message').value.trim()
-            };
-            
-            // Validação básica
-            if (!formData.name || !formData.email || !formData.subject || !formData.message) {
-                showToast('Preencha todos os campos obrigatórios', 'error');
-                return;
-            }
-            
-            if (!validateEmail(formData.email)) {
-                showToast('Email inválido', 'error');
-                return;
-            }
-            
-            // Desabilitar botão e mostrar loading
-            const submitBtn = contactForm.querySelector('button[type="submit"]');
-            const originalText = submitBtn.textContent;
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Enviando...';
-            
-            try {
-                const response = await fetch('/api/email/send-contact', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData)
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const contactForm = document.getElementById('contact-form');
+
+            if (contactForm) {
+                contactForm.addEventListener('submit', async function (e) {
+                    e.preventDefault();
+
+                    // Coletar dados do formulário
+                    const formData = {
+                        name: document.getElementById('contact-name').value.trim(),
+                        email: document.getElementById('contact-email').value.trim(),
+                        phone: document.getElementById('contact-phone').value.trim(),
+                        subject: document.getElementById('contact-subject').value,
+                        message: document.getElementById('contact-message').value.trim()
+                    };
+
+                    // Validação básica
+                    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+                        showToast('Preencha todos os campos obrigatórios', 'error');
+                        return;
+                    }
+
+                    if (!validateEmail(formData.email)) {
+                        showToast('Email inválido', 'error');
+                        return;
+                    }
+
+                    // Desabilitar botão e mostrar loading
+                    const submitBtn = contactForm.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.textContent;
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Enviando...';
+
+                    try {
+                        const response = await fetch('/api/email/send-contact', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(formData)
+                        });
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                            showToast(result.message, 'success');
+                            contactForm.reset(); // Limpar formulário
+                        } else {
+                            showToast(result.message, 'error');
+                        }
+
+                    } catch (error) {
+                        console.error('Erro ao enviar formulário:', error);
+                        showToast('Erro ao enviar mensagem. Tente novamente.', 'error');
+                    } finally {
+                        // Reabilitar botão
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = originalText;
+                    }
                 });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    showToast(result.message, 'success');
-                    contactForm.reset(); // Limpar formulário
-                } else {
-                    showToast(result.message, 'error');
-                }
-                
-            } catch (error) {
-                console.error('Erro ao enviar formulário:', error);
-                showToast('Erro ao enviar mensagem. Tente novamente.', 'error');
-            } finally {
-                // Reabilitar botão
-                submitBtn.disabled = false;
-                submitBtn.textContent = originalText;
             }
-        });
-    }
-    
-    // Função de validação de email (reutilizada do servicos.js)
-    function validateEmail(email) {
-        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return re.test(email);
-    }
-    
-    // Função para mostrar mensagens toast (simplificada)
-    function showToast(message, type = 'success') {
-        // Cria um toast temporário se não existir
-        let toast = document.getElementById('toast');
-        if (!toast) {
-            toast = document.createElement('div');
-            toast.id = 'toast';
-            toast.style.cssText = `
+
+            // Função de validação de email (reutilizada do servicos.js)
+            function validateEmail(email) {
+                const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return re.test(email);
+            }
+
+            // Função para mostrar mensagens toast (simplificada)
+            function showToast(message, type = 'success') {
+                // Cria um toast temporário se não existir
+                let toast = document.getElementById('toast');
+                if (!toast) {
+                    toast = document.createElement('div');
+                    toast.id = 'toast';
+                    toast.style.cssText = `
                 position: fixed;
                 top: 20px;
                 right: 20px;
@@ -526,18 +591,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 font-weight: 500;
                 transition: all 0.3s ease;
             `;
-            document.body.appendChild(toast);
-        }
-        
-        toast.textContent = message;
-        toast.style.backgroundColor = type === 'success' ? '#28a745' : '#dc3545';
-        toast.style.display = 'block';
-        
-        setTimeout(() => {
-            toast.style.display = 'none';
-        }, 5000);
-    }
-});
+                    document.body.appendChild(toast);
+                }
+
+                toast.textContent = message;
+                toast.style.backgroundColor = type === 'success' ? '#28a745' : '#dc3545';
+                toast.style.display = 'block';
+
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 5000);
+            }
+        });
 
         // Script aprimorado para o carrossel
         document.addEventListener("DOMContentLoaded", function () {
@@ -549,11 +614,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
             function updateCarousel() {
                 track.style.transform = `translateX(-${index * 100}%)`;
-                
+
                 // Atualiza classes ativas
                 slides.forEach(slide => slide.classList.remove('active'));
                 slides[index].classList.add('active');
-                
+
                 indicators.forEach(indicator => indicator.classList.remove('active'));
                 indicators[index].classList.add('active');
             }
@@ -565,27 +630,27 @@ document.addEventListener('DOMContentLoaded', function() {
                     updateCarousel();
                 }, 4000);
             }
-            
+
             // Para auto-play ao interagir
             function stopAutoPlay() {
                 clearInterval(interval);
             }
-            
+
             // Adiciona eventos aos indicadores
             indicators.forEach(indicator => {
-                indicator.addEventListener('click', function() {
+                indicator.addEventListener('click', function () {
                     stopAutoPlay();
                     index = parseInt(this.getAttribute('data-index'));
                     updateCarousel();
                     startAutoPlay();
                 });
             });
-            
+
             // Pausa ao passar o mouse
             const heroBanner = document.querySelector('.hero-banner');
             heroBanner.addEventListener('mouseenter', stopAutoPlay);
             heroBanner.addEventListener('mouseleave', startAutoPlay);
-            
+
             // Inicia o carrossel
             startAutoPlay();
 
@@ -618,7 +683,7 @@ document.addEventListener('DOMContentLoaded', function() {
             checkLoginStatus();
         });
 
-</script>
+    </script>
 </body>
 
 </html>

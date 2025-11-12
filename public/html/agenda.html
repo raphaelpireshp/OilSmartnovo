@@ -1,19 +1,22 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agendamentos - OilSmart</title>
-    <meta name="description" content="Agende seus serviços automotivos com a OilSmart. Histórico de agendamentos e lembretes para próxima troca.">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="description"
+        content="Agende seus serviços automotivos com a OilSmart. Histórico de agendamentos e lembretes para próxima troca.">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/css/main.css">
     <link rel="icon" href="/img/tentativa3.png" type="image/x-icon">
     <link rel="stylesheet" href="/css/auth.css">
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="/js/auth.js" defer></script>
 </head>
+
 <body>
     <header class="header">
         <div class="container">
@@ -27,17 +30,17 @@
                 <div class="logo">
                     <a href="/html/Início.html"><img src="/img/oilamarelo.png" alt="OilSmart"></a>
                 </div>
-                
+
                 <nav class="nav" id="nav">
                     <ul class="nav__list">
-                    <li><a href="/html/Início.html">Início</a></li>
+                        <li><a href="/html/Início.html">Início</a></li>
                         <li><a href="/html/servicos.html">Serviços</a></li>
                         <li><a href="/html/agenda.html" class="active">Agenda</a></li>
                         <li><a href="/html/sobre.html">Sobre</a></li>
                         <li><a href="/html/contato.html">Contato</a></li>
                     </ul>
                 </nav>
-                
+
                 <div class="action-icons">
                     <div class="user-dropdown" id="user-dropdown">
                         <div class="user-icon" id="login-btn">
@@ -67,7 +70,7 @@
     <main class="main-content">
         <div class="container">
             <h1 class="page-title">Meus Agendamentos</h1>
-            
+
             <div class="agenda-container">
                 <!-- Lembrete de Próxima Troca -->
                 <section class="reminder-section">
@@ -104,7 +107,7 @@
                                     <option value="fora_prazo">Fora do Prazo</option>
                                 </select>
                             </div>
-                            
+
                             <div class="filter-group">
                                 <label for="filter-period"><i class="fas fa-calendar"></i> Período:</label>
                                 <select id="filter-period" class="filter-select">
@@ -132,7 +135,7 @@
                             </button>
                         </div>
                     </div>
-                    
+
                     <div class="appointments-list">
                         <!-- Agendamento 1 -->
                         <div class="appointment-card">
@@ -159,12 +162,15 @@
                                 </div>
                             </div>
                             <div class="appointment-footer">
-                                <button class="btn btn-outline" onclick="repeatAppointment(1)"><i class="fas fa-redo"></i> Repetir Agendamento</button>
-                                <button class="btn btn-outline" onclick="downloadInvoice(1)"><i class="fas fa-file-invoice"></i> Comprovante</button>
-                                <button class="btn btn-outline" onclick="rateService(1)"><i class="fas fa-star"></i> Avaliar Serviço</button>
+                                <button class="btn btn-outline" onclick="repeatAppointment(1)"><i
+                                        class="fas fa-redo"></i> Repetir Agendamento</button>
+                                <button class="btn btn-outline" onclick="downloadInvoice(1)"><i
+                                        class="fas fa-file-invoice"></i> Comprovante</button>
+                                <button class="btn btn-outline" onclick="rateService(1)"><i class="fas fa-star"></i>
+                                    Avaliar Serviço</button>
                             </div>
                         </div>
-                        
+
                         <!-- Agendamento 2 -->
                         <div class="appointment-card">
                             <div class="appointment-header">
@@ -190,12 +196,15 @@
                                 </div>
                             </div>
                             <div class="appointment-footer">
-                                <button class="btn btn-outline" onclick="repeatAppointment(2)"><i class="fas fa-redo"></i> Repetir Agendamento</button>
-                                <button class="btn btn-outline" onclick="downloadInvoice(2)"><i class="fas fa-file-invoice"></i> Comprovante</button>
-                                <button class="btn btn-outline" onclick="rateService(2)"><i class="fas fa-star"></i> Avaliar Serviço</button>
+                                <button class="btn btn-outline" onclick="repeatAppointment(2)"><i
+                                        class="fas fa-redo"></i> Repetir Agendamento</button>
+                                <button class="btn btn-outline" onclick="downloadInvoice(2)"><i
+                                        class="fas fa-file-invoice"></i> Comprovante</button>
+                                <button class="btn btn-outline" onclick="rateService(2)"><i class="fas fa-star"></i>
+                                    Avaliar Serviço</button>
                             </div>
                         </div>
-                        
+
                         <!-- Agendamento 3 - Cancelado -->
                         <div class="appointment-card cancelled">
                             <div class="appointment-header">
@@ -221,8 +230,10 @@
                                 </div>
                             </div>
                             <div class="appointment-footer">
-                                <button class="btn btn-outline" onclick="repeatAppointment(3)"><i class="fas fa-redo"></i> Novo Agendamento</button>
-                                <button class="btn btn-outline" onclick="downloadInvoice(3)"><i class="fas fa-file-invoice"></i> Comprovante</button>
+                                <button class="btn btn-outline" onclick="repeatAppointment(3)"><i
+                                        class="fas fa-redo"></i> Novo Agendamento</button>
+                                <button class="btn btn-outline" onclick="downloadInvoice(3)"><i
+                                        class="fas fa-file-invoice"></i> Comprovante</button>
                                 <span class="text-muted">Ações indisponíveis</span>
                             </div>
                         </div>
@@ -259,7 +270,49 @@
         </div>
     </footer>
 
+    <!-- Chatbot Widget -->
+    <div id="chatbot-widget" class="chatbot-widget">
+        <div class="chatbot-header">
+            <div class="chatbot-avatar">
+                <i class="fas fa-oil-can"></i>
+            </div>
+            <div class="chatbot-info">
+                <h4>OilSmart Assistente</h4>
+            </div>
+            <button id="chatbot-close" class="chatbot-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div id="chatbot-messages" class="chatbot-messages">
+            <div class="chatbot-message bot-message">
+                <div class="message-avatar">
+                    <i class="fas fa-oil-can"></i>
+                </div>
+                <div class="message-content">
+                    <p>Olá! Sou o assistente virtual da OilSmart. Como posso ajudá-lo hoje?</p>
+                    <div class="quick-options">
+                        <button class="quick-option" data-option="agendamento">📅 Agendar serviço</button>
+                        <button class="quick-option" data-option="duvidas">❓ Tirar dúvidas</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="chatbot-input">
+            <input type="text" id="chatbot-input" placeholder="Digite sua mensagem..." maxlength="200">
+            <button id="chatbot-send">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Botão de abertura do chatbot -->
+    <button id="chatbot-toggle" class="chatbot-toggle">
+        <i class="fas fa-comments"></i>
+        <span class="chatbot-notification"></span>
+    </button>
+
     <script src="/js/agenda.js"></script>
     <script src="/js/main.js"></script>
 </body>
+
 </html>

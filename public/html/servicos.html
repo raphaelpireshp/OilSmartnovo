@@ -193,42 +193,42 @@
                     </form>
                 </section>
 
-<!-- Passo 2: Produtos Recomendados -->
-<section class="service-step" id="step2">
-    <div class="step-header">
-        <h2><span class="step-number">2</span> Produtos Recomendados</h2>
-        <p>Selecione os produtos que deseja incluir no serviço:</p>
-    </div>
+                <!-- Passo 2: Produtos Recomendados -->
+                <section class="service-step" id="step2">
+                    <div class="step-header">
+                        <h2><span class="step-number">2</span> Produtos Recomendados</h2>
+                        <p>Selecione os produtos que deseja incluir no serviço:</p>
+                    </div>
 
-    <div class="recommendation-container">
-        <div class="product-card" id="recommended-oil">
-            <!-- Conteúdo será preenchido pelo JavaScript -->
-            <div class="product-placeholder">
-                <i class="fas fa-oil-can"></i>
-                <p>Carregando recomendação de óleo...</p>
-            </div>
-        </div>
-        
-        <div class="product-card" id="recommended-filter">
-            <!-- Conteúdo será preenchido pelo JavaScript -->
-            <div class="product-placeholder">
-                <i class="fas fa-filter"></i>
-                <p>Carregando recomendação de filtro...</p>
-            </div>
-        </div>
-    </div>
+                    <div class="recommendation-container">
+                        <div class="product-card" id="recommended-oil">
+                            <!-- Conteúdo será preenchido pelo JavaScript -->
+                            <div class="product-placeholder">
+                                <i class="fas fa-oil-can"></i>
+                                <p>Carregando recomendação de óleo...</p>
+                            </div>
+                        </div>
 
-    <!-- Resumo da Seleção (APENAS UM) -->
-    <div class="selection-summary">
-        <h4>Resumo da Seleção</h4>
-        <p id="selected-items">Nenhum produto selecionado</p>
-    </div>
+                        <div class="product-card" id="recommended-filter">
+                            <!-- Conteúdo será preenchido pelo JavaScript -->
+                            <div class="product-placeholder">
+                                <i class="fas fa-filter"></i>
+                                <p>Carregando recomendação de filtro...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resumo da Seleção (APENAS UM) -->
+                    <div class="selection-summary">
+                        <h4>Resumo da Seleção</h4>
+                        <p id="selected-items">Nenhum produto selecionado</p>
+                    </div>
 
                     <div class="step-buttons">
                         <button type="button" class="btn btn-secondary" onclick="goToStep(1)">Voltar</button>
                         <button type="button" class="btn btn-primary" onclick="goToStep(3)">Continuar</button>
                     </div>
-</section>
+                </section>
 
                 <!-- Passo 3: Agendamento -->
                 <section class="service-step" id="step3">
@@ -348,14 +348,15 @@
                                     <label for="customer-name">Nome Completo</label>
                                     <input type="text" id="customer-name" required>
                                 </div>
-<div class="form-group">
-    <label for="customer-cpf">CPF <small>(opcional para testes)</small></label>
-    <input type="text" id="customer-cpf" placeholder="000.000.000-00 ou qualquer número" maxlength="20">
-    <small style="display:block; color:#666; font-size:12px; margin-top:4px;">
-        Campo opcional para testes. Pode inserir qualquer número.
-    </small>
-    <div class="error-message"></div>
-</div>
+                                <div class="form-group">
+                                    <label for="customer-cpf">CPF <small>(opcional para testes)</small></label>
+                                    <input type="text" id="customer-cpf" placeholder="000.000.000-00 ou qualquer número"
+                                        maxlength="20">
+                                    <small style="display:block; color:#666; font-size:12px; margin-top:4px;">
+                                        Campo opcional para testes. Pode inserir qualquer número.
+                                    </small>
+                                    <div class="error-message"></div>
+                                </div>
                             </div>
 
                             <div class="form-row">
@@ -431,6 +432,47 @@
             </div>
         </div>
     </footer>
+
+    <!-- Chatbot Widget -->
+    <div id="chatbot-widget" class="chatbot-widget">
+        <div class="chatbot-header">
+            <div class="chatbot-avatar">
+                <i class="fas fa-oil-can"></i>
+            </div>
+            <div class="chatbot-info">
+                <h4>OilSmart Assistente</h4>
+            </div>
+            <button id="chatbot-close" class="chatbot-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div id="chatbot-messages" class="chatbot-messages">
+            <div class="chatbot-message bot-message">
+                <div class="message-avatar">
+                    <i class="fas fa-oil-can"></i>
+                </div>
+                <div class="message-content">
+                    <p>Olá! Sou o assistente virtual da OilSmart. Como posso ajudá-lo hoje?</p>
+                    <div class="quick-options">
+                        <button class="quick-option" data-option="agendamento">📅 Agendar serviço</button>
+                        <button class="quick-option" data-option="duvidas">❓ Tirar dúvidas</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="chatbot-input">
+            <input type="text" id="chatbot-input" placeholder="Digite sua mensagem..." maxlength="200">
+            <button id="chatbot-send">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Botão de abertura do chatbot -->
+    <button id="chatbot-toggle" class="chatbot-toggle">
+        <i class="fas fa-comments"></i>
+        <span class="chatbot-notification"></span>
+    </button>
 
     <div id="loading-overlay">
         <div class="loader"></div>
