@@ -18,22 +18,23 @@ O **OilSmart** é um sistema completo para agendamento e gestão de serviços em
 
 ---
 
+
 ## ✨ Funcionalidades e Fluxo de Navegação
 
-### 1. Cliente (Mobile)
+### 1. Cliente (Mobile & Web)
 
-O cliente acessa o aplicativo via **Login/Cadastro**:
+O cliente pode usar o sistema via aplicativo móvel (React Native / Expo) ou via páginas web públicas (HTML/CSS/JS em `public/html/`). Ambos os meios oferecem o mesmo fluxo funcional principal:
 
-- **Autenticação:** login e cadastro (validação básica no frontend e backend)
-- **Tela Inicial:** tutorial e widget chatbot
+- **Autenticação:** login e cadastro (validação no frontend e backend)
+- **Tela Inicial / Landing:** tutorial, informações e widget chatbot (quando disponível)
 - **Agendamento de Serviços:**
-  - Serviços: troca de óleo, filtro, etc.
+  - Serviços: troca de óleo, filtro, revisões, serviços adicionais
   - Fluxo em 4 etapas: Veículo → Serviços → Data/Hora → Confirmação (gera protocolo)
-- **Minha Agenda:** histórico de agendamentos com status e opção de cancelar
-- **Suporte:** formulário de contato / mensagens vinculadas ao agendamento
-- **Outras telas:** FAQ, políticas e sobre
+- **Minha Agenda / Histórico:** listar agendamentos, ver detalhes, cancelar quando permitido
+- **Suporte / Contato:** formulário de contato, envio de mensagens vinculadas ao agendamento
+- **Páginas Web principais:** `index.html`, `servicos.html`, `agenda.html`, `cadastro.html`, `login.html`, `contato.html`, `politicas.html`, `sobre.html` (localizadas em `public/html/`)
 
-> ⚠️ O app mobile está em `mobile/` — rode-o separadamente (veja seção de execução).
+Observação: o app mobile está em `mobile/` e as páginas web do cliente em `public/html/`. Ao testar em dispositivo físico, exponha a API local (ex.: `ngrok`) ou use a rede local.
 
 ---
 
@@ -75,7 +76,7 @@ O painel admin provê controle de operações da oficina:
 
 | Perfil                        | Funcionalidades Principais                                        |
 | ----------------------------- | ---------------------------------------------------------------- |
-| **Cliente (Mobile)**          | Agendamento, histórico, suporte, recomendações por veículo       |
+| **Cliente (Mobile & Web)**    | Agendamento, histórico, suporte, recomendações por veículo       |
 | **Administrador / adm-oficina** | Dashboard, CRUD de agendamentos, gestão de produtos e configurações |
 
 ---
