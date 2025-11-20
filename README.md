@@ -201,8 +201,24 @@ curl -X POST http://localhost:3000/api/agendamento \
 
 ---
 
+---
+
+## ⚡ Futuros passos
+
+Itens sugeridos para roadmap e próximas sprints:
+
+- **Tela de administração no mobile:** implementar versão responsiva/compacta do painel administrativo dentro do app mobile para gerentes/oficinas.
+- **Reestruturar o backend:** migrar `server.js` para estrutura modular (rotas/controllers/services/models) e adicionar pasta `tests/` com exemplos de testes unitários.
+- **Chatbot aprimorado:** melhorar respostas e fluxos (logs, fallback, possíveis integrações com NLP leve).
+- **Chatbot no mobile e administrativo:** disponibilizar o chatbot tanto no app mobile quanto no painel web, com sincronização de conversas por agendamento/oficina.
+- **Gerenciar Estoque funcional:** implementar módulo de estoque (CRUD, entradas/saídas, alertas de baixo estoque) integrado ao catálogo de produtos.
+- **Admin cadastrar funcionário:** adicionar funcionalidade para o admin criar/gerenciar contas de funcionários com roles/permissões para reduzir risco de sabotagem.
+
 ## 👤 Autor
 
 - Raphael Pires — [LinkedIn](https://www.linkedin.com/in/raphael-pires-516a6b369)
+
+
+
 
 
