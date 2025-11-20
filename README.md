@@ -30,11 +30,21 @@ O projeto utiliza um *stack* moderno e amplamente utilizado no mercado, demonstr
 *   **Visualização de Agenda** e histórico de serviços.
 *   **Sistema de Suporte** (mensagens).
 
+## 📂 Estrutura do Projeto
 
+O repositório está organizado para separar as responsabilidades do backend e do mobile:
 
+OilSmartnovo/
+├── database/               # Scripts SQL (oil.sql) e conexão com o banco (db.js)
+├── mobile/                 # Código-fonte do aplicativo React Native/Expo
+│   ├── src/                # Telas e componentes do mobile
+│   └── README.md           # Documentação detalhada do app mobile
+├── routes/                 # (Futuramente) Rotas modularizadas do Express
+├── public/                 # Arquivos estáticos (se houver)
+├── server.js               # Servidor principal (Node.js/Express)
+└── README.md               # Este arquivo
 
-
-
+    
 ## 🛠️ Como Rodar Localmente
 
 ### 1. Backend (Node.js/Express)
@@ -68,7 +78,22 @@ O projeto utiliza um *stack* moderno e amplamente utilizado no mercado, demonstr
 
 ### 2. Aplicativo Mobile (React Native/Expo)
 
-As instruções detalhadas para rodar o aplicativo mobile estão no `README.md` específico do diretório `mobile/`.
+O aplicativo mobile é um projeto React Native/Expo aninhado no diretório `mobile/`. Para rodá-lo, você deve tratá-lo como um projeto separado.
+
+1.  **Acesse o diretório mobile:**
+    ```bash
+    cd mobile
+    ```
+2.  **Instale as dependências do mobile:**
+    ```bash
+    npm install
+    ```
+3.  **Inicie o projeto Expo:**
+    ```bash
+    npx expo start
+    ```
+4.  **Siga as instruções:** O terminal irá gerar um QR Code. Use o aplicativo **Expo Go** no seu celular para escanear o código e carregar o aplicativo.
+5.  **Configuração da API:** Certifique-se de que a URL do ngrok (obtida na etapa 5 do Backend) foi configurada como a URL base da API dentro do código do aplicativo mobile.
 
 ## 💡 Próximos Passos e Melhorias (Roadmap)
 
