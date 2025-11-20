@@ -1,19 +1,20 @@
+
 # ⚙️ OilSmart: Sistema Inteligente de Agendamento para Oficinas
 
-O **OilSmart** é um sistema completo desenvolvido para otimizar o processo de agendamento e gestão de serviços em oficinas de troca de óleo e manutenção veicular.  
-
-O projeto possui dois perfis de acesso: **Cliente (Mobile)** e **Administrador / adm-oficina (Web/API)**.
+O **OilSmart** é um sistema completo para agendamento e gestão de serviços em oficinas de troca de óleo e manutenção veicular. O projeto possui dois perfis de acesso: **Cliente (Mobile & Web)** e **Administrador / adm-oficina (Web/API)**.
 
 ---
 
 ## 🚀 Tecnologias Utilizadas
 
-| Componente         | Tecnologia                    | Detalhes                                                                            |
+| Componente         | Tecnologia                    | Observações                                                                        |
 | ----------------- | ---------------------------- | ---------------------------------------------------------------------------------- |
-| **Backend**        | Node.js + Express             | Servidor RESTful para lógica de negócios e administração                             |
-| **Banco de Dados** | MySQL                         | Armazenamento de usuários, oficinas, agendamentos e configurações                  |
-| **Mobile**         | React Native + Expo           | Aplicativo móvel para clientes, focado em agendamento e acompanhamento de serviços |
-| **Autenticação**   | bcryptjs, express-session     | Segurança no armazenamento de senhas e gestão de sessões administrativas           |
+| **Backend**        | Node.js + Express             | API REST, middlewares, rotas em `routes/`                                          |
+| **Banco de Dados** | MySQL (mysql2)                | Esquema em `database/oil.sql`, conexão em `database/db.js`                         |
+| **Mobile**         | React Native + Expo           | App cliente (pasta `mobile/`)                                                      |
+| **Frontend (Web)** | HTML / CSS / JS               | Páginas estáticas em `public/html/` usadas pelo cliente e painel administrativo     |
+| **Autenticação**   | bcryptjs, express-session     | Senhas com bcrypt; sessões para admins; JWT em fluxos opcionais                   |
+| **Emails**         | nodemailer                    | Transporter configurável via variáveis de ambiente                                 |
 
 ---
 
@@ -23,67 +24,50 @@ O projeto possui dois perfis de acesso: **Cliente (Mobile)** e **Administrador /
 
 O cliente acessa o aplicativo via **Login/Cadastro**:
 
-- **Autenticação:** Login e cadastro de usuários com validação de campos  
-- **Tela Inicial:** Tutorial e Chatbot para dúvidas  
-- **Agendamento de Serviços:**  
-  - Serviços: Troca de óleo, filtro, etc.  
-  - Agenda em 4 etapas: Veículo → Serviços → Data/Hora → Confirmação (gera protocolo)  
-- **Minha Agenda:** Histórico de agendamentos e cancelamentos  
-- **Suporte:** Histórico de mensagens e contato com a oficina  
-- **Outras Telas:** "Nossa História" e "Ajuda/Suporte"  
+- **Autenticação:** login e cadastro (validação básica no frontend e backend)
+- **Tela Inicial:** tutorial e widget chatbot
+- **Agendamento de Serviços:**
+  - Serviços: troca de óleo, filtro, etc.
+  - Fluxo em 4 etapas: Veículo → Serviços → Data/Hora → Confirmação (gera protocolo)
+- **Minha Agenda:** histórico de agendamentos com status e opção de cancelar
+- **Suporte:** formulário de contato / mensagens vinculadas ao agendamento
+- **Outras telas:** FAQ, políticas e sobre
 
-> ⚠️ Para rodar o mobile, trate-o como projeto **separado**. Copie a pasta `mobile/` para outro diretório antes de instalar dependências.
+> ⚠️ O app mobile está em `mobile/` — rode-o separadamente (veja seção de execução).
 
 ---
 
 ### 2. Administrador / adm-oficina (Web/API)
 
-O administrador acessa via Web/API com login seguro:
+O painel admin provê controle de operações da oficina:
 
 #### A. Configurações da Oficina
 
-- **Horário de Funcionamento:** Definir horário comercial diário  
-- **Intervalo Entre Agendamentos / Duração do Serviço:**  
-  - 30 min → Serviço rápido  
-  - 45 min → Serviço padrão  
-  - 1 h → Serviço completo  
-  - 1h30 → Serviço + revisão  
-  - 2 h → Serviço completo + detalhes  
-- **Capacidade de Atendimento:** Quantidade de clientes simultâneos  
-- **Dias de Funcionamento:** Segunda a Domingo (ativo/fechado)  
-- **Informações da Oficina:** Nome, telefone, endereço  
-- **Preview do Horário:** Visualização automática dos horários configurados  
+- Horário de funcionamento e dias ativos
+- Intervalo entre agendamentos (30m/45m/60m/90m/120m)
+- Capacidade simultânea por horário
+- Dados de contato e endereço
 
 #### B. Dashboard
 
-- Métricas em tempo real: agendamentos do dia, último agendamento, resumo mensal  
-- Status atual: Pendentes, Confirmados, Cancelados  
-- Notificações de novos agendamentos ou ações recentes  
-- Ações rápidas: Acesso à lista de agendamentos, conclusão por protocolo e relatórios  
+- Visualização de métricas: agendamentos do dia, status por categoria, relatórios simples
 
-#### C. Gerenciamento de Agendamentos (CRUD)
+#### C. Gerenciamento de Agendamentos
 
-- Filtros: Status, período, cliente, telefone, veículo, serviço, protocolo  
-- CRUD completo: Criação, leitura, atualização e exclusão de agendamentos  
-- Conclusão rápida por protocolo: ex. `OIL20231201-001`  
+- Filtros por status, cliente, veículo, data e protocolo
+- CRUD completo sobre agendamentos
 
-#### D. Sistema de Gerenciamento OilSmart (Admin Completo)
+#### D. Gestão de Produtos e Catálogo
 
-- **Módulos:** Produtos, Oficinas, Marcas, Modelos, Anos  
-- **Integração:** Conectividade total entre agendamentos, clientes, veículos e serviços  
+- CRUD para `produto_oleo` e `produto_filtro`
+- Vinculação de produtos a modelos/anos (recomendação)
 
 ---
 
-### 3. Problema Atual e Refatoração Futura do Backend
+### 3. Observações de arquitetura e manutenção
 
-O boa parte do backend atual está **concentrado em um único arquivo (`server.js`) com mais de 3.700 linhas**, o que dificulta a manutenção e escalabilidade.  
-
-**Planejamento de melhorias:**
-
-- **Refatoração e Modularização:** Separar rotas, controllers e services  
-- **Padrão MVC:** Facilitar manutenção e futuras integrações  
-- **Testes Unitários:** Garantir que as principais funcionalidades funcionem corretamente  
-- **Validação de Dados:** Adicionar validação robusta usando ferramentas como Joi  
+- Atualmente o `server.js` concentra muitas rotas; ideal migrar para controllers + services
+- Próximos passos técnicos sugeridos: modularização, validação com Joi, testes unitários e integração contínua
 
 ---
 
@@ -91,72 +75,124 @@ O boa parte do backend atual está **concentrado em um único arquivo (`server.j
 
 | Perfil                        | Funcionalidades Principais                                        |
 | ----------------------------- | ---------------------------------------------------------------- |
-| **Cliente (Mobile)**          | Serviços, agendamento, login/criação de conta, suporte           |
-| **Administrador / adm-oficina** | CRUD de agendamentos, dashboard, relatórios, configuração da oficina, gestão de produtos, marcas, modelos e anos |
+| **Cliente (Mobile)**          | Agendamento, histórico, suporte, recomendações por veículo       |
+| **Administrador / adm-oficina** | Dashboard, CRUD de agendamentos, gestão de produtos e configurações |
 
 ---
 
-## 📂 Estrutura do Projeto
+## 📂 Estrutura do Projeto (resumo)
 
 OilSmartnovo/
 
-├── database/ # Scripts SQL (oil.sql) e conexão com o banco (db.js)
-
-├── mobile/ # Projeto React Native/Expo
-
-│ ├── src/ # Telas e componentes
-
-│ └── README.md # Documentação mobile
-
-├── routes/ # Rotas modularizadas do Express
-
-├── public/ # Arquivos estáticos
-
-├── server.js # Servidor Node.js/Express
-
-└── README.md # Este arquivo
-
+- `server.js` — entrada do backend
+- `database/` — `db.js` (conexão) e `oil.sql` (esquema)
+- `routes/` — definições das rotas Express
+- `public/` — frontend estático (HTML/CSS/JS) para painel e site público
+- `mobile/` — app React Native + Expo (cliente)
+- `fix-passwords.js` — script utilitário para atualizar senhas via bcrypt
+- `docs/` — documentação extra (`ARCHITECTURE.md`, `ENDPOINTS.md`)
 
 ---
 
 ## 🛠️ Como Rodar Localmente
 
-### Backend
+Pré-requisitos: Node.js e MySQL.
 
-git clone https://github.com/raphaelpireshp/OilSmartnovo
-cd OilSmartnovo
+1) Instalar dependências (no root):
+
+```powershell
 npm install
+```
 
-Execute database/oil.sql
+2) Configurar banco de dados:
 
+- Edite `database/db.js` com suas credenciais (host, user, password, database).
+- Importe o esquema:
 
-npm start
-# Backend rodando em http://localhost:3000
-Exponha via ngrok para acesso mobile:
+```powershell
+mysql -u <usuario> -p < database/oil.sql
+```
 
+3) Variáveis de ambiente (opcionais / recomendadas)
 
-ngrok http 3000
-Atualize a URL base da API dentro do mobile.
+- `PORT` — porta do servidor (padrão 3000)
+- `SESSION_SECRET` — segredo da sessão
+- `EMAIL_USER`, `EMAIL_PASS` — para `nodemailer` (se usado)
 
-Mobile (React Native / Expo)
-bash
-Copiar código
+4) Iniciar servidor:
+
+```powershell
+node server.js
+```
+
+Servidor padrão: `http://localhost:3000`.
+
+5) Rodar mobile (opcional):
+
+```powershell
 cd mobile
 npm install
 npx expo start
-Escaneie o QR Code com Expo Go
+```
 
-Configure a URL do backend (ngrok) dentro do projeto
+Se testar no dispositivo, exponha a API com `ngrok http 3000` e atualize `baseURL` no cliente mobile.
 
-💡 Próximos Passos e Melhorias
-Refatoração do Backend (modularização, MVC, controllers, services)
+---
 
-Testes unitários para rotas e lógica de agendamento
+## 🔌 Endpoints (resumo técnico)
 
-Validação de dados robusta (ex: Joi)
+Consulte `docs/ENDPOINTS.md` para a lista completa; abaixo estão os endpoints mais usados.
 
-👤 Autor
-Raphael Pires - [LinkedIn](https://www.linkedin.com/in/raphael-pires-516a6b369)
+- `POST /api/auth/login` — { email, senha }
+- `POST /api/auth/register` — cadastro de usuário
+- `POST /api/auth/forgot-password` — solicitar reset
+- `POST /api/auth/reset-password` — redefinir senha
 
-📄 Licença
-Privado - pertence ao OilSmart.
+- `GET /api/oficina` — listar oficinas (filtros por cidade/estado)
+- `GET /api/oficina/:id` — dados da oficina
+- `GET /api/oficina/:id/capacidade` — capacidade/configuração
+
+- `POST /api/agendamento` — criar agendamento
+- `GET /api/agendamento` — listar (filtros)
+- `GET /api/agendamento/:id` — obter por id
+- `PUT /api/agendamento/:id` — atualizar
+- `POST /api/agendamento/:id/cancelar` — cancelar
+
+Exemplo rápido (curl) — login:
+
+```bash
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"usuario@exemplo.com","senha":"123456"}'
+```
+
+Exemplo — criar agendamento (JSON simplificado):
+
+```bash
+curl -X POST http://localhost:3000/api/agendamento \
+  -H "Content-Type: application/json" \
+  -d '{"usuario_id":1,"oficina_id":2,"servicos":[{"id":1,"quantidade":1}],"data":"2025-12-01","hora":"10:00"}'
+```
+
+---
+
+## 🧰 Scripts e utilitários
+
+- `fix-passwords.js` — atualiza senhas de usuários do tipo `oficina` para uma senha padrão (gera hash bcrypt). Use com cautela.
+- `docs/` — documentação gerada: arquitetura e endpoints resumidos.
+
+---
+
+## ✅ Boas práticas e recomendações
+
+- Não comitar `.env` ou credenciais no repositório.
+- Use senha de app para Gmail ou provedor SMTP dedicado para `nodemailer`.
+- Considere refatorar `server.js` em módulos (rotas/controllers/services) antes de escalar.
+
+---
+
+## 👤 Autor
+
+- Raphael Pires — [LinkedIn](https://www.linkedin.com/in/raphael-pires-516a6b369)
+
+
