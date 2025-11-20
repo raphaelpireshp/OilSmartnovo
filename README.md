@@ -1,6 +1,6 @@
-# ⚙️ OilSmartnovo: Sistema Inteligente de Agendamento para Oficinas
+# ⚙️ OilSmart: Sistema Inteligente de Agendamento para Oficinas
 
-O **OilSmartnovo** é um sistema completo desenvolvido para otimizar o processo de agendamento e gestão de serviços em oficinas de troca de óleo e manutenção veicular.  
+O **OilSmart** é um sistema completo desenvolvido para otimizar o processo de agendamento e gestão de serviços em oficinas de troca de óleo e manutenção veicular.  
 
 O projeto possui dois perfis de acesso: **Cliente (Mobile)** e **Administrador / adm-oficina (Web/API)**.
 
@@ -74,7 +74,20 @@ O administrador acessa via Web/API com login seguro:
 
 ---
 
-### 3. Resumo Mobile x Web
+### 3. Problema Atual e Refatoração Futura do Backend
+
+O boa parte do backend atual está **concentrado em um único arquivo (`server.js`) com mais de 3.700 linhas**, o que dificulta a manutenção e escalabilidade.  
+
+**Planejamento de melhorias:**
+
+- **Refatoração e Modularização:** Separar rotas, controllers e services  
+- **Padrão MVC:** Facilitar manutenção e futuras integrações  
+- **Testes Unitários:** Garantir que as principais funcionalidades funcionem corretamente  
+- **Validação de Dados:** Adicionar validação robusta usando ferramentas como Joi  
+
+---
+
+### 4. Resumo Mobile x Web
 
 | Perfil                        | Funcionalidades Principais                                        |
 | ----------------------------- | ---------------------------------------------------------------- |
@@ -86,13 +99,21 @@ O administrador acessa via Web/API com login seguro:
 ## 📂 Estrutura do Projeto
 
 OilSmartnovo/
+
 ├── database/ # Scripts SQL (oil.sql) e conexão com o banco (db.js)
+
 ├── mobile/ # Projeto React Native/Expo
+
 │ ├── src/ # Telas e componentes
+
 │ └── README.md # Documentação mobile
+
 ├── routes/ # Rotas modularizadas do Express
+
 ├── public/ # Arquivos estáticos
+
 ├── server.js # Servidor Node.js/Express
+
 └── README.md # Este arquivo
 
 
@@ -102,39 +123,32 @@ OilSmartnovo/
 
 ### Backend
 
-```bash
 git clone https://github.com/raphaelpireshp/OilSmartnovo
 cd OilSmartnovo
 npm install
 
-
-Configure o banco de dados no .env
-
 Execute database/oil.sql
+
 
 npm start
 # Backend rodando em http://localhost:3000
-
-
 Exponha via ngrok para acesso mobile:
 
+
 ngrok http 3000
-
-
 Atualize a URL base da API dentro do mobile.
 
 Mobile (React Native / Expo)
+bash
+Copiar código
 cd mobile
 npm install
 npx expo start
-
-
 Escaneie o QR Code com Expo Go
 
 Configure a URL do backend (ngrok) dentro do projeto
 
 💡 Próximos Passos e Melhorias
-
 Refatoração do Backend (modularização, MVC, controllers, services)
 
 Testes unitários para rotas e lógica de agendamento
@@ -142,9 +156,7 @@ Testes unitários para rotas e lógica de agendamento
 Validação de dados robusta (ex: Joi)
 
 👤 Autor
-
-Raphael Pires - https://www.linkedin.com/in/raphael-pires-516a6b369
+Raphael Pires - [LinkedIn](https://www.linkedin.com/in/raphael-pires-516a6b369)
 
 📄 Licença
-
 Privado - pertence ao OilSmart.
