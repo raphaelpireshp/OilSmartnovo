@@ -33,19 +33,7 @@ O projeto utiliza um *stack* moderno e amplamente utilizado no mercado, demonstr
 
 
 
-## 📂 Estrutura do Projeto
 
-O repositório está organizado para separar as responsabilidades do backend e do mobile:
-
-OilSmartnovo/
-├── database/               # Scripts SQL (oil.sql) e conexão com o banco (db.js)
-├── mobile/                 # Código-fonte do aplicativo React Native/Expo
-│   ├── src/                # Telas e componentes do mobile
-│   └── README.md           # Documentação detalhada do app mobile
-├── routes/                 # (Futuramente) Rotas modularizadas do Express
-├── public/                 # Arquivos estáticos (se houver)
-├── server.js               # Servidor principal (Node.js/Express)
-└── README.md               # Este arquivo
 
 ## 🛠️ Como Rodar Localmente
 
