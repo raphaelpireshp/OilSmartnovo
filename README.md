@@ -65,10 +65,19 @@ O painel admin provê controle de operações da oficina:
 
 ---
 
-### 3. Observações de arquitetura e manutenção
+### 3. Problema Atual e Refatoração Futura do Backend
 
-- Atualmente o `server.js` concentra muitas rotas; ideal migrar para controllers + services
-- Próximos passos técnicos sugeridos: modularização, validação com Joi, testes unitários e integração contínua
+O backend atual está **concentrado em um único arquivo (`server.js`) com mais de 3.700 linhas**, o que dificulta a manutenção e escalabilidade.
+
+**Planejamento de melhorias:**
+
+- **Refatoração e Modularização:** Separar rotas, controllers e services para responsabilidades claras e testes mais simples.
+- **Padrão MVC:** Reestruturar código em Models, Views (para o frontend se aplicável) e Controllers para facilitar manutenção e integração futura.
+- **Testes Unitários e de Integração:** Adotar testes automatizados (Jest, Mocha/Chai) para garantir regressões controladas e qualidade do código.
+- **Validação de Dados:** Implementar validação robusta em entradas/requests usando bibliotecas como `Joi` ou `express-validator`.
+- **CI/CD e Linters:** Adicionar pipeline de CI (GitHub Actions) e linters (ESLint, Prettier) para manter qualidade e estilo consistentes.
+
+Essas ações reduzem o risco de bugs, melhoram a velocidade de desenvolvimento e facilitam a adoção de novas funcionalidades.
 
 ---
 
