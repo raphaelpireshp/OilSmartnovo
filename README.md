@@ -216,11 +216,11 @@ Itens sugeridos para roadmap e próximas sprints:
 
 ## 👤 Autores
 
-- Raphael Pires — [LinkedIn](https://www.linkedin.com/in/raphael-pires-516a6b369)
-- Diego Ferreira — [LinkedIn](https://www.linkedin.com/in/diego-silva-ferreira-a81b66147)
-- Leonardo Hantke — [LinkedIn](https://www.linkedin.com/in/leonardo-hantke)
-- Pedro Cremonezi — [LinkedIn](https://www.linkedin.com/in/pedro-cremonezi-4213a9285/overlay/about-this-profile/?lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base%3BcqYGOrNzR3qYcJuVYEdO2Q%3D%3D)
-- Luis Barão — [LinkedIn](https://www.linkedin.com/in/luis-santos-62b97739a/overlay/about-this-profile/?lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base%3BaNmZTf0hQ4%2BMTLo99u6qXA%3D%3D)
+- Raphael Pires — [LinkedIn](https://www.linkedin.com/in/raphael-pires-516a6b369) Front e Backend — Web Cliente, Painel Admin e Mobile - Documentação (Word)
+- Diego Ferreira — [LinkedIn](https://www.linkedin.com/in/diego-silva-ferreira-a81b66147) Front-end — Painel Admin (Web) - Documentação (Word)
+- Leonardo Hantke — [LinkedIn](https://www.linkedin.com/in/leonardo-hantke) Front-end — Painel Admin (Web)
+- Pedro Cremonezi — [LinkedIn](https://www.linkedin.com/in/pedro-cremonezi-4213a9285/overlay/about-this-profile/?lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base%3BcqYGOrNzR3qYcJuVYEdO2Q%3D%3D) Front-end Mobile — App Cliente (React Native)
+- Luis Barão — [LinkedIn](https://www.linkedin.com/in/luis-santos-62b97739a/overlay/about-this-profile/?lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base%3BaNmZTf0hQ4%2BMTLo99u6qXA%3D%3D) Backend — Web Cliente
 
 
 
