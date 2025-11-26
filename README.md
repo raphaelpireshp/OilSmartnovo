@@ -216,12 +216,14 @@ Itens sugeridos para roadmap e próximas sprints:
 
 ## 👤 Autores
 
+| **👤 Autores**            | **LinkedIn**                                                           | **Função / Extras**                                                            |
 | ------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
 | **Raphael Pires**   | [LinkedIn](https://www.linkedin.com/in/raphael-pires-516a6b369)        | Front e Backend — Web Cliente, Painel Admin e Mobile — **Documentação (Word)** |
 | **Diego Ferreira**  | [LinkedIn](https://www.linkedin.com/in/diego-silva-ferreira-a81b66147) | Front-end — Painel Admin (Web) — **Documentação (Word)**                       |
 | **Leonardo Hantke** | [LinkedIn](https://www.linkedin.com/in/leonardo-hantke)                | Front-end — Painel Admin (Web)                                                 |
 | **Pedro Cremonezi** | [LinkedIn](https://www.linkedin.com/in/pedro-cremonezi-4213a9285)      | Front-end Mobile — App Cliente (React Native)                                  |
 | **Luis Barão**      | [LinkedIn](https://www.linkedin.com/in/luis-santos-62b97739a)          | Backend — Web Cliente                                                          |
+
 
 
 
