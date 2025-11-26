@@ -214,9 +214,14 @@ Itens sugeridos para roadmap e próximas sprints:
 - **Gerenciar Estoque funcional:** implementar módulo de estoque (CRUD, entradas/saídas, alertas de baixo estoque) integrado ao catálogo de produtos.
 - **Admin cadastrar funcionário:** adicionar funcionalidade para o admin criar/gerenciar contas de funcionários com roles/permissões para reduzir risco de sabotagem.
 
-## 👤 Autor
+## 👤 Autores
 
 - Raphael Pires — [LinkedIn](https://www.linkedin.com/in/raphael-pires-516a6b369)
+- Diego Ferreira — [LinkedIn](https://www.linkedin.com/in/diego-silva-ferreira-a81b66147)
+- Leonardo Hantke — [LinkedIn](https://www.linkedin.com/in/leonardo-hantke)
+- Pedro Cremonezi — [LinkedIn](https://www.linkedin.com/in/pedro-cremonezi-4213a9285/overlay/about-this-profile/?lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base%3BcqYGOrNzR3qYcJuVYEdO2Q%3D%3D)
+- Luis Barão — [LinkedIn](https://www.linkedin.com/in/luis-santos-62b97739a/overlay/about-this-profile/?lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base%3BaNmZTf0hQ4%2BMTLo99u6qXA%3D%3D)
+
 
 
 
