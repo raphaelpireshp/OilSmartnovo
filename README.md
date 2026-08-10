@@ -65,19 +65,18 @@ O painel admin provê controle de operações da oficina:
 
 ---
 
-### 3. Problema Atual e Refatoração Futura do Backend
+### 3. Backend modularizado
 
-O backend atual está **concentrado em um único arquivo (`server.js`) com mais de 3.700 linhas**, o que dificulta a manutenção e escalabilidade.
+O ponto de entrada `server.js` contém apenas a inicialização do servidor. A configuração do Express fica em `app.js`, e as regras foram separadas por responsabilidade:
 
-**Planejamento de melhorias:**
+- `routes/admin/` — sessão, agendamentos, dashboard, relatórios e configurações;
+- `routes/management/` — produtos, catálogo e oficinas;
+- `routes/public/` — consultas públicas de disponibilidade;
+- `middlewares/` — autenticação administrativa e resposta 404 da API;
+- `config/` — configurações compartilhadas;
+- `utils/` — funções utilitárias reutilizáveis.
 
-- **Refatoração e Modularização:** Separar rotas, controllers e services para responsabilidades claras e testes mais simples.
-- **Padrão MVC:** Reestruturar código em Models, Views (para o frontend se aplicável) e Controllers para facilitar manutenção e integração futura.
-- **Testes Unitários e de Integração:** Adotar testes automatizados (Jest, Mocha/Chai) para garantir regressões controladas e qualidade do código.
-- **Validação de Dados:** Implementar validação robusta em entradas/requests usando bibliotecas como `Joi` ou `express-validator`.
-- **CI/CD e Linters:** Adicionar pipeline de CI (GitHub Actions) e linters (ESLint, Prettier) para manter qualidade e estilo consistentes.
-
-Essas ações reduzem o risco de bugs, melhoram a velocidade de desenvolvimento e facilitam a adoção de novas funcionalidades.
+O arquivo `routes/registerRoutes.js` centraliza a ordem de montagem das rotas, preservando a compatibilidade dos endpoints existentes.
 
 ---
 
@@ -94,9 +93,14 @@ Essas ações reduzem o risco de bugs, melhoram a velocidade de desenvolvimento 
 
 OilSmartnovo/
 
-- `server.js` — entrada do backend
+- `server.js` — entrada mínima que inicia o backend
+- `app.js` — configuração do Express e dos middlewares globais
+- `config/` — configuração compartilhada de sessão
+- `middlewares/` — middlewares reutilizáveis
 - `database/` — `db.js` (conexão) e `oil.sql` (esquema)
-- `routes/` — definições das rotas Express
+- `routes/` — rotas Express separadas por responsabilidade
+- `utils/` — utilitários compartilhados
+- `scripts/` — validação local do projeto
 - `public/` — frontend estático (HTML/CSS/JS) para painel e site público
 - `mobile/` — app React Native + Expo (cliente)
 - `fix-passwords.js` — script utilitário para atualizar senhas via bcrypt
@@ -146,6 +150,12 @@ npx expo start
 ```
 
 Se testar no dispositivo, exponha a API com `ngrok http 3000` e atualize `baseURL` no cliente mobile.
+
+6) Validar os arquivos JavaScript após alterações:
+
+```powershell
+npm run check
+```
 
 ---
 
@@ -222,7 +232,6 @@ Itens sugeridos para roadmap e próximas sprints:
 | **Leonardo Hantke** | [LinkedIn](https://www.linkedin.com/in/leonardo-hantke)                | Front-end — Painel Admin (Web)                                                                          |
 | **Pedro Cremonezi** | [LinkedIn](https://www.linkedin.com/in/pedro-cremonezi-4213a9285)      | Front-end Mobile — App Cliente (React Native)                                                           |
 | **Luis Barão**      | [LinkedIn](https://www.linkedin.com/in/luis-santos-62b97739a)          | Backend — Web Cliente — **Banco de Dados**                                                              |
-
 
 
 

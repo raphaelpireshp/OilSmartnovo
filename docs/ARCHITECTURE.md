@@ -9,8 +9,13 @@ Componentes principais
   - Telas consomem a API REST do backend e apresentam fluxo de agendamento ao usuário
 
 - Backend (Node.js + Express)
-  - Arquivo principal: `server.js`
-  - Rotas em `routes/` (ex.: `auth.js`, `agendamentoSimples.js`, `oficina.js`, `adminRoutes.js`)
+  - Entrada do processo: `server.js`
+  - Configuração do Express: `app.js`
+  - Registro central de rotas: `routes/registerRoutes.js`
+  - Rotas administrativas: `routes/admin/`
+  - Rotas de gestão: `routes/management/`
+  - Rotas públicas: `routes/public/`
+  - Middlewares compartilhados: `middlewares/`
   - Autenticação: `bcryptjs`, `express-session` (sessões para admins); JWT usado em alguns fluxos
 
 - Banco de dados (MySQL)
