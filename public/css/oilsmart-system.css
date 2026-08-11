@@ -1,0 +1,317 @@
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,700&family=Inter:wght@400;500;600;700&display=swap');
+
+/* Identidade compartilhada entre cliente, oficina, gestão e autenticação. */
+:root {
+    color-scheme: light;
+    --oil-navy: #213f57;
+    --oil-navy-deep: #132838;
+    --oil-navy-soft: #2a4f6d;
+    --oil-gold: #ffd700;
+    --oil-gold-muted: #b49434;
+    --oil-gold-soft: #d4b15f;
+    --oil-canvas: #f3f5f6;
+    --oil-surface: #ffffff;
+    --oil-surface-raised: #ffffff;
+    --oil-surface-soft: #e9eef1;
+    --oil-ink: #17232d;
+    --oil-copy: #53626e;
+    --oil-muted: #71808b;
+    --oil-line: #d8e0e5;
+    --oil-shadow: 0 18px 45px rgba(19, 40, 56, .10);
+    --oil-font-display: 'Barlow Condensed', sans-serif;
+    --oil-font-body: 'Inter', sans-serif;
+
+    /* Compatibilidade com as telas antigas. */
+    --primary-color: var(--oil-navy);
+    --primary-dark: var(--oil-navy-deep);
+    --primary-light: var(--oil-navy-soft);
+    --secondary-color: var(--oil-gold-muted);
+    --secondary-dark: #977a28;
+    --secondary-light: var(--oil-gold-soft);
+    --accent-color: var(--oil-gold);
+    --accent-gold: var(--oil-gold);
+    --bg-color: var(--oil-canvas);
+    --bg-light: var(--oil-surface);
+    --bg-lighter: var(--oil-surface-soft);
+    --light-color: var(--oil-surface-soft);
+    --card-bg: var(--oil-surface-raised);
+    --text-color: var(--oil-ink);
+    --text-light: var(--oil-copy);
+    --text-lighter: var(--oil-muted);
+    --border-color: var(--oil-line);
+    --border-light: var(--oil-line);
+}
+
+html { background: var(--oil-canvas); scroll-behavior: smooth; }
+body.oil-page {
+    background: var(--oil-canvas);
+    color: var(--oil-ink);
+    font-family: var(--oil-font-body);
+    -webkit-font-smoothing: antialiased;
+}
+
+.oil-page h1,
+.oil-page h2,
+.oil-page h3,
+.oil-page .page-title,
+.oil-page .section-title,
+.oil-page .login-title {
+    font-family: var(--oil-font-display);
+    font-weight: 800;
+    letter-spacing: -.015em;
+}
+
+.oil-page input,
+.oil-page select,
+.oil-page textarea {
+    color: var(--oil-ink);
+    background-color: var(--oil-surface);
+    border-color: var(--oil-line);
+}
+.oil-page input::placeholder,
+.oil-page textarea::placeholder { color: var(--oil-muted); opacity: 1; }
+.oil-page input:focus,
+.oil-page select:focus,
+.oil-page textarea:focus {
+    border-color: var(--oil-gold-muted);
+    outline: 2px solid color-mix(in srgb, var(--oil-gold) 22%, transparent);
+    outline-offset: 1px;
+}
+.oil-page option { color: var(--oil-ink); background: var(--oil-surface); }
+.oil-page :focus-visible { outline: 2px solid var(--oil-gold); outline-offset: 3px; }
+
+/* Cliente: mesmo cabeçalho editorial e mais presença para a marca. */
+.oil-client .header {
+    height: 84px;
+    background: rgba(26, 50, 70, .97);
+    border-bottom: 1px solid rgba(255,255,255,.12);
+    box-shadow: 0 12px 35px rgba(10,22,31,.16);
+    backdrop-filter: blur(14px);
+}
+.oil-client .header.scrolled { height: 72px; background: rgba(19,40,56,.99); }
+.oil-client .navbar { height: 100%; padding: 0; }
+.oil-client .logo { width: 190px; height: 78px; display: flex; align-items: center; overflow: hidden; }
+.oil-client .logo a { display: flex; align-items: center; width: 100%; height: 100%; }
+.oil-client .logo img {
+    width: 190px;
+    height: 78px;
+    object-fit: contain;
+    transform: scale(2.1);
+    transform-origin: center;
+    filter: drop-shadow(0 3px 8px rgba(0,0,0,.24));
+}
+.oil-client .logo img:hover { transform: scale(2.16); }
+.oil-client .nav__list { gap: clamp(8px, 1.5vw, 24px); }
+.oil-client .nav__list a {
+    padding: 10px 3px;
+    border-radius: 0;
+    color: rgba(255,255,255,.76);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+.oil-client .nav__list a::before { display: none; }
+.oil-client .nav__list a::after { height: 2px; bottom: 0; background: var(--oil-gold); }
+.oil-client .nav__list a.active,
+.oil-client .nav__list a:hover { color: #fff; transform: none; }
+.oil-client .main-content { background: var(--oil-canvas); }
+.oil-client .section-title,
+.oil-client .about-section h2,
+.oil-client .contact-form-section h2 { color: var(--oil-navy-deep); text-transform: uppercase; }
+.oil-client .btn-primary {
+    color: var(--oil-navy-deep);
+    background: var(--oil-gold);
+    border-radius: 0;
+    box-shadow: 7px 7px 0 rgba(19,40,56,.16);
+    text-transform: uppercase;
+    letter-spacing: .05em;
+}
+.oil-client .btn-primary:hover { background: var(--oil-gold-soft); box-shadow: 7px 10px 0 rgba(19,40,56,.16); }
+.oil-client .dropdown-menu,
+.oil-client .user-info,
+.oil-client .dropdown-item { color: var(--oil-ink); background-color: var(--oil-surface-raised); border-color: var(--oil-line); }
+.oil-client .dropdown-item:hover { background-color: var(--oil-surface-soft); }
+.oil-client .user-info strong { color: var(--oil-ink); }
+.oil-client .footer { background: var(--oil-navy-deep); }
+
+/* Cards e blocos públicos: menos arredondados, mais editoriais. */
+.oil-client :is(.service-card,.feature-card,.contact-card,.info-card,.faq-item,.appointment-card,.vehicle-card,.vehicle-item,.detail-section,.form-section,.modal-content,.workshop-popup,.filter-controls) {
+    color: var(--oil-ink);
+    background-color: var(--oil-surface-raised);
+    border-color: var(--oil-line);
+    border-radius: 2px;
+    box-shadow: var(--oil-shadow);
+}
+.oil-client :is(.service-card,.feature-card,.contact-card,.info-card)::before { border-radius: 0; }
+.oil-client :is(.service-card,.feature-card,.contact-card):hover { transform: translateY(-6px); }
+.oil-client :is(.appointment-header,.appointment-body,.appointment-footer,.filters-bar,.contact-form) {
+    color: var(--oil-ink);
+    background: var(--oil-surface-raised);
+    border-color: var(--oil-line);
+}
+.oil-client .filter-select,
+.oil-client .leaflet-popup-content-wrapper,
+.oil-client .leaflet-popup-tip { color: var(--oil-ink); background: var(--oil-surface-raised); }
+
+/* Oficina: navegação técnica escura e superfícies consistentes. */
+.oil-workshop .sidebar { background: var(--oil-navy-deep); border-right: 1px solid rgba(255,255,255,.1); }
+.oil-workshop .sidebar-header { border-bottom-color: rgba(255,255,255,.12); }
+.oil-workshop .sidebar-logo { color: var(--oil-navy-deep); background: var(--oil-gold); border-radius: 0; }
+.oil-workshop .sidebar-header h2,
+.oil-workshop .sidebar-header p,
+.oil-workshop .sidebar-nav a,
+.oil-workshop .sidebar-footer { color: rgba(255,255,255,.78); }
+.oil-workshop .sidebar-nav .nav-link.active,
+.oil-workshop .sidebar-nav .nav-link:hover { color: var(--oil-navy-deep); background: var(--oil-gold); border-radius: 0; }
+.oil-workshop .main-content,
+.oil-workshop .content-area { background: var(--oil-canvas); }
+.oil-workshop .main-header {
+    color: var(--oil-ink);
+    background: color-mix(in srgb, var(--oil-surface-raised) 92%, transparent);
+    border-bottom: 1px solid var(--oil-line);
+    backdrop-filter: blur(12px);
+}
+.oil-workshop :is(.metric-card,.activities-card,.chart-card,.info-card,.content-card,.form-section,.filters-bar,.relatorios-container,.appointment-card,.stock-card,.modal-content,.detail-section) {
+    color: var(--oil-ink);
+    background: var(--oil-surface-raised);
+    border-color: var(--oil-line);
+    border-radius: 2px;
+    box-shadow: var(--oil-shadow);
+}
+.oil-workshop :is(table,thead,tbody,tr,th,td) { border-color: var(--oil-line); }
+.oil-workshop thead,
+.oil-workshop th { color: var(--oil-ink); background: var(--oil-surface-soft); }
+.oil-workshop .btn-primary { color: var(--oil-navy-deep); background: var(--oil-gold); border-radius: 0; }
+
+/* Gestão geral. */
+.oil-management > header { background: var(--oil-navy-deep); border-bottom: 3px solid var(--oil-gold); }
+.oil-management .header-content h1 { color: #fff; }
+.oil-management .tabs,
+.oil-management .tab-content,
+.oil-management .form-section,
+.oil-management .search-section,
+.oil-management .card,
+.oil-management .modal-content {
+    color: var(--oil-ink);
+    background: var(--oil-surface-raised);
+    border-color: var(--oil-line);
+    border-radius: 2px;
+    box-shadow: var(--oil-shadow);
+}
+.oil-management .tab { color: var(--oil-copy); }
+.oil-management .tab.active { color: var(--oil-navy-deep); background: var(--oil-gold); border-radius: 0; }
+.oil-management :is(.btn-primary,button[type='submit']) { color: var(--oil-navy-deep); background: var(--oil-gold); border-radius: 0; }
+
+/* Login e recuperação de senha. */
+.oil-auth {
+    position: relative;
+    background:
+        linear-gradient(115deg, color-mix(in srgb, var(--oil-navy-deep) 94%, transparent), color-mix(in srgb, var(--oil-navy) 82%, transparent)),
+        url('/img/carro1.jpg') center / cover fixed;
+}
+.oil-auth::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+    background-size: 38px 38px;
+}
+.oil-auth .login-card,
+.oil-auth .auth-card,
+.oil-auth .container-login {
+    color: var(--oil-ink);
+    background: color-mix(in srgb, var(--oil-surface-raised) 96%, transparent);
+    border: 1px solid var(--oil-line);
+    border-radius: 2px;
+    box-shadow: 18px 18px 0 color-mix(in srgb, var(--oil-gold-muted) 68%, transparent);
+    backdrop-filter: blur(15px);
+}
+.oil-auth .login-card::before { height: 5px; background: var(--oil-gold); }
+.oil-auth .logo { color: var(--oil-navy-deep); background: var(--oil-gold); border-radius: 0; }
+.oil-auth :is(.login-button,.btn-login,.btn-primary,button[type='submit']) {
+    color: var(--oil-navy-deep);
+    background: var(--oil-gold);
+    border-radius: 0;
+}
+
+.oil-back-to-top {
+    position: fixed;
+    right: 26px;
+    bottom: 26px;
+    z-index: 890;
+    width: 46px;
+    height: 46px;
+    display: grid;
+    place-items: center;
+    color: var(--oil-navy-deep);
+    background: var(--oil-gold);
+    border: 1px solid var(--oil-navy-deep);
+    box-shadow: 6px 6px 0 rgba(19,40,56,.18);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: opacity .2s ease, visibility .2s ease, transform .2s ease;
+}
+.oil-back-to-top.is-visible { opacity: 1; visibility: visible; transform: translateY(0); }
+.oil-client .oil-back-to-top { bottom: 104px; }
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        color-scheme: dark;
+        --oil-canvas: #0c141b;
+        --oil-surface: #121f28;
+        --oil-surface-raised: #182731;
+        --oil-surface-soft: #22333e;
+        --oil-ink: #f2f5f7;
+        --oil-copy: #c2cbd1;
+        --oil-muted: #9ca9b2;
+        --oil-line: #344752;
+        --oil-shadow: 0 18px 45px rgba(0,0,0,.28);
+        --bg-color: var(--oil-canvas);
+        --bg-light: var(--oil-surface);
+        --bg-lighter: var(--oil-surface-soft);
+        --light-color: var(--oil-surface-soft);
+        --card-bg: var(--oil-surface-raised);
+        --text-color: var(--oil-ink);
+        --text-light: var(--oil-copy);
+        --text-lighter: var(--oil-muted);
+        --border-color: var(--oil-line);
+        --border-light: var(--oil-line);
+    }
+    .oil-client .section-title,
+    .oil-client .about-section h2,
+    .oil-client .contact-form-section h2,
+    .oil-client :is(.service-card,.feature-card,.contact-card,.info-card,.faq-item,.appointment-card,.vehicle-card,.vehicle-item,.detail-section) h2,
+    .oil-client :is(.service-card,.feature-card,.contact-card,.info-card,.faq-item,.appointment-card,.vehicle-card,.vehicle-item,.detail-section) h3 {
+        color: var(--oil-ink);
+    }
+    .oil-client .dropdown-menu,
+    .oil-client .dropdown-menu * { border-color: var(--oil-line) !important; }
+    .oil-client .footer { color: #fff; }
+    .oil-workshop .main-header,
+    .oil-workshop .main-header * { color: var(--oil-ink); }
+    .oil-workshop :is(.metric-card,.activities-card,.chart-card,.info-card,.content-card,.form-section,.filters-bar,.relatorios-container,.appointment-card,.stock-card,.modal-content,.detail-section) :is(h2,h3,h4,p,span,label) {
+        color: inherit;
+    }
+    .oil-management .tab.active { color: var(--oil-navy-deep); }
+    .oil-auth .login-title { color: var(--oil-ink); }
+}
+
+@media (max-width: 1024px) {
+    .oil-client .logo { width: 156px; }
+    .oil-client .logo img { width: 156px; transform: scale(1.82); }
+    .oil-client .logo img:hover { transform: scale(1.88); }
+    .oil-client .dropdown-menu { background-color: var(--oil-surface-raised) !important; border-color: var(--oil-line) !important; }
+}
+@media (max-width: 640px) {
+    .oil-client .header { height: 72px; }
+    .oil-client .logo { width: 132px; height: 66px; }
+    .oil-client .logo img { width: 132px; height: 66px; transform: scale(1.58); }
+    .oil-back-to-top { right: 16px; bottom: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .oil-page *, .oil-page *::before, .oil-page *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}

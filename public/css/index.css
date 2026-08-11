@@ -1,4 +1,5 @@
 :root {
+    color-scheme: light;
     --primary-color: #213f57;
     --primary-dark: #1a3246;
     --primary-light: #2a4f6d;
@@ -92,8 +93,8 @@ img { max-width: 100%; display: block; }
     box-shadow: 0 12px 35px rgba(10, 22, 31, .22);
 }
 .header-inner { height: 100%; display: flex; align-items: center; justify-content: space-between; gap: 32px; }
-.brand { flex: 0 0 auto; }
-.brand img { width: 142px; height: 64px; object-fit: contain; }
+.brand { flex: 0 0 auto; width: 190px; height: 78px; display: flex; align-items: center; overflow: hidden; }
+.brand img { width: 190px; height: 78px; object-fit: contain; transform: scale(2.1); transform-origin: center; }
 .landing-nav { display: flex; align-items: center; gap: clamp(20px, 2.6vw, 42px); }
 .landing-nav a {
     position: relative;
@@ -447,7 +448,8 @@ img { max-width: 100%; display: block; }
 @media (max-width: 780px) {
     .container { width: min(calc(100% - 32px), var(--container)); }
     .header { height: 70px; }
-    .brand img { width: 112px; height: 52px; }
+    .brand { width: 138px; height: 62px; }
+    .brand img { width: 138px; height: 62px; transform: scale(1.72); }
     .header-cta { min-height: 40px; padding: 0 13px; font-size: 10px; }
     .hero { min-height: 720px; max-height: none; }
     .hero-media { background-position: 63% center; }
@@ -512,4 +514,35 @@ img { max-width: 100%; display: block; }
     *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
     .has-custom-cursor, .has-custom-cursor * { cursor: auto !important; }
     .oil-cursor-dot, .oil-cursor-ring { display: none; }
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        color-scheme: dark;
+        --ink: #f2f5f7;
+        --text: #d1d8dd;
+        --muted: #a9b4bc;
+        --line: #344752;
+        --paper: #0c141b;
+        --paper-alt: #15232d;
+    }
+    .services-section,
+    .workshop-section { color: var(--text); }
+    .section-heading h2,
+    .workshop-copy h2,
+    .service-row h3,
+    .workshop-benefits li { color: var(--ink); }
+    .service-row > i { color: var(--secondary-light); }
+    .service-ledger { border-top-color: var(--line); }
+    .dashboard-preview { box-shadow: 28px 28px 0 #806c2c; }
+    .chatbot-widget,
+    .chatbot-input,
+    .message-content,
+    .quick-option,
+    .faq-question,
+    .chatbot-back-btn { color: var(--text); background: #182731; border-color: var(--line); }
+    .question-category { color: var(--secondary-light); }
+    .chatbot-input input { color: var(--ink); background: #0f1b23; border-color: var(--line); }
+    .user-message .message-content { color: #fff; background: var(--primary-color); border-color: var(--primary-light); }
+    .phone-screen { background: #101820; }
 }
