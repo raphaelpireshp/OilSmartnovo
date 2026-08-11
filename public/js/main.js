@@ -120,43 +120,72 @@ document.addEventListener('DOMContentLoaded', function () {
     // Verificar status de login
     async function checkLoginStatus() {
         const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-        const userData = JSON.parse(localStorage.getItem('user') || '{}');
-        const userId = localStorage.getItem('userId');
+        const storedUser = localStorage.getItem('userData') || localStorage.getItem('user');
+        const token = localStorage.getItem('token');
+        let userData = null;
 
-        if (isLoggedIn && userData && userId) {
+        try {
+            userData = storedUser ? JSON.parse(storedUser) : null;
+        } catch (error) {
+            console.warn('Dados locais de usuário inválidos:', error);
+        }
+
+        // Atualiza o header imediatamente, sem depender de um clique no botão.
+        if (isLoggedIn && userData && (userData.nome || userData.email)) {
+            updateUserInterface(userData);
+        }
+
+        if (isLoggedIn && token) {
             try {
                 // Verificar no servidor se o login ainda é válido
-                const response = await fetch('http://localhost:3000/api/auth/check-login', {
-                    method: 'POST',
+                const response = await fetch('/api/auth/check-login', {
+                    method: 'GET',
                     headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ userId: userId })
+                        'Authorization': `Bearer ${token}`
+                    }
                 });
 
                 if (response.ok) {
                     const result = await response.json();
 
                     if (result.loggedIn) {
+                        localStorage.setItem('user', JSON.stringify(result.user));
+                        localStorage.setItem('userData', JSON.stringify(result.user));
+                        localStorage.setItem('userId', result.user.id);
                         updateUserInterface(result.user);
-                        userDropdown.classList.add('user-logged-in');
                         return;
                     }
                 }
-            } catch (error) {
-                console.error('Erro ao verificar login:', error);
-                // Se der erro, usa os dados locais
-                if (userData.nome || userData.email) {
-                    updateUserInterface(userData);
-                    userDropdown.classList.add('user-logged-in');
+
+                // Respostas 401/403 significam sessão expirada de verdade.
+                if (response.status === 401 || response.status === 403) {
+                    clearClientSession();
+                    updateLoggedOutInterface();
                     return;
                 }
+
+                // Falhas temporárias do servidor não derrubam uma sessão local válida.
+                if (userData && (userData.nome || userData.email)) return;
+            } catch (error) {
+                console.error('Erro ao verificar login:', error);
+                // Sem conexão, preserva temporariamente os dados locais já exibidos.
+                if (userData && (userData.nome || userData.email)) return;
             }
         }
 
         // Se não estiver logado ou dados inválidos
-        userDropdown.classList.remove('user-logged-in');
-        loginStatus.textContent = 'Login';
+        updateLoggedOutInterface();
+    }
+
+    function clearClientSession() {
+        ['isLoggedIn', 'user', 'userData', 'userId', 'token'].forEach(key => localStorage.removeItem(key));
+    }
+
+    function updateLoggedOutInterface() {
+        if (userDropdown) userDropdown.classList.remove('user-logged-in', 'logged-in');
+        if (loginStatus) loginStatus.textContent = 'Login';
+        if (userDisplayName) userDisplayName.textContent = 'Usuário';
+        if (userEmail) userEmail.textContent = 'email@exemplo.com';
     }
 
     // Atualizar interface com dados do usuário
@@ -208,7 +237,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             try {
                 // Chamar API de logout
-                const response = await fetch('http://localhost:3000/api/auth/logout', {
+                const response = await fetch('/api/auth/logout', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -216,9 +245,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
 
                 // Mesmo se a API falhar, faz logout localmente
-                localStorage.removeItem('isLoggedIn');
-                localStorage.removeItem('user');
-                localStorage.removeItem('userId');
+                clearClientSession();
 
                 showToast('Você foi deslogado com sucesso', 'success');
 
@@ -237,9 +264,7 @@ document.addEventListener('DOMContentLoaded', function () {
             } catch (error) {
                 console.error('Erro no logout:', error);
                 // Logout local mesmo com erro
-                localStorage.removeItem('isLoggedIn');
-                localStorage.removeItem('user');
-                localStorage.removeItem('userId');
+                clearClientSession();
                 userDropdown.classList.remove('user-logged-in');
                 loginStatus.textContent = 'Login';
                 dropdownMenu.style.display = 'none';
@@ -293,6 +318,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Verificar login também quando a página ganha foco
     window.addEventListener('focus', checkLoginStatus);
+
+    // Cobre retorno pelo histórico/bfcache e login realizado em outra aba.
+    window.addEventListener('pageshow', checkLoginStatus);
+    window.addEventListener('storage', event => {
+        if (['isLoggedIn', 'user', 'userData', 'token'].includes(event.key)) checkLoginStatus();
+    });
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') checkLoginStatus();
+    });
     
     // Verificar login periodicamente (a cada 30 segundos)
     setInterval(checkLoginStatus, 30000);

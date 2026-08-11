@@ -11,9 +11,14 @@ class AuthManager {
 
     checkLoginStatus() {
         const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-        const userData = localStorage.getItem('userData');
-        
-        this.updateUI(isLoggedIn, userData ? JSON.parse(userData) : null);
+        const userData = localStorage.getItem('userData') || localStorage.getItem('user');
+
+        try {
+            this.updateUI(isLoggedIn, userData ? JSON.parse(userData) : null);
+        } catch (error) {
+            console.warn('Não foi possível restaurar os dados do usuário:', error);
+            this.updateUI(false);
+        }
     }
 
     updateUI(isLoggedIn, userData = null) {
@@ -102,7 +107,7 @@ class AuthManager {
         const rememberMe = form.querySelector('#remember-me')?.checked;
 
         try {
-            const response = await fetch('http://localhost:3000/api/auth/login', {
+            const response = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -149,6 +154,8 @@ class AuthManager {
     handleLogout() {
         localStorage.removeItem('isLoggedIn');
         localStorage.removeItem('userData');
+        localStorage.removeItem('user');
+        localStorage.removeItem('userId');
         localStorage.removeItem('token');
         
         this.updateUI(false);
@@ -217,4 +224,3 @@ getUserId() {
 document.addEventListener('DOMContentLoaded', () => {
     window.authManager = new AuthManager();
 });
-

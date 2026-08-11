@@ -75,6 +75,44 @@ router.post('/login', (req, res) => {
     });
 });
 
+// Valida automaticamente a sessão do cliente ao abrir ou retornar para uma página.
+router.get('/check-login', (req, res) => {
+    const authorization = req.headers.authorization || '';
+    const token = authorization.startsWith('Bearer ') ? authorization.slice(7) : null;
+
+    if (!token) {
+        return res.status(401).json({ loggedIn: false, message: 'Sessão não encontrada' });
+    }
+
+    try {
+        const payload = jwt.verify(token, SECRET);
+
+        db.query(
+            'SELECT id, nome, email, tipo FROM usuario WHERE id = ? LIMIT 1',
+            [payload.id],
+            (err, results) => {
+                if (err) {
+                    console.error('Erro ao validar sessão do cliente:', err);
+                    return res.status(500).json({ loggedIn: false, message: 'Erro interno do servidor' });
+                }
+
+                if (!results.length) {
+                    return res.status(401).json({ loggedIn: false, message: 'Usuário não encontrado' });
+                }
+
+                return res.json({ loggedIn: true, user: results[0] });
+            }
+        );
+    } catch (error) {
+        return res.status(401).json({ loggedIn: false, message: 'Sessão inválida ou expirada' });
+    }
+});
+
+// O login do cliente usa JWT; encerrar no servidor confirma a ação para o front.
+router.post('/logout', (req, res) => {
+    res.json({ success: true, message: 'Sessão encerrada' });
+});
+
 // Registro
 router.post('/register', async (req, res) => {
     const { nome, email, senha, tipo, telefone, cpf, endereco, cep, cidade, estado } = req.body;

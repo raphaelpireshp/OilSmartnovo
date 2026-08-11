@@ -515,3 +515,158 @@ body.oil-page {
     .client-action { width: 100%; }
     .client-next-step small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 }
+
+/* Navegação de retorno para a landing. */
+.client-back-site {
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 12px;
+    color: rgba(255,255,255,.72);
+    border: 1px solid rgba(255,255,255,.18);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color .2s ease, border-color .2s ease, background .2s ease;
+}
+.client-back-site:hover { color: var(--oil-navy-deep); border-color: var(--oil-gold); background: var(--oil-gold); }
+
+/* Páginas internas do cliente: o mesmo ritmo editorial do index. */
+.oil-client:not(.client-home) .main-content { min-height: calc(100vh - 84px); padding-top: 84px; background: var(--oil-canvas); }
+.oil-client:not(.client-home) .hero-banner {
+    height: 390px !important;
+    min-height: 390px !important;
+    max-height: 390px !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+    background: var(--oil-navy-deep) !important;
+}
+.oil-client:not(.client-home) .hero-carousel img { filter: brightness(.58) contrast(1.08) !important; }
+.oil-client:not(.client-home) .hero-overlay {
+    background: linear-gradient(90deg, rgba(12,27,38,.96), rgba(19,40,56,.72) 54%, rgba(19,40,56,.28)) !important;
+    backdrop-filter: none !important;
+}
+.oil-client:not(.client-home) .hero-content { width: min(90%, 1200px) !important; max-width: 1200px !important; margin-inline: auto !important; padding: 30px 15px !important; text-align: left !important; }
+.oil-client:not(.client-home) .hero-content::before {
+    content: 'OilSmart • Área do cliente';
+    display: block;
+    margin-bottom: 13px;
+    color: var(--oil-gold);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+}
+.oil-client:not(.client-home) .hero-content h1 {
+    margin: 0 !important;
+    color: #fff !important;
+    font: 800 clamp(42px, 4.5vw, 62px)/.95 var(--oil-font-display) !important;
+    letter-spacing: -.025em !important;
+    text-transform: uppercase;
+    text-shadow: none !important;
+}
+.oil-client:not(.client-home) .hero-content p { max-width: 600px; margin: 15px 0 24px !important; color: rgba(255,255,255,.7) !important; font-size: 15px !important; text-shadow: none !important; }
+.oil-client:not(.client-home) .hero-content .btn { border-radius: 0 !important; }
+.oil-client:not(.client-home) .hero-divider { height: 8px !important; margin: 0 !important; border-radius: 0 !important; background: var(--oil-gold) !important; box-shadow: none !important; }
+
+.oil-client:not(.client-home) .page-title {
+    margin: 50px 0 8px;
+    color: var(--oil-ink);
+    font: 800 clamp(38px, 4vw, 54px)/1 var(--oil-font-display);
+    letter-spacing: -.02em;
+    text-align: left;
+    text-transform: uppercase;
+}
+.oil-client:not(.client-home) .page-title::before {
+    content: '';
+    width: 38px;
+    height: 2px;
+    display: inline-block;
+    margin: 0 12px 12px 0;
+    background: var(--oil-gold-muted);
+}
+.oil-client:not(.client-home) .page-subtitle { max-width: none; margin: 0 0 38px; color: var(--oil-copy); text-align: left; }
+.oil-client:not(.client-home) :is(.agenda-container,.service-flow,.about-container,.contact-info-section,.contact-form-section,.faq-container,.privacy-content,.terms-content) {
+    color: var(--oil-ink);
+}
+.oil-client:not(.client-home) :is(.reminder-card,.history-section,.service-step,.about-section,.contact-card,.contact-form,.faq-item,.privacy-section,.terms-section) {
+    color: var(--oil-ink);
+    background: var(--oil-surface-raised);
+    border-color: var(--oil-line);
+    border-radius: 2px;
+    box-shadow: var(--oil-shadow);
+}
+.oil-client:not(.client-home) :is(.section-header,.service-step > h2,.about-section h2,.contact-form-section h2) {
+    color: var(--oil-ink);
+    font-family: var(--oil-font-display);
+    text-transform: uppercase;
+}
+.oil-client:not(.client-home) .progress-container { margin-top: 42px; padding: 22px 30px; background: var(--oil-navy-deep); border-bottom: 3px solid var(--oil-gold); }
+.oil-client:not(.client-home) .progress-step .step-label { color: rgba(255,255,255,.62); }
+.oil-client:not(.client-home) .progress-step.active .step-label { color: var(--oil-gold); }
+.oil-client:not(.client-home) .progress-step .step-bubble { border-color: rgba(255,255,255,.28); background: var(--oil-navy); }
+.oil-client:not(.client-home) .progress-step.active .step-bubble { color: var(--oil-navy-deep); border-color: var(--oil-gold); background: var(--oil-gold); }
+.oil-client:not(.client-home) .filter-controls { padding: 18px; border-left: 3px solid var(--oil-gold-muted); }
+
+/* Tutorial do painel da oficina. */
+.admin-help-button {
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 13px;
+    color: var(--oil-ink);
+    background: var(--oil-surface-soft);
+    border: 1px solid var(--oil-line);
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.admin-help-button:hover { color: var(--oil-navy-deep); background: var(--oil-gold); border-color: var(--oil-gold); }
+body.tutorial-open { overflow: hidden; }
+.admin-tutorial[hidden] { display: none; }
+.admin-tutorial { position: fixed; inset: 0; z-index: 20000; display: grid; place-items: center; padding: 20px; }
+.admin-tutorial-backdrop { position: absolute; inset: 0; background: rgba(6,15,21,.78); backdrop-filter: blur(8px); }
+.admin-tutorial-dialog {
+    position: relative;
+    width: min(520px, 100%);
+    min-height: 470px;
+    padding: 40px;
+    color: var(--oil-ink);
+    background: var(--oil-surface-raised);
+    border: 1px solid var(--oil-line);
+    border-top: 5px solid var(--oil-gold);
+    box-shadow: 22px 22px 0 rgba(180,148,52,.28);
+    animation: tutorial-enter .28s ease both;
+}
+.admin-tutorial-close { position: absolute; top: 20px; right: 20px; width: 38px; height: 38px; color: var(--oil-copy); background: transparent; cursor: pointer; }
+.admin-tutorial-progress { display: grid; grid-template-columns: repeat(4,1fr); gap: 7px; margin-right: 48px; }
+.admin-tutorial-progress span { height: 3px; background: var(--oil-line); }
+.admin-tutorial-progress span.is-active { background: var(--oil-gold); }
+.admin-tutorial-icon { width: 62px; height: 62px; display: grid; place-items: center; margin-top: 54px; color: var(--oil-navy-deep); background: var(--oil-gold); font-size: 24px; }
+.admin-tutorial-eyebrow { display: block; margin-top: 25px; color: var(--oil-gold-muted); font-size: 10px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+.admin-tutorial-dialog h2 { margin-top: 7px; color: var(--oil-ink); font: 800 clamp(34px, 5vw, 46px)/.95 var(--oil-font-display); text-transform: uppercase; }
+.admin-tutorial-text { min-height: 72px; margin-top: 18px; color: var(--oil-copy); font-size: 14px; line-height: 1.65; }
+.admin-tutorial-count { margin-top: 16px; color: var(--oil-muted); font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.admin-tutorial-actions { display: flex; justify-content: space-between; gap: 12px; margin-top: 22px; }
+.admin-tutorial-actions button { min-height: 44px; padding: 0 20px; font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; cursor: pointer; }
+.admin-tutorial-secondary { color: var(--oil-copy); background: transparent; border: 1px solid var(--oil-line); }
+.admin-tutorial-secondary:disabled { opacity: .35; cursor: default; }
+.admin-tutorial-primary { margin-left: auto; color: var(--oil-navy-deep); background: var(--oil-gold); border: 1px solid var(--oil-gold); }
+@keyframes tutorial-enter { from { opacity: 0; transform: translateY(18px) scale(.98); } }
+
+@media (max-width: 900px) {
+    .client-back-site span { display: none; }
+    .client-back-site { width: 38px; justify-content: center; padding: 0; }
+}
+@media (max-width: 720px) {
+    .oil-client:not(.client-home) .main-content { padding-top: 72px; }
+    .oil-client:not(.client-home) .hero-banner { height: 330px !important; min-height: 330px !important; max-height: 330px !important; }
+    .oil-client:not(.client-home) .hero-content h1 { font-size: 42px !important; }
+    .admin-help-button span { display: none; }
+    .admin-help-button { width: 38px; justify-content: center; padding: 0; }
+    .admin-tutorial-dialog { min-height: 440px; padding: 30px 24px; box-shadow: 10px 10px 0 rgba(180,148,52,.28); }
+}
