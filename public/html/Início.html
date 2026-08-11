@@ -17,25 +17,26 @@
 
 
     <link rel="icon" href="/img/tentativa3.png" type="image/x-icon">
+</head>
 
-<body class="oil-page oil-client">
+<body class="oil-page oil-client client-home">
     <header class="header">
         <div class="container">
 
             <div class="navbar">
-                <button class="hamburger" id="hamburger">
+                <button class="hamburger" id="hamburger" aria-label="Abrir menu" aria-controls="nav">
                     <span class="hamburger-line"></span>
                     <span class="hamburger-line"></span>
                     <span class="hamburger-line"></span>
                 </button>
 
                 <div class="logo">
-                    <a href="index.html"><img src="/img/oilamarelo.png" alt="OilSmart"></a>
+                    <a href="/html/Início.html"><img src="/img/oilamarelo.png" alt="OilSmart"></a>
                 </div>
 
                 <nav class="nav" id="nav">
                     <ul class="nav__list">
-                        <li><a href="/html/index.html" class="active">Início</a></li>
+                        <li><a href="/html/Início.html" class="active">Início</a></li>
                         <li><a href="/html/servicos.html">Serviços</a></li>
                         <li><a href="/html/agenda.html">Agenda</a></li>
                         <li><a href="/html/sobre.html">Sobre</a></li>
@@ -69,408 +70,110 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
     </header>
-    <!-- <li><a href="/html/index.html" class="active">Início</a></li> -->
 
     <main class="main-content">
-        <!-- Banner Hero com Carrossel e Texto -->
-        <section class="hero-banner">
-            <!-- Carrossel como fundo -->
-            <div class="hero-carousel">
-                <div class="carousel-track">
-                    <div class="carousel-slide"><img src="/img/carro1.jpg" alt="Carro 1"></div>
-                    <div class="carousel-slide"><img src="/img/carro2.jpg" alt="Carro 2"></div>
-                    <div class="carousel-slide"><img src="/img/carro3.jpg" alt="Carro 3"></div>
-
-                    <div class="carousel-slide"><img src="/img/carro4.jpg" alt="Carro 4"></div>
-
+        <section class="client-welcome" aria-labelledby="client-welcome-title">
+            <div class="client-welcome-media" aria-hidden="true"></div>
+            <div class="client-welcome-shade" aria-hidden="true"></div>
+            <div class="container client-welcome-layout">
+                <div class="client-welcome-copy">
+                    <span class="client-kicker"><span></span>Sua garagem digital</span>
+                    <h1 id="client-welcome-title">Seu carro em dia.<br><em>Sem complicação.</em></h1>
+                    <p>Encontre o serviço certo, escolha uma oficina próxima e confirme o melhor horário em poucos minutos.</p>
+                    <div class="client-welcome-actions">
+                        <a href="/html/servicos.html" class="client-action client-action-primary">
+                            Agendar serviço <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                        </a>
+                        <a href="/html/agenda.html" class="client-action client-action-outline">
+                            <i class="far fa-calendar" aria-hidden="true"></i> Minha agenda
+                        </a>
+                    </div>
+                    <div class="client-confidence" aria-label="Vantagens da plataforma">
+                        <span><i class="fas fa-check" aria-hidden="true"></i> Escolha orientada</span>
+                        <span><i class="fas fa-check" aria-hidden="true"></i> Oficinas parceiras</span>
+                        <span><i class="fas fa-check" aria-hidden="true"></i> Confirmação online</span>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Overlay escuro com blur -->
-            <div class="hero-overlay"></div>
-
-            <!-- Conteúdo do hero em destaque -->
-            <div class="hero-content container">
-                <h1>Troca de Óleo com Qualidade e Agilidade</h1>
-                <p>Agende online e ganhe 10% de desconto na primeira troca</p>
-                <a href="/html/servicos.html" class="btn btn-primary">Agendar Serviço</a>
+                <aside class="client-next-step" aria-label="Como começar">
+                    <span class="client-card-label">Comece por aqui</span>
+                    <strong>O que você precisa hoje?</strong>
+                    <a href="/html/servicos.html">
+                        <span class="client-step-icon"><i class="fas fa-oil-can" aria-hidden="true"></i></span>
+                        <span><b>Trocar óleo ou filtro</b><small>Veja a indicação para seu veículo</small></span>
+                        <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                    </a>
+                    <a href="/html/servicos.html">
+                        <span class="client-step-icon"><i class="fas fa-screwdriver-wrench" aria-hidden="true"></i></span>
+                        <span><b>Agendar manutenção</b><small>Escolha serviço, oficina e horário</small></span>
+                        <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                    </a>
+                    <a href="/html/agenda.html">
+                        <span class="client-step-icon"><i class="fas fa-calendar-check" aria-hidden="true"></i></span>
+                        <span><b>Acompanhar agendamento</b><small>Consulte seus serviços marcados</small></span>
+                        <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                    </a>
+                </aside>
             </div>
         </section>
-        <div class="hero-divider"></div>
 
-        <style>
-            /* ================= HERO BANNER ================= */
-
-            .hero-banner {
-                position: relative;
-                width: 100%;
-                height: 65vh;
-                min-height: 450px;
-                max-height: 650px;
-                overflow: hidden;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: white;
-                text-align: center;
-                isolation: isolate;
-            }
-
-            /* Carrossel de fundo */
-            .hero-carousel {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                z-index: 1;
-                overflow: hidden;
-            }
-
-            .hero-carousel .carousel-track {
-                display: flex;
-                height: 100%;
-                transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1);
-            }
-
-            .hero-carousel .carousel-slide {
-                min-width: 100%;
-                height: 100%;
-                position: relative;
-            }
-
-            .hero-carousel img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                filter: brightness(0.7) contrast(1.1);
-                transition: transform 10s linear;
-            }
-
-            .hero-carousel .carousel-slide.active img {
-                transform: scale(1.05);
-            }
-
-            /* Overlay escuro com blur */
-            .hero-overlay {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(135deg,
-                        rgba(0, 0, 0, 0.5) 0%,
-                        rgba(0, 0, 0, 0.3) 50%,
-                        rgba(0, 0, 0, 0.5) 100%);
-                backdrop-filter: blur(5px);
-                z-index: 2;
-            }
-
-            /* Conteúdo do banner */
-            .hero-content {
-                position: relative;
-                z-index: 3;
-                padding: 2rem;
-                max-width: 900px;
-                animation: fadeInUp 1s ease-out 0.5s both;
-            }
-
-            .hero-content h1 {
-                font-size: 3rem;
-                font-weight: 700;
-                text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-            }
-
-            .hero-content p {
-                font-size: 1.3rem;
-                margin: 1rem 0 2rem;
-                text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-            }
-
-            /* Botão principal */
-            .btn-primary {
-                background: linear-gradient(135deg, #f7b900, #E05D00);
-                border: none;
-                padding: 14px 35px;
-                font-size: 1.1rem;
-                border-radius: 50px;
-                transition: all 0.3s ease;
-                box-shadow: 0 5px 15px rgba(224, 93, 0, 0.4);
-                position: relative;
-                overflow: hidden;
-            }
-
-            .btn-primary::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: -100%;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-                transition: 0.5s;
-            }
-
-            .btn-primary:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 8px 20px rgba(224, 93, 0, 0.6);
-            }
-
-            .btn-primary:hover::before {
-                left: 100%;
-            }
-
-            /* Indicadores do carrossel */
-            .carousel-indicators {
-                position: absolute;
-                bottom: 25px;
-                left: 50%;
-                transform: translateX(-50%);
-                display: flex;
-                gap: 10px;
-                z-index: 4;
-            }
-
-            .carousel-indicator {
-                width: 12px;
-                height: 12px;
-                border-radius: 50%;
-                background: rgba(255, 255, 255, 0.5);
-                cursor: pointer;
-                transition: all 0.3s ease;
-            }
-
-            .carousel-indicator.active {
-                background: #f7b900;
-                transform: scale(1.2);
-                box-shadow: 0 0 8px rgba(247, 185, 0, 0.8);
-            }
-
-            /* Barra de progresso */
-            .progress-bar {
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                height: 4px;
-                width: 100%;
-                background: rgba(255, 255, 255, 0.2);
-                z-index: 4;
-            }
-
-            .progress-fill {
-                height: 100%;
-                width: 0%;
-                background: #f7b900;
-                transition: width 0.1s linear;
-            }
-
-            /* Animação do conteúdo */
-            @keyframes fadeInUp {
-                from {
-                    opacity: 0;
-                    transform: translateY(40px);
-                }
-
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
-
-            /* ================= DIVISOR ENTRE BANNER E SITE ================= */
-            .hero-divider {
-                width: 100%;
-                height: 40px;
-                background: linear-gradient(to right, #f7b900, #E05D00);
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-                border-radius: 0 0 20px 20px;
-                margin-bottom: 2rem;
-            }
-
-            /* ================= RESPONSIVO ================= */
-            @media (max-width: 992px) {
-                .hero-content h1 {
-                    font-size: 2.4rem;
-                }
-            }
-
-            @media (max-width: 768px) {
-                .hero-banner {
-                    height: 55vh;
-                    min-height: 400px;
-                }
-
-                .hero-content h1 {
-                    font-size: 2rem;
-                }
-
-                .hero-content p {
-                    font-size: 1.1rem;
-                }
-
-                .btn-primary {
-                    padding: 12px 30px;
-                    font-size: 1rem;
-                }
-            }
-
-            @media (max-width: 576px) {
-                .hero-banner {
-                    min-height: 350px;
-                }
-
-                .hero-content h1 {
-                    font-size: 1.7rem;
-                }
-
-                .hero-content {
-                    padding: 1.5rem;
-                }
-            }
-        </style>
-
-
-
-        <div class="container main-grid">
-            <!-- Conteúdo Principal -->
-            <div class="primary-content">
-                <!-- Carrossel de Serviços -->
-                <section class="services-carousel">
-                    <h2 class="section-title">Nossos Serviços Automotivos</h2>
-                    <div class="carousel-container">
-                        <div class="carousel-track">
-                            <div class="carousel-slide">
-                                <div class="service-card">
-                                    <div class="service-icon">
-                                        <i class="fas fa-oil-can"></i>
-                                    </div>
-                                    <h3>Troca de Óleo Completa</h3>
-                                    <p>Óleo e filtro recomendados automaticamente para o seu veículo com base em marca,
-                                        modelo e quilometragem.</p>
-                                    <span class="price">Produtos homologados,<br>Agendamento online,<br>Histórico e
-                                        lembretes automáticos;</span>
-                                    <a href="/html/servicos.html" class="btn btn-secondary">Agendar</a>
-                                </div>
-                            </div>
-
-
-
-                            <div class="carousel-slide">
-                                <div class="service-card">
-                                    <div class="service-icon">
-                                        <i class="fas fa-tools"></i>
-                                    </div>
-                                    <h3>Revisão Lubrificação</h3>
-                                    <p>Verificamos o estado do óleo, filtro, fluido de freio e lubrificantes essenciais
-                                        para garantir o bom funcionamento do motor.</p>
-                                    <span class="price">Avaliação técnica,<br>Recomendação personalizada,<br>Integrado
-                                        ao seu histórico;</span>
-                                    <a href="/html/servicos.html" class="btn btn-secondary">Agendar</a>
-                                </div>
-                            </div>
-                            <div class="carousel-slide">
-                                <div class="service-card">
-                                    <div class="service-icon">
-                                        <i class="fas fa-search-plus"></i>
-                                    </div>
-                                    <h3>Diagnóstico de Óleo Inteligente</h3>
-                                    <p>Análise rápida para saber se está na hora de trocar — mesmo sem saber a
-                                        quilometragem.</p>
-                                    <span class="price">Consulta de cor, textura e viscosidade,<br>Apoio de IA para
-                                        recomendação,<br>Mais segurança para você e seu carro;
-                                    </span>
-                                    <a href="/html/servicos.html" class="btn btn-secondary">Agendar</a>
-                                </div>
-                            </div>
-                            <div class="carousel-slide">
-                                <div class="service-card">
-                                    <div class="service-icon">
-                                        <i class="fas fa-calendar-check"></i>
-                                    </div>
-                                    <h3>Controle de Trocas</h3>
-                                    <p>Fique tranquilo! A OilSmart te avisa quando for hora de trocar o óleo novamente.
-                                    </p>
-                                    <span class="price">Notificações por e-mail,<br>Baseado em uso real do
-                                        veículo,<br>Fidelização com oficinas parceiras;</span>
-                                    <a href="/html/servicos.html" class="btn btn-secondary">Agendar</a>
-                                </div>
-                            </div>
-                        </div>
+        <section class="client-path" aria-labelledby="client-path-title">
+            <div class="container">
+                <div class="client-section-heading">
+                    <div>
+                        <span class="client-kicker client-kicker-dark"><span></span>Como funciona</span>
+                        <h2 id="client-path-title">Você escolhe.<br>A OilSmart organiza.</h2>
                     </div>
-                </section>
+                    <p>Sem ligações e sem descobrir tudo sozinho. A plataforma conduz você do veículo até a confirmação.</p>
+                </div>
 
-                <!-- Seção de Informações sobre Troca de Óleo -->
-                <section class="oil-info-section">
-                    <h2 class="section-title">A Importância da Troca de Óleo Regular</h2>
-                    <div class="info-grid">
-                        <div class="info-card">
-                            <i class="fas fa-cog"></i>
-                            <h3>Proteção do Motor</h3>
-                            <p>O óleo lubrifica as peças móveis do motor, reduzindo o atrito e o desgaste, prolongando a
-                                vida útil do seu veículo.</p>
-                        </div>
-                        <div class="info-card">
-                            <i class="fas fa-temperature-high"></i>
-                            <h3>Controle de Temperatura</h3>
-                            <p>O óleo ajuda a dissipar o calor gerado pela combustão e pelo atrito, evitando
-                                superaquecimento.</p>
-                        </div>
-                        <div class="info-card">
-                            <i class="fas fa-gas-pump"></i>
-                            <h3>Economia de Combustível</h3>
-                            <p>Um motor bem lubrificado trabalha com mais eficiência, reduzindo o consumo de
-                                combustível.</p>
-                        </div>
-                        <div class="info-card">
-                            <i class="fas fa-shield-alt"></i>
-                            <h3>Prevenção de Corrosão</h3>
-                            <p>Aditivos no óleo protegem as peças metálicas contra oxidação e corrosão.</p>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Como Funciona o Agendamento -->
-                <section class="special-offers">
-                    <h2 class="section-title">Como Funciona o Agendamento</h2>
-                    <div class="offer-cards">
-
-                        <!-- Passo 1 -->
-                        <div class="offer-card highlight">
-                            <div class="offer-badge">Passo 1</div>
-                            <h3>Dados do Veículo e Localização</h3>
-                            <p>Informe a marca, modelo, ano e quilometragem (opcional) do seu veículo e selecione a
-                                localização desejada.</p>
-                            <a href="/html/veiculo-localizacao.html" class="btn btn-primary">Inserir Dados</a>
-                        </div>
-
-                        <!-- Passo 2 -->
-                        <div class="offer-card">
-                            <div class="offer-badge">Passo 2</div>
-                            <h3>Escolha a Oficina e Produtos</h3>
-                            <p>Selecione a oficina mais conveniente e os produtos ou serviços que deseja realizar.</p>
-                            <a href="/html/oficinas-produtos.html" class="btn btn-secondary">Ver Oficinas e Produtos</a>
-                        </div>
-
-                        <!-- Passo 3 -->
-                        <div class="offer-card">
-                            <div class="offer-badge">Passo 3</div>
-                            <h3>Agende o Horário</h3>
-                            <p>Escolha a data e horário disponíveis, informe seus dados pessoais e confirme o
-                                agendamento.</p>
-                            <a href="/html/agendamento.html" class="btn btn-secondary">Agendar Agora</a>
-                        </div>
-
-                    </div>
-                </section>
-
-
+                <ol class="client-path-list">
+                    <li>
+                        <span class="client-path-number">01</span>
+                        <i class="fas fa-car-side" aria-hidden="true"></i>
+                        <div><h3>Conte qual é o seu carro</h3><p>Marca, modelo e ano ajudam a mostrar opções compatíveis.</p></div>
+                    </li>
+                    <li>
+                        <span class="client-path-number">02</span>
+                        <i class="fas fa-location-dot" aria-hidden="true"></i>
+                        <div><h3>Escolha serviço e oficina</h3><p>Compare as opções disponíveis e selecione a mais conveniente.</p></div>
+                    </li>
+                    <li>
+                        <span class="client-path-number">03</span>
+                        <i class="fas fa-calendar-check" aria-hidden="true"></i>
+                        <div><h3>Confirme o horário</h3><p>Finalize online e consulte os detalhes sempre que precisar.</p></div>
+                    </li>
+                </ol>
             </div>
+        </section>
 
-            <!-- Sidebar -->
-            <aside class="sidebar">
-            </aside>
-        </div>
+        <section class="client-tools" aria-labelledby="client-tools-title">
+            <div class="container client-tools-layout">
+                <div class="client-tools-copy">
+                    <span class="client-kicker"><span></span>Tudo no mesmo lugar</span>
+                    <h2 id="client-tools-title">Menos dúvida.<br>Mais controle.</h2>
+                    <p>A OilSmart concentra o essencial para você cuidar do carro sem transformar manutenção em pesquisa interminável.</p>
+                    <a href="/html/servicos.html" class="client-action client-action-primary">Começar agora <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+                </div>
+                <div class="client-tool-grid">
+                    <article><i class="fas fa-oil-can" aria-hidden="true"></i><h3>Produto compatível</h3><p>Indicações de óleo e filtro conforme o veículo informado.</p></article>
+                    <article><i class="fas fa-map-location-dot" aria-hidden="true"></i><h3>Oficinas próximas</h3><p>Localização e opções reunidas para facilitar sua escolha.</p></article>
+                    <article><i class="fas fa-clock-rotate-left" aria-hidden="true"></i><h3>Histórico acessível</h3><p>Seus agendamentos ficam organizados em uma única área.</p></article>
+                    <article><i class="fas fa-bell" aria-hidden="true"></i><h3>Lembretes úteis</h3><p>Mais tranquilidade para não perder o momento da manutenção.</p></article>
+                </div>
+            </div>
+        </section>
+
+        <section class="client-final-cta">
+            <div class="container client-final-cta-layout">
+                <div><span>Pronto para cuidar do seu carro?</span><h2>Seu próximo serviço começa aqui.</h2></div>
+                <a href="/html/servicos.html" class="client-action client-action-dark">Agendar agora <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+            </div>
+        </section>
+
     </main>
 
     <footer class="footer">
@@ -543,92 +246,6 @@
 
     <script src="/js/main.js"></script>
     <script src="/js/oilsmart-system.js"></script>
-    <script>
-        // Script aprimorado para o carrossel
-        document.addEventListener("DOMContentLoaded", function () {
-            const track = document.querySelector(".hero-carousel .carousel-track");
-            const slides = document.querySelectorAll(".hero-carousel .carousel-slide");
-            const indicators = document.querySelectorAll(".carousel-indicator");
-            let index = 0;
-            let interval;
-
-            function updateCarousel() {
-                track.style.transform = `translateX(-${index * 100}%)`;
-
-                // Atualiza classes ativas
-                slides.forEach(slide => slide.classList.remove('active'));
-                slides[index].classList.add('active');
-
-                indicators.forEach(indicator => indicator.classList.remove('active'));
-                indicators[index].classList.add('active');
-            }
-
-            // Inicia auto-play
-            function startAutoPlay() {
-                interval = setInterval(() => {
-                    index = (index + 1) % slides.length;
-                    updateCarousel();
-                }, 4000);
-            }
-
-            // Para auto-play ao interagir
-            function stopAutoPlay() {
-                clearInterval(interval);
-            }
-
-            // Adiciona eventos aos indicadores
-            indicators.forEach(indicator => {
-                indicator.addEventListener('click', function () {
-                    stopAutoPlay();
-                    index = parseInt(this.getAttribute('data-index'));
-                    updateCarousel();
-                    startAutoPlay();
-                });
-            });
-
-            // Pausa ao passar o mouse
-            const heroBanner = document.querySelector('.hero-banner');
-            heroBanner.addEventListener('mouseenter', stopAutoPlay);
-            heroBanner.addEventListener('mouseleave', startAutoPlay);
-
-            // Inicia o carrossel
-            startAutoPlay();
-
-
-
-
-            function checkLoginStatus() {
-                const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-                const userDropdown = document.getElementById('user-dropdown');
-                const loginStatus = document.getElementById('login-status');
-
-                if (userDropdown && loginStatus) {
-                    if (isLoggedIn) {
-                        userDropdown.classList.add('user-logged-in');
-                        const userFullName = localStorage.getItem('userFullName');
-                        const userEmail = localStorage.getItem('userEmail');
-
-                        if (userFullName) {
-                            loginStatus.textContent = userFullName;
-                        } else if (userEmail) {
-                            loginStatus.textContent = userEmail.split('@')[0];
-                        } else {
-                            loginStatus.textContent = 'Minha Conta';
-                        }
-                    } else {
-                        userDropdown.classList.remove('user-logged-in');
-                        loginStatus.textContent = 'Login';
-                    }
-                }
-            }
-
-            // Inicializar componentes
-            initHeroCarousel();
-            checkLoginStatus();
-
-        });
-    </script>
-
 
 </body>
 
