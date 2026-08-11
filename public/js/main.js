@@ -2,6 +2,71 @@
 
 document.addEventListener('DOMContentLoaded', function () {
 
+    // Cursor personalizado compartilhado pelas páginas públicas do sistema.
+    // Em touch e com redução de movimento, o cursor nativo é preservado.
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const hasFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+    if (hasFinePointer && !prefersReducedMotion) {
+        const cursorDot = document.createElement('span');
+        const cursorRing = document.createElement('span');
+        cursorDot.className = 'oil-cursor-dot';
+        cursorRing.className = 'oil-cursor-ring';
+        cursorDot.setAttribute('aria-hidden', 'true');
+        cursorRing.setAttribute('aria-hidden', 'true');
+        document.body.append(cursorDot, cursorRing);
+        document.documentElement.classList.add('has-custom-cursor');
+
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let ringX = mouseX;
+        let ringY = mouseY;
+        let cursorRunning = false;
+
+        function animateCursor() {
+            ringX += (mouseX - ringX) * 0.18;
+            ringY += (mouseY - ringY) * 0.18;
+            cursorRing.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
+
+            if (Math.abs(mouseX - ringX) > 0.1 || Math.abs(mouseY - ringY) > 0.1) {
+                requestAnimationFrame(animateCursor);
+            } else {
+                cursorRunning = false;
+            }
+        }
+
+        window.addEventListener('mousemove', function (event) {
+            mouseX = event.clientX;
+            mouseY = event.clientY;
+            cursorDot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
+            if (!cursorRunning) {
+                cursorRunning = true;
+                requestAnimationFrame(animateCursor);
+            }
+        }, { passive: true });
+
+        document.addEventListener('mouseover', function (event) {
+            if (event.target.closest('a, button, input, select, textarea, .service-card, .workshop-card')) {
+                cursorRing.classList.add('is-hover');
+            }
+        });
+        document.addEventListener('mouseout', function (event) {
+            if (event.target.closest('a, button, input, select, textarea, .service-card, .workshop-card')) {
+                cursorRing.classList.remove('is-hover');
+            }
+        });
+        document.addEventListener('mousedown', () => cursorRing.classList.add('is-click'));
+        document.addEventListener('mouseup', () => cursorRing.classList.remove('is-click'));
+        document.addEventListener('mouseleave', () => {
+            cursorDot.style.opacity = '0';
+            cursorRing.style.opacity = '0';
+        });
+        document.addEventListener('mouseenter', () => {
+            cursorDot.style.opacity = '';
+            cursorRing.style.opacity = '';
+        });
+    }
+
     // =============================================
     // FUNCIONALIDADES GLOBAIS (todas as páginas)
     // =============================================

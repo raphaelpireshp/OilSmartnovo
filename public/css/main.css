@@ -7843,3 +7843,66 @@ select option[style*="color: #f4a261"] {
         --border-light: #1f2937;
     }
 }
+/* ===== CURSOR PERSONALIZADO OILSMART ===== */
+.has-custom-cursor,
+.has-custom-cursor * {
+    cursor: none !important;
+}
+
+.oil-cursor-dot,
+.oil-cursor-ring {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    border-radius: 50%;
+    opacity: 0;
+    z-index: 10000;
+    transform: translate(-50%, -50%);
+    will-change: transform;
+}
+
+.oil-cursor-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--accent-color, #ffd700);
+    transition: opacity 150ms ease;
+}
+
+.oil-cursor-ring {
+    width: 36px;
+    height: 36px;
+    border: 1.5px solid rgba(255, 215, 0, .48);
+    transition: width 200ms ease, height 200ms ease, border-color 200ms ease, background 200ms ease, opacity 150ms ease;
+}
+
+.oil-cursor-ring.is-hover {
+    width: 56px;
+    height: 56px;
+    border-color: var(--secondary-light, #d4b15f);
+    background: rgba(180, 148, 52, .13);
+}
+
+.oil-cursor-ring.is-click {
+    width: 42px;
+    height: 42px;
+    border-color: var(--accent-color, #ffd700);
+    background: rgba(255, 215, 0, .18);
+}
+
+.has-custom-cursor .oil-cursor-dot,
+.has-custom-cursor .oil-cursor-ring {
+    opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .has-custom-cursor,
+    .has-custom-cursor * {
+        cursor: auto !important;
+    }
+
+    .oil-cursor-dot,
+    .oil-cursor-ring {
+        display: none;
+    }
+}

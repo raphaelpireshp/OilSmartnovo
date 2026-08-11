@@ -1,336 +1,214 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OilSmart - Sistema de Agendamento para Oficinas</title>
-    <link rel="stylesheet" href="../css/index.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
+    <meta name="description" content="OilSmart: encontre oficinas, receba a recomendação certa e agende a troca de óleo do seu veículo.">
+    <title>OilSmart — Seu carro em dia, sem complicação</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/index.css">
     <link rel="icon" href="/img/tentativa3.png" type="image/x-icon">
 </head>
-
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="logo">
+    <header class="header" id="topo">
+        <div class="container header-inner">
+            <a class="brand" href="#topo" aria-label="OilSmart — início">
                 <img src="/img/oilamarelo.png" alt="OilSmart">
-                <p class="site-subtitle">Sistema Inteligente de Agendamento para Oficinas</p>
-
-            </div>
+            </a>
+            <nav class="landing-nav" aria-label="Navegação principal">
+                <a href="#solucoes">Soluções</a>
+                <a href="#como-funciona">Como funciona</a>
+                <a href="#oficinas">Para oficinas</a>
+                <a href="#aplicativo">Aplicativo</a>
+            </nav>
+            <a class="header-cta" href="/html/Início.html">Acessar plataforma <i class="fas fa-arrow-right"></i></a>
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <h2>Bem-vindo ao OilSmart</h2>
-                <p>Uma plataforma completa que conecta clientes a oficinas especializadas em troca de óleo e serviços
-                    automotivos</p>
-                <div class="hero-buttons">
-                    <a href="#client-section" class="btn btn-primary">Sou Cliente</a>
-                    <a href="#admin-section" class="btn btn-secondary">Sou Administrador</a>
+    <main>
+        <section class="hero" aria-labelledby="hero-title">
+            <div class="hero-media" aria-hidden="true"></div>
+            <div class="hero-shade" aria-hidden="true"></div>
+            <div class="container hero-layout">
+                <div class="hero-content">
+                    <span class="eyebrow"><span></span> Manutenção automotiva, do jeito certo</span>
+                    <h1 id="hero-title">Seu carro em dia.<br><em>Sem perder tempo.</em></h1>
+                    <p>Encontre oficinas, receba a indicação certa para o seu veículo e agende o serviço em poucos minutos.</p>
+                    <div class="hero-buttons">
+                        <a href="/html/Início.html" class="btn btn-primary">Agendar agora <i class="fas fa-arrow-right"></i></a>
+                        <a href="#oficinas" class="btn btn-outline">Sou uma oficina</a>
+                    </div>
+                </div>
+                <div class="hero-specs" aria-label="Diferenciais OilSmart">
+                    <div><strong>01</strong><span>Oficinas<br>próximas</span></div>
+                    <div><strong>02</strong><span>Óleo certo<br>para o veículo</span></div>
+                    <div><strong>03</strong><span>Horário<br>confirmado</span></div>
                 </div>
             </div>
-            <div class="hero-oil">
-                <img src="../img/sistema-oilsmart.png" alt="Sistema OilSmart" class="hero-oil">
-            </div>
-        </div>
-    </section>
+            <a class="hero-scroll" href="#solucoes"><span></span> Conheça a plataforma</a>
+        </section>
 
-    <!-- Client Section -->
-    <section id="client-section" class="section client-section">
-        <div class="container">
-            <h2 class="section-title">Para Clientes</h2>
-            <p class="section-subtitle">Agende serviços automotivos de forma rápida e inteligente</p>
+        <section class="audience-strip" id="solucoes" aria-label="Escolha seu acesso">
+            <a class="audience-panel audience-client" href="/html/Início.html">
+                <span class="panel-index">01 / CLIENTE</span>
+                <div>
+                    <h2>Precisa cuidar do seu veículo?</h2>
+                    <p>Agende serviços e acompanhe tudo em um só lugar.</p>
+                </div>
+                <span class="panel-link">Entrar como cliente <i class="fas fa-arrow-right"></i></span>
+            </a>
+            <a class="audience-panel audience-admin" href="/html/login-adm.html">
+                <span class="panel-index">02 / OFICINA</span>
+                <div>
+                    <h2>Quer organizar melhor sua oficina?</h2>
+                    <p>Controle agenda, estoque e operação com mais precisão.</p>
+                </div>
+                <span class="panel-link">Acessar gestão <i class="fas fa-arrow-right"></i></span>
+            </a>
+        </section>
 
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-search"></i>
+        <section class="section services-section" aria-labelledby="services-title">
+            <div class="container">
+                <div class="section-heading">
+                    <div>
+                        <span class="kicker">OILSMART / SERVIÇOS</span>
+                        <h2 id="services-title">Tudo o que a manutenção pede.<br>Sem o caminho complicado.</h2>
                     </div>
-                    <h3>Encontre Oficinas</h3>
-                    <p>Localize as melhores oficinas próximas a você com base em avaliações e serviços oferecidos</p>
+                    <p>Da escolha do produto ao comprovante final, a OilSmart concentra cada etapa da manutenção em uma experiência clara.</p>
                 </div>
 
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-calendar-check"></i>
-                    </div>
-                    <h3>Agendamento Online</h3>
-                    <p>Agende serviços de troca de óleo e manutenção em poucos cliques, sem complicação</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">
+                <div class="service-ledger">
+                    <article class="service-row">
+                        <span class="service-number">01</span>
+                        <i class="fas fa-location-dot"></i>
+                        <h3>Encontre oficinas</h3>
+                        <p>Localize opções próximas e escolha com mais segurança.</p>
+                    </article>
+                    <article class="service-row">
+                        <span class="service-number">02</span>
                         <i class="fas fa-oil-can"></i>
-                    </div>
-                    <h3>Recomendações Inteligentes</h3>
-                    <p>Receba recomendações personalizadas de óleo e filtros para o seu veículo</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-history"></i>
-                    </div>
-                    <h3>Histórico Completo</h3>
-                    <p>Acompanhe todo o histórico de serviços do seu veículo em um só lugar</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-bell"></i>
-                    </div>
-                    <h3>Lembretes Automáticos</h3>
-                    <p>Receba notificações quando for hora da próxima troca de óleo</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-file-invoice"></i>
-                    </div>
-                    <h3>Comprovantes Digitais</h3>
-                    <p>Baixe comprovantes de agendamento e serviços realizados em formato PDF</p>
+                        <h3>Use o produto certo</h3>
+                        <p>Receba recomendações compatíveis com seu veículo.</p>
+                    </article>
+                    <article class="service-row">
+                        <span class="service-number">03</span>
+                        <i class="fas fa-calendar-check"></i>
+                        <h3>Agende online</h3>
+                        <p>Escolha data e horário sem ligação ou espera.</p>
+                    </article>
+                    <article class="service-row">
+                        <span class="service-number">04</span>
+                        <i class="fas fa-gauge-high"></i>
+                        <h3>Acompanhe seu histórico</h3>
+                        <p>Consulte serviços, comprovantes e próximos cuidados.</p>
+                    </article>
                 </div>
             </div>
+        </section>
 
-            <div class="process-steps">
-                <h3>Como funciona para clientes:</h3>
-                <div class="steps-container">
-                    <div class="step">
-                        <div class="step-number">1</div>
-                        <h4>Cadastre seu veículo</h4>
-                        <p>Informe marca, modelo, ano e quilometragem do seu carro</p>
+        <section class="process-section" id="como-funciona" aria-labelledby="process-title">
+            <div class="container process-grid">
+                <div class="process-intro">
+                    <span class="kicker kicker-light">PROCESSO / 4 ETAPAS</span>
+                    <h2 id="process-title">Da garagem à oficina em poucos minutos.</h2>
+                    <p>Um fluxo simples, pensado para quem quer resolver a manutenção e seguir o dia.</p>
+                    <a href="/html/Início.html" class="text-link">Começar agendamento <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <ol class="process-list">
+                    <li><span>01</span><div><strong>Cadastre o veículo</strong><p>Marca, modelo, ano e quilometragem.</p></div></li>
+                    <li><span>02</span><div><strong>Selecione o serviço</strong><p>Veja recomendações adequadas para o carro.</p></div></li>
+                    <li><span>03</span><div><strong>Escolha a oficina</strong><p>Defina o melhor local, dia e horário.</p></div></li>
+                    <li><span>04</span><div><strong>Serviço confirmado</strong><p>Compareça e mantenha o histórico atualizado.</p></div></li>
+                </ol>
+            </div>
+        </section>
+
+        <section class="section workshop-section" id="oficinas" aria-labelledby="workshop-title">
+            <div class="container workshop-layout">
+                <div class="workshop-copy">
+                    <span class="kicker">GESTÃO PARA OFICINAS</span>
+                    <h2 id="workshop-title">Mais controle no box.<br>Mais ritmo no negócio.</h2>
+                    <p>Uma central operacional para organizar atendimentos, produtos e decisões sem depender de planilhas espalhadas.</p>
+                    <ul class="workshop-benefits">
+                        <li><i class="fas fa-check"></i> Agenda e capacidade de atendimento</li>
+                        <li><i class="fas fa-check"></i> Estoque e alertas de reposição</li>
+                        <li><i class="fas fa-check"></i> Indicadores e relatórios de desempenho</li>
+                        <li><i class="fas fa-check"></i> Conclusão rápida por protocolo</li>
+                    </ul>
+                    <a href="/html/login-adm.html" class="btn btn-dark">Acessar painel administrativo <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="dashboard-preview" aria-label="Resumo visual do painel OilSmart">
+                    <div class="dash-top"><span>OILSMART / OPERAÇÃO</span><i class="fas fa-ellipsis"></i></div>
+                    <div class="dash-main-number"><span>Atendimentos hoje</span><strong>24</strong><small>+12% esta semana</small></div>
+                    <div class="dash-bars" aria-hidden="true">
+                        <span style="height:38%"></span><span style="height:52%"></span><span style="height:43%"></span><span style="height:70%"></span><span style="height:62%"></span><span style="height:88%"></span><span style="height:76%"></span>
                     </div>
-                    <div class="step">
-                        <div class="step-number">2</div>
-                        <h4>Escolha serviços e produtos</h4>
-                        <p>Selecione os serviços desejados e receba recomendações de produtos</p>
-                    </div>
-                    <div class="step">
-                        <div class="step-number">3</div>
-                        <h4>Agende data e horário</h4>
-                        <p>Escolha a oficina e agende o melhor horário para você</p>
-                    </div>
-                    <div class="step">
-                        <div class="step-number">4</div>
-                        <h4>Compareça e aproveite</h4>
-                        <p>Leve seu veículo na data agendada e receba um serviço de qualidade</p>
+                    <div class="dash-metrics">
+                        <div><span>Confirmados</span><strong>18</strong></div>
+                        <div><span>Em serviço</span><strong>06</strong></div>
+                        <div><span>Estoque crítico</span><strong>03</strong></div>
                     </div>
                 </div>
             </div>
+        </section>
 
-            <div class="cta-section">
-                <a href="/html/Início.html" class="btn btn-large btn-primary">Acessar Área do Cliente</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Admin Section -->
-    <section id="admin-section" class="section admin-section">
-        <div class="container">
-            <h2 class="section-title">Para Administradores</h2>
-            <p class="section-subtitle">Gerencie sua oficina com eficiência e precisão</p>
-
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-tachometer-alt"></i>
-                    </div>
-                    <h3>Dashboard Completo</h3>
-                    <p>Visualize métricas importantes e o desempenho da sua oficina em tempo real</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-calendar-alt"></i>
-                    </div>
-                    <h3>Gestão de Agendamentos</h3>
-                    <p>Controle todos os agendamentos, confirme serviços e gerencie horários</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-boxes"></i>
-                    </div>
-                    <h3>Controle de Estoque</h3>
-                    <p>Monitore produtos, receba alertas de reposição e gerencie inventário</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-chart-bar"></i>
-                    </div>
-                    <h3>Relatórios Detalhados</h3>
-                    <p>Gere relatórios de vendas, serviços mais populares e desempenho financeiro</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-cog"></i>
-                    </div>
-                    <h3>Configurações Personalizadas</h3>
-                    <p>Defina horários de funcionamento, capacidade de atendimento e muito mais</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-user-check"></i>
-                    </div>
-                    <h3>Conclusão Rápida</h3>
-                    <p>Finalize agendamentos rapidamente usando o protocolo do cliente</p>
-                </div>
-            </div>
-
-            <div class="admin-benefits">
-                <h3>Vantagens para sua oficina:</h3>
-                <ul class="benefits-list">
-                    <li><i class="fas fa-check"></i> Otimização do fluxo de agendamentos</li>
-                    <li><i class="fas fa-check"></i> Redução de tempo ocioso</li>
-                    <li><i class="fas fa-check"></i> Melhor experiência para o cliente</li>
-                    <li><i class="fas fa-check"></i> Controle preciso do estoque</li>
-                    <li><i class="fas fa-check"></i> Insights valiosos sobre o negócio</li>
-                    <li><i class="fas fa-check"></i> Aumento da produtividade da equipe</li>
-                </ul>
-            </div>
-
-            <div class="cta-section">
-                <a href="/html/login-adm.html" class="btn btn-large btn-secondary">Acessar Painel Administrativo</a>
-            </div>
-        </div>
-    </section>
-    <!-- App Download Section -->
-    <section class="app-download-section">
-        <div class="container">
-            <div class="app-content">
-                <div class="app-text">
-                    <h2 class="app-title">Baixe Nosso App</h2>
-                    <p class="app-subtitle">Agende serviços de troca de óleo diretamente do seu celular</p>
-
-                    <div class="app-features">
-                        <div class="app-feature">
-                            <i class="fas fa-bolt"></i>
-                            <span>Agendamento rápido em 2 minutos</span>
-                        </div>
-                        <div class="app-feature">
-                            <i class="fas fa-bell"></i>
-                            <span>Lembretes inteligentes</span>
-                        </div>
-                        <div class="app-feature">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span>Localização de oficinas próximas</span>
-                        </div>
-                        <div class="app-feature">
-                            <i class="fas fa-history"></i>
-                            <span>Histórico completo de serviços</span>
-                        </div>
-                    </div>
-
-                    <div class="download-buttons">
-                        <a href="#" class="download-btn app-store">
-                            <i class="fab fa-apple"></i>
-                            <div class="btn-text">
-                                <span>Disponível na</span>
-                                <strong>App Store</strong>
-                            </div>
-                        </a>
-                        <a href="#" class="download-btn google-play">
-                            <i class="fab fa-google-play"></i>
-                            <div class="btn-text">
-                                <span>Disponível no</span>
-                                <strong>Google Play</strong>
-                            </div>
-                        </a>
-                    </div>
-
-                    <p class="app-note">⚠️ Disponível apenas para clientes</p>
-                </div>
-
+        <section class="app-download-section" id="aplicativo" aria-labelledby="app-title">
+            <div class="container app-content">
                 <div class="app-preview">
                     <div class="phone-mockup">
-                        <div class="phone-screen">
-                            <img src="../img/mobile.jpg" alt="Preview do App OilSmart" class="app-screenshot">
-                            alt="Preview do App OilSmart" class="app-screenshot">
-                        </div>
+                        <div class="phone-screen"><img src="../img/mobile.jpg" alt="Aplicativo OilSmart no celular" class="app-screenshot"></div>
                     </div>
+                    <span class="app-orbit" aria-hidden="true">OILSMART • MOBILIDADE • OILSMART •</span>
+                </div>
+                <div class="app-text">
+                    <span class="kicker kicker-light">OILSMART NO BOLSO</span>
+                    <h2 id="app-title">Seu próximo serviço já pode estar agendado.</h2>
+                    <p>Consulte oficinas, receba lembretes e tenha o histórico do veículo sempre à mão.</p>
+                    <div class="app-features">
+                        <span><i class="fas fa-bolt"></i> Agendamento rápido</span>
+                        <span><i class="fas fa-bell"></i> Lembretes inteligentes</span>
+                        <span><i class="fas fa-location-dot"></i> Oficinas próximas</span>
+                        <span><i class="fas fa-clock-rotate-left"></i> Histórico completo</span>
+                    </div>
+                    <div class="download-buttons">
+                        <a href="#" class="download-btn" aria-label="Disponível na App Store"><i class="fab fa-apple"></i><span>Disponível na<strong>App Store</strong></span></a>
+                        <a href="#" class="download-btn" aria-label="Disponível no Google Play"><i class="fab fa-google-play"></i><span>Disponível no<strong>Google Play</strong></span></a>
+                    </div>
+                    <small>Aplicativo disponível para clientes.</small>
                 </div>
             </div>
-        </div>
-    </section>
-    <!-- Footer -->
+        </section>
+    </main>
+
     <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-brand">
-                    <img src="/img/fjkaemfkemif.png" alt="OilSmart" class="footer-logo">
-                    <p>Soluções completas para seu veículo</p>
-                </div>
-                <div class="footer-links">
-                    <h3>Links Úteis</h3>
-                    <ul>
-                        <li><a href="/html/politicas.html">Política de Privacidade</a></li>
-                        <li><a href="/html/termos.html">Termos de Serviço</a></li>
-                        <li><a href="/html/faq.html">Perguntas Frequentes</a></li>
-                    </ul>
-                </div>
-                <div class="footer-contact">
-                    <h3>Contato</h3>
-                    <p><i class="fas fa-phone"></i> (11) 4002-8922</p>
-                    <p><i class="fas fa-envelope"></i> contato@OilSmart.com.br</p>
-                </div>
-            </div>
-            <div class="copyright">
-                <p>© 2025 OilSmart. Todos os direitos reservados.</p>
-            </div>
+        <div class="container footer-content">
+            <div class="footer-brand"><img src="/img/fjkaemfkemif.png" alt="OilSmart"><p>Manutenção automotiva mais simples, conectada e inteligente.</p></div>
+            <div class="footer-links"><h3>OilSmart</h3><a href="#solucoes">Soluções</a><a href="#como-funciona">Como funciona</a><a href="#oficinas">Para oficinas</a></div>
+            <div class="footer-links"><h3>Informações</h3><a href="/html/politicas.html">Privacidade</a><a href="/html/termos.html">Termos de serviço</a><a href="/html/faq.html">Perguntas frequentes</a></div>
+            <div class="footer-contact"><h3>Contato</h3><a href="tel:+551140028922">(11) 4002-8922</a><a href="mailto:contato@OilSmart.com.br">contato@OilSmart.com.br</a></div>
         </div>
+        <div class="container footer-bottom"><span>© 2025 OilSmart. Todos os direitos reservados.</span><a href="#topo">Voltar ao topo <i class="fas fa-arrow-up"></i></a></div>
     </footer>
 
-    <!-- Chatbot Widget -->
-    <div id="chatbot-widget" class="chatbot-widget">
+    <div id="chatbot-widget" class="chatbot-widget" aria-label="Assistente OilSmart">
         <div class="chatbot-header">
-            <div class="chatbot-avatar">
-                <i class="fas fa-oil-can"></i>
-            </div>
-            <div class="chatbot-info">
-                <h4>OilSmart Assistente</h4>
-            </div>
-            <button id="chatbot-close" class="chatbot-close">
-                <i class="fas fa-times"></i>
-            </button>
+            <div class="chatbot-avatar"><i class="fas fa-oil-can"></i></div>
+            <div class="chatbot-info"><h4>OilSmart Assistente</h4><span>Online agora</span></div>
+            <button id="chatbot-close" class="chatbot-close" aria-label="Fechar assistente"><i class="fas fa-times"></i></button>
         </div>
         <div id="chatbot-messages" class="chatbot-messages">
             <div class="chatbot-message bot-message">
-                <div class="message-avatar">
-                    <i class="fas fa-oil-can"></i>
-                </div>
-                <div class="message-content">
-                    <p>Olá! Sou o assistente virtual da OilSmart. Como posso ajudá-lo hoje?</p>
-                    <div class="quick-options">
-                        <button class="quick-option" data-option="agendamento">📅 Agendar serviço</button>
-                        <button class="quick-option" data-option="duvidas">❓ Tirar dúvidas</button>
-                    </div>
-                </div>
+                <div class="message-avatar"><i class="fas fa-oil-can"></i></div>
+                <div class="message-content"><p>Olá! Como posso ajudar?</p><div class="quick-options"><button class="quick-option" data-option="agendamento">Agendar serviço</button><button class="quick-option" data-option="duvidas">Tirar dúvidas</button></div></div>
             </div>
         </div>
-        <div class="chatbot-input">
-            <input type="text" id="chatbot-input" placeholder="Digite sua mensagem..." maxlength="200">
-            <button id="chatbot-send">
-                <i class="fas fa-paper-plane"></i>
-            </button>
-        </div>
+        <div class="chatbot-input"><input type="text" id="chatbot-input" placeholder="Digite sua mensagem..." maxlength="200"><button id="chatbot-send" aria-label="Enviar mensagem"><i class="fas fa-paper-plane"></i></button></div>
     </div>
-
-    <!-- Botão de abertura do chatbot -->
-    <button id="chatbot-toggle" class="chatbot-toggle">
-        <i class="fas fa-comments"></i>
-        <span class="chatbot-notification"></span>
-    </button>
+    <button id="chatbot-toggle" class="chatbot-toggle" aria-label="Abrir assistente"><i class="fas fa-comments"></i><span class="chatbot-notification"></span></button>
 
     <script src="../js/index.js"></script>
 </body>
-
 </html>

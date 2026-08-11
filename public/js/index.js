@@ -1,5 +1,70 @@
 // index.js
 document.addEventListener('DOMContentLoaded', function () {
+    // Cursor personalizado: acompanha o mouse com um ponto e um anel suave,
+    // sem ser ativado em telas touch ou para quem reduz movimentos.
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const hasFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+    if (hasFinePointer && !prefersReducedMotion) {
+        const cursorDot = document.createElement('span');
+        const cursorRing = document.createElement('span');
+        cursorDot.className = 'oil-cursor-dot';
+        cursorRing.className = 'oil-cursor-ring';
+        cursorDot.setAttribute('aria-hidden', 'true');
+        cursorRing.setAttribute('aria-hidden', 'true');
+        document.body.append(cursorDot, cursorRing);
+        document.documentElement.classList.add('has-custom-cursor');
+
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let ringX = mouseX;
+        let ringY = mouseY;
+        let cursorRunning = false;
+
+        function animateCursor() {
+            ringX += (mouseX - ringX) * 0.18;
+            ringY += (mouseY - ringY) * 0.18;
+            cursorRing.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
+
+            if (Math.abs(mouseX - ringX) > 0.1 || Math.abs(mouseY - ringY) > 0.1) {
+                requestAnimationFrame(animateCursor);
+            } else {
+                cursorRunning = false;
+            }
+        }
+
+        window.addEventListener('mousemove', function (event) {
+            mouseX = event.clientX;
+            mouseY = event.clientY;
+            cursorDot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
+            if (!cursorRunning) {
+                cursorRunning = true;
+                requestAnimationFrame(animateCursor);
+            }
+        }, { passive: true });
+
+        document.addEventListener('mouseover', function (event) {
+            if (event.target.closest('a, button, input, .service-row, .audience-panel')) {
+                cursorRing.classList.add('is-hover');
+            }
+        });
+        document.addEventListener('mouseout', function (event) {
+            if (event.target.closest('a, button, input, .service-row, .audience-panel')) {
+                cursorRing.classList.remove('is-hover');
+            }
+        });
+        document.addEventListener('mousedown', () => cursorRing.classList.add('is-click'));
+        document.addEventListener('mouseup', () => cursorRing.classList.remove('is-click'));
+        document.addEventListener('mouseleave', () => {
+            cursorDot.style.opacity = '0';
+            cursorRing.style.opacity = '0';
+        });
+        document.addEventListener('mouseenter', () => {
+            cursorDot.style.opacity = '';
+            cursorRing.style.opacity = '';
+        });
+    }
+
     // Smooth scrolling for anchor links
     const anchorLinks = document.querySelectorAll('a[href^="#"]');
 
@@ -56,31 +121,12 @@ document.addEventListener('DOMContentLoaded', function () {
         observer.observe(step);
     });
 
-    // Add hover effect to buttons
-    const buttons = document.querySelectorAll('.btn');
-
-    buttons.forEach(button => {
-        button.addEventListener('mouseenter', function () {
-            this.style.transform = 'translateY(-2px)';
-        });
-
-        button.addEventListener('mouseleave', function () {
-            this.style.transform = 'translateY(0)';
-        });
-    });
-
     // Add scroll effect to header
     const header = document.querySelector('.header');
 
     window.addEventListener('scroll', function () {
-        if (window.scrollY > 50) {
-            header.style.padding = '15px 0';
-            header.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
-        } else {
-            header.style.padding = '30px 0';
-            header.style.boxShadow = 'none';
-        }
-    });
+        header.classList.toggle('is-scrolled', window.scrollY > 40);
+    }, { passive: true });
 
     // Chatbot functionality
     const chatbotToggle = document.getElementById('chatbot-toggle');
